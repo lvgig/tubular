@@ -1,0 +1,7 @@
+### profile may optionally select or skip tests
+
+# skip B101 test (assert used) in test scripts and tubular/testing/helpers.py which uses
+# assert as the functions are intended to be used in tests
+assert_used:
+  skips: ['*/test_*.py', '*tubular/testing/helpers.py']
+
