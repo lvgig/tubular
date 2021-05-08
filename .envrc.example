@@ -1,0 +1,2 @@
+# For Sphinx build documentation
+export SPHINX_BUILD_DIR=
