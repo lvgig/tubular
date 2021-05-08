@@ -37,7 +37,7 @@ class CappingTransformer(BaseTransformer):
         supplied.
 
     weights_column : str or None, default = None
-        Optional weights column argumnet that can be used in combination with quantiles. Not used
+        Optional weights column argument that can be used in combination with quantiles. Not used
         if capping_values is supplied. Allows weighted quantiles to be calculated.
 
     **kwargs
@@ -451,7 +451,7 @@ class OutOfRangeNullTransformer(CappingTransformer):
         in the lists cannot be None. Either one of capping_values or quantiles must be supplied.
 
     weights_column : str or None, default = None
-        Optional weights column argumnet that can be used in combination with quantiles. Not used
+        Optional weights column argument that can be used in combination with quantiles. Not used
         if capping_values is supplied. Allows weighted quantiles to be calculated.
 
     **kwargs

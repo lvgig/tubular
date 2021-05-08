@@ -160,7 +160,7 @@ def test_mocker_patch_object_call(mocker):
 
 
 def test_successful_function_call(mocker):
-    """Test a successful function call with the correct argumnets specified."""
+    """Test a successful function call with the correct arguments specified."""
 
     expected_call_arguments = {
         0: {"args": ("a",), "kwargs": {"other": 1}},
