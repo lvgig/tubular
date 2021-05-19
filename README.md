@@ -1,19 +1,19 @@
-# tubular 
+# tubular
 
 ----
 
-`tubular` implements transformers for pre processing steps commonly used in machine learning pipelines. 
+`tubular` implements transformers for pre processing steps commonly used in machine learning pipelines.
 
-The transformers are compatible with scikit-learn [Pipelines](https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html), having a `transform` method to apply the pre processing step to data and a `fit` method to learn the relevant information from the data, if applicable. 
+The transformers are compatible with scikit-learn [Pipelines](https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html), having a `transform` method to apply the pre processing step to data and a `fit` method to learn the relevant information from the data, if applicable.
 
-The transformers in `tubular` work with data in [pandas DataFrames](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html). 
+The transformers in `tubular` work with data in [pandas DataFrames](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html).
 
 There are a variety of transformers to assist with;
 
 - capping
 - imputation
 - mapping
-- date differencing 
+- date differencing
 - categorical encoding
 - numeric operations
 
@@ -36,21 +36,21 @@ capper = CappingTransformer(columns=['INDUS', 'RM'], cap_value_max = 20)
 X_capped = capper.transform(X)
 ```
 
-# Installation
+## Installation
 
 tubular can be installed from PyPI simply with;
 
  `pip install tubular`
 
-# Documentation
+## Documentation
 
 Documentation for tubular can be found on [readthedocs](https://tubular.readthedocs.io/en/latest/).
 
-# Examples
+## Examples
 
 To help get started there are example notebooks in the [examples](https://github.com/lvgig/tubular/tree/master/examples) folder that show how to use each transformer as well as an example of putting several together in a Pipeline.
 
-# Build and test
+## Build and test
 
 The test framework we are using for this project is [pytest](https://docs.pytest.org/en/stable/), to run the tests follow the steps below.
 
@@ -73,9 +73,8 @@ Then run the tests simply with pytest
 pytest
 ```
 
-# Contribute
+## Contribute
 
-`tubular` is under active development, we're super excited if you're interested in contributing! See the `CONTRIBUTING.md` for the full details of our working practices. 
+`tubular` is under active development, we're super excited if you're interested in contributing! See the `CONTRIBUTING.md` for the full details of our working practices.
 
 For bugs and feature requests please open an [issue](https://github.com/lvgig/tubular/issues).
-
