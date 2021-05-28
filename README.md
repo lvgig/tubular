@@ -48,7 +48,7 @@ To build local documentation, specify the environment variable $SPHINX_BUILD_DIR
 run from the `docs/` directory
 
 ```shell
-sphinx-apidoc -fMe ../tubular -o source/api
+make apidoc
 make html
 ```
 
