@@ -654,7 +654,7 @@ def assert_function_call_count(mocker, target, attribute, expected_n_calls, **kw
         Expected number of calls to target.attribute.
 
     **kwargs : any
-        Arbitrary keyword argumnets passed on to mocker.patch.object.
+        Arbitrary keyword arguments passed on to mocker.patch.object.
 
     Examples
     --------
@@ -717,7 +717,7 @@ def assert_function_call(mocker, target, attribute, expected_calls_args, **kwarg
         args ('a','b') and keyword args {'c': 1}. See the example section below for more examples.
 
     **kwargs : any
-        Arbitrary keyword argumnets passed on to mocker.patch.object.
+        Arbitrary keyword arguments passed on to mocker.patch.object.
 
     Examples
     --------

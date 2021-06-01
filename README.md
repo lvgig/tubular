@@ -44,7 +44,13 @@ tubular can be installed from PyPI simply with;
 
 ## Documentation
 
-Documentation for tubular can be found on [readthedocs](https://tubular.readthedocs.io/en/latest/).
+To build local documentation, specify the environment variable $SPHINX_BUILD_DIR$, and then
+run from the `docs/` directory
+
+```shell
+make apidoc
+make html
+```
 
 ## Examples
 

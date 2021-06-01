@@ -368,7 +368,7 @@ class SeriesDtMethodTransformer(BaseTransformer):
         The name of the pandas.DataFrame method to call.
 
     pd_method_kwargs : dict
-        Dictionary of keyword argumnets to call the pd.Series.dt method with.
+        Dictionary of keyword arguments to call the pd.Series.dt method with.
 
     """
 
@@ -508,13 +508,13 @@ class BetweenDatesTransformer(BaseTransformer):
         column_upper].
 
     new_column_name : str
-        new_column_name argumnet passed when initialising the transformer.
+        new_column_name argument passed when initialising the transformer.
 
     lower_inclusive : bool
-        lower_inclusive argumnet passed when initialising the transformer.
+        lower_inclusive argument passed when initialising the transformer.
 
     upper_inclusive : bool
-        upper_inclusive argumnet passed when initialising the transformer.
+        upper_inclusive argument passed when initialising the transformer.
 
     """
 
