@@ -7,3 +7,5 @@ pytest-benchmark
 black>=19.10b0
 flake8==3.8.4
 bandit>=1.7.0
+sphinx==4.0.2
+sphinx-rtd-theme==0.5.2 
