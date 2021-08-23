@@ -282,9 +282,7 @@ class NearestMeanResponseImputer(BaseImputer):
         when the transform method is called.
     """
 
-    def __init__(
-        self, response_column, columns=None, **kwds
-    ):
+    def __init__(self, response_column, columns=None, **kwds):
 
         if not type(response_column) is str:
 
@@ -327,7 +325,7 @@ class NearestMeanResponseImputer(BaseImputer):
             if c_nulls.sum() == 0:
 
                 raise ValueError(
-                        f"Column {c} has no missing values, cannot use this transformer."
+                    f"Column {c} has no missing values, cannot use this transformer."
                 )
 
             else:

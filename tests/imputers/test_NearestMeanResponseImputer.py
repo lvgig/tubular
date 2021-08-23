@@ -16,20 +16,14 @@ class TestInit(object):
 
         h.test_function_arguments(
             func=NearestMeanResponseImputer.__init__,
-            expected_arguments=[
-                "self",
-                "response_column",
-                "columns",
-            ],
-            expected_default_values=(False, None),
+            expected_arguments=["self", "response_column", "columns"],
+            expected_default_values=(None,),
         )
 
     def test_class_methods(self):
         """Test that NearestMeanResponseImputer has fit and transform methods."""
 
-        x = NearestMeanResponseImputer(
-            response_column="c",  columns=None
-        )
+        x = NearestMeanResponseImputer(response_column="c", columns=None)
 
         h.test_object_method(obj=x, expected_method="fit", msg="fit")
 
@@ -38,9 +32,7 @@ class TestInit(object):
     def test_inheritance(self):
         """Test that NearestMeanResponseImputer inherits from BaseImputer."""
 
-        x = NearestMeanResponseImputer(
-            response_column="c",  columns=None
-        )
+        x = NearestMeanResponseImputer(response_column="c", columns=None)
 
         h.assert_inheritance(x, tubular.imputers.BaseImputer)
 
@@ -56,10 +48,7 @@ class TestInit(object):
         ):
 
             NearestMeanResponseImputer(
-                response_column="c",
-                columns=None,
-                verbose=True,
-                copy=True,
+                response_column="c", columns=None, verbose=True, copy=True,
             )
 
     def test_response_column_not_str_error(self):
@@ -69,19 +58,14 @@ class TestInit(object):
 
             NearestMeanResponseImputer(response_column=0)
 
-
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that the values passed in init are saved in an attribute of the same name."""
 
-        x = NearestMeanResponseImputer(
-            response_column="c", columns="a",
-        )
+        x = NearestMeanResponseImputer(response_column="c", columns="a",)
 
         h.test_object_attributes(
             obj=x,
-            expected_attributes={
-                "response_column": "c",
-            },
+            expected_attributes={"response_column": "c",},
             msg="Attributes for NearestMeanResponseImputer set in init",
         )
 
@@ -200,10 +184,7 @@ class TestFit(object):
         h.test_object_attributes(
             obj=x,
             expected_attributes={
-                "impute_values_": {
-                    "a": np.float64(2),
-                    "b": np.float64(3),
-                }
+                "impute_values_": {"a": np.float64(2), "b": np.float64(3),}
             },
             msg="impute_values_ attribute",
         )
@@ -219,19 +200,14 @@ class TestFit(object):
             }
         )
 
-        x = NearestMeanResponseImputer(
-            response_column="c", columns=["a", "b"]
-        )
+        x = NearestMeanResponseImputer(response_column="c", columns=["a", "b"])
 
         x.fit(df)
 
         h.test_object_attributes(
             obj=x,
             expected_attributes={
-                "impute_values_": {
-                    "a": np.float64(5),
-                    "b": np.float64(3),
-                }
+                "impute_values_": {"a": np.float64(5), "b": np.float64(3),}
             },
             msg="impute_values_ attribute",
         )
@@ -380,9 +356,7 @@ class TestTransform(object):
     def test_nulls_imputed_correctly3(self, df, expected):
         """Test missing values are filled with the correct values - with median value from separate dataframe."""
 
-        x = NearestMeanResponseImputer(
-            response_column="c", columns="a"
-        )
+        x = NearestMeanResponseImputer(response_column="c", columns="a")
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
         x.impute_values_ = {"a": 2.0}
