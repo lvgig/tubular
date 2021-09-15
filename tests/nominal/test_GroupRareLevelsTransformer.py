@@ -85,12 +85,12 @@ class TestInit(object):
 
             GroupRareLevelsTransformer(weight=2)
 
-    def test_rare_level_name_not_str_error(self):
+    '''def test_rare_level_name_not_str_error(self):
         """Test that an exception is raised if rare_level_name is not a str."""
 
         with pytest.raises(ValueError, match="rare_level_name must be a str"):
 
-            GroupRareLevelsTransformer(rare_level_name=2)
+            GroupRareLevelsTransformer(rare_level_name=2)'''
 
     def test_record_rare_levels_not_str_error(self):
         """Test that an exception is raised if record_rare_levels is not a bool."""
@@ -138,7 +138,7 @@ class TestFit(object):
 
         df = d.create_df_5()
 
-        x = GroupRareLevelsTransformer(columns=["a", "b", "c"])
+        x = GroupRareLevelsTransformer(columns=["b", "c"])
 
         expected_call_args = {0: {"args": (d.create_df_5(), None), "kwargs": {}}}
 
@@ -153,7 +153,7 @@ class TestFit(object):
 
         df = d.create_df_5()
 
-        x = GroupRareLevelsTransformer(columns=["a", "b", "c"], weight="aaaa")
+        x = GroupRareLevelsTransformer(columns=["b", "c"], weight="aaaa")
 
         with pytest.raises(ValueError, match="weight aaaa not in X"):
 
@@ -164,7 +164,7 @@ class TestFit(object):
 
         df = d.create_df_5()
 
-        x = GroupRareLevelsTransformer(columns=["a", "b", "c"])
+        x = GroupRareLevelsTransformer(columns=["b", "c"])
 
         x_fitted = x.fit(df)
 
@@ -177,7 +177,7 @@ class TestFit(object):
 
         df = d.create_df_5()
 
-        x = GroupRareLevelsTransformer(columns=["a", "b", "c"])
+        x = GroupRareLevelsTransformer(columns=["b", "c"])
 
         x.fit(df)
 
@@ -234,6 +234,51 @@ class TestFit(object):
             msg="mapping_ attribute",
         )
 
+    def test_rare_level_name_not_diff_col_type(self):
+        """Test that an exception is raised if rare_level_name is of a different type with respect columns."""
+
+        df = d.create_df_10()
+
+        with pytest.raises(ValueError, match="rare_level_name must be of the same type of the columns"):
+
+            x = GroupRareLevelsTransformer(columns = ['a', 'b'], rare_level_name=2)
+            
+            x.fit(df)
+        
+        with pytest.raises(ValueError, match="rare_level_name must be of the same type of the columns"):
+
+            x = GroupRareLevelsTransformer(columns = ['c'])
+            
+            x.fit(df)
+
+    def test_rare_level_name_same_col_type(self):
+        """Test that checks if rare_level_name is of the same type with respect columns."""
+
+        df = d.create_df_10()
+
+        label = 2.0
+        col = 'a'
+
+        x = GroupRareLevelsTransformer(columns = [col], rare_level_name=label)
+        x.fit(df)
+
+        assert pd.Series(label).dtype == df[col].dtypes
+        
+        label = 'zzzz'
+        col = 'b'
+
+        x = GroupRareLevelsTransformer(columns = [col], rare_level_name=label)
+        x.fit(df)
+
+        assert pd.Series(label).dtype == df[col].dtypes
+
+        label = 100
+        col = 'c'
+
+        x = GroupRareLevelsTransformer(columns = [col], rare_level_name=label)
+        x.fit(df)
+
+        assert pd.Series(label).dtype == df[col].dtypes
 
 class TestTransform(object):
     """Tests for GroupRareLevelsTransformer.transform()."""
@@ -287,7 +332,7 @@ class TestTransform(object):
 
         df = d.create_df_5()
 
-        x = GroupRareLevelsTransformer(columns=["a", "b", "c"])
+        x = GroupRareLevelsTransformer(columns=["b", "c"])
 
         x.fit(df)
 
@@ -304,7 +349,7 @@ class TestTransform(object):
 
         df = d.create_df_5()
 
-        x = GroupRareLevelsTransformer(columns=["a", "b", "c"])
+        x = GroupRareLevelsTransformer(columns=["b", "c"])
 
         x.fit(df)
 
@@ -325,11 +370,11 @@ class TestTransform(object):
 
         df = d.create_df_5()
 
-        x = GroupRareLevelsTransformer(columns=["a", "b", "c"])
+        x = GroupRareLevelsTransformer(columns=["b", "c"])
 
         x.fit(df)
 
-        x2 = GroupRareLevelsTransformer(columns=["a", "b", "c"])
+        x2 = GroupRareLevelsTransformer(columns=["b", "c"])
 
         x2.fit(df)
 
@@ -388,7 +433,7 @@ class TestTransform(object):
         one_row_df["c"] = one_row_df["c"].astype("category")
 
         # add rare as a category in dataframe
-        one_row_df["c"].cat.add_categories("rare", inplace=True)
+        one_row_df["c"] = one_row_df["c"].cat.add_categories('rare')
 
         x = GroupRareLevelsTransformer(columns=["b", "c"], cut_off_percent=0.2)
 

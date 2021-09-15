@@ -213,6 +213,19 @@ def create_df_9():
 
     return df
 
+def create_df_10():
+    """Create simple DataFrame to use in other tests"""
+
+    df = pd.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.NaN],
+            "b": ["a", "a", "a", "d", "e", "f", "g", np.NaN, np.NaN, np.NaN],
+            "c": [1, 1, 3, 4, 5, 6, 5, 8, 9, 50],
+        }
+    )
+
+    return df
+
 
 def create_large_null_df(n_col=1000):
     """Create large single row df with all null values.

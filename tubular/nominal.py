@@ -234,7 +234,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         Name of weights column that should be used so cut_off_percent applies to sum of weights
         rather than number of rows.
 
-    rare_level_name : str, default = 'rare'
+    rare_level_name : default = 'rare'. Must be of the same type as columns.
         Label for the new 'rare' level.
 
     record_rare_levels : bool, default = False
@@ -304,9 +304,9 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
         self.weight = weight
 
-        if not isinstance(rare_level_name, str):
+        #if not isinstance(rare_level_name, str):
 
-            raise ValueError("rare_level_name must be a str")
+         #   raise ValueError("rare_level_name must be a str")
 
         self.rare_level_name = rare_level_name
 
@@ -323,6 +323,8 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         unchanged - all other levels will be grouped. If record_rare_levels is True then the
         rare levels will also be recorded.
 
+        The label for the rare levels must be of the same type as the columns.
+
         Parameters
         ----------
         X : pd.DataFrame
@@ -334,6 +336,20 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         """
 
         super().fit(X, y)
+
+        for c in self.columns:
+
+            if X[c].dtype.name == 'category':
+
+                if X[c].cat.categories.dtype != pd.Series(self.rare_level_name).dtype:
+                    
+                    raise ValueError("rare_level_name must be of the same type of the columns")
+
+            else:
+
+                if pd.Series(self.rare_level_name).dtype != X[c].dtype:
+            
+                    raise ValueError("rare_level_name must be of the same type of the columns")
 
         if self.weight is not None:
 
@@ -434,7 +450,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
                 if self.rare_level_name not in X[c].cat.categories:
 
-                    X[c].cat.add_categories(self.rare_level_name, inplace=True)
+                    X[c] = X[c].cat.add_categories(self.rare_level_name)
 
                 dtype_before = X[c].dtype
 
