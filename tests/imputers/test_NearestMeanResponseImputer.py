@@ -48,7 +48,10 @@ class TestInit(object):
         ):
 
             NearestMeanResponseImputer(
-                response_column="c", columns=None, verbose=True, copy=True,
+                response_column="c",
+                columns=None,
+                verbose=True,
+                copy=True,
             )
 
     def test_response_column_not_str_error(self):
@@ -61,11 +64,14 @@ class TestInit(object):
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that the values passed in init are saved in an attribute of the same name."""
 
-        x = NearestMeanResponseImputer(response_column="c", columns="a",)
+        x = NearestMeanResponseImputer(
+            response_column="c",
+            columns="a",
+        )
 
         h.test_object_attributes(
             obj=x,
-            expected_attributes={"response_column": "c",},
+            expected_attributes={"response_column": "c"},
             msg="Attributes for NearestMeanResponseImputer set in init",
         )
 
@@ -184,13 +190,13 @@ class TestFit(object):
         h.test_object_attributes(
             obj=x,
             expected_attributes={
-                "impute_values_": {"a": np.float64(2), "b": np.float64(3),}
+                "impute_values_": {"a": np.float64(2), "b": np.float64(3)}
             },
             msg="impute_values_ attribute",
         )
 
     def test_learnt_values2(self):
-        """Test that the nearest mean response values learnt during fit are expected """
+        """Test that the nearest mean response values learnt during fit are expected"""
 
         df = pd.DataFrame(
             {
@@ -207,7 +213,7 @@ class TestFit(object):
         h.test_object_attributes(
             obj=x,
             expected_attributes={
-                "impute_values_": {"a": np.float64(5), "b": np.float64(3),}
+                "impute_values_": {"a": np.float64(5), "b": np.float64(3)}
             },
             msg="impute_values_ attribute",
         )
