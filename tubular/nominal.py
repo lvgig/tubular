@@ -339,15 +339,9 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
         for c in self.columns:
 
-            if X[c].dtype.name == 'category':
+            if (X[c].dtype.name != 'category'):
 
-                if X[c].cat.categories.dtype != pd.Series(self.rare_level_name).dtype:
-                    
-                    raise ValueError("rare_level_name must be of the same type of the columns")
-
-            else:
-
-                if pd.Series(self.rare_level_name).dtype != X[c].dtype:
+                if (pd.Series(self.rare_level_name).dtype != X[c].dtypes):
             
                     raise ValueError("rare_level_name must be of the same type of the columns")
 

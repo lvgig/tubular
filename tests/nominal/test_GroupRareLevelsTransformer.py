@@ -252,7 +252,7 @@ class TestFit(object):
             x.fit(df)
 
     def test_rare_level_name_same_col_type(self):
-        """Test that checks if rare_level_name is of the same type with respect columns."""
+        """Test that checks if output columns are of the same type with respect to the input label."""
 
         df = d.create_df_10()
 
@@ -261,24 +261,27 @@ class TestFit(object):
 
         x = GroupRareLevelsTransformer(columns = [col], rare_level_name=label)
         x.fit(df)
+        df_2 = x.transform(df)
 
-        assert pd.Series(label).dtype == df[col].dtypes
+        assert pd.Series(label).dtype == df_2[col].dtypes
         
         label = 'zzzz'
         col = 'b'
 
         x = GroupRareLevelsTransformer(columns = [col], rare_level_name=label)
         x.fit(df)
+        df_2 = x.transform(df)
 
-        assert pd.Series(label).dtype == df[col].dtypes
+        assert pd.Series(label).dtype == df_2[col].dtypes
 
         label = 100
         col = 'c'
 
         x = GroupRareLevelsTransformer(columns = [col], rare_level_name=label)
         x.fit(df)
+        df_2 = x.transform(df)
 
-        assert pd.Series(label).dtype == df[col].dtypes
+        assert pd.Series(label).dtype == df_2[col].dtypes
 
 class TestTransform(object):
     """Tests for GroupRareLevelsTransformer.transform()."""
