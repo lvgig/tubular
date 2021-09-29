@@ -1,19 +1,4 @@
 # This workflow will install the package and dependencies, run tests and lint with a single version of Python
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
-# pip install "flit>=2,<4"
-#flit install --deps=all
-#- name: mypy
-#      if: always()
-#      run: |
-#        mypy pitci/
-
-#   - name: Upload coverage pytest html test results to codacy
-#      if: always()
-#      run: |
-#        export CODACY_PROJECT_TOKEN=${{secrets.CODACY_PROJECT_TOKEN}}
-#        bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage.xml
-#bandit -c "bandit.yml" -r tubular
 
 name: Python package build and test
 
