@@ -1,0 +1,62 @@
+# This workflow will install the package and dependencies, run tests and lint with a single version of Python
+
+name: Python package build and test
+
+on:
+
+  push:
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements-dev.txt
+
+    - name: Lint with flake8
+      if: always()
+      run: |
+        flake8 .
+
+    - name: Lint with black
+      if: always()
+      run: |
+        black --version
+        black --check .
+
+    - name: Test with pytest
+      if: always()
+      run: |
+        pytest . --cov=tubular/ --cov-report=html --cov-config=.coveragerc
+
+    - name: Upload coverage pytest html test results to github
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: coverage-html-pytest-results
+        path: htmlcov
+
+    - name: Run Bandit tests
+      if: always()
+      run: |
+        bandit -c "bandit.yml" -r tubular -f html -o bandit-test-results.html
+
+    - name: Upload bandit test results
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: bandit-results
+        path: bandit-test-results.html
+
+
+

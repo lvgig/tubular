@@ -16,21 +16,14 @@ class TestInit(object):
 
         h.test_function_arguments(
             func=NearestMeanResponseImputer.__init__,
-            expected_arguments=[
-                "self",
-                "response_column",
-                "use_median_if_no_nulls",
-                "columns",
-            ],
-            expected_default_values=(False, None),
+            expected_arguments=["self", "response_column", "columns"],
+            expected_default_values=(None,),
         )
 
     def test_class_methods(self):
         """Test that NearestMeanResponseImputer has fit and transform methods."""
 
-        x = NearestMeanResponseImputer(
-            response_column="c", use_median_if_no_nulls=False, columns=None
-        )
+        x = NearestMeanResponseImputer(response_column="c", columns=None)
 
         h.test_object_method(obj=x, expected_method="fit", msg="fit")
 
@@ -39,9 +32,7 @@ class TestInit(object):
     def test_inheritance(self):
         """Test that NearestMeanResponseImputer inherits from BaseImputer."""
 
-        x = NearestMeanResponseImputer(
-            response_column="c", use_median_if_no_nulls=False, columns=None
-        )
+        x = NearestMeanResponseImputer(response_column="c", columns=None)
 
         h.assert_inheritance(x, tubular.imputers.BaseImputer)
 
@@ -58,7 +49,6 @@ class TestInit(object):
 
             NearestMeanResponseImputer(
                 response_column="c",
-                use_median_if_no_nulls=False,
                 columns=None,
                 verbose=True,
                 copy=True,
@@ -71,28 +61,17 @@ class TestInit(object):
 
             NearestMeanResponseImputer(response_column=0)
 
-    def test_use_median_if_no_nulls_not_bool_error(self):
-        """Test that an exception is raised if use_median_if_no_nulls is not bool"""
-
-        with pytest.raises(TypeError, match="use_median_if_no_nulls must be a bool"):
-
-            NearestMeanResponseImputer(
-                response_column="a", use_median_if_no_nulls="abc"
-            )
-
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that the values passed in init are saved in an attribute of the same name."""
 
         x = NearestMeanResponseImputer(
-            response_column="c", columns="a", use_median_if_no_nulls=True
+            response_column="c",
+            columns="a",
         )
 
         h.test_object_attributes(
             obj=x,
-            expected_attributes={
-                "response_column": "c",
-                "use_median_if_no_nulls": True,
-            },
+            expected_attributes={"response_column": "c"},
             msg="Attributes for NearestMeanResponseImputer set in init",
         )
 
@@ -155,8 +134,8 @@ class TestFit(object):
 
             x.fit(df)
 
-    def test_use_median_if_no_nulls_false_and_columns_with_no_nulls_error(self):
-        """Test an error is raised if a non-response column contains no nulls and use_median_if_no_nulls is false."""
+    def test_columns_with_no_nulls_error(self):
+        """Test an error is raised if a non-response column contains no nulls."""
 
         df = pd.DataFrame(
             {"a": [1, 2, 3, 4, 5], "b": [5, 4, 3, 2, 1], "c": [3, 2, 1, 4, 5]}
@@ -211,38 +190,30 @@ class TestFit(object):
         h.test_object_attributes(
             obj=x,
             expected_attributes={
-                "impute_values_": {
-                    "a": np.float64(2),
-                    "b": np.float64(3),
-                }
+                "impute_values_": {"a": np.float64(2), "b": np.float64(3)}
             },
             msg="impute_values_ attribute",
         )
 
     def test_learnt_values2(self):
-        """Test that the nearest mean response values learnt during fit are expected - when values to be learnt include medians"""
+        """Test that the nearest mean response values learnt during fit are expected"""
 
         df = pd.DataFrame(
             {
-                "a": [1, 1, 2, 3, 3, 5],
+                "a": [1, 1, np.nan, np.nan, 3, 5],
                 "b": [np.nan, np.nan, 1, 3, 3, 4],
                 "c": [2, 3, 2, 1, 4, 1],
             }
         )
 
-        x = NearestMeanResponseImputer(
-            response_column="c", columns=["a", "b"], use_median_if_no_nulls=True
-        )
+        x = NearestMeanResponseImputer(response_column="c", columns=["a", "b"])
 
         x.fit(df)
 
         h.test_object_attributes(
             obj=x,
             expected_attributes={
-                "impute_values_": {
-                    "a": np.float64(2.5),
-                    "b": np.float64(3),
-                }
+                "impute_values_": {"a": np.float64(5), "b": np.float64(3)}
             },
             msg="impute_values_ attribute",
         )
@@ -388,12 +359,10 @@ class TestTransform(object):
             pd.DataFrame({"a": [np.nan, 3, 4, 1, 4, np.nan]}), expected_df_3()
         ),
     )
-    def test_nulls_imputed_correctly4(self, df, expected):
+    def test_nulls_imputed_correctly3(self, df, expected):
         """Test missing values are filled with the correct values - with median value from separate dataframe."""
 
-        x = NearestMeanResponseImputer(
-            response_column="c", columns="a", use_median_if_no_nulls=True
-        )
+        x = NearestMeanResponseImputer(response_column="c", columns="a")
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
         x.impute_values_ = {"a": 2.0}
