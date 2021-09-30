@@ -234,7 +234,8 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         Name of weights column that should be used so cut_off_percent applies to sum of weights
         rather than number of rows.
 
-    rare_level_name : default = 'rare'. Must be of the same type as columns.
+    rare_level_name : any,default = 'rare'.
+        Must be of the same type as columns.
         Label for the new 'rare' level.
 
     record_rare_levels : bool, default = False
@@ -256,7 +257,8 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         Created in fit. A dict of non-rare levels (i.e. levels with more than cut_off_percent weight or rows)
         that is used to identify rare levels in transform.
 
-    rare_level_name : str
+    rare_level_name : any
+        Must be of the same type as columns.
         Label for the new nominal level that will be added to group together rare levels (as
         defined by cut_off_percent).
 
