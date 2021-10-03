@@ -306,10 +306,6 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
         self.weight = weight
 
-        # if not isinstance(rare_level_name, str):
-
-        #   raise ValueError("rare_level_name must be a str")
-
         self.rare_level_name = rare_level_name
 
         if not isinstance(record_rare_levels, bool):
