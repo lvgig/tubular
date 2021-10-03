@@ -213,6 +213,7 @@ def create_df_9():
 
     return df
 
+
 def create_df_10():
     """Create simple DataFrame to use in other tests"""
 
