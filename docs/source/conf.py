@@ -23,7 +23,7 @@ copyright = "2021, LV GI Data Science Team"
 author = "LV GI Data Science Team"
 
 # The full version, including alpha/beta/rc tags
-release = "0.2.14"
+release = "0.2.15"
 
 
 # -- General configuration ---------------------------------------------------
