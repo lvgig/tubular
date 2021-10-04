@@ -306,10 +306,6 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
         self.weight = weight
 
-        #if not isinstance(rare_level_name, str):
-
-         #   raise ValueError("rare_level_name must be a str")
-
         self.rare_level_name = rare_level_name
 
         if not isinstance(record_rare_levels, bool):
@@ -341,11 +337,13 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
         for c in self.columns:
 
-            if (X[c].dtype.name != 'category'):
+            if X[c].dtype.name != "category":
 
-                if (pd.Series(self.rare_level_name).dtype != X[c].dtypes):
-            
-                    raise ValueError("rare_level_name must be of the same type of the columns")
+                if pd.Series(self.rare_level_name).dtype != X[c].dtypes:
+
+                    raise ValueError(
+                        "rare_level_name must be of the same type of the columns"
+                    )
 
         if self.weight is not None:
 

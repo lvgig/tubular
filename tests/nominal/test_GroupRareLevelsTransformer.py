@@ -232,17 +232,22 @@ class TestFit(object):
 
         df = d.create_df_10()
 
-        with pytest.raises(ValueError, match="rare_level_name must be of the same type of the columns"):
+        with pytest.raises(
+            ValueError, match="rare_level_name must be of the same type of the columns"
+        ):
 
-            x = GroupRareLevelsTransformer(columns = ['a', 'b'], rare_level_name=2)
-            
-            x.fit(df)
-        
-        with pytest.raises(ValueError, match="rare_level_name must be of the same type of the columns"):
+            x = GroupRareLevelsTransformer(columns=["a", "b"], rare_level_name=2)
 
-            x = GroupRareLevelsTransformer(columns = ['c'])
-            
             x.fit(df)
+
+        with pytest.raises(
+            ValueError, match="rare_level_name must be of the same type of the columns"
+        ):
+
+            x = GroupRareLevelsTransformer(columns=["c"])
+
+            x.fit(df)
+
 
 class TestTransform(object):
     """Tests for GroupRareLevelsTransformer.transform()."""
@@ -397,7 +402,7 @@ class TestTransform(object):
         one_row_df["c"] = one_row_df["c"].astype("category")
 
         # add rare as a category in dataframe
-        one_row_df["c"] = one_row_df["c"].cat.add_categories('rare')
+        one_row_df["c"] = one_row_df["c"].cat.add_categories("rare")
 
         x = GroupRareLevelsTransformer(columns=["b", "c"], cut_off_percent=0.2)
 
@@ -433,24 +438,18 @@ class TestTransform(object):
             msg_tag="Unexpected values in GroupRareLevelsTransformer.transform (with weights)",
         )
 
-    @pytest.mark.parametrize(
-        "label,col",
-        [
-            (2.0, "a"),
-            ("zzzz", "b"),
-            (100, 'c')
-        ]
-    )
-
-    def test_rare_level_name_same_col_type(self, label,col):
+    @pytest.mark.parametrize("label,col", [(2.0, "a"), ("zzzz", "b"), (100, "c")])
+    def test_rare_level_name_same_col_type(self, label, col):
         """Test that checks if output columns are of the same type with respect to the input label."""
 
         df = d.create_df_10()
 
-        x = GroupRareLevelsTransformer(columns = [col], rare_level_name=label)
+        x = GroupRareLevelsTransformer(columns=[col], rare_level_name=label)
 
         x.fit(df)
 
         df_2 = x.transform(df)
 
-        assert pd.Series(label).dtype == df_2[col].dtypes, "column type should be the same as label type"
+        assert (
+            pd.Series(label).dtype == df_2[col].dtypes
+        ), "column type should be the same as label type"

@@ -30,6 +30,10 @@ To be consistent with `scikit-learn` - all transformers will implement at least 
 
 ## List of contributors
 
+- [munichpavel](https://github.com/munichpavel)
+- [bissoligiulia](https://github.com/bissoligiulia)
+- [ClaireF57](https://github.com/ClaireF57)
+
 Prior to the open source release of the package there have been contributions from many individuals in the LV GI Data Science team;
 
 - Richard Angell
