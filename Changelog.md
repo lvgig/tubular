@@ -2,6 +2,13 @@
 
 ----
 
+## 0.2.15
+
+- Update NearestMeanResponseImputer to remove fallback to median imputation when no nulls present in a column
+- Add github action to run pytest, flake8, black and bandit 
+- Modified GroupRareLevelsTransformer to remove the constraint type of rare_level_name being string, instead it must be the same type as the columns selected
+- Fix failing NullIndicator.transform tests
+
 ## 0.2.14
 
 - Open source release of code on Github

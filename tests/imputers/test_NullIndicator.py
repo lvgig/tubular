@@ -64,8 +64,6 @@ class TestTransform(object):
             }
         )
 
-        df[["b_nulls", "c_nulls"]] = df[["b_nulls", "c_nulls"]].astype("int32")
-
         return df
 
     def test_arguments(self):

@@ -280,25 +280,15 @@ class NearestMeanResponseImputer(BaseImputer):
     columns : None or str or list, default = None
         Columns to impute, if the default of None is supplied all columns in X are used
         when the transform method is called.
-    use_median_if_no_nulls : bool, default = False
-        If there are no nulls in a column on which the model is fitted, should the median of the column be learned instead?
-        If use_median_if_no_nulls = False and there are no nulls in the column to impute an error will be raised.
     """
 
-    def __init__(
-        self, response_column, use_median_if_no_nulls=False, columns=None, **kwds
-    ):
+    def __init__(self, response_column, columns=None, **kwds):
 
         if not type(response_column) is str:
 
             raise TypeError("response_column must be a str")
 
-        if not type(use_median_if_no_nulls) is bool:
-
-            raise TypeError("use_median_if_no_nulls must be a bool")
-
         self.response_column = response_column
-        self.use_median_if_no_nulls = use_median_if_no_nulls
 
         super().__init__(columns=columns, **kwds)
 
@@ -334,15 +324,9 @@ class NearestMeanResponseImputer(BaseImputer):
 
             if c_nulls.sum() == 0:
 
-                if self.use_median_if_no_nulls:
-
-                    self.impute_values_[c] = X[c].median()
-
-                else:
-
-                    raise ValueError(
-                        f"Column {c} has no missing values, cannot use this transformer."
-                    )
+                raise ValueError(
+                    f"Column {c} has no missing values, cannot use this transformer."
+                )
 
             else:
 
@@ -356,7 +340,7 @@ class NearestMeanResponseImputer(BaseImputer):
                     mean_response_by_levels[self.response_column] - mean_response_nulls
                 )
 
-                # take first value having the minimum difference in terms of average resposne
+                # take first value having the minimum difference in terms of average response
                 self.impute_values_[c] = mean_response_by_levels.loc[
                     mean_response_by_levels["abs_diff_response"]
                     == mean_response_by_levels["abs_diff_response"].min(),
