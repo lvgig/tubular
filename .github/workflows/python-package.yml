@@ -22,6 +22,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements-dev.txt
+        pip install git+https://github.com/lvgig/test-aide.git
 
     - name: Lint with flake8
       if: always()
