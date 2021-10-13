@@ -21,8 +21,6 @@ apidoc:
 		"removing unwanted output."
 	rm source/api/modules.rst
 	rm source/api/tubular.rst
-	rm source/api/tubular.testing.rst
-	rm source/api/tubular.testing.test_data.rst
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).

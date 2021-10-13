@@ -1,6 +1,6 @@
 import pytest
-import tubular.testing.test_data as d
-import tubular.testing.helpers as h
+import test_aide.test_data as d
+import test_aide.helpers as h
 import datetime
 
 import tubular

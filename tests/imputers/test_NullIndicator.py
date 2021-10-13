@@ -1,8 +1,8 @@
 import pytest
+import test_aide.test_data as d
+import test_aide.helpers as h
 import pandas as pd
 import numpy as np
-import tubular.testing.test_data as d
-import tubular.testing.helpers as h
 
 import tubular
 from tubular.imputers import NullIndicator
