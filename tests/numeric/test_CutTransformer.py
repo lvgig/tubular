@@ -1,13 +1,11 @@
 import pytest
-import test_aide.test_data as d
-import test_aide.helpers as h
+import test_aide as ta
 import re
+import pandas
+import pandas as pd
 
 import tubular
 from tubular.numeric import CutTransformer
-
-import pandas
-import pandas as pd
 
 
 class TestInit(object):
@@ -16,7 +14,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=CutTransformer.__init__,
             expected_arguments=[
                 "self",
@@ -32,14 +30,16 @@ class TestInit(object):
 
         x = CutTransformer(column="a", new_column_name="b")
 
-        h.test_object_method(obj=x, expected_method="transform", msg="transform")
+        ta.class_helpers.test_object_method(
+            obj=x, expected_method="transform", msg="transform"
+        )
 
     def test_inheritance(self):
         """Test that CutTransformer inherits from BaseTransformer."""
 
         x = CutTransformer(column="a", new_column_name="b")
 
-        h.assert_inheritance(x, tubular.base.BaseTransformer)
+        ta.class_helpers.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
@@ -55,7 +55,7 @@ class TestInit(object):
             }
         }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -116,7 +116,7 @@ class TestInit(object):
             cut_kwargs={"a": 1, "b": 2},
         )
 
-        h.test_object_attributes(
+        ta.class_helpers.test_object_attributes(
             obj=x,
             expected_attributes={
                 "columns": ["b"],
@@ -133,7 +133,7 @@ class TestTransform(object):
     def expected_df_1():
         """Expected output for test_expected_output."""
 
-        df = d.create_df_9()
+        df = ta.test_data.create_df_9()
 
         df["d"] = pd.Series(["c", "b", "a", "d", "e", "f"], dtype="category")
 
@@ -142,25 +142,25 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=CutTransformer.transform, expected_arguments=["self", "X"]
         )
 
     def test_super_transform_call(self, mocker):
         """Test the call to BaseTransformer.transform is as expected."""
 
-        df = d.create_df_9()
+        df = ta.test_data.create_df_9()
 
         x = CutTransformer(column="a", new_column_name="Y", cut_kwargs={"bins": 3})
 
-        expected_call_args = {0: {"args": (d.create_df_9(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (ta.test_data.create_df_9(),), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
-            return_value=d.create_df_9(),
+            return_value=ta.test_data.create_df_9(),
         ):
 
             x.transform(df)
@@ -168,7 +168,7 @@ class TestTransform(object):
     def test_pd_cut_call(self, mocker):
         """Test the call to pd.cut is as expected."""
 
-        df = d.create_df_9()
+        df = ta.test_data.create_df_9()
 
         x = CutTransformer(
             column="a",
@@ -178,12 +178,12 @@ class TestTransform(object):
 
         expected_call_args = {
             0: {
-                "args": (d.create_df_9()["a"],),
+                "args": (ta.test_data.create_df_9()["a"],),
                 "kwargs": {"bins": 3, "right": False, "precision": 2},
             }
         }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, pandas, "cut", expected_call_args, return_value=[1, 2, 3, 4, 5, 6]
         ):
 
@@ -192,7 +192,7 @@ class TestTransform(object):
     def test_output_from_cut_assigned_to_column(self, mocker):
         """Test that the output from pd.cut is assigned to column with name new_column_name."""
 
-        df = d.create_df_9()
+        df = ta.test_data.create_df_9()
 
         x = CutTransformer(column="c", new_column_name="c_new", cut_kwargs={"bins": 2})
 
@@ -208,8 +208,10 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_9(), expected_df_1())
-        + h.index_preserved_params(d.create_df_9(), expected_df_1()),
+        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_9(), expected_df_1())
+        + ta.pandas_helpers.index_preserved_params(
+            ta.test_data.create_df_9(), expected_df_1()
+        ),
     )
     def test_expected_output(self, df, expected):
         """Test input data is transformed as expected."""
@@ -226,7 +228,7 @@ class TestTransform(object):
 
         df_transformed = cut_1.transform(df)
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="CutTransformer.transform output",
@@ -235,7 +237,7 @@ class TestTransform(object):
     def test_non_numeric_column_error(self):
         """Test that an exception is raised if the column to discretise is not numeric."""
 
-        df = d.create_df_8()
+        df = ta.test_data.create_df_8()
 
         x = CutTransformer(column="b", new_column_name="d")
 

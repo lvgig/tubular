@@ -1,7 +1,5 @@
 import pytest
-import test_aide.test_data as d
-import test_aide.helpers as h
-
+import test_aide as ta
 import pandas as pd
 import numpy as np
 
@@ -15,7 +13,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=CappingTransformer.__init__,
             expected_arguments=[
                 "self",
@@ -41,14 +39,16 @@ class TestInit(object):
 
         x = CappingTransformer(capping_values={"a": [1, 3]})
 
-        h.test_object_method(obj=x, expected_method=method_name, msg=method_name)
+        ta.class_helpers.test_object_method(
+            obj=x, expected_method=method_name, msg=method_name
+        )
 
     def test_inheritance(self):
         """Test that CappingTransformer inherits from BaseTransformer."""
 
         x = CappingTransformer(capping_values={"a": [1, 3]})
 
-        h.assert_inheritance(x, tubular.base.BaseTransformer)
+        ta.class_helpers.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_capping_values_quantiles_both_none_error(self):
         """Test that an exception is raised if both capping_values and quantiles are passed as None."""
@@ -96,7 +96,7 @@ class TestInit(object):
             }
         }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -114,7 +114,7 @@ class TestInit(object):
             }
         }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -132,7 +132,7 @@ class TestInit(object):
             }
         }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker,
             tubular.capping.CappingTransformer,
             "check_capping_values_dict",
@@ -151,7 +151,7 @@ class TestInit(object):
             }
         }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker,
             tubular.capping.CappingTransformer,
             "check_capping_values_dict",
@@ -167,7 +167,7 @@ class TestInit(object):
 
         x = CappingTransformer(capping_values=capping_values_dict)
 
-        h.test_object_attributes(
+        ta.class_helpers.test_object_attributes(
             obj=x,
             expected_attributes={
                 "capping_values": capping_values_dict,
@@ -185,7 +185,7 @@ class TestInit(object):
 
         x = CappingTransformer(quantiles=quantiles_dict)
 
-        h.test_object_attributes(
+        ta.class_helpers.test_object_attributes(
             obj=x,
             expected_attributes={
                 "quantiles": quantiles_dict,
@@ -203,7 +203,7 @@ class TestCheckCappingValuesDict(object):
     def test_arguments(self):
         """Test that check_capping_values_dict has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=CappingTransformer.check_capping_values_dict,
             expected_arguments=["self", "capping_values_dict", "dict_name"],
             expected_default_values=None,
@@ -326,7 +326,7 @@ class TestFit(object):
     def test_arguments(self):
         """Test that fit has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=CappingTransformer.fit,
             expected_arguments=["self", "X", "y"],
             expected_default_values=(None,),
@@ -340,7 +340,7 @@ class TestFit(object):
             match="quantiles not set so no fitting done in CappingTransformer",
         ):
 
-            df = d.create_df_3()
+            df = ta.test_data.create_df_3()
 
             x = CappingTransformer(capping_values={"a": [2, 5], "b": [-1, 8]})
 
@@ -349,15 +349,17 @@ class TestFit(object):
     def test_super_fit_call(self, mocker):
         """Test the call to BaseTransformer.fit."""
 
-        df = d.create_df_9()
+        df = ta.test_data.create_df_9()
 
         x = CappingTransformer(
             quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
         )
 
-        expected_call_args = {0: {"args": (d.create_df_9(), None), "kwargs": {}}}
+        expected_call_args = {
+            0: {"args": (ta.test_data.create_df_9(), None), "kwargs": {}}
+        }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "fit", expected_call_args
         ):
 
@@ -366,7 +368,7 @@ class TestFit(object):
     def test_prepare_quantiles_call_weight(self, mocker):
         """Test the call to prepare_quantiles if weights_column is set."""
 
-        df = d.create_df_9()
+        df = ta.test_data.create_df_9()
 
         x = CappingTransformer(
             quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
@@ -374,16 +376,24 @@ class TestFit(object):
 
         expected_call_args = {
             0: {
-                "args": (d.create_df_9()["a"], [0.1, 1], d.create_df_9()["c"]),
+                "args": (
+                    ta.test_data.create_df_9()["a"],
+                    [0.1, 1],
+                    ta.test_data.create_df_9()["c"],
+                ),
                 "kwargs": {},
             },
             1: {
-                "args": (d.create_df_9()["b"], [0.5, None], d.create_df_9()["c"]),
+                "args": (
+                    ta.test_data.create_df_9()["b"],
+                    [0.5, None],
+                    ta.test_data.create_df_9()["c"],
+                ),
                 "kwargs": {},
             },
         }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker,
             tubular.capping.CappingTransformer,
             "prepare_quantiles",
@@ -395,16 +405,22 @@ class TestFit(object):
     def test_prepare_quantiles_call_no_weight(self, mocker):
         """Test the call to prepare_quantiles if weights_column is not set."""
 
-        df = d.create_df_9()
+        df = ta.test_data.create_df_9()
 
         x = CappingTransformer(quantiles={"a": [0.1, 1], "b": [0.5, None]})
 
         expected_call_args = {
-            0: {"args": (d.create_df_9()["a"], [0.1, 1], None), "kwargs": {}},
-            1: {"args": (d.create_df_9()["b"], [0.5, None], None), "kwargs": {}},
+            0: {
+                "args": (ta.test_data.create_df_9()["a"], [0.1, 1], None),
+                "kwargs": {},
+            },
+            1: {
+                "args": (ta.test_data.create_df_9()["b"], [0.5, None], None),
+                "kwargs": {},
+            },
         }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker,
             tubular.capping.CappingTransformer,
             "prepare_quantiles",
@@ -417,7 +433,7 @@ class TestFit(object):
     def test_prepare_quantiles_output_set_attributes(self, mocker, weights_column):
         """Test the output of prepare_quantiles is set to capping_values and_replacement_values attributes."""
 
-        df = d.create_df_9()
+        df = ta.test_data.create_df_9()
 
         x = CappingTransformer(
             quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column=weights_column
@@ -432,7 +448,7 @@ class TestFit(object):
 
         x.fit(df)
 
-        h.test_object_attributes(
+        ta.class_helpers.test_object_attributes(
             obj=x,
             expected_attributes={
                 "capping_values": {
@@ -452,7 +468,7 @@ class TestFit(object):
     def test_quantile_combinations_handled(self, quantiles, weights_column):
         """Test that a given combination of None and non-None quantile values can be calculated successfully."""
 
-        df = d.create_df_9()
+        df = ta.test_data.create_df_9()
 
         x = CappingTransformer(
             quantiles={"a": quantiles}, weights_column=weights_column
@@ -475,7 +491,7 @@ class TestPrepareQuantiles(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=CappingTransformer.prepare_quantiles,
             expected_arguments=["self", "values", "quantiles", "sample_weight"],
             expected_default_values=(None,),
@@ -484,12 +500,27 @@ class TestPrepareQuantiles(object):
     @pytest.mark.parametrize(
         "values, quantiles, sample_weight, expected_quantiles",
         [
-            (d.create_df_9()["a"], [0.1, 0.6], d.create_df_9()["c"], [0.1, 0.6]),
-            (d.create_df_9()["b"], [0.1, None], d.create_df_9()["c"], [0.1]),
-            (d.create_df_9()["a"], [None, 0.6], d.create_df_9()["c"], [0.6]),
-            (d.create_df_9()["b"], [0.1, 0.6], None, [0.1, 0.6]),
-            (d.create_df_9()["a"], [0.1, None], None, [0.1]),
-            (d.create_df_9()["b"], [None, 0.6], None, [0.6]),
+            (
+                ta.test_data.create_df_9()["a"],
+                [0.1, 0.6],
+                ta.test_data.create_df_9()["c"],
+                [0.1, 0.6],
+            ),
+            (
+                ta.test_data.create_df_9()["b"],
+                [0.1, None],
+                ta.test_data.create_df_9()["c"],
+                [0.1],
+            ),
+            (
+                ta.test_data.create_df_9()["a"],
+                [None, 0.6],
+                ta.test_data.create_df_9()["c"],
+                [0.6],
+            ),
+            (ta.test_data.create_df_9()["b"], [0.1, 0.6], None, [0.1, 0.6]),
+            (ta.test_data.create_df_9()["a"], [0.1, None], None, [0.1]),
+            (ta.test_data.create_df_9()["b"], [None, 0.6], None, [0.6]),
         ],
     )
     def test_weighted_quantile_call(
@@ -524,12 +555,27 @@ class TestPrepareQuantiles(object):
     @pytest.mark.parametrize(
         "values, quantiles, sample_weight, expected_results",
         [
-            (d.create_df_9()["a"], [0.1, 0.6], d.create_df_9()["c"], ["aaaa"]),
-            (d.create_df_9()["b"], [0.1, None], d.create_df_9()["c"], ["aaaa", None]),
-            (d.create_df_9()["a"], [None, 0.6], d.create_df_9()["c"], [None, "aaaa"]),
-            (d.create_df_9()["b"], [0.1, 0.6], None, ["aaaa"]),
-            (d.create_df_9()["a"], [0.1, None], None, ["aaaa", None]),
-            (d.create_df_9()["b"], [None, 0.6], None, [None, "aaaa"]),
+            (
+                ta.test_data.create_df_9()["a"],
+                [0.1, 0.6],
+                ta.test_data.create_df_9()["c"],
+                ["aaaa"],
+            ),
+            (
+                ta.test_data.create_df_9()["b"],
+                [0.1, None],
+                ta.test_data.create_df_9()["c"],
+                ["aaaa", None],
+            ),
+            (
+                ta.test_data.create_df_9()["a"],
+                [None, 0.6],
+                ta.test_data.create_df_9()["c"],
+                [None, "aaaa"],
+            ),
+            (ta.test_data.create_df_9()["b"], [0.1, 0.6], None, ["aaaa"]),
+            (ta.test_data.create_df_9()["a"], [0.1, None], None, ["aaaa", None]),
+            (ta.test_data.create_df_9()["b"], [None, 0.6], None, [None, "aaaa"]),
         ],
     )
     def test_output_from_weighted_quantile_returned(
@@ -585,18 +631,18 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=CappingTransformer.transform, expected_arguments=["self", "X"]
         )
 
     def test_check_is_fitted_call_count(self, mocker):
         """Test there are 2 calls to BaseTransformer check_is_fitted in transform."""
 
-        df = d.create_df_3()
+        df = ta.test_data.create_df_3()
 
         x = CappingTransformer(capping_values={"a": [2, 5], "b": [-1, 8]})
 
-        with h.assert_function_call_count(
+        with ta.function_helpers.assert_function_call_count(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", 2
         ):
 
@@ -605,7 +651,7 @@ class TestTransform(object):
     def test_check_is_fitted_call_1(self, mocker):
         """Test the first call to BaseTransformer check_is_fitted in transform."""
 
-        df = d.create_df_3()
+        df = ta.test_data.create_df_3()
 
         x = CappingTransformer(capping_values={"a": [2, 5], "b": [-1, 8]})
 
@@ -614,7 +660,7 @@ class TestTransform(object):
             1: {"args": (["_replacement_values"],), "kwargs": {}},
         }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
 
@@ -623,18 +669,18 @@ class TestTransform(object):
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
 
-        df = d.create_df_3()
+        df = ta.test_data.create_df_3()
 
         x = CappingTransformer(capping_values={"a": [2, 5], "b": [-1, 8]})
 
-        expected_call_args = {0: {"args": (d.create_df_3(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (ta.test_data.create_df_3(),), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
-            return_value=d.create_df_3(),
+            return_value=ta.test_data.create_df_3(),
         ):
 
             x.transform(df)
@@ -644,13 +690,13 @@ class TestTransform(object):
 
         capping_values_dict = {"a": [2, 5], "b": [-1, 8]}
 
-        df = d.create_df_3()
+        df = ta.test_data.create_df_3()
 
         x = CappingTransformer(capping_values_dict)
 
         x.transform(df)
 
-        h.test_object_attributes(
+        ta.class_helpers.test_object_attributes(
             obj=x,
             expected_attributes={"capping_values": capping_values_dict},
             msg="Attributes for CappingTransformer set in init",
@@ -658,8 +704,10 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_3(), expected_df_1())
-        + h.index_preserved_params(d.create_df_3(), expected_df_1()),
+        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_3(), expected_df_1())
+        + ta.pandas_helpers.index_preserved_params(
+            ta.test_data.create_df_3(), expected_df_1()
+        ),
     )
     def test_expected_output_min_and_max_combinations(self, df, expected):
         """Test that capping is applied correctly in transform."""
@@ -670,7 +718,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_frame_equal_msg(
+        ta.equality_helpers.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in CappingTransformer.transform",
@@ -678,8 +726,10 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_4(), expected_df_2())
-        + h.index_preserved_params(d.create_df_4(), expected_df_2()),
+        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_4(), expected_df_2())
+        + ta.pandas_helpers.index_preserved_params(
+            ta.test_data.create_df_4(), expected_df_2()
+        ),
     )
     def test_non_cap_column_left_untouched(self, df, expected):
         """Test that capping is applied only to specific columns, others remain the same."""
@@ -688,7 +738,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_frame_equal_msg(
+        ta.equality_helpers.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in CappingTransformer.transform, with columns meant to not be transformed",
@@ -697,7 +747,7 @@ class TestTransform(object):
     def test_non_numeric_column_error(self):
         """Test that transform will raise an error if a column to transform is not numeric."""
 
-        df = d.create_df_5()
+        df = ta.test_data.create_df_5()
 
         x = CappingTransformer(capping_values={"a": [2, 5], "b": [-1, 8], "c": [-1, 8]})
 
@@ -710,7 +760,7 @@ class TestTransform(object):
     def test_quantile_not_fit_error(self):
         """Test that transform will raise an error if quantiles are specified in init but fit is not run before calling transform."""
 
-        df = d.create_df_9()
+        df = ta.test_data.create_df_9()
 
         x = CappingTransformer(quantiles={"a": [0.2, 1], "b": [0, 1]})
 
@@ -724,7 +774,7 @@ class TestTransform(object):
     def test_replacement_values_dict_not_set_error(self):
         """Test that transform will raise an error if _replacement_values is an empty dict."""
 
-        df = d.create_df_9()
+        df = ta.test_data.create_df_9()
 
         x = CappingTransformer(quantiles={"a": [0.2, 1], "b": [0, 1]})
 
@@ -741,7 +791,7 @@ class TestTransform(object):
     def test_attributes_unchanged_from_transform(self):
         """Test that attributes are unchanged after transform is run."""
 
-        df = d.create_df_9()
+        df = ta.test_data.create_df_9()
 
         x = CappingTransformer(quantiles={"a": [0.2, 1], "b": [0, 1]})
 
@@ -771,7 +821,7 @@ class TestWeightedQuantile(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=CappingTransformer.weighted_quantile,
             expected_arguments=["self", "values", "quantiles", "sample_weight"],
             expected_default_values=(None,),

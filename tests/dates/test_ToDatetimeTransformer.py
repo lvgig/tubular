@@ -1,13 +1,12 @@
 import pytest
-import test_aide.test_data as d
-import test_aide.helpers as h
+import test_aide as ta
 import datetime
-
-import tubular
-from tubular.dates import ToDatetimeTransformer
 import pandas
 import pandas as pd
 import numpy as np
+
+import tubular
+from tubular.dates import ToDatetimeTransformer
 
 
 class TestInit(object):
@@ -16,7 +15,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=ToDatetimeTransformer.__init__,
             expected_arguments=[
                 "self",
@@ -32,14 +31,16 @@ class TestInit(object):
 
         to_dt = ToDatetimeTransformer(column="a", new_column_name="b")
 
-        h.test_object_method(obj=to_dt, expected_method="transform", msg="transform")
+        ta.class_helpers.test_object_method(
+            obj=to_dt, expected_method="transform", msg="transform"
+        )
 
     def test_inheritance(self):
         """Test that ToDatetimeTransformer inherits from BaseTransformer."""
 
         to_dt = ToDatetimeTransformer(column="a", new_column_name="b")
 
-        h.assert_inheritance(to_dt, tubular.base.BaseTransformer)
+        ta.class_helpers.assert_inheritance(to_dt, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
@@ -55,7 +56,7 @@ class TestInit(object):
             }
         }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -116,7 +117,7 @@ class TestInit(object):
             to_datetime_kwargs={"a": 1, "b": 2},
         )
 
-        h.test_object_attributes(
+        ta.class_helpers.test_object_attributes(
             obj=to_dt,
             expected_attributes={
                 "columns": ["b"],
@@ -161,33 +162,35 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=ToDatetimeTransformer.transform, expected_arguments=["self", "X"]
         )
 
     def test_super_transform_call(self, mocker):
         """Test the call to BaseTransformer.transform is as expected."""
 
-        df = d.create_datediff_test_df()
+        df = ta.test_data.create_datediff_test_df()
 
         to_dt = ToDatetimeTransformer(column="a", new_column_name="Y")
 
-        expected_call_args = {0: {"args": (d.create_datediff_test_df(),), "kwargs": {}}}
+        expected_call_args = {
+            0: {"args": (ta.test_data.create_datediff_test_df(),), "kwargs": {}}
+        }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
-            return_value=d.create_datediff_test_df(),
+            return_value=ta.test_data.create_datediff_test_df(),
         ):
 
             to_dt.transform(df)
 
     def test_to_datetime_call(self, mocker):
-        """Test the call to pd.to_datetime is as expected."""
+        """Test the call to pandas.to_datetime is as expected."""
 
-        df = d.create_to_datetime_test_df()
+        df = ta.test_data.create_to_datetime_test_df()
 
         to_dt = ToDatetimeTransformer(
             column="a", new_column_name="a_Y", to_datetime_kwargs={"format": "%Y"}
@@ -195,17 +198,17 @@ class TestTransform(object):
 
         expected_call_args = {
             0: {
-                "args": (d.create_to_datetime_test_df()["a"],),
+                "args": (ta.test_data.create_to_datetime_test_df()["a"],),
                 "kwargs": {"format": "%Y"},
             }
         }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker,
             pandas,
             "to_datetime",
             expected_call_args,
-            return_value=pd.to_datetime(d.create_to_datetime_test_df()["a"]),
+            return_value=pd.to_datetime(ta.test_data.create_to_datetime_test_df()["a"]),
         ):
 
             to_dt.transform(df)
@@ -213,7 +216,7 @@ class TestTransform(object):
     def test_output_from_to_datetime_assigned_to_column(self, mocker):
         """Test that the output from pd.to_datetime is assigned to column with name new_column_name."""
 
-        df = d.create_to_datetime_test_df()
+        df = ta.test_data.create_to_datetime_test_df()
 
         to_dt = ToDatetimeTransformer(
             column="a", new_column_name="a_new", to_datetime_kwargs={"format": "%Y"}
@@ -231,8 +234,12 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_to_datetime_test_df(), expected_df_1())
-        + h.index_preserved_params(d.create_to_datetime_test_df(), expected_df_1()),
+        ta.pandas_helpers.row_by_row_params(
+            ta.test_data.create_to_datetime_test_df(), expected_df_1()
+        )
+        + ta.pandas_helpers.index_preserved_params(
+            ta.test_data.create_to_datetime_test_df(), expected_df_1()
+        ),
     )
     def test_expected_output(self, df, expected):
         """Test input data is transformed as expected."""
@@ -248,7 +255,7 @@ class TestTransform(object):
         df_transformed = to_dt_1.transform(df)
         df_transformed = to_dt_2.transform(df_transformed)
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="ToDatetimeTransformer.transform output",

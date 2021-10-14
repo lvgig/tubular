@@ -1,10 +1,9 @@
 import pytest
-import test_aide.test_data as d
-import test_aide.helpers as h
+import test_aide as ta
+import pandas as pd
 
 import tubular
 from tubular.strings import SeriesStrMethodTransformer
-import pandas as pd
 
 
 class TestInit(object):
@@ -13,7 +12,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=SeriesStrMethodTransformer.__init__,
             expected_arguments=[
                 "self",
@@ -32,7 +31,9 @@ class TestInit(object):
             new_column_name="a", pd_method_name="find", columns=["b"]
         )
 
-        h.test_object_method(obj=x, expected_method="transform", msg="transform")
+        ta.class_helpers.test_object_method(
+            obj=x, expected_method="transform", msg="transform"
+        )
 
     def test_inheritance(self):
         """Test that SeriesStrMethodTransformer inherits from BaseTransformer."""
@@ -41,7 +42,7 @@ class TestInit(object):
             new_column_name="a", pd_method_name="find", columns=["b"]
         )
 
-        h.assert_inheritance(x, tubular.base.BaseTransformer)
+        ta.class_helpers.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
@@ -53,7 +54,7 @@ class TestInit(object):
             }
         }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -141,7 +142,7 @@ class TestInit(object):
             pd_method_kwargs={"d": 1},
         )
 
-        h.test_object_attributes(
+        ta.class_helpers.test_object_attributes(
             obj=x,
             expected_attributes={
                 "new_column_name": "a",
@@ -158,7 +159,7 @@ class TestTransform(object):
     def expected_df_1():
         """Expected output of test_expected_output_no_overwrite."""
 
-        df = d.create_df_7()
+        df = ta.test_data.create_df_7()
 
         df["b_new"] = df["b"].str.find(sub="a")
 
@@ -167,7 +168,7 @@ class TestTransform(object):
     def expected_df_2():
         """Expected output of test_expected_output_overwrite."""
 
-        df = d.create_df_7()
+        df = ta.test_data.create_df_7()
 
         df["b"] = df["b"].str.pad(width=10)
 
@@ -176,22 +177,22 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=SeriesStrMethodTransformer.transform, expected_arguments=["self", "X"]
         )
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
 
-        df = d.create_df_7()
+        df = ta.test_data.create_df_7()
 
         x = SeriesStrMethodTransformer(
             new_column_name="cc", pd_method_name="find", columns=["c"]
         )
 
-        expected_call_args = {0: {"args": (d.create_df_7(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (ta.test_data.create_df_7(),), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
 
@@ -199,8 +200,10 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_7(), expected_df_1())
-        + h.index_preserved_params(d.create_df_7(), expected_df_1()),
+        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_7(), expected_df_1())
+        + ta.pandas_helpers.index_preserved_params(
+            ta.test_data.create_df_7(), expected_df_1()
+        ),
     )
     def test_expected_output_no_overwrite(self, df, expected):
         """Test a single column output from transform gives expected results, when not overwriting the original column."""
@@ -214,7 +217,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_frame_equal_msg(
+        ta.equality_helpers.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in SeriesStrMethodTransformer.transform with find, not overwriting original column",
@@ -222,8 +225,10 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_7(), expected_df_2())
-        + h.index_preserved_params(d.create_df_7(), expected_df_2()),
+        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_7(), expected_df_2())
+        + ta.pandas_helpers.index_preserved_params(
+            ta.test_data.create_df_7(), expected_df_2()
+        ),
     )
     def test_expected_output_overwrite(self, df, expected):
         """Test a single column output from transform gives expected results, when overwriting the original column."""
@@ -237,7 +242,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_frame_equal_msg(
+        ta.equality_helpers.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in SeriesStrMethodTransformer.transform with pad, overwriting original column",
@@ -246,15 +251,15 @@ class TestTransform(object):
     @pytest.mark.parametrize(
         "df, new_column_name, pd_method_name, columns, pd_method_kwargs",
         [
-            (d.create_df_7(), "b_new", "find", ["b"], {"sub": "a"}),
+            (ta.test_data.create_df_7(), "b_new", "find", ["b"], {"sub": "a"}),
             (
-                d.create_df_7(),
+                ta.test_data.create_df_7(),
                 "c_slice",
                 "slice",
                 ["c"],
                 {"start": 0, "stop": 1, "step": 1},
             ),
-            (d.create_df_7(), "b_upper", "upper", ["b"], {}),
+            (ta.test_data.create_df_7(), "b_upper", "upper", ["b"], {}),
         ],
     )
     def test_pandas_method_called(
@@ -278,7 +283,7 @@ class TestTransform(object):
         call_kwargs = call_args[1]
 
         # test keyword are as expected
-        h.assert_dict_equal_msg(
+        ta.equality_helpers.assert_dict_equal_msg(
             actual=call_kwargs,
             expected=pd_method_kwargs,
             msg_tag=f"""Keyword arg assert for {pd_method_name}""",
@@ -287,7 +292,7 @@ class TestTransform(object):
     def test_attributes_unchanged_by_transform(self):
         """Test that attributes set in init are unchanged by the transform method."""
 
-        df = d.create_df_7()
+        df = ta.test_data.create_df_7()
 
         x = SeriesStrMethodTransformer(
             new_column_name="b",

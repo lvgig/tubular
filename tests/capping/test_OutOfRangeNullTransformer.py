@@ -1,7 +1,5 @@
 import pytest
-import test_aide.test_data as d
-import test_aide.helpers as h
-
+import test_aide as ta
 import numpy as np
 
 import tubular
@@ -14,7 +12,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=OutOfRangeNullTransformer.__init__,
             expected_arguments=[
                 "self",
@@ -34,14 +32,16 @@ class TestInit(object):
 
         x = OutOfRangeNullTransformer(capping_values={"a": [1, 3]})
 
-        h.test_object_method(obj=x, expected_method=method_name, msg=method_name)
+        ta.class_helpers.test_object_method(
+            obj=x, expected_method=method_name, msg=method_name
+        )
 
     def test_inheritance(self):
         """Test that OutOfRangeNullTransformer inherits from CappingTransformer."""
 
         x = OutOfRangeNullTransformer(capping_values={"a": [1, 3]})
 
-        h.assert_inheritance(x, tubular.capping.CappingTransformer)
+        ta.class_helpers.assert_inheritance(x, tubular.capping.CappingTransformer)
 
     @pytest.mark.parametrize(
         "capping_values, quantiles, weights_column, verbose, copy",
@@ -95,7 +95,7 @@ class TestInit(object):
 
         expected_call_args = {0: {"args": (), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker,
             tubular.capping.OutOfRangeNullTransformer,
             "set_replacement_values",
@@ -113,7 +113,7 @@ class TestFit(object):
     def test_arguments(self):
         """Test that fit has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=OutOfRangeNullTransformer.fit,
             expected_arguments=["self", "X", "y"],
             expected_default_values=(None,),
@@ -124,7 +124,7 @@ class TestFit(object):
 
         spy = mocker.spy(tubular.capping.CappingTransformer, "fit")
 
-        df = d.create_df_9()
+        df = ta.test_data.create_df_9()
 
         x = OutOfRangeNullTransformer(
             quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
@@ -144,9 +144,9 @@ class TestFit(object):
             x,
         ), "unexpected positional args in CappingTransformer.fit call"
 
-        expected_kwargs = {"X": d.create_df_9(), "y": None}
+        expected_kwargs = {"X": ta.test_data.create_df_9(), "y": None}
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected=expected_kwargs,
             actual=call_kwargs,
             msg="unexpected kwargs in CappingTransformer.fit call",
@@ -155,7 +155,7 @@ class TestFit(object):
     def test_set_replacement_values_called(self, mocker):
         """Test that init calls OutOfRangeNullTransformer.set_replacement_values during fit."""
 
-        df = d.create_df_9()
+        df = ta.test_data.create_df_9()
 
         x = OutOfRangeNullTransformer(
             quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
@@ -163,7 +163,7 @@ class TestFit(object):
 
         expected_call_args = {0: {"args": (), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker,
             tubular.capping.OutOfRangeNullTransformer,
             "set_replacement_values",
@@ -175,7 +175,7 @@ class TestFit(object):
     def test_fit_returns_self(self):
         """Test fit returns self?"""
 
-        df = d.create_df_9()
+        df = ta.test_data.create_df_9()
 
         x = OutOfRangeNullTransformer(
             quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
@@ -194,7 +194,7 @@ class TestSetReplacementValues(object):
     def test_arguments(self):
         """Test that set_replacement_values has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=OutOfRangeNullTransformer.set_replacement_values,
             expected_arguments=["self"],
             expected_default_values=None,
@@ -223,7 +223,7 @@ class TestSetReplacementValues(object):
         x.set_replacement_values()
 
         # also tests that capping_values is not modified
-        h.test_object_attributes(
+        ta.class_helpers.test_object_attributes(
             obj=x,
             expected_attributes={
                 "_replacement_values": expected_replacement_values,

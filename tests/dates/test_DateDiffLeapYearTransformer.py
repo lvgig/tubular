@@ -1,8 +1,6 @@
 import pytest
-import test_aide.test_data as d
-import test_aide.helpers as h
+import test_aide as ta
 import datetime
-
 import pandas as pd
 import numpy as np
 
@@ -78,7 +76,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=DateDiffLeapYearTransformer.__init__,
             expected_arguments=[
                 "self",
@@ -101,8 +99,10 @@ class TestInit(object):
             drop_cols=True,
         )
 
-        h.test_object_method(obj=x, expected_method="transform", msg="transform")
-        h.test_object_method(
+        ta.class_helpers.test_object_method(
+            obj=x, expected_method="transform", msg="transform"
+        )
+        ta.class_helpers.test_object_method(
             obj=x, expected_method="calculate_age", msg="calculate_message"
         )
 
@@ -116,7 +116,7 @@ class TestInit(object):
             drop_cols=True,
         )
 
-        h.assert_inheritance(x, tubular.base.BaseTransformer)
+        ta.class_helpers.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
@@ -132,7 +132,7 @@ class TestInit(object):
             }
         }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -223,7 +223,7 @@ class TestInit(object):
             missing_replacement="dummy_3",
         )
 
-        h.test_object_attributes(
+        ta.class_helpers.test_object_attributes(
             obj=x,
             expected_attributes={
                 "new_column_name": value_1,
@@ -319,35 +319,41 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=DateDiffLeapYearTransformer.transform, expected_arguments=["self", "X"]
         )
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
 
-        df = d.create_date_test_df()
+        df = ta.test_data.create_date_test_df()
 
         x = DateDiffLeapYearTransformer(
             column_lower="a", column_upper="b", new_column_name="c", drop_cols=True
         )
 
-        expected_call_args = {0: {"args": (d.create_date_test_df(),), "kwargs": {}}}
+        expected_call_args = {
+            0: {"args": (ta.test_data.create_date_test_df(),), "kwargs": {}}
+        }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
-            return_value=d.create_date_test_df(),
+            return_value=ta.test_data.create_date_test_df(),
         ):
 
             x.transform(df)
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_date_test_df(), expected_df_1())
-        + h.index_preserved_params(d.create_date_test_df(), expected_df_1()),
+        ta.pandas_helpers.row_by_row_params(
+            ta.test_data.create_date_test_df(), expected_df_1()
+        )
+        + ta.pandas_helpers.index_preserved_params(
+            ta.test_data.create_date_test_df(), expected_df_1()
+        ),
     )
     def test_expected_output_drop_cols_true(self, df, expected):
         """Test that the output is expected from transform, when drop_cols is True.
@@ -362,7 +368,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_frame_equal_msg(
+        ta.equality_helpers.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in DateDiffLeapYearTransformer.transform (with drop_cols)",
@@ -370,8 +376,12 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_date_test_df(), expected_df_2())
-        + h.index_preserved_params(d.create_date_test_df(), expected_df_2()),
+        ta.pandas_helpers.row_by_row_params(
+            ta.test_data.create_date_test_df(), expected_df_2()
+        )
+        + ta.pandas_helpers.index_preserved_params(
+            ta.test_data.create_date_test_df(), expected_df_2()
+        ),
     )
     def test_expected_output_drop_cols_false(self, df, expected):
         """Test that the output is expected from transform, when drop_cols is False.
@@ -386,7 +396,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_frame_equal_msg(
+        ta.equality_helpers.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in DateDiffLeapYearTransformer.transform (without drop_cols)",
@@ -394,8 +404,12 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_date_test_nulls_df(), expected_df_3())
-        + h.index_preserved_params(d.create_date_test_nulls_df(), expected_df_3()),
+        ta.pandas_helpers.row_by_row_params(
+            ta.test_data.create_date_test_nulls_df(), expected_df_3()
+        )
+        + ta.pandas_helpers.index_preserved_params(
+            ta.test_data.create_date_test_nulls_df(), expected_df_3()
+        ),
     )
     def test_expected_output_nulls(self, df, expected):
         """Test that the output is expected from transform, when columns are nulls."""
@@ -406,7 +420,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_frame_equal_msg(
+        ta.equality_helpers.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in DateDiffLeapYearTransformer.transform (nulls)",

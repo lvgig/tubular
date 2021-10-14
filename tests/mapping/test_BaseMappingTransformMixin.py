@@ -1,6 +1,5 @@
 import pandas as pd
-import test_aide.test_data as d
-import test_aide.helpers as h
+import test_aide as ta
 
 import tubular
 from tubular.mapping import BaseMappingTransformMixin
@@ -14,14 +13,16 @@ class TestInit(object):
 
         x = BaseMappingTransformMixin()
 
-        h.test_object_method(obj=x, expected_method="transform", msg="transform method")
+        ta.class_helpers.test_object_method(
+            obj=x, expected_method="transform", msg="transform method"
+        )
 
     def test_inheritance(self):
         """Test that BaseMappingTransformMixin inherits from BaseTransformer."""
 
         x = BaseMappingTransformMixin()
 
-        h.assert_inheritance(x, tubular.base.BaseTransformer)
+        ta.class_helpers.assert_inheritance(x, tubular.base.BaseTransformer)
 
 
 class TestTransform(object):
@@ -30,7 +31,7 @@ class TestTransform(object):
     def test_check_is_fitted_call(self, mocker):
         """Test the call to check_is_fitted."""
 
-        df = d.create_df_1()
+        df = ta.test_data.create_df_1()
 
         mapping = {
             "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
@@ -43,7 +44,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (["mappings"],), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
 
@@ -52,7 +53,7 @@ class TestTransform(object):
     def test_super_transform_call(self, mocker):
         """Test the call to BaseTransformer.transform."""
 
-        df = d.create_df_1()
+        df = ta.test_data.create_df_1()
 
         mapping = {
             "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
@@ -63,9 +64,9 @@ class TestTransform(object):
         x.columns = ["a", "b"]
         x.mappings = mapping
 
-        expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (ta.test_data.create_df_1(),), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
 
@@ -76,7 +77,7 @@ class TestTransform(object):
 
         spy = mocker.spy(pd.Series, "map")
 
-        df = d.create_df_1()
+        df = ta.test_data.create_df_1()
 
         mapping = {
             "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
@@ -100,7 +101,7 @@ class TestTransform(object):
 
         expected_pos_args = (df["a"], mapping["a"])
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected_pos_args,
             call_pos_arg,
             "positional args in first pd.Series.map call not correct",
@@ -115,7 +116,7 @@ class TestTransform(object):
 
         expected_pos_args = (df["b"], mapping["b"])
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected_pos_args,
             call_pos_arg,
             "positional args in second pd.Series.map call not correct",

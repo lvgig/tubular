@@ -1,4 +1,4 @@
-import test_aide.helpers as h
+import test_aide as ta
 
 from tubular.base import ReturnKeyDict
 
@@ -8,7 +8,7 @@ def test_inheritance():
 
     x = ReturnKeyDict()
 
-    h.assert_inheritance(x, dict)
+    ta.class_helpers.assert_inheritance(x, dict)
 
 
 def test_has___missing___method():
@@ -16,7 +16,7 @@ def test_has___missing___method():
 
     x = ReturnKeyDict()
 
-    h.test_object_method(
+    ta.class_helpers.test_object_method(
         x, "__missing__", "ReturnKeyDict does not have __missing__ method"
     )
 

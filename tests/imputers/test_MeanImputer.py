@@ -1,12 +1,10 @@
 import pytest
-import test_aide.test_data as d
-import test_aide.helpers as h
+import test_aide as ta
+import pandas as pd
+import numpy as np
 
 import tubular
 from tubular.imputers import MeanImputer
-
-import pandas as pd
-import numpy as np
 
 
 class TestInit(object):
@@ -15,7 +13,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=MeanImputer.__init__,
             expected_arguments=["self", "columns"],
             expected_default_values=(None,),
@@ -26,16 +24,18 @@ class TestInit(object):
 
         x = MeanImputer()
 
-        h.test_object_method(obj=x, expected_method="fit", msg="fit")
+        ta.class_helpers.test_object_method(obj=x, expected_method="fit", msg="fit")
 
-        h.test_object_method(obj=x, expected_method="transform", msg="transform")
+        ta.class_helpers.test_object_method(
+            obj=x, expected_method="transform", msg="transform"
+        )
 
     def test_inheritance(self):
         """Test that MeanImputer inherits from BaseImputer."""
 
         x = MeanImputer()
 
-        h.assert_inheritance(x, tubular.imputers.BaseImputer)
+        ta.class_helpers.assert_inheritance(x, tubular.imputers.BaseImputer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
@@ -44,7 +44,7 @@ class TestInit(object):
             0: {"args": (), "kwargs": {"columns": None, "verbose": True, "copy": True}}
         }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -57,7 +57,7 @@ class TestFit(object):
     def test_arguments(self):
         """Test that init fit expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=MeanImputer.fit,
             expected_arguments=["self", "X", "y"],
             expected_default_values=(None,),
@@ -66,13 +66,15 @@ class TestFit(object):
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseTransformer.fit."""
 
-        df = d.create_df_3()
+        df = ta.test_data.create_df_3()
 
         x = MeanImputer(columns=["a", "b", "c"])
 
-        expected_call_args = {0: {"args": (d.create_df_3(), None), "kwargs": {}}}
+        expected_call_args = {
+            0: {"args": (ta.test_data.create_df_3(), None), "kwargs": {}}
+        }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "fit", expected_call_args
         ):
 
@@ -81,13 +83,13 @@ class TestFit(object):
     def test_learnt_values(self):
         """Test that the impute values learnt during fit are expected."""
 
-        df = d.create_df_3()
+        df = ta.test_data.create_df_3()
 
         x = MeanImputer(columns=["a", "b", "c"])
 
         x.fit(df)
 
-        h.test_object_attributes(
+        ta.class_helpers.test_object_attributes(
             obj=x,
             expected_attributes={
                 "impute_values_": {
@@ -102,7 +104,7 @@ class TestFit(object):
     def test_fit_returns_self(self):
         """Test fit returns self?"""
 
-        df = d.create_df_1()
+        df = ta.test_data.create_df_1()
 
         x = MeanImputer(columns="a")
 
@@ -113,14 +115,14 @@ class TestFit(object):
     def test_fit_not_changing_data(self):
         """Test fit does not change X."""
 
-        df = d.create_df_1()
+        df = ta.test_data.create_df_1()
 
         x = MeanImputer(columns="a")
 
         x.fit(df)
 
-        h.assert_equal_dispatch(
-            expected=d.create_df_1(),
+        ta.equality_helpers.assert_equal_dispatch(
+            expected=ta.test_data.create_df_1(),
             actual=df,
             msg="Check X not changing during fit",
         )
@@ -166,14 +168,14 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=MeanImputer.transform, expected_arguments=["self", "X"]
         )
 
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""
 
-        df = d.create_df_1()
+        df = ta.test_data.create_df_1()
 
         x = MeanImputer(columns="a")
 
@@ -181,7 +183,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (["impute_values_"],), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
 
@@ -190,15 +192,15 @@ class TestTransform(object):
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
 
-        df = d.create_df_1()
+        df = ta.test_data.create_df_1()
 
         x = MeanImputer(columns="a")
 
         x.fit(df)
 
-        expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (ta.test_data.create_df_1(),), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
 
@@ -206,8 +208,10 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_3(), expected_df_1())
-        + h.index_preserved_params(d.create_df_3(), expected_df_1()),
+        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_3(), expected_df_1())
+        + ta.pandas_helpers.index_preserved_params(
+            ta.test_data.create_df_3(), expected_df_1()
+        ),
     )
     def test_nulls_imputed_correctly(self, df, expected):
         """Test missing values are filled with the correct values."""
@@ -219,7 +223,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="Check nulls filled correctly in transform",
@@ -227,8 +231,10 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_3(), expected_df_2())
-        + h.index_preserved_params(d.create_df_3(), expected_df_2()),
+        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_3(), expected_df_2())
+        + ta.pandas_helpers.index_preserved_params(
+            ta.test_data.create_df_3(), expected_df_2()
+        ),
     )
     def test_nulls_imputed_correctly_2(self, df, expected):
         """Test missing values are filled with the correct values - and unrelated columns are not changed."""
@@ -240,7 +246,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="Check nulls filled correctly in transform",
@@ -249,7 +255,7 @@ class TestTransform(object):
     def test_learnt_values_not_modified(self):
         """Test that the impute_values_ from fit are not changed in transform."""
 
-        df = d.create_df_3()
+        df = ta.test_data.create_df_3()
 
         x = MeanImputer(columns=["a", "b", "c"])
 
@@ -259,7 +265,7 @@ class TestTransform(object):
 
         x2.fit_transform(df)
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected=x.impute_values_,
             actual=x2.impute_values_,
             msg="Impute values not changed in transform",

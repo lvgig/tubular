@@ -1,7 +1,5 @@
 import pytest
-import test_aide.test_data as d
-import test_aide.helpers as h
-
+import test_aide as ta
 import pandas as pd
 import numpy as np
 
@@ -15,7 +13,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=GroupRareLevelsTransformer.__init__,
             expected_arguments=[
                 "self",
@@ -33,16 +31,18 @@ class TestInit(object):
 
         x = GroupRareLevelsTransformer()
 
-        h.test_object_method(obj=x, expected_method="fit", msg="fit")
+        ta.class_helpers.test_object_method(obj=x, expected_method="fit", msg="fit")
 
-        h.test_object_method(obj=x, expected_method="transform", msg="transform")
+        ta.class_helpers.test_object_method(
+            obj=x, expected_method="transform", msg="transform"
+        )
 
     def test_inheritance(self):
         """Test that NominalToIntegerTransformer inherits from BaseNominalTransformer."""
 
         x = GroupRareLevelsTransformer()
 
-        h.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
+        ta.class_helpers.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
@@ -51,7 +51,7 @@ class TestInit(object):
             0: {"args": (), "kwargs": {"columns": None, "verbose": True, "copy": True}}
         }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -102,7 +102,7 @@ class TestInit(object):
             record_rare_levels=False,
         )
 
-        h.test_object_attributes(
+        ta.class_helpers.test_object_attributes(
             obj=x,
             expected_attributes={
                 "cut_off_percent": 0.05,
@@ -120,7 +120,7 @@ class TestFit(object):
     def test_arguments(self):
         """Test that init fit expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=GroupRareLevelsTransformer.fit,
             expected_arguments=["self", "X", "y"],
             expected_default_values=(None,),
@@ -129,13 +129,15 @@ class TestFit(object):
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseTransformer.fit."""
 
-        df = d.create_df_5()
+        df = ta.test_data.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
 
-        expected_call_args = {0: {"args": (d.create_df_5(), None), "kwargs": {}}}
+        expected_call_args = {
+            0: {"args": (ta.test_data.create_df_5(), None), "kwargs": {}}
+        }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "fit", expected_call_args
         ):
 
@@ -144,7 +146,7 @@ class TestFit(object):
     def test_weight_column_not_in_X_error(self):
         """Test that an exception is raised if weight is not in X."""
 
-        df = d.create_df_5()
+        df = ta.test_data.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"], weight="aaaa")
 
@@ -155,7 +157,7 @@ class TestFit(object):
     def test_fit_returns_self(self):
         """Test fit returns self?"""
 
-        df = d.create_df_5()
+        df = ta.test_data.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
 
@@ -168,14 +170,14 @@ class TestFit(object):
     def test_fit_not_changing_data(self):
         """Test fit does not change X."""
 
-        df = d.create_df_5()
+        df = ta.test_data.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
 
         x.fit(df)
 
-        h.assert_equal_dispatch(
-            expected=d.create_df_5(),
+        ta.equality_helpers.assert_equal_dispatch(
+            expected=ta.test_data.create_df_5(),
             actual=df,
             msg="Check X not changing during fit",
         )
@@ -183,13 +185,13 @@ class TestFit(object):
     def test_learnt_values_no_weight(self):
         """Test that the impute values learnt during fit, without using a weight, are expected."""
 
-        df = d.create_df_5()
+        df = ta.test_data.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"], cut_off_percent=0.2)
 
         x.fit(df)
 
-        h.test_object_attributes(
+        ta.class_helpers.test_object_attributes(
             obj=x,
             expected_attributes={
                 "mapping_": {"b": ["a", np.NaN], "c": ["a", "c", "e"]}
@@ -200,13 +202,13 @@ class TestFit(object):
     def test_learnt_values_weight(self):
         """Test that the impute values learnt during fit, using a weight, are expected."""
 
-        df = d.create_df_6()
+        df = ta.test_data.create_df_6()
 
         x = GroupRareLevelsTransformer(columns=["b"], cut_off_percent=0.3, weights="a")
 
         x.fit(df)
 
-        h.test_object_attributes(
+        ta.class_helpers.test_object_attributes(
             obj=x,
             expected_attributes={"mapping_": {"b": ["a", np.NaN]}},
             msg="mapping_ attribute",
@@ -215,13 +217,13 @@ class TestFit(object):
     def test_learnt_values_weight_2(self):
         """Test that the impute values learnt during fit, using a weight, are expected."""
 
-        df = d.create_df_6()
+        df = ta.test_data.create_df_6()
 
         x = GroupRareLevelsTransformer(columns=["c"], cut_off_percent=0.2, weights="a")
 
         x.fit(df)
 
-        h.test_object_attributes(
+        ta.class_helpers.test_object_attributes(
             obj=x,
             expected_attributes={"mapping_": {"c": ["f", "g"]}},
             msg="mapping_ attribute",
@@ -230,7 +232,7 @@ class TestFit(object):
     def test_rare_level_name_not_diff_col_type(self):
         """Test that an exception is raised if rare_level_name is of a different type with respect columns."""
 
-        df = d.create_df_10()
+        df = ta.test_data.create_df_10()
 
         with pytest.raises(
             ValueError, match="rare_level_name must be of the same type of the columns"
@@ -292,14 +294,14 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=GroupRareLevelsTransformer.transform, expected_arguments=["self", "X"]
         )
 
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""
 
-        df = d.create_df_5()
+        df = ta.test_data.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
 
@@ -307,7 +309,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (["mapping_"],), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
 
@@ -316,20 +318,20 @@ class TestTransform(object):
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
 
-        df = d.create_df_5()
+        df = ta.test_data.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
 
         x.fit(df)
 
-        expected_call_args = {0: {"args": (d.create_df_5(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (ta.test_data.create_df_5(),), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
-            return_value=d.create_df_5(),
+            return_value=ta.test_data.create_df_5(),
         ):
 
             x.transform(df)
@@ -337,7 +339,7 @@ class TestTransform(object):
     def test_learnt_values_not_modified(self):
         """Test that the mapping_ from fit are not changed in transform."""
 
-        df = d.create_df_5()
+        df = ta.test_data.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
 
@@ -349,7 +351,7 @@ class TestTransform(object):
 
         x2.transform(df)
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected=x.mapping_,
             actual=x2.mapping_,
             msg="Non rare levels not changed in transform",
@@ -357,8 +359,10 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_5(), expected_df_1())
-        + h.index_preserved_params(d.create_df_5(), expected_df_1()),
+        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_5(), expected_df_1())
+        + ta.pandas_helpers.index_preserved_params(
+            ta.test_data.create_df_5(), expected_df_1()
+        ),
     )
     def test_expected_output_no_weight(self, df, expected):
         """Test that the output is expected from transform."""
@@ -370,7 +374,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_frame_equal_msg(
+        ta.equality_helpers.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in GroupRareLevelsTransformer.transform",
@@ -388,7 +392,7 @@ class TestTransform(object):
 
         one_row_df_transformed = x.transform(one_row_df)
 
-        h.assert_frame_equal_msg(
+        ta.equality_helpers.assert_frame_equal_msg(
             actual=one_row_df_transformed,
             expected=one_row_df,
             msg_tag="Unexpected values in GroupRareLevelsTransformer.transform",
@@ -411,7 +415,7 @@ class TestTransform(object):
 
         one_row_df_transformed = x.transform(one_row_df)
 
-        h.assert_frame_equal_msg(
+        ta.equality_helpers.assert_frame_equal_msg(
             actual=one_row_df_transformed,
             expected=one_row_df,
             msg_tag="Unexpected values in GroupRareLevelsTransformer.transform",
@@ -419,8 +423,10 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_6(), expected_df_2())
-        + h.index_preserved_params(d.create_df_6(), expected_df_2()),
+        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_6(), expected_df_2())
+        + ta.pandas_helpers.index_preserved_params(
+            ta.test_data.create_df_6(), expected_df_2()
+        ),
     )
     def test_expected_output_weight(self, df, expected):
         """Test that the output is expected from transform, when weights are used."""
@@ -432,7 +438,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_frame_equal_msg(
+        ta.equality_helpers.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in GroupRareLevelsTransformer.transform (with weights)",
@@ -442,7 +448,7 @@ class TestTransform(object):
     def test_rare_level_name_same_col_type(self, label, col):
         """Test that checks if output columns are of the same type with respect to the input label."""
 
-        df = d.create_df_10()
+        df = ta.test_data.create_df_10()
 
         x = GroupRareLevelsTransformer(columns=[col], rare_level_name=label)
 

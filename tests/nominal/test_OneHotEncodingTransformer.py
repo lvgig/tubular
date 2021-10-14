@@ -1,7 +1,5 @@
 import pytest
-import test_aide.test_data as d
-import test_aide.helpers as h
-
+import test_aide as ta
 import pandas as pd
 import sklearn
 
@@ -15,7 +13,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=OneHotEncodingTransformer.__init__,
             expected_arguments=[
                 "self",
@@ -33,21 +31,23 @@ class TestInit(object):
 
         x = OneHotEncodingTransformer()
 
-        h.test_object_method(obj=x, expected_method="fit", msg="fit")
-        h.test_object_method(obj=x, expected_method="transform", msg="transform")
+        ta.class_helpers.test_object_method(obj=x, expected_method="fit", msg="fit")
+        ta.class_helpers.test_object_method(
+            obj=x, expected_method="transform", msg="transform"
+        )
 
     def test_inheritance(self):
         """Test that OneHotEncodingTransformer inherits from BaseNominalTransformer and sklean's OneHotEncoder."""
 
         x = OneHotEncodingTransformer()
 
-        h.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
-        h.assert_inheritance(x, sklearn.preprocessing.OneHotEncoder)
+        ta.class_helpers.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
+        ta.class_helpers.assert_inheritance(x, sklearn.preprocessing.OneHotEncoder)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseNominalTransformer.init.
 
-        Note, not using h.assert_function_call for this as it does not handle self being passed to BaseNominalTransformer.init.
+        Note, not using ta.function_helpers.assert_function_call for this as it does not handle self being passed to BaseNominalTransformer.init.
         """
 
         expected_keyword_args = {"columns": None, "verbose": True, "copy": True}
@@ -64,7 +64,7 @@ class TestInit(object):
         call_pos_args = call_args[0]
         call_kwargs = call_args[1]
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected=expected_keyword_args,
             actual=call_kwargs,
             msg="kwargs for BaseNominalTransformer.__init__ in OneHotEncodingTransformer.init",
@@ -81,7 +81,7 @@ class TestInit(object):
     def test_one_hot_encoder_init_called(self, mocker):
         """Test that init calls OneHotEncoder.init.
 
-        Again not using h.assert_function_call for this as it does not handle self being passed to OneHotEncoder.init
+        Again not using ta.function_helpers.assert_function_call for this as it does not handle self being passed to OneHotEncoder.init
         """
 
         expected_keyword_args = {"sparse": False, "handle_unknown": "ignore"}
@@ -100,7 +100,7 @@ class TestInit(object):
         call_pos_args = call_args[0]
         call_kwargs = call_args[1]
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected=expected_keyword_args,
             actual=call_kwargs,
             msg="kwargs for OneHotEncoder.__init__ in OneHotEncodingTransformer.init",
@@ -121,7 +121,7 @@ class TestInit(object):
             columns=None, verbose=True, copy=True, separator="x", drop_original=True
         )
 
-        h.test_object_attributes(
+        ta.class_helpers.test_object_attributes(
             obj=x,
             expected_attributes={"separator": "x", "drop_original": True},
             msg="Attributes for OneHotEncodingTransformer set in init",
@@ -134,7 +134,7 @@ class TestFit(object):
     def test_arguments(self):
         """Test that init fit expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=OneHotEncodingTransformer.fit,
             expected_arguments=["self", "X", "y"],
             expected_default_values=(None,),
@@ -143,13 +143,13 @@ class TestFit(object):
     def test_columns_set_or_check_called(self, mocker):
         """Test that fit calls BaseNominalTransformer.columns_set_or_check."""
 
-        df = d.create_df_1()
+        df = ta.test_data.create_df_1()
 
         x = OneHotEncodingTransformer(columns="b")
 
-        expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (ta.test_data.create_df_1(),), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker,
             tubular.nominal.BaseNominalTransformer,
             "columns_set_or_check",
@@ -161,9 +161,9 @@ class TestFit(object):
     def test_base_nominal_transformer_fit_called(self, mocker):
         """Test that fit calls BaseNominalTransformer.fit."""
 
-        expected_keyword_args = {"X": d.create_df_1(), "y": None}
+        expected_keyword_args = {"X": ta.test_data.create_df_1(), "y": None}
 
-        df = d.create_df_1()
+        df = ta.test_data.create_df_1()
 
         x = OneHotEncodingTransformer(columns="b")
 
@@ -179,7 +179,7 @@ class TestFit(object):
         call_pos_args = call_args[0]
         call_kwargs = call_args[1]
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected=expected_keyword_args,
             actual=call_kwargs,
             msg="kwargs for BaseNominalTransformer.fit in OneHotEncodingTransformer.init",
@@ -196,9 +196,9 @@ class TestFit(object):
     def test_one_hot_encoder_fit_called(self, mocker):
         """Test that fit calls OneHotEncoder.fit."""
 
-        expected_keyword_args = {"X": d.create_df_1()[["b"]], "y": None}
+        expected_keyword_args = {"X": ta.test_data.create_df_1()[["b"]], "y": None}
 
-        df = d.create_df_1()
+        df = ta.test_data.create_df_1()
 
         x = OneHotEncodingTransformer(columns="b")
 
@@ -214,7 +214,7 @@ class TestFit(object):
         call_pos_args = call_args[0]
         call_kwargs = call_args[1]
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected=expected_keyword_args,
             actual=call_kwargs,
             msg="kwargs for OneHotEncoder.fit in OneHotEncodingTransformer.init",
@@ -231,7 +231,7 @@ class TestFit(object):
     def test_nulls_in_X_error(self):
         """Test that an exception is raised if X has nulls in column to be fit on."""
 
-        df = d.create_df_2()
+        df = ta.test_data.create_df_2()
 
         x = OneHotEncodingTransformer(columns=["b", "c"])
 
@@ -244,7 +244,7 @@ class TestFit(object):
     def test_fields_with_over_100_levels_error(self):
         """Test that OneHotEncodingTransformer.fit on fields with more than 100 levels raises error."""
 
-        df = d.prepare_boston_df()
+        df = ta.test_data.prepare_boston_df()
         df = df.loc[df["CRIM"].notnull(), ["CHAS_cat", "CRIM"]]
 
         x = OneHotEncodingTransformer(columns=["CHAS_cat", "CRIM"])
@@ -259,7 +259,7 @@ class TestFit(object):
     def test_fit_returns_self(self):
         """Test fit returns self?"""
 
-        df = d.create_df_1()
+        df = ta.test_data.create_df_1()
 
         x = OneHotEncodingTransformer(columns="b")
 
@@ -272,14 +272,14 @@ class TestFit(object):
     def test_fit_not_changing_data(self):
         """Test fit does not change X."""
 
-        df = d.create_df_1()
+        df = ta.test_data.create_df_1()
 
         x = OneHotEncodingTransformer(columns="b")
 
         x.fit(df)
 
-        h.assert_equal_dispatch(
-            expected=d.create_df_1(),
+        ta.equality_helpers.assert_equal_dispatch(
+            expected=ta.test_data.create_df_1(),
             actual=df,
             msg="Check X not changing during fit",
         )
@@ -337,22 +337,22 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.function_helpers.test_function_arguments(
             func=OneHotEncodingTransformer.transform, expected_arguments=["self", "X"]
         )
 
     def test_columns_check_call(self, mocker):
         """Test the first call to BaseTransformer columns_check."""
 
-        df = d.create_df_1()
+        df = ta.test_data.create_df_1()
 
         x = OneHotEncodingTransformer(columns="b")
 
         x.fit(df)
 
-        expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (ta.test_data.create_df_1(),), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "columns_check", expected_call_args
         ):
 
@@ -361,7 +361,7 @@ class TestTransform(object):
     def test_check_is_fitted_first_call(self, mocker):
         """Test the calls to BaseTransformer check_is_fitted."""
 
-        df = d.create_df_1()
+        df = ta.test_data.create_df_1()
 
         x = OneHotEncodingTransformer(columns="b")
 
@@ -372,7 +372,7 @@ class TestTransform(object):
             1: {"args": (["drop_original"],), "kwargs": {}},
         }
 
-        with h.assert_function_call(
+        with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
 
@@ -381,8 +381,8 @@ class TestTransform(object):
     def test_non_numeric_column_error_1(self):
         """Test that transform will raise an error if a column to transform has nulls."""
 
-        df_train = d.create_df_1()
-        df_test = d.create_df_2()
+        df_train = ta.test_data.create_df_1()
+        df_test = ta.test_data.create_df_2()
 
         x = OneHotEncodingTransformer(columns=["b"])
 
@@ -397,7 +397,7 @@ class TestTransform(object):
     def test_base_nominal_transformer_transform_called(self, mocker):
         """Test that BaseNominalTransformer.transform called."""
 
-        df = d.create_df_1()
+        df = ta.test_data.create_df_1()
 
         x = OneHotEncodingTransformer(columns="b")
 
@@ -405,7 +405,7 @@ class TestTransform(object):
 
         mocker.patch(
             "tubular.nominal.BaseNominalTransformer.transform",
-            return_value=d.create_df_1(),
+            return_value=ta.test_data.create_df_1(),
         )
 
         x.transform(df)
@@ -418,19 +418,19 @@ class TestTransform(object):
         call_pos_args = call_args[0]
         call_kwargs = call_args[1]
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected={},
             actual=call_kwargs,
             msg="kwargs for BaseNominalTransformer.transform in OneHotEncodingTransformer.init",
         )
 
-        expected_pos_args = (x, d.create_df_1())
+        expected_pos_args = (x, ta.test_data.create_df_1())
 
         assert (
             len(call_pos_args) == 2
         ), f"Unepxected number of positional args in BaseNominalTransformer.transform call -\n  Expected: 2\n  Actual: {len(call_pos_args)}"
 
-        h.assert_frame_equal_msg(
+        ta.equality_helpers.assert_frame_equal_msg(
             expected=expected_pos_args[1],
             actual=call_pos_args[1],
             msg_tag="X positional arg in BaseNominalTransformer.transform call",
@@ -443,7 +443,7 @@ class TestTransform(object):
     def test_one_hot_encoder_transform_called(self, mocker):
         """Test that OneHotEncoder.transform called."""
 
-        df = d.create_df_1()
+        df = ta.test_data.create_df_1()
 
         x = OneHotEncodingTransformer(columns="b")
 
@@ -461,7 +461,7 @@ class TestTransform(object):
         call_pos_args = call_args[0]
         call_kwargs = call_args[1]
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected={},
             actual=call_kwargs,
             msg="kwargs for OneHotEncodingTransformer.transform in BaseTransformer.init",
@@ -475,16 +475,18 @@ class TestTransform(object):
             call_pos_args[0] is x
         ), f"Unexpected positional arg (self, index 1) in OneHotEncodingTransformer.transform call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
 
-        h.assert_frame_equal_msg(
-            expected=d.create_df_1()[["b"]],
+        ta.equality_helpers.assert_frame_equal_msg(
+            expected=ta.test_data.create_df_1()[["b"]],
             actual=call_pos_args[1],
             msg_tag="X positional arg in OneHotEncodingTransformer.transform call",
         )
 
     @pytest.mark.parametrize(
         "df_test, expected",
-        h.row_by_row_params(d.create_df_7(), expected_df_1())
-        + h.index_preserved_params(d.create_df_7(), expected_df_1()),
+        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_7(), expected_df_1())
+        + ta.pandas_helpers.index_preserved_params(
+            ta.test_data.create_df_7(), expected_df_1()
+        ),
     )
     def test_expected_output(self, df_test, expected):
         """Test that OneHotEncodingTransformer.transform encodes the feature correctly.
@@ -493,13 +495,13 @@ class TestTransform(object):
         """
 
         # transformer is fit on the whole dataset separately from the input df to work with the decorators
-        df_train = d.create_df_7()
+        df_train = ta.test_data.create_df_7()
         x = OneHotEncodingTransformer(columns="b")
         x.fit(df_train)
 
         df_transformed = x.transform(df_test)
 
-        h.assert_frame_equal_msg(
+        ta.equality_helpers.assert_frame_equal_msg(
             expected=expected,
             actual=df_transformed,
             msg_tag="Unspecified columns changed in transform",
@@ -508,8 +510,8 @@ class TestTransform(object):
     def test_categories_not_modified(self):
         """Test that the categories from fit are not changed in transform."""
 
-        df_train = d.create_df_1()
-        df_test = d.create_df_7()
+        df_train = ta.test_data.create_df_1()
+        df_test = ta.test_data.create_df_7()
 
         x = OneHotEncodingTransformer(columns=["a", "b"], verbose=False)
         x2 = OneHotEncodingTransformer(columns=["a", "b"], verbose=False)
@@ -519,13 +521,13 @@ class TestTransform(object):
 
         x.transform(df_test)
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected=list(x2.categories_[0]),
             actual=list(x.categories_[0]),
             msg="categories_ (index 0) modified during transform",
         )
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected=list(x2.categories_[1]),
             actual=list(x.categories_[1]),
             msg="categories_ (index 1) modified during transform",
@@ -534,7 +536,7 @@ class TestTransform(object):
     def test_renaming_feature_works_as_expected(self):
         """Test OneHotEncodingTransformer.transform() is renaming features correctly."""
 
-        df = d.create_df_7()
+        df = ta.test_data.create_df_7()
         df = df[["b", "c"]]
 
         x = OneHotEncodingTransformer(
@@ -545,7 +547,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected=["b|x", "b|y", "b|z", "c|a", "c|b", "c|c"],
             actual=list(df_transformed.columns.values),
             msg="renaming columns feature in OneHotEncodingTransformer.transform",
@@ -554,8 +556,8 @@ class TestTransform(object):
     def test_warning_generated_by_unseen_categories(self):
         """Test OneHotEncodingTransformer.transform triggers a warning for unseen categories."""
 
-        df_train = d.create_df_7()
-        df_test = d.create_df_8()
+        df_train = ta.test_data.create_df_7()
+        df_test = ta.test_data.create_df_8()
 
         x = OneHotEncodingTransformer(verbose=True)
 
@@ -567,20 +569,22 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df_test, expected",
-        h.row_by_row_params(d.create_df_8(), expected_df_2())
-        + h.index_preserved_params(d.create_df_8(), expected_df_2()),
+        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_8(), expected_df_2())
+        + ta.pandas_helpers.index_preserved_params(
+            ta.test_data.create_df_8(), expected_df_2()
+        ),
     )
     def test_unseen_categories_encoded_as_all_zeroes(self, df_test, expected):
         """Test OneHotEncodingTransformer.transform encodes unseen categories correctly (all 0s)."""
 
         # transformer is fit on the whole dataset separately from the input df to work with the decorators
-        df_train = d.create_df_7()
+        df_train = ta.test_data.create_df_7()
         x = OneHotEncodingTransformer(columns=["a", "b", "c"], verbose=False)
         x.fit(df_train)
 
         df_transformed = x.transform(df_test)
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="unseen category rows not encoded as 0s",
@@ -589,7 +593,7 @@ class TestTransform(object):
     def test_original_columns_dropped_when_specified(self):
         """Test OneHotEncodingTransformer.transform drops original columns get when specified."""
 
-        df = d.create_df_7()
+        df = ta.test_data.create_df_7()
 
         x = OneHotEncodingTransformer(columns=["a", "b", "c"], drop_original=True)
 
@@ -597,7 +601,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected=["a", "b", "c"],
             actual=[
                 x for x in df.columns.values if x not in df_transformed.columns.values
@@ -608,7 +612,7 @@ class TestTransform(object):
     def test_original_columns_kept_when_specified(self):
         """Test OneHotEncodingTransformer.transform keeps original columns when specified."""
 
-        df = d.create_df_7()
+        df = ta.test_data.create_df_7()
 
         x = OneHotEncodingTransformer(drop_original=False)
 
@@ -616,7 +620,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_equal_dispatch(
+        ta.equality_helpers.assert_equal_dispatch(
             expected=list(set()),
             actual=list(set(["a", "b", "c"]) - set(df_transformed.columns)),
             msg="original columns not kept",
