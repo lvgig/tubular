@@ -201,10 +201,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_7(), expected_df_1())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_7(), expected_df_1()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_7(), expected_df_1()),
     )
     def test_expected_output_no_overwrite(self, df, expected):
         """Test a single column output from transform gives expected results, when not overwriting the original column."""
@@ -226,10 +223,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_7(), expected_df_2())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_7(), expected_df_2()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_7(), expected_df_2()),
     )
     def test_expected_output_overwrite(self, df, expected):
         """Test a single column output from transform gives expected results, when overwriting the original column."""

@@ -484,10 +484,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df_test, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_7(), expected_df_1())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_7(), expected_df_1()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_7(), expected_df_1()),
     )
     def test_expected_output(self, df_test, expected):
         """Test that OneHotEncodingTransformer.transform encodes the feature correctly.
@@ -570,10 +567,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df_test, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_8(), expected_df_2())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_8(), expected_df_2()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_8(), expected_df_2()),
     )
     def test_unseen_categories_encoded_as_all_zeroes(self, df_test, expected):
         """Test OneHotEncodingTransformer.transform encodes unseen categories correctly (all 0s)."""

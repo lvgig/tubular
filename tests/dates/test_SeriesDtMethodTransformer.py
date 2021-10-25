@@ -213,9 +213,7 @@ class TestTransform(object):
             new_column_name="a2", pd_method_name="year", column="a"
         )
 
-        expected_call_args = {
-            0: {"args": (d.create_datediff_test_df(),), "kwargs": {}}
-        }
+        expected_call_args = {0: {"args": (d.create_datediff_test_df(),), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
@@ -225,10 +223,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(
-            d.create_datediff_test_df(), expected_df_1()
-        )
-        + ta.pandas_helpers.index_preserved_params(
+        ta.pandas_helpers.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_1()
         ),
     )
@@ -252,10 +247,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(
-            d.create_datediff_test_df(), expected_df_2()
-        )
-        + ta.pandas_helpers.index_preserved_params(
+        ta.pandas_helpers.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_2()
         ),
     )
@@ -279,10 +271,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(
-            d.create_datediff_test_df(), expected_df_3()
-        )
-        + ta.pandas_helpers.index_preserved_params(
+        ta.pandas_helpers.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_3()
         ),
     )

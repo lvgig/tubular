@@ -85,10 +85,7 @@ class TestTransform:
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_2(), expected_df_1())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_2(), expected_df_1()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_2(), expected_df_1()),
     )
     def test_expected_output_1(self, df, expected):
         """Test that transform is giving the expected output when applied to float column."""
@@ -107,10 +104,7 @@ class TestTransform:
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_2(), expected_df_2())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_2(), expected_df_2()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_2(), expected_df_2()),
     )
     def test_expected_output_2(self, df, expected):
         """Test that transform is giving the expected output when applied to object column."""
@@ -129,10 +123,7 @@ class TestTransform:
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_2(), expected_df_3())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_2(), expected_df_3()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_2(), expected_df_3()),
     )
     def test_expected_output_3(self, df, expected):
         """Test that transform is giving the expected output when applied to object and categorical columns."""

@@ -134,9 +134,7 @@ class TestFit(object):
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
 
-        expected_call_args = {
-            0: {"args": (d.create_df_5(), None), "kwargs": {}}
-        }
+        expected_call_args = {0: {"args": (d.create_df_5(), None), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "fit", expected_call_args
@@ -360,10 +358,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_5(), expected_df_1())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_5(), expected_df_1()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_5(), expected_df_1()),
     )
     def test_expected_output_no_weight(self, df, expected):
         """Test that the output is expected from transform."""
@@ -424,10 +419,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_6(), expected_df_2())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_6(), expected_df_2()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_6(), expected_df_2()),
     )
     def test_expected_output_weight(self, df, expected):
         """Test that the output is expected from transform, when weights are used."""

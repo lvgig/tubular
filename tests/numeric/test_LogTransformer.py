@@ -218,10 +218,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_1())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_3(), expected_df_1()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
     )
     def test_expected_output_1(self, df, expected):
         """Test that transform is giving the expected output when not adding one and dropping original columns."""
@@ -240,10 +237,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_2())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_3(), expected_df_2()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_3(), expected_df_2()),
     )
     def test_expected_output_2(self, df, expected):
         """Test that transform is giving the expected output when adding one and dropping original columns."""
@@ -260,10 +254,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_3())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_3(), expected_df_3()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_3(), expected_df_3()),
     )
     def test_expected_output_3(self, df, expected):
         """Test that transform is giving the expected output when not adding one and not dropping original columns."""
@@ -282,10 +273,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_4())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_3(), expected_df_4()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_3(), expected_df_4()),
     )
     def test_expected_output_4(self, df, expected):
         """Test that transform is giving the expected output when adding one and not dropping original columns."""
@@ -304,10 +292,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_4(), expected_df_5())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_4(), expected_df_5()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_4(), expected_df_5()),
     )
     def test_expected_output_5(self, df, expected):
         """Test that transform is giving the expected output when adding one and not dropping
@@ -327,10 +312,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_4(), expected_df_6())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_4(), expected_df_6()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_4(), expected_df_6()),
     )
     def test_expected_output_6(self, df, expected):
         """Test that transform is giving the expected output when  not adding one and dropping

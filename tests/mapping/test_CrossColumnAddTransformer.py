@@ -200,10 +200,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_1(), expected_df_1())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_1(), expected_df_1()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_1(), expected_df_1()),
     )
     def test_expected_output(self, df, expected):
         """Test that transform is giving the expected output."""
@@ -222,10 +219,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_1(), expected_df_2())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_1(), expected_df_2()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_1(), expected_df_2()),
     )
     def test_non_specified_values_unchanged(self, df, expected):
         """Test that values not specified in mappings are left unchanged in transform."""
@@ -244,10 +238,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_5(), expected_df_3())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_5(), expected_df_3()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_5(), expected_df_3()),
     )
     def test_multiple_mappings_expected_output(self, df, expected):
         """Test that mappings by multiple columns are both applied in transform"""

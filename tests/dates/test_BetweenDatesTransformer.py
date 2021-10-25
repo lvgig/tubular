@@ -273,10 +273,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(
-            d.create_is_between_dates_df_1(), expected_df_1()
-        )
-        + ta.pandas_helpers.index_preserved_params(
+        ta.pandas_helpers.adjusted_dataframe_params(
             d.create_is_between_dates_df_1(), expected_df_1()
         ),
     )
@@ -302,10 +299,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(
-            d.create_is_between_dates_df_2(), expected_df_2()
-        )
-        + ta.pandas_helpers.index_preserved_params(
+        ta.pandas_helpers.adjusted_dataframe_params(
             d.create_is_between_dates_df_2(), expected_df_2()
         ),
     )
@@ -331,10 +325,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(
-            d.create_is_between_dates_df_2(), expected_df_3()
-        )
-        + ta.pandas_helpers.index_preserved_params(
+        ta.pandas_helpers.adjusted_dataframe_params(
             d.create_is_between_dates_df_2(), expected_df_3()
         ),
     )
@@ -360,10 +351,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(
-            d.create_is_between_dates_df_2(), expected_df_4()
-        )
-        + ta.pandas_helpers.index_preserved_params(
+        ta.pandas_helpers.adjusted_dataframe_params(
             d.create_is_between_dates_df_2(), expected_df_4()
         ),
     )
@@ -389,10 +377,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(
-            d.create_is_between_dates_df_2(), expected_df_5()
-        )
-        + ta.pandas_helpers.index_preserved_params(
+        ta.pandas_helpers.adjusted_dataframe_params(
             d.create_is_between_dates_df_2(), expected_df_5()
         ),
     )

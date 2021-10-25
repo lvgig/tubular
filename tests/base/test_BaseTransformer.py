@@ -288,12 +288,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(
-            d.create_df_1(), d.create_df_1()
-        )
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_1(), d.create_df_1()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_1(), d.create_df_1()),
     )
     def test_X_returned(self, df, expected):
         """Test that X is returned from transform."""

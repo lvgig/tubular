@@ -197,9 +197,7 @@ class TestFit(object):
 
         x = ScalingTransformer(columns=["a"], scaler="standard")
 
-        expected_call_args = {
-            0: {"args": (d.create_df_2(), None), "kwargs": {}}
-        }
+        expected_call_args = {0: {"args": (d.create_df_2(), None), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "fit", expected_call_args

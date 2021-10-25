@@ -206,10 +206,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_1())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_3(), expected_df_1()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
     )
     def test_expected_output_single_columns_assignment(self, df, expected):
         """Test a single column output from transform gives expected results."""
@@ -231,10 +228,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_2())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_3(), expected_df_2()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_3(), expected_df_2()),
     )
     def test_expected_output_multi_columns_assignment(self, df, expected):
         """Test a multiple column output from transform gives expected results."""

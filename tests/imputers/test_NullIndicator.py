@@ -92,10 +92,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_9(), expected_df_1())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_9(), expected_df_1()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_9(), expected_df_1()),
     )
     def test_null_indicator_columns_correct(self, df, expected):
         """Test that the created indicator column is correct - and unrelated columns are unchanged"""

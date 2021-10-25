@@ -90,10 +90,7 @@ class TestTransform:
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_2(), expected_df_1())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_2(), expected_df_1()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_2(), expected_df_1()),
     )
     def test_value_set_in_transform(self, df, expected):
         """Test that transform sets the value as expected."""

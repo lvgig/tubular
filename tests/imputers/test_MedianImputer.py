@@ -71,9 +71,7 @@ class TestFit(object):
 
         x = MedianImputer(columns=["a", "b", "c"])
 
-        expected_call_args = {
-            0: {"args": (d.create_df_3(), None), "kwargs": {}}
-        }
+        expected_call_args = {0: {"args": (d.create_df_3(), None), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "fit", expected_call_args
@@ -209,10 +207,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_1())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_3(), expected_df_1()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
     )
     def test_nulls_imputed_correctly(self, df, expected):
         """Test missing values are filled with the correct values."""
@@ -232,10 +227,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_2())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_3(), expected_df_2()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_3(), expected_df_2()),
     )
     def test_nulls_imputed_correctly_2(self, df, expected):
         """Test missing values are filled with the correct values - and unrelated columns are not changed."""

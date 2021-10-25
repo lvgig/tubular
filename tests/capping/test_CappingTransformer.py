@@ -356,9 +356,7 @@ class TestFit(object):
             quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
         )
 
-        expected_call_args = {
-            0: {"args": (d.create_df_9(), None), "kwargs": {}}
-        }
+        expected_call_args = {0: {"args": (d.create_df_9(), None), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "fit", expected_call_args
@@ -705,10 +703,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_1())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_3(), expected_df_1()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
     )
     def test_expected_output_min_and_max_combinations(self, df, expected):
         """Test that capping is applied correctly in transform."""
@@ -727,10 +722,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(d.create_df_4(), expected_df_2())
-        + ta.pandas_helpers.index_preserved_params(
-            d.create_df_4(), expected_df_2()
-        ),
+        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_4(), expected_df_2()),
     )
     def test_non_cap_column_left_untouched(self, df, expected):
         """Test that capping is applied only to specific columns, others remain the same."""
