@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 import pandas as pd
 
 import tubular
@@ -138,7 +139,7 @@ class TestTransform(object):
     def test_super_transform_call(self, mocker):
         """Test the call to BaseMappingTransformMixin.transform."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         mapping = {
             "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
@@ -165,7 +166,7 @@ class TestTransform(object):
             call_kwargs == expected_kwargs
         ), "unexpected kwargs in BaseMappingTransformMixin.transform call"
 
-        expected_pos_args = (x, ta.test_data.create_df_1())
+        expected_pos_args = (x, d.create_df_1())
 
         assert (
             expected_pos_args[0] == call_pos_args[0]
@@ -179,9 +180,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_1(), expected_df_1())
+        ta.pandas_helpers.row_by_row_params(d.create_df_1(), expected_df_1())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_1(), expected_df_1()
+            d.create_df_1(), expected_df_1()
         ),
     )
     def test_expected_output(self, df, expected):
@@ -204,9 +205,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_1(), expected_df_2())
+        ta.pandas_helpers.row_by_row_params(d.create_df_1(), expected_df_2())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_1(), expected_df_2()
+            d.create_df_1(), expected_df_2()
         ),
     )
     def test_non_specified_values_unchanged(self, df, expected):
@@ -227,7 +228,7 @@ class TestTransform(object):
     def test_mappings_unchanged(self):
         """Test that mappings is unchanged in transform."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         mapping = {
             "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},

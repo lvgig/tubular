@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 
 import tubular
 from tubular.imputers import ArbitraryImputer
@@ -91,7 +92,7 @@ class TestTransform(object):
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = ArbitraryImputer(impute_value=1, columns="a")
 
@@ -106,11 +107,11 @@ class TestTransform(object):
     def test_super_transform_called(self, mocker):
         """Test that BaseImputer.transform called."""
 
-        df = ta.test_data.create_df_2()
+        df = d.create_df_2()
 
         x = ArbitraryImputer(impute_value=1, columns="a")
 
-        expected_call_args = {0: {"args": (ta.test_data.create_df_2(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker, tubular.imputers.BaseImputer, "transform", expected_call_args
@@ -121,7 +122,7 @@ class TestTransform(object):
     def test_impute_values_set(self, mocker):
         """Test that impute_values_ are set with imput_value in transform."""
 
-        df = ta.test_data.create_df_2()
+        df = d.create_df_2()
 
         x = ArbitraryImputer(impute_value=1, columns=["a", "b", "c"])
 
@@ -141,7 +142,7 @@ class TestTransform(object):
     def test_impute_value_unchanged(self):
         """Test that self.impute_value is unchanged after transform."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         value = 1
 
@@ -158,11 +159,11 @@ class TestTransform(object):
     def test_super_columns_check_called(self, mocker):
         """Test that BaseTransformer.columns_check called."""
 
-        df = ta.test_data.create_df_2()
+        df = d.create_df_2()
 
         x = ArbitraryImputer(impute_value=-1, columns="a")
 
-        expected_call_args = {0: {"args": (ta.test_data.create_df_2(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "columns_check", expected_call_args

@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 import re
 import pandas
 import pandas as pd
@@ -133,7 +134,7 @@ class TestTransform(object):
     def expected_df_1():
         """Expected output for test_expected_output."""
 
-        df = ta.test_data.create_df_9()
+        df = d.create_df_9()
 
         df["d"] = pd.Series(["c", "b", "a", "d", "e", "f"], dtype="category")
 
@@ -149,18 +150,18 @@ class TestTransform(object):
     def test_super_transform_call(self, mocker):
         """Test the call to BaseTransformer.transform is as expected."""
 
-        df = ta.test_data.create_df_9()
+        df = d.create_df_9()
 
         x = CutTransformer(column="a", new_column_name="Y", cut_kwargs={"bins": 3})
 
-        expected_call_args = {0: {"args": (ta.test_data.create_df_9(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_df_9(),), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
-            return_value=ta.test_data.create_df_9(),
+            return_value=d.create_df_9(),
         ):
 
             x.transform(df)
@@ -168,7 +169,7 @@ class TestTransform(object):
     def test_pd_cut_call(self, mocker):
         """Test the call to pd.cut is as expected."""
 
-        df = ta.test_data.create_df_9()
+        df = d.create_df_9()
 
         x = CutTransformer(
             column="a",
@@ -178,7 +179,7 @@ class TestTransform(object):
 
         expected_call_args = {
             0: {
-                "args": (ta.test_data.create_df_9()["a"],),
+                "args": (d.create_df_9()["a"],),
                 "kwargs": {"bins": 3, "right": False, "precision": 2},
             }
         }
@@ -192,7 +193,7 @@ class TestTransform(object):
     def test_output_from_cut_assigned_to_column(self, mocker):
         """Test that the output from pd.cut is assigned to column with name new_column_name."""
 
-        df = ta.test_data.create_df_9()
+        df = d.create_df_9()
 
         x = CutTransformer(column="c", new_column_name="c_new", cut_kwargs={"bins": 2})
 
@@ -208,9 +209,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_9(), expected_df_1())
+        ta.pandas_helpers.row_by_row_params(d.create_df_9(), expected_df_1())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_9(), expected_df_1()
+            d.create_df_9(), expected_df_1()
         ),
     )
     def test_expected_output(self, df, expected):
@@ -237,7 +238,7 @@ class TestTransform(object):
     def test_non_numeric_column_error(self):
         """Test that an exception is raised if the column to discretise is not numeric."""
 
-        df = ta.test_data.create_df_8()
+        df = d.create_df_8()
 
         x = CutTransformer(column="b", new_column_name="d")
 

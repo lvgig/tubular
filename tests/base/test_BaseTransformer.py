@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 from unittest import mock
 import pandas
 import re
@@ -138,7 +139,7 @@ class TestFit(object):
     def test_fit_returns_self(self):
         """Test fit returns self?"""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = BaseTransformer(columns="a")
 
@@ -158,7 +159,7 @@ class TestFit(object):
     def test_y_multi_col_df_error(self):
         """Test an error is raised if y is passed as a multi column pd.DataFrame."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = BaseTransformer(columns="a")
 
@@ -169,7 +170,7 @@ class TestFit(object):
     def test_non_pd_type_error(self):
         """Test an error is raised if y is not passed as a pd.DataFrame or pd.Series."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = BaseTransformer(columns="a")
 
@@ -180,7 +181,7 @@ class TestFit(object):
     def test_columns_set_or_check_called(self, mocker):
         """Test that self.columns_set_or_check is called during fit."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = BaseTransformer(columns="a")
 
@@ -238,7 +239,7 @@ class TestTransform(object):
     def test_columns_check_called(self, mocker):
         """Test that self.columns_check is called during transform."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = BaseTransformer(columns="a")
 
@@ -262,7 +263,7 @@ class TestTransform(object):
     def test_df_copy_called(self, mocker):
         """Test pd.DataFrame.copy is called if copy is True."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = BaseTransformer(columns="a", copy=True)
 
@@ -288,10 +289,10 @@ class TestTransform(object):
     @pytest.mark.parametrize(
         "df, expected",
         ta.pandas_helpers.row_by_row_params(
-            ta.test_data.create_df_1(), ta.test_data.create_df_1()
+            d.create_df_1(), d.create_df_1()
         )
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_1(), ta.test_data.create_df_1()
+            d.create_df_1(), d.create_df_1()
         ),
     )
     def test_X_returned(self, df, expected):
@@ -330,7 +331,7 @@ class TestColumnsCheck(object):
     def test_columns_none_error(self):
         """Test an error is raised if self.columns is None."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = BaseTransformer(columns=None)
 
@@ -343,7 +344,7 @@ class TestColumnsCheck(object):
     def test_columns_str_error(self):
         """Test an error is raised if self.columns is not a list."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = BaseTransformer(columns=None)
 
@@ -356,7 +357,7 @@ class TestColumnsCheck(object):
     def test_columns_not_in_X_error(self):
         """Test an error is raised if self.columns contains a value not in X."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = BaseTransformer(columns=["a", "z"])
 
@@ -387,7 +388,7 @@ class TestColumnsSetOrCheck(object):
     def test_columns_set_to_all_columns_when_none(self):
         """Test that X.columns are set to self.columns if self.columns is None when function called."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = BaseTransformer(columns=None)
 

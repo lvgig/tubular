@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 import numpy as np
 
 import tubular
@@ -124,7 +125,7 @@ class TestFit(object):
 
         spy = mocker.spy(tubular.capping.CappingTransformer, "fit")
 
-        df = ta.test_data.create_df_9()
+        df = d.create_df_9()
 
         x = OutOfRangeNullTransformer(
             quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
@@ -144,7 +145,7 @@ class TestFit(object):
             x,
         ), "unexpected positional args in CappingTransformer.fit call"
 
-        expected_kwargs = {"X": ta.test_data.create_df_9(), "y": None}
+        expected_kwargs = {"X": d.create_df_9(), "y": None}
 
         ta.equality_helpers.assert_equal_dispatch(
             expected=expected_kwargs,
@@ -155,7 +156,7 @@ class TestFit(object):
     def test_set_replacement_values_called(self, mocker):
         """Test that init calls OutOfRangeNullTransformer.set_replacement_values during fit."""
 
-        df = ta.test_data.create_df_9()
+        df = d.create_df_9()
 
         x = OutOfRangeNullTransformer(
             quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
@@ -175,7 +176,7 @@ class TestFit(object):
     def test_fit_returns_self(self):
         """Test fit returns self?"""
 
-        df = ta.test_data.create_df_9()
+        df = d.create_df_9()
 
         x = OutOfRangeNullTransformer(
             quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"

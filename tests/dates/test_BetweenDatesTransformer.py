@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 import pandas as pd
 import datetime
 
@@ -175,7 +176,7 @@ class TestTransform(object):
     def expected_df_1():
         """Expected output from transform in test_output."""
 
-        df = ta.test_data.create_is_between_dates_df_1()
+        df = d.create_is_between_dates_df_1()
 
         df["d"] = [True, False]
 
@@ -184,7 +185,7 @@ class TestTransform(object):
     def expected_df_2():
         """Expected output from transform in test_output_both_exclusive."""
 
-        df = ta.test_data.create_is_between_dates_df_2()
+        df = d.create_is_between_dates_df_2()
 
         df["e"] = [False, False, True, True, False, False]
 
@@ -193,7 +194,7 @@ class TestTransform(object):
     def expected_df_3():
         """Expected output from transform in test_output_lower_exclusive."""
 
-        df = ta.test_data.create_is_between_dates_df_2()
+        df = d.create_is_between_dates_df_2()
 
         df["e"] = [False, False, True, True, True, False]
 
@@ -202,7 +203,7 @@ class TestTransform(object):
     def expected_df_4():
         """Expected output from transform in test_output_upper_exclusive."""
 
-        df = ta.test_data.create_is_between_dates_df_2()
+        df = d.create_is_between_dates_df_2()
 
         df["e"] = [False, True, True, True, False, False]
 
@@ -211,7 +212,7 @@ class TestTransform(object):
     def expected_df_5():
         """Expected output from transform in test_output_both_inclusive."""
 
-        df = ta.test_data.create_is_between_dates_df_2()
+        df = d.create_is_between_dates_df_2()
 
         df["e"] = [False, True, True, True, True, False]
 
@@ -229,14 +230,14 @@ class TestTransform(object):
     def test_super_transform_call(self, mocker):
         """Test that call the BaseTransformer.transform() is as expected."""
 
-        df = ta.test_data.create_is_between_dates_df_1()
+        df = d.create_is_between_dates_df_1()
 
         x = BetweenDatesTransformer(
             column_lower="a", column_between="b", column_upper="c", new_column_name="d"
         )
 
         expected_call_args = {
-            0: {"args": (ta.test_data.create_is_between_dates_df_1(),), "kwargs": {}}
+            0: {"args": (d.create_is_between_dates_df_1(),), "kwargs": {}}
         }
 
         with ta.function_helpers.assert_function_call(
@@ -244,7 +245,7 @@ class TestTransform(object):
             tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
-            return_value=ta.test_data.create_is_between_dates_df_1(),
+            return_value=d.create_is_between_dates_df_1(),
         ):
 
             x.transform(df)
@@ -273,10 +274,10 @@ class TestTransform(object):
     @pytest.mark.parametrize(
         "df, expected",
         ta.pandas_helpers.row_by_row_params(
-            ta.test_data.create_is_between_dates_df_1(), expected_df_1()
+            d.create_is_between_dates_df_1(), expected_df_1()
         )
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_is_between_dates_df_1(), expected_df_1()
+            d.create_is_between_dates_df_1(), expected_df_1()
         ),
     )
     def test_output(self, df, expected):
@@ -302,10 +303,10 @@ class TestTransform(object):
     @pytest.mark.parametrize(
         "df, expected",
         ta.pandas_helpers.row_by_row_params(
-            ta.test_data.create_is_between_dates_df_2(), expected_df_2()
+            d.create_is_between_dates_df_2(), expected_df_2()
         )
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_is_between_dates_df_2(), expected_df_2()
+            d.create_is_between_dates_df_2(), expected_df_2()
         ),
     )
     def test_output_both_exclusive(self, df, expected):
@@ -331,10 +332,10 @@ class TestTransform(object):
     @pytest.mark.parametrize(
         "df, expected",
         ta.pandas_helpers.row_by_row_params(
-            ta.test_data.create_is_between_dates_df_2(), expected_df_3()
+            d.create_is_between_dates_df_2(), expected_df_3()
         )
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_is_between_dates_df_2(), expected_df_3()
+            d.create_is_between_dates_df_2(), expected_df_3()
         ),
     )
     def test_output_lower_exclusive(self, df, expected):
@@ -360,10 +361,10 @@ class TestTransform(object):
     @pytest.mark.parametrize(
         "df, expected",
         ta.pandas_helpers.row_by_row_params(
-            ta.test_data.create_is_between_dates_df_2(), expected_df_4()
+            d.create_is_between_dates_df_2(), expected_df_4()
         )
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_is_between_dates_df_2(), expected_df_4()
+            d.create_is_between_dates_df_2(), expected_df_4()
         ),
     )
     def test_output_upper_exclusive(self, df, expected):
@@ -389,10 +390,10 @@ class TestTransform(object):
     @pytest.mark.parametrize(
         "df, expected",
         ta.pandas_helpers.row_by_row_params(
-            ta.test_data.create_is_between_dates_df_2(), expected_df_5()
+            d.create_is_between_dates_df_2(), expected_df_5()
         )
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_is_between_dates_df_2(), expected_df_5()
+            d.create_is_between_dates_df_2(), expected_df_5()
         ),
     )
     def test_output_both_inclusive(self, df, expected):
@@ -427,7 +428,7 @@ class TestTransform(object):
             upper_inclusive=True,
         )
 
-        df = ta.test_data.create_is_between_dates_df_2()
+        df = d.create_is_between_dates_df_2()
 
         df["c"][0] = datetime.datetime(1989, 3, 1)
 

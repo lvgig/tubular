@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 import pandas as pd
 import numpy as np
 
@@ -129,12 +130,12 @@ class TestFit(object):
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseTransformer.fit."""
 
-        df = ta.test_data.create_df_5()
+        df = d.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
 
         expected_call_args = {
-            0: {"args": (ta.test_data.create_df_5(), None), "kwargs": {}}
+            0: {"args": (d.create_df_5(), None), "kwargs": {}}
         }
 
         with ta.function_helpers.assert_function_call(
@@ -146,7 +147,7 @@ class TestFit(object):
     def test_weight_column_not_in_X_error(self):
         """Test that an exception is raised if weight is not in X."""
 
-        df = ta.test_data.create_df_5()
+        df = d.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"], weight="aaaa")
 
@@ -157,7 +158,7 @@ class TestFit(object):
     def test_fit_returns_self(self):
         """Test fit returns self?"""
 
-        df = ta.test_data.create_df_5()
+        df = d.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
 
@@ -170,14 +171,14 @@ class TestFit(object):
     def test_fit_not_changing_data(self):
         """Test fit does not change X."""
 
-        df = ta.test_data.create_df_5()
+        df = d.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
 
         x.fit(df)
 
         ta.equality_helpers.assert_equal_dispatch(
-            expected=ta.test_data.create_df_5(),
+            expected=d.create_df_5(),
             actual=df,
             msg="Check X not changing during fit",
         )
@@ -185,7 +186,7 @@ class TestFit(object):
     def test_learnt_values_no_weight(self):
         """Test that the impute values learnt during fit, without using a weight, are expected."""
 
-        df = ta.test_data.create_df_5()
+        df = d.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"], cut_off_percent=0.2)
 
@@ -202,7 +203,7 @@ class TestFit(object):
     def test_learnt_values_weight(self):
         """Test that the impute values learnt during fit, using a weight, are expected."""
 
-        df = ta.test_data.create_df_6()
+        df = d.create_df_6()
 
         x = GroupRareLevelsTransformer(columns=["b"], cut_off_percent=0.3, weights="a")
 
@@ -217,7 +218,7 @@ class TestFit(object):
     def test_learnt_values_weight_2(self):
         """Test that the impute values learnt during fit, using a weight, are expected."""
 
-        df = ta.test_data.create_df_6()
+        df = d.create_df_6()
 
         x = GroupRareLevelsTransformer(columns=["c"], cut_off_percent=0.2, weights="a")
 
@@ -232,7 +233,7 @@ class TestFit(object):
     def test_rare_level_name_not_diff_col_type(self):
         """Test that an exception is raised if rare_level_name is of a different type with respect columns."""
 
-        df = ta.test_data.create_df_10()
+        df = d.create_df_10()
 
         with pytest.raises(
             ValueError, match="rare_level_name must be of the same type of the columns"
@@ -301,7 +302,7 @@ class TestTransform(object):
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""
 
-        df = ta.test_data.create_df_5()
+        df = d.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
 
@@ -318,20 +319,20 @@ class TestTransform(object):
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
 
-        df = ta.test_data.create_df_5()
+        df = d.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
 
         x.fit(df)
 
-        expected_call_args = {0: {"args": (ta.test_data.create_df_5(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_df_5(),), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
-            return_value=ta.test_data.create_df_5(),
+            return_value=d.create_df_5(),
         ):
 
             x.transform(df)
@@ -339,7 +340,7 @@ class TestTransform(object):
     def test_learnt_values_not_modified(self):
         """Test that the mapping_ from fit are not changed in transform."""
 
-        df = ta.test_data.create_df_5()
+        df = d.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
 
@@ -359,9 +360,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_5(), expected_df_1())
+        ta.pandas_helpers.row_by_row_params(d.create_df_5(), expected_df_1())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_5(), expected_df_1()
+            d.create_df_5(), expected_df_1()
         ),
     )
     def test_expected_output_no_weight(self, df, expected):
@@ -423,9 +424,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_6(), expected_df_2())
+        ta.pandas_helpers.row_by_row_params(d.create_df_6(), expected_df_2())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_6(), expected_df_2()
+            d.create_df_6(), expected_df_2()
         ),
     )
     def test_expected_output_weight(self, df, expected):
@@ -448,7 +449,7 @@ class TestTransform(object):
     def test_rare_level_name_same_col_type(self, label, col):
         """Test that checks if output columns are of the same type with respect to the input label."""
 
-        df = ta.test_data.create_df_10()
+        df = d.create_df_10()
 
         x = GroupRareLevelsTransformer(columns=[col], rare_level_name=label)
 

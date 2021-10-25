@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 import pandas as pd
 import numpy as np
 
@@ -120,7 +121,7 @@ class TestFit(object):
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseTransformer.fit."""
 
-        df = ta.test_data.create_MeanResponseTransformer_test_df()
+        df = d.create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(response_column="a", columns="b")
 
@@ -142,7 +143,7 @@ class TestFit(object):
 
         expected_pos_args = (
             x,
-            ta.test_data.create_MeanResponseTransformer_test_df(),
+            d.create_MeanResponseTransformer_test_df(),
             None,
         )
 
@@ -163,7 +164,7 @@ class TestFit(object):
     def test_fit_returns_self(self):
         """Test fit returns self?"""
 
-        df = ta.test_data.create_MeanResponseTransformer_test_df()
+        df = d.create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(response_column="a", columns="b")
 
@@ -176,14 +177,14 @@ class TestFit(object):
     def test_fit_not_changing_data(self):
         """Test fit does not change X."""
 
-        df = ta.test_data.create_MeanResponseTransformer_test_df()
+        df = d.create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(response_column="a", columns="b")
 
         x.fit(df)
 
         ta.equality_helpers.assert_equal_dispatch(
-            expected=ta.test_data.create_MeanResponseTransformer_test_df(),
+            expected=d.create_MeanResponseTransformer_test_df(),
             actual=df,
             msg="Check X not changing during fit",
         )
@@ -191,7 +192,7 @@ class TestFit(object):
     def test_learnt_values(self):
         """Test that the mean response values learnt during fit are expected."""
 
-        df = ta.test_data.create_MeanResponseTransformer_test_df()
+        df = d.create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(response_column="a", columns=["b", "d", "f"])
 
@@ -212,7 +213,7 @@ class TestFit(object):
     def test_learnt_values_weight(self):
         """Test that the mean response values learnt during fit are expected if a weights column is specified."""
 
-        df = ta.test_data.create_MeanResponseTransformer_test_df()
+        df = d.create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(
             response_column="a", weights_column="e", columns=["b", "d", "f"]
@@ -235,7 +236,7 @@ class TestFit(object):
     def test_response_column_missing_error(self):
         """Test that an exception is raised if response_column is not present in data."""
 
-        df = ta.test_data.create_MeanResponseTransformer_test_df()
+        df = d.create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(response_column="z", columns=["b", "d", "f"])
 
@@ -246,7 +247,7 @@ class TestFit(object):
     def test_weights_column_missing_error(self):
         """Test that an exception is raised if weights_column is specified but not present in data for fit."""
 
-        df = ta.test_data.create_MeanResponseTransformer_test_df()
+        df = d.create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(
             response_column="a", weights_column="z", columns=["b", "d", "f"]
@@ -259,7 +260,7 @@ class TestFit(object):
     def test_response_column_nulls_error(self):
         """Test that an exception is raised if nulls are present in response_column."""
 
-        df = ta.test_data.create_df_4()
+        df = d.create_df_4()
 
         x = MeanResponseTransformer(response_column="a", columns=["b"])
 
@@ -314,7 +315,7 @@ class TestTransform(object):
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""
 
-        df = ta.test_data.create_MeanResponseTransformer_test_df()
+        df = d.create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(response_column="a", columns="b")
 
@@ -331,7 +332,7 @@ class TestTransform(object):
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
 
-        df = ta.test_data.create_MeanResponseTransformer_test_df()
+        df = d.create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(response_column="a", columns="b")
 
@@ -339,7 +340,7 @@ class TestTransform(object):
 
         expected_call_args = {
             0: {
-                "args": (ta.test_data.create_MeanResponseTransformer_test_df(),),
+                "args": (d.create_MeanResponseTransformer_test_df(),),
                 "kwargs": {},
             }
         }
@@ -349,7 +350,7 @@ class TestTransform(object):
             tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
-            return_value=ta.test_data.create_MeanResponseTransformer_test_df(),
+            return_value=d.create_MeanResponseTransformer_test_df(),
         ):
 
             x.transform(df)
@@ -357,7 +358,7 @@ class TestTransform(object):
     def test_learnt_values_not_modified(self):
         """Test that the mappings from fit are not changed in transform."""
 
-        df = ta.test_data.create_MeanResponseTransformer_test_df()
+        df = d.create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(response_column="a", columns="b")
 
@@ -378,10 +379,10 @@ class TestTransform(object):
     @pytest.mark.parametrize(
         "df, expected",
         ta.pandas_helpers.row_by_row_params(
-            ta.test_data.create_MeanResponseTransformer_test_df(), expected_df_1()
+            d.create_MeanResponseTransformer_test_df(), expected_df_1()
         )
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_MeanResponseTransformer_test_df(), expected_df_1()
+            d.create_MeanResponseTransformer_test_df(), expected_df_1()
         ),
     )
     def test_expected_output(self, df, expected):
@@ -407,7 +408,7 @@ class TestTransform(object):
     def test_nulls_introduced_in_transform_error(self):
         """Test that transform will raise an error if nulls are introduced."""
 
-        df = ta.test_data.create_MeanResponseTransformer_test_df()
+        df = d.create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(response_column="a", columns=["b", "d", "f"])
 

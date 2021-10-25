@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 import pandas as pd
 import numpy as np
 
@@ -340,7 +341,7 @@ class TestFit(object):
             match="quantiles not set so no fitting done in CappingTransformer",
         ):
 
-            df = ta.test_data.create_df_3()
+            df = d.create_df_3()
 
             x = CappingTransformer(capping_values={"a": [2, 5], "b": [-1, 8]})
 
@@ -349,14 +350,14 @@ class TestFit(object):
     def test_super_fit_call(self, mocker):
         """Test the call to BaseTransformer.fit."""
 
-        df = ta.test_data.create_df_9()
+        df = d.create_df_9()
 
         x = CappingTransformer(
             quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
         )
 
         expected_call_args = {
-            0: {"args": (ta.test_data.create_df_9(), None), "kwargs": {}}
+            0: {"args": (d.create_df_9(), None), "kwargs": {}}
         }
 
         with ta.function_helpers.assert_function_call(
@@ -368,7 +369,7 @@ class TestFit(object):
     def test_prepare_quantiles_call_weight(self, mocker):
         """Test the call to prepare_quantiles if weights_column is set."""
 
-        df = ta.test_data.create_df_9()
+        df = d.create_df_9()
 
         x = CappingTransformer(
             quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
@@ -377,17 +378,17 @@ class TestFit(object):
         expected_call_args = {
             0: {
                 "args": (
-                    ta.test_data.create_df_9()["a"],
+                    d.create_df_9()["a"],
                     [0.1, 1],
-                    ta.test_data.create_df_9()["c"],
+                    d.create_df_9()["c"],
                 ),
                 "kwargs": {},
             },
             1: {
                 "args": (
-                    ta.test_data.create_df_9()["b"],
+                    d.create_df_9()["b"],
                     [0.5, None],
-                    ta.test_data.create_df_9()["c"],
+                    d.create_df_9()["c"],
                 ),
                 "kwargs": {},
             },
@@ -405,17 +406,17 @@ class TestFit(object):
     def test_prepare_quantiles_call_no_weight(self, mocker):
         """Test the call to prepare_quantiles if weights_column is not set."""
 
-        df = ta.test_data.create_df_9()
+        df = d.create_df_9()
 
         x = CappingTransformer(quantiles={"a": [0.1, 1], "b": [0.5, None]})
 
         expected_call_args = {
             0: {
-                "args": (ta.test_data.create_df_9()["a"], [0.1, 1], None),
+                "args": (d.create_df_9()["a"], [0.1, 1], None),
                 "kwargs": {},
             },
             1: {
-                "args": (ta.test_data.create_df_9()["b"], [0.5, None], None),
+                "args": (d.create_df_9()["b"], [0.5, None], None),
                 "kwargs": {},
             },
         }
@@ -433,7 +434,7 @@ class TestFit(object):
     def test_prepare_quantiles_output_set_attributes(self, mocker, weights_column):
         """Test the output of prepare_quantiles is set to capping_values and_replacement_values attributes."""
 
-        df = ta.test_data.create_df_9()
+        df = d.create_df_9()
 
         x = CappingTransformer(
             quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column=weights_column
@@ -468,7 +469,7 @@ class TestFit(object):
     def test_quantile_combinations_handled(self, quantiles, weights_column):
         """Test that a given combination of None and non-None quantile values can be calculated successfully."""
 
-        df = ta.test_data.create_df_9()
+        df = d.create_df_9()
 
         x = CappingTransformer(
             quantiles={"a": quantiles}, weights_column=weights_column
@@ -501,26 +502,26 @@ class TestPrepareQuantiles(object):
         "values, quantiles, sample_weight, expected_quantiles",
         [
             (
-                ta.test_data.create_df_9()["a"],
+                d.create_df_9()["a"],
                 [0.1, 0.6],
-                ta.test_data.create_df_9()["c"],
+                d.create_df_9()["c"],
                 [0.1, 0.6],
             ),
             (
-                ta.test_data.create_df_9()["b"],
+                d.create_df_9()["b"],
                 [0.1, None],
-                ta.test_data.create_df_9()["c"],
+                d.create_df_9()["c"],
                 [0.1],
             ),
             (
-                ta.test_data.create_df_9()["a"],
+                d.create_df_9()["a"],
                 [None, 0.6],
-                ta.test_data.create_df_9()["c"],
+                d.create_df_9()["c"],
                 [0.6],
             ),
-            (ta.test_data.create_df_9()["b"], [0.1, 0.6], None, [0.1, 0.6]),
-            (ta.test_data.create_df_9()["a"], [0.1, None], None, [0.1]),
-            (ta.test_data.create_df_9()["b"], [None, 0.6], None, [0.6]),
+            (d.create_df_9()["b"], [0.1, 0.6], None, [0.1, 0.6]),
+            (d.create_df_9()["a"], [0.1, None], None, [0.1]),
+            (d.create_df_9()["b"], [None, 0.6], None, [0.6]),
         ],
     )
     def test_weighted_quantile_call(
@@ -556,26 +557,26 @@ class TestPrepareQuantiles(object):
         "values, quantiles, sample_weight, expected_results",
         [
             (
-                ta.test_data.create_df_9()["a"],
+                d.create_df_9()["a"],
                 [0.1, 0.6],
-                ta.test_data.create_df_9()["c"],
+                d.create_df_9()["c"],
                 ["aaaa"],
             ),
             (
-                ta.test_data.create_df_9()["b"],
+                d.create_df_9()["b"],
                 [0.1, None],
-                ta.test_data.create_df_9()["c"],
+                d.create_df_9()["c"],
                 ["aaaa", None],
             ),
             (
-                ta.test_data.create_df_9()["a"],
+                d.create_df_9()["a"],
                 [None, 0.6],
-                ta.test_data.create_df_9()["c"],
+                d.create_df_9()["c"],
                 [None, "aaaa"],
             ),
-            (ta.test_data.create_df_9()["b"], [0.1, 0.6], None, ["aaaa"]),
-            (ta.test_data.create_df_9()["a"], [0.1, None], None, ["aaaa", None]),
-            (ta.test_data.create_df_9()["b"], [None, 0.6], None, [None, "aaaa"]),
+            (d.create_df_9()["b"], [0.1, 0.6], None, ["aaaa"]),
+            (d.create_df_9()["a"], [0.1, None], None, ["aaaa", None]),
+            (d.create_df_9()["b"], [None, 0.6], None, [None, "aaaa"]),
         ],
     )
     def test_output_from_weighted_quantile_returned(
@@ -638,7 +639,7 @@ class TestTransform(object):
     def test_check_is_fitted_call_count(self, mocker):
         """Test there are 2 calls to BaseTransformer check_is_fitted in transform."""
 
-        df = ta.test_data.create_df_3()
+        df = d.create_df_3()
 
         x = CappingTransformer(capping_values={"a": [2, 5], "b": [-1, 8]})
 
@@ -651,7 +652,7 @@ class TestTransform(object):
     def test_check_is_fitted_call_1(self, mocker):
         """Test the first call to BaseTransformer check_is_fitted in transform."""
 
-        df = ta.test_data.create_df_3()
+        df = d.create_df_3()
 
         x = CappingTransformer(capping_values={"a": [2, 5], "b": [-1, 8]})
 
@@ -669,18 +670,18 @@ class TestTransform(object):
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
 
-        df = ta.test_data.create_df_3()
+        df = d.create_df_3()
 
         x = CappingTransformer(capping_values={"a": [2, 5], "b": [-1, 8]})
 
-        expected_call_args = {0: {"args": (ta.test_data.create_df_3(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_df_3(),), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
-            return_value=ta.test_data.create_df_3(),
+            return_value=d.create_df_3(),
         ):
 
             x.transform(df)
@@ -690,7 +691,7 @@ class TestTransform(object):
 
         capping_values_dict = {"a": [2, 5], "b": [-1, 8]}
 
-        df = ta.test_data.create_df_3()
+        df = d.create_df_3()
 
         x = CappingTransformer(capping_values_dict)
 
@@ -704,9 +705,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_3(), expected_df_1())
+        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_1())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_3(), expected_df_1()
+            d.create_df_3(), expected_df_1()
         ),
     )
     def test_expected_output_min_and_max_combinations(self, df, expected):
@@ -726,9 +727,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_4(), expected_df_2())
+        ta.pandas_helpers.row_by_row_params(d.create_df_4(), expected_df_2())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_4(), expected_df_2()
+            d.create_df_4(), expected_df_2()
         ),
     )
     def test_non_cap_column_left_untouched(self, df, expected):
@@ -747,7 +748,7 @@ class TestTransform(object):
     def test_non_numeric_column_error(self):
         """Test that transform will raise an error if a column to transform is not numeric."""
 
-        df = ta.test_data.create_df_5()
+        df = d.create_df_5()
 
         x = CappingTransformer(capping_values={"a": [2, 5], "b": [-1, 8], "c": [-1, 8]})
 
@@ -760,7 +761,7 @@ class TestTransform(object):
     def test_quantile_not_fit_error(self):
         """Test that transform will raise an error if quantiles are specified in init but fit is not run before calling transform."""
 
-        df = ta.test_data.create_df_9()
+        df = d.create_df_9()
 
         x = CappingTransformer(quantiles={"a": [0.2, 1], "b": [0, 1]})
 
@@ -774,7 +775,7 @@ class TestTransform(object):
     def test_replacement_values_dict_not_set_error(self):
         """Test that transform will raise an error if _replacement_values is an empty dict."""
 
-        df = ta.test_data.create_df_9()
+        df = d.create_df_9()
 
         x = CappingTransformer(quantiles={"a": [0.2, 1], "b": [0, 1]})
 
@@ -791,7 +792,7 @@ class TestTransform(object):
     def test_attributes_unchanged_from_transform(self):
         """Test that attributes are unchanged after transform is run."""
 
-        df = ta.test_data.create_df_9()
+        df = d.create_df_9()
 
         x = CappingTransformer(quantiles={"a": [0.2, 1], "b": [0, 1]})
 

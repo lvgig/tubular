@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 
 import tubular
 from tubular.base import BaseTransformer
@@ -36,7 +37,7 @@ class TestNominalColumnSetOrCheck(object):
     def test_columns_none_get_cat_columns(self):
         """If self.columns is None then object and categorical columns are set as self.columns."""
 
-        df = ta.test_data.create_df_4()
+        df = d.create_df_4()
 
         x = BaseNominalTransformer()
 
@@ -51,7 +52,7 @@ class TestNominalColumnSetOrCheck(object):
     def test_columns_none_no_cat_columns_error(self):
         """If self.columns is None and there are no object and categorical columns then an exception is raised."""
 
-        df = ta.test_data.create_1_int_column_df()
+        df = d.create_1_int_column_df()
 
         x = BaseNominalTransformer()
 
@@ -72,13 +73,13 @@ class TestNominalColumnSetOrCheck(object):
 
             pass
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = JointInheritanceClass()
 
         x.columns = ["a"]
 
-        expected_call_args = {0: {"args": (ta.test_data.create_df_1(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "columns_check", expected_call_args
@@ -93,7 +94,7 @@ class TestCheckMappableRows:
     def test_exception_raised(self):
         """Test an exception is raised if non-mappable rows are present in X."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = BaseNominalTransformer()
         x.columns = ["a", "b"]

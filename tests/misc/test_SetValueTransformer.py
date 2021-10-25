@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 
 import tubular
 from tubular.misc import SetValueTransformer
@@ -56,7 +57,7 @@ class TestTransform:
     def expected_df_1():
         """Expected output of test_value_set_in_transform."""
 
-        df = ta.test_data.create_df_2()
+        df = d.create_df_2()
 
         df["a"] = "a"
         df["b"] = "a"
@@ -75,11 +76,11 @@ class TestTransform:
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
 
-        df = ta.test_data.create_df_7()
+        df = d.create_df_7()
 
         x = SetValueTransformer(columns=["a", "b"], value=1)
 
-        expected_call_args = {0: {"args": (ta.test_data.create_df_7(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_df_7(),), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
@@ -89,9 +90,9 @@ class TestTransform:
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_2(), expected_df_1())
+        ta.pandas_helpers.row_by_row_params(d.create_df_2(), expected_df_1())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_2(), expected_df_1()
+            d.create_df_2(), expected_df_1()
         ),
     )
     def test_value_set_in_transform(self, df, expected):

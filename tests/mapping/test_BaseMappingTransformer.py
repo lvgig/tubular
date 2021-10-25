@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 
 import tubular
 from tubular.mapping import BaseMappingTransformer
@@ -98,7 +99,7 @@ class TestTransform(object):
     def test_check_is_fitted_call(self, mocker):
         """Test the call to check_is_fitted."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         mapping = {
             "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
@@ -118,7 +119,7 @@ class TestTransform(object):
     def test_super_transform_call(self, mocker):
         """Test the call to BaseTransformer.transform."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         mapping = {
             "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
@@ -127,7 +128,7 @@ class TestTransform(object):
 
         x = BaseMappingTransformer(mappings=mapping)
 
-        expected_call_args = {0: {"args": (ta.test_data.create_df_1(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
@@ -138,10 +139,10 @@ class TestTransform(object):
     @pytest.mark.parametrize(
         "df, expected",
         ta.pandas_helpers.row_by_row_params(
-            ta.test_data.create_df_1(), ta.test_data.create_df_1()
+            d.create_df_1(), d.create_df_1()
         )
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_1(), ta.test_data.create_df_1()
+            d.create_df_1(), d.create_df_1()
         ),
     )
     def test_X_returned(self, df, expected):
@@ -165,7 +166,7 @@ class TestTransform(object):
     def test_mappings_unchanged(self):
         """Test that mappings is unchanged in transform."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         mapping = {
             "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},

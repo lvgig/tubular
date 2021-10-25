@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 import pandas as pd
 import numpy as np
 
@@ -189,7 +190,7 @@ class TestTransform(object):
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
 
-        df = ta.test_data.create_df_3()
+        df = d.create_df_3()
 
         x = DataFrameMethodTransformer(
             new_column_name="d", pd_method_name="sum", columns=["b", "c"]
@@ -205,9 +206,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_3(), expected_df_1())
+        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_1())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_3(), expected_df_1()
+            d.create_df_3(), expected_df_1()
         ),
     )
     def test_expected_output_single_columns_assignment(self, df, expected):
@@ -230,9 +231,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_3(), expected_df_2())
+        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_2())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_3(), expected_df_2()
+            d.create_df_3(), expected_df_2()
         ),
     )
     def test_expected_output_multi_columns_assignment(self, df, expected):
@@ -256,30 +257,30 @@ class TestTransform(object):
     @pytest.mark.parametrize(
         "df, new_column_name, pd_method_name, columns, pd_method_kwargs",
         [
-            (ta.test_data.create_df_3(), ["d", "e"], "div", ["b", "c"], {"other": 2}),
-            (ta.test_data.create_df_3(), "d", "sum", ["b", "c"], {"axis": 1}),
+            (d.create_df_3(), ["d", "e"], "div", ["b", "c"], {"other": 2}),
+            (d.create_df_3(), "d", "sum", ["b", "c"], {"axis": 1}),
             (
-                ta.test_data.create_df_3(),
+                d.create_df_3(),
                 ["d", "e"],
                 "cumprod",
                 ["b", "c"],
                 {"axis": 1},
             ),
             (
-                ta.test_data.create_df_3(),
+                d.create_df_3(),
                 ["d", "e", "f"],
                 "mod",
                 ["a", "b", "c"],
                 {"other": 2},
             ),
             (
-                ta.test_data.create_df_3(),
+                d.create_df_3(),
                 ["d", "e", "f"],
                 "le",
                 ["a", "b", "c"],
                 {"other": 0},
             ),
-            (ta.test_data.create_df_3(), ["d", "e"], "abs", ["a", "b"], {}),
+            (d.create_df_3(), ["d", "e"], "abs", ["a", "b"], {}),
         ],
     )
     def test_pandas_method_called(

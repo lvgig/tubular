@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 import pandas as pd
 
 import tubular
@@ -159,7 +160,7 @@ class TestTransform(object):
     def expected_df_1():
         """Expected output of test_expected_output_no_overwrite."""
 
-        df = ta.test_data.create_df_7()
+        df = d.create_df_7()
 
         df["b_new"] = df["b"].str.find(sub="a")
 
@@ -168,7 +169,7 @@ class TestTransform(object):
     def expected_df_2():
         """Expected output of test_expected_output_overwrite."""
 
-        df = ta.test_data.create_df_7()
+        df = d.create_df_7()
 
         df["b"] = df["b"].str.pad(width=10)
 
@@ -184,13 +185,13 @@ class TestTransform(object):
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
 
-        df = ta.test_data.create_df_7()
+        df = d.create_df_7()
 
         x = SeriesStrMethodTransformer(
             new_column_name="cc", pd_method_name="find", columns=["c"]
         )
 
-        expected_call_args = {0: {"args": (ta.test_data.create_df_7(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_df_7(),), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
@@ -200,9 +201,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_7(), expected_df_1())
+        ta.pandas_helpers.row_by_row_params(d.create_df_7(), expected_df_1())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_7(), expected_df_1()
+            d.create_df_7(), expected_df_1()
         ),
     )
     def test_expected_output_no_overwrite(self, df, expected):
@@ -225,9 +226,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_7(), expected_df_2())
+        ta.pandas_helpers.row_by_row_params(d.create_df_7(), expected_df_2())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_7(), expected_df_2()
+            d.create_df_7(), expected_df_2()
         ),
     )
     def test_expected_output_overwrite(self, df, expected):
@@ -251,15 +252,15 @@ class TestTransform(object):
     @pytest.mark.parametrize(
         "df, new_column_name, pd_method_name, columns, pd_method_kwargs",
         [
-            (ta.test_data.create_df_7(), "b_new", "find", ["b"], {"sub": "a"}),
+            (d.create_df_7(), "b_new", "find", ["b"], {"sub": "a"}),
             (
-                ta.test_data.create_df_7(),
+                d.create_df_7(),
                 "c_slice",
                 "slice",
                 ["c"],
                 {"start": 0, "stop": 1, "step": 1},
             ),
-            (ta.test_data.create_df_7(), "b_upper", "upper", ["b"], {}),
+            (d.create_df_7(), "b_upper", "upper", ["b"], {}),
         ],
     )
     def test_pandas_method_called(
@@ -292,7 +293,7 @@ class TestTransform(object):
     def test_attributes_unchanged_by_transform(self):
         """Test that attributes set in init are unchanged by the transform method."""
 
-        df = ta.test_data.create_df_7()
+        df = d.create_df_7()
 
         x = SeriesStrMethodTransformer(
             new_column_name="b",

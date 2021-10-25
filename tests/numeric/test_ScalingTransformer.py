@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler
 
@@ -150,7 +151,7 @@ class TestCheckNumericColumns(object):
     def test_exception_raised(self):
         """Test an exception is raised if non numeric columns are passed in X."""
 
-        df = ta.test_data.create_df_2()
+        df = d.create_df_2()
 
         x = ScalingTransformer(columns=["a", "b", "c"], scaler="standard")
 
@@ -164,7 +165,7 @@ class TestCheckNumericColumns(object):
     def test_X_returned(self):
         """Test that the input X is returned from the method."""
 
-        df = ta.test_data.create_df_2()
+        df = d.create_df_2()
 
         x = ScalingTransformer(columns=["a"], scaler="standard")
 
@@ -192,12 +193,12 @@ class TestFit(object):
     def test_super_fit_call(self, mocker):
         """Test the call to BaseTransformer.fit."""
 
-        df = ta.test_data.create_df_2()
+        df = d.create_df_2()
 
         x = ScalingTransformer(columns=["a"], scaler="standard")
 
         expected_call_args = {
-            0: {"args": (ta.test_data.create_df_2(), None), "kwargs": {}}
+            0: {"args": (d.create_df_2(), None), "kwargs": {}}
         }
 
         with ta.function_helpers.assert_function_call(
@@ -209,18 +210,18 @@ class TestFit(object):
     def test_check_numeric_columns_call(self, mocker):
         """Test the call to ScalingTransformer.check_numeric_columns."""
 
-        df = ta.test_data.create_df_2()
+        df = d.create_df_2()
 
         x = ScalingTransformer(columns=["a"], scaler="standard")
 
-        expected_call_args = {0: {"args": (ta.test_data.create_df_2(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker,
             tubular.numeric.ScalingTransformer,
             "check_numeric_columns",
             expected_call_args,
-            return_value=ta.test_data.create_df_2(),
+            return_value=d.create_df_2(),
         ):
 
             x.fit(df)
@@ -236,7 +237,7 @@ class TestFit(object):
     def test_scaler_fit_call(self, mocker, scaler, scaler_type_str):
         """Test that the call to the scaler.fit method."""
 
-        df = ta.test_data.create_df_3()
+        df = d.create_df_3()
 
         x = ScalingTransformer(
             columns=["b", "c"], scaler=scaler, scaler_kwargs={"copy": True}
@@ -267,7 +268,7 @@ class TestFit(object):
     def test_return_self(self):
         """Test that fit returns self."""
 
-        df = ta.test_data.create_df_2()
+        df = d.create_df_2()
 
         x = ScalingTransformer(columns=["a"], scaler="standard")
 
@@ -293,20 +294,20 @@ class TestTransform(object):
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
 
-        df = ta.test_data.create_df_2()
+        df = d.create_df_2()
 
         x = ScalingTransformer(columns=["a"], scaler="standard")
 
         x.fit(df)
 
-        expected_call_args = {0: {"args": (ta.test_data.create_df_2(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
-            return_value=ta.test_data.create_df_2(),
+            return_value=d.create_df_2(),
         ):
 
             x.transform(df)
@@ -314,20 +315,20 @@ class TestTransform(object):
     def test_check_numeric_columns_call(self, mocker):
         """Test the call to ScalingTransformer.check_numeric_columns."""
 
-        df = ta.test_data.create_df_2()
+        df = d.create_df_2()
 
         x = ScalingTransformer(columns=["a"], scaler="standard", copy=True)
 
         x.fit(df)
 
-        expected_call_args = {0: {"args": (ta.test_data.create_df_2(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
-            return_value=ta.test_data.create_df_2(),
+            return_value=d.create_df_2(),
         ):
 
             x.transform(df)
@@ -343,7 +344,7 @@ class TestTransform(object):
     def test_scaler_transform_call(self, mocker, scaler, scaler_type_str):
         """Test that the call to the scaler.transform method."""
 
-        df = ta.test_data.create_df_3()
+        df = d.create_df_3()
 
         x = ScalingTransformer(
             columns=["b", "c"], scaler=scaler, scaler_kwargs={"copy": True}
@@ -389,7 +390,7 @@ class TestTransform(object):
     ):
         """Test that the call to the scaler.transform method."""
 
-        df = ta.test_data.create_df_3()
+        df = d.create_df_3()
 
         x = ScalingTransformer(
             columns=["b", "c"], scaler=scaler, scaler_kwargs={"copy": True}
@@ -426,7 +427,7 @@ class TestTransform(object):
     def test_return_type(self, scaler, scaler_type_str, columns):
         """Test that transform returns a pd.DataFrame."""
 
-        df = ta.test_data.create_df_3()
+        df = d.create_df_3()
 
         x = ScalingTransformer(
             columns=columns, scaler=scaler, scaler_kwargs={"copy": True}

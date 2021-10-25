@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 
 import tubular
 from tubular.dates import SeriesDtMethodTransformer
@@ -172,7 +173,7 @@ class TestTransform(object):
     def expected_df_1():
         """Expected output of test_expected_output_no_overwrite."""
 
-        df = ta.test_data.create_datediff_test_df()
+        df = d.create_datediff_test_df()
 
         df["a_year"] = [1993, 2000, 2018, 2018, 2018, 2018, 2018, 1985]
 
@@ -181,7 +182,7 @@ class TestTransform(object):
     def expected_df_2():
         """Expected output of test_expected_output_overwrite."""
 
-        df = ta.test_data.create_datediff_test_df()
+        df = d.create_datediff_test_df()
 
         df["a"] = [1993, 2000, 2018, 2018, 2018, 2018, 2018, 1985]
 
@@ -190,7 +191,7 @@ class TestTransform(object):
     def expected_df_3():
         """Expected output of test_expected_output_callable."""
 
-        df = ta.test_data.create_datediff_test_df()
+        df = d.create_datediff_test_df()
 
         df["b_new"] = df["b"].dt.to_period("M")
 
@@ -206,14 +207,14 @@ class TestTransform(object):
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
 
-        df = ta.test_data.create_datediff_test_df()
+        df = d.create_datediff_test_df()
 
         x = SeriesDtMethodTransformer(
             new_column_name="a2", pd_method_name="year", column="a"
         )
 
         expected_call_args = {
-            0: {"args": (ta.test_data.create_datediff_test_df(),), "kwargs": {}}
+            0: {"args": (d.create_datediff_test_df(),), "kwargs": {}}
         }
 
         with ta.function_helpers.assert_function_call(
@@ -225,10 +226,10 @@ class TestTransform(object):
     @pytest.mark.parametrize(
         "df, expected",
         ta.pandas_helpers.row_by_row_params(
-            ta.test_data.create_datediff_test_df(), expected_df_1()
+            d.create_datediff_test_df(), expected_df_1()
         )
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_datediff_test_df(), expected_df_1()
+            d.create_datediff_test_df(), expected_df_1()
         ),
     )
     def test_expected_output_no_overwrite(self, df, expected):
@@ -252,10 +253,10 @@ class TestTransform(object):
     @pytest.mark.parametrize(
         "df, expected",
         ta.pandas_helpers.row_by_row_params(
-            ta.test_data.create_datediff_test_df(), expected_df_2()
+            d.create_datediff_test_df(), expected_df_2()
         )
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_datediff_test_df(), expected_df_2()
+            d.create_datediff_test_df(), expected_df_2()
         ),
     )
     def test_expected_output_overwrite(self, df, expected):
@@ -279,10 +280,10 @@ class TestTransform(object):
     @pytest.mark.parametrize(
         "df, expected",
         ta.pandas_helpers.row_by_row_params(
-            ta.test_data.create_datediff_test_df(), expected_df_3()
+            d.create_datediff_test_df(), expected_df_3()
         )
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_datediff_test_df(), expected_df_3()
+            d.create_datediff_test_df(), expected_df_3()
         ),
     )
     def test_expected_output_callable(self, df, expected):
@@ -306,7 +307,7 @@ class TestTransform(object):
     def test_attributes_unchanged_by_transform(self):
         """Test that attributes set in init are unchanged by the transform method."""
 
-        df = ta.test_data.create_datediff_test_df()
+        df = d.create_datediff_test_df()
 
         x = SeriesDtMethodTransformer(
             new_column_name="b_new",

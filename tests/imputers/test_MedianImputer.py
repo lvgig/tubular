@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 import pandas as pd
 import numpy as np
 
@@ -66,12 +67,12 @@ class TestFit(object):
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseTransformer.fit."""
 
-        df = ta.test_data.create_df_3()
+        df = d.create_df_3()
 
         x = MedianImputer(columns=["a", "b", "c"])
 
         expected_call_args = {
-            0: {"args": (ta.test_data.create_df_3(), None), "kwargs": {}}
+            0: {"args": (d.create_df_3(), None), "kwargs": {}}
         }
 
         with ta.function_helpers.assert_function_call(
@@ -83,7 +84,7 @@ class TestFit(object):
     def test_learnt_values(self):
         """Test that the impute values learnt during fit are expected."""
 
-        df = ta.test_data.create_df_3()
+        df = d.create_df_3()
 
         x = MedianImputer(columns=["a", "b", "c"])
 
@@ -104,7 +105,7 @@ class TestFit(object):
     def test_fit_returns_self(self):
         """Test fit returns self?"""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = MedianImputer(columns="a")
 
@@ -115,14 +116,14 @@ class TestFit(object):
     def test_fit_not_changing_data(self):
         """Test fit does not change X."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = MedianImputer(columns="a")
 
         x.fit(df)
 
         ta.equality_helpers.assert_equal_dispatch(
-            expected=ta.test_data.create_df_1(),
+            expected=d.create_df_1(),
             actual=df,
             msg="Check X not changing during fit",
         )
@@ -175,7 +176,7 @@ class TestTransform(object):
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = MedianImputer(columns="a")
 
@@ -192,13 +193,13 @@ class TestTransform(object):
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = MedianImputer(columns="a")
 
         x.fit(df)
 
-        expected_call_args = {0: {"args": (ta.test_data.create_df_1(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
@@ -208,9 +209,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_3(), expected_df_1())
+        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_1())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_3(), expected_df_1()
+            d.create_df_3(), expected_df_1()
         ),
     )
     def test_nulls_imputed_correctly(self, df, expected):
@@ -231,9 +232,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_3(), expected_df_2())
+        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_2())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_3(), expected_df_2()
+            d.create_df_3(), expected_df_2()
         ),
     )
     def test_nulls_imputed_correctly_2(self, df, expected):
@@ -255,7 +256,7 @@ class TestTransform(object):
     def test_learnt_values_not_modified(self):
         """Test that the impute_values_ from fit are not changed in transform."""
 
-        df = ta.test_data.create_df_3()
+        df = d.create_df_3()
 
         x = MedianImputer(columns=["a", "b", "c"])
 

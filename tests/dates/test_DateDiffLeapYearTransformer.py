@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 import datetime
 import pandas as pd
 import numpy as np
@@ -326,14 +327,14 @@ class TestTransform(object):
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
 
-        df = ta.test_data.create_date_test_df()
+        df = d.create_date_test_df()
 
         x = DateDiffLeapYearTransformer(
             column_lower="a", column_upper="b", new_column_name="c", drop_cols=True
         )
 
         expected_call_args = {
-            0: {"args": (ta.test_data.create_date_test_df(),), "kwargs": {}}
+            0: {"args": (d.create_date_test_df(),), "kwargs": {}}
         }
 
         with ta.function_helpers.assert_function_call(
@@ -341,7 +342,7 @@ class TestTransform(object):
             tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
-            return_value=ta.test_data.create_date_test_df(),
+            return_value=d.create_date_test_df(),
         ):
 
             x.transform(df)
@@ -349,10 +350,10 @@ class TestTransform(object):
     @pytest.mark.parametrize(
         "df, expected",
         ta.pandas_helpers.row_by_row_params(
-            ta.test_data.create_date_test_df(), expected_df_1()
+            d.create_date_test_df(), expected_df_1()
         )
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_date_test_df(), expected_df_1()
+            d.create_date_test_df(), expected_df_1()
         ),
     )
     def test_expected_output_drop_cols_true(self, df, expected):
@@ -377,10 +378,10 @@ class TestTransform(object):
     @pytest.mark.parametrize(
         "df, expected",
         ta.pandas_helpers.row_by_row_params(
-            ta.test_data.create_date_test_df(), expected_df_2()
+            d.create_date_test_df(), expected_df_2()
         )
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_date_test_df(), expected_df_2()
+            d.create_date_test_df(), expected_df_2()
         ),
     )
     def test_expected_output_drop_cols_false(self, df, expected):
@@ -405,10 +406,10 @@ class TestTransform(object):
     @pytest.mark.parametrize(
         "df, expected",
         ta.pandas_helpers.row_by_row_params(
-            ta.test_data.create_date_test_nulls_df(), expected_df_3()
+            d.create_date_test_nulls_df(), expected_df_3()
         )
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_date_test_nulls_df(), expected_df_3()
+            d.create_date_test_nulls_df(), expected_df_3()
         ),
     )
     def test_expected_output_nulls(self, df, expected):

@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 import numpy as np
 import pandas as pd
 import re
@@ -115,7 +116,7 @@ class TestTransform(object):
     def expected_df_1():
         """Expected output of test_expected_output_1."""
 
-        df = ta.test_data.create_df_3()
+        df = d.create_df_3()
 
         df["a_new_col"] = np.log(df["a"])
         df["b_new_col"] = np.log(df["b"])
@@ -127,7 +128,7 @@ class TestTransform(object):
     def expected_df_2():
         """Expected output of test_expected_output_2."""
 
-        df = ta.test_data.create_df_3()
+        df = d.create_df_3()
 
         df["a_new_col"] = np.log(df["a"] + 1)
         df["b_new_col"] = np.log(df["b"] + 1)
@@ -139,7 +140,7 @@ class TestTransform(object):
     def expected_df_3():
         """Expected output of test_expected_output_3."""
 
-        df = ta.test_data.create_df_3()
+        df = d.create_df_3()
 
         df["a_new_col"] = np.log(df["a"])
         df["b_new_col"] = np.log(df["b"])
@@ -149,7 +150,7 @@ class TestTransform(object):
     def expected_df_4():
         """Expected output of test_expected_output_4."""
 
-        df = ta.test_data.create_df_3()
+        df = d.create_df_3()
 
         df["a_new_col"] = np.log(df["a"] + 1)
         df["b_new_col"] = np.log(df["b"] + 1)
@@ -159,7 +160,7 @@ class TestTransform(object):
     def expected_df_5():
         """Expected output of test_expected_output_5."""
 
-        df = ta.test_data.create_df_4()
+        df = d.create_df_4()
 
         df["a_new_col"] = np.log(df["a"] + 1) / np.log(5)
 
@@ -168,7 +169,7 @@ class TestTransform(object):
     def expected_df_6():
         """Expected output of test_expected_output_6."""
 
-        df = ta.test_data.create_df_4()
+        df = d.create_df_4()
 
         df["a_new_col"] = np.log(df["a"]) / np.log(7)
 
@@ -186,18 +187,18 @@ class TestTransform(object):
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
 
-        df = ta.test_data.create_df_3()
+        df = d.create_df_3()
 
         x = LogTransformer(columns=["a", "b"])
 
-        expected_call_args = {0: {"args": (ta.test_data.create_df_3(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_df_3(),), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
-            return_value=ta.test_data.create_df_3(),
+            return_value=d.create_df_3(),
         ):
 
             x.transform(df)
@@ -205,7 +206,7 @@ class TestTransform(object):
     def test_error_with_non_numeric_columns(self):
         """Test an exception is raised if transform is applied to non-numeric columns."""
 
-        df = ta.test_data.create_df_5()
+        df = d.create_df_5()
 
         x = LogTransformer(columns=["a", "b", "c"])
 
@@ -217,9 +218,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_3(), expected_df_1())
+        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_1())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_3(), expected_df_1()
+            d.create_df_3(), expected_df_1()
         ),
     )
     def test_expected_output_1(self, df, expected):
@@ -239,9 +240,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_3(), expected_df_2())
+        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_2())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_3(), expected_df_2()
+            d.create_df_3(), expected_df_2()
         ),
     )
     def test_expected_output_2(self, df, expected):
@@ -259,9 +260,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_3(), expected_df_3())
+        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_3())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_3(), expected_df_3()
+            d.create_df_3(), expected_df_3()
         ),
     )
     def test_expected_output_3(self, df, expected):
@@ -281,9 +282,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_3(), expected_df_4())
+        ta.pandas_helpers.row_by_row_params(d.create_df_3(), expected_df_4())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_3(), expected_df_4()
+            d.create_df_3(), expected_df_4()
         ),
     )
     def test_expected_output_4(self, df, expected):
@@ -303,9 +304,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_4(), expected_df_5())
+        ta.pandas_helpers.row_by_row_params(d.create_df_4(), expected_df_5())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_4(), expected_df_5()
+            d.create_df_4(), expected_df_5()
         ),
     )
     def test_expected_output_5(self, df, expected):
@@ -326,9 +327,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_4(), expected_df_6())
+        ta.pandas_helpers.row_by_row_params(d.create_df_4(), expected_df_6())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_4(), expected_df_6()
+            d.create_df_4(), expected_df_6()
         ),
     )
     def test_expected_output_6(self, df, expected):

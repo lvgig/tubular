@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 import pandas as pd
 import numpy as np
 
@@ -84,9 +85,9 @@ class TestTransform:
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_2(), expected_df_1())
+        ta.pandas_helpers.row_by_row_params(d.create_df_2(), expected_df_1())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_2(), expected_df_1()
+            d.create_df_2(), expected_df_1()
         ),
     )
     def test_expected_output_1(self, df, expected):
@@ -106,9 +107,9 @@ class TestTransform:
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_2(), expected_df_2())
+        ta.pandas_helpers.row_by_row_params(d.create_df_2(), expected_df_2())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_2(), expected_df_2()
+            d.create_df_2(), expected_df_2()
         ),
     )
     def test_expected_output_2(self, df, expected):
@@ -128,9 +129,9 @@ class TestTransform:
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_2(), expected_df_3())
+        ta.pandas_helpers.row_by_row_params(d.create_df_2(), expected_df_3())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_2(), expected_df_3()
+            d.create_df_2(), expected_df_3()
         ),
     )
     def test_expected_output_3(self, df, expected):
@@ -151,7 +152,7 @@ class TestTransform:
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         x = BaseImputer()
         x.columns = []
@@ -167,13 +168,13 @@ class TestTransform:
     def test_super_transform_called(self, mocker):
         """Test that BaseImputer.transform called."""
 
-        df = ta.test_data.create_df_2()
+        df = d.create_df_2()
 
         x = BaseImputer()
         x.columns = []
         x.impute_values_ = {}
 
-        expected_call_args = {0: {"args": (ta.test_data.create_df_2(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args

@@ -1,5 +1,6 @@
 import pytest
 import test_aide as ta
+import tests.test_data as d
 import pandas as pd
 import numpy as np
 
@@ -140,7 +141,7 @@ class TestTransform(object):
     def test_check_is_fitted_call(self, mocker):
         """Test the call to check_is_fitted."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         mapping = {"b": {"a": 1.1, "b": 1.2, "c": 1.3, "d": 1.4, "e": 1.5, "f": 1.6}}
 
@@ -157,20 +158,20 @@ class TestTransform(object):
     def test_super_transform_call(self, mocker):
         """Test the call to BaseMappingTransformer.transform."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         mapping = {"b": {"a": 1.1, "b": 1.2, "c": 1.3, "d": 1.4, "e": 1.5, "f": 1.6}}
 
         x = CrossColumnMultiplyTransformer(mappings=mapping, adjust_column="a")
 
-        expected_call_args = {0: {"args": (ta.test_data.create_df_1(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
 
         with ta.function_helpers.assert_function_call(
             mocker,
             tubular.mapping.BaseMappingTransformer,
             "transform",
             expected_call_args,
-            return_value=ta.test_data.create_df_1(),
+            return_value=d.create_df_1(),
         ):
 
             x.transform(df)
@@ -178,7 +179,7 @@ class TestTransform(object):
     def test_adjust_col_not_in_x_error(self):
         """Test that an exception is raised if the adjust_column is not present in the dataframe."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         mapping = {"b": {"a": 1.1, "b": 1.2, "c": 1.3, "d": 1.4, "e": 1.5, "f": 1.6}}
 
@@ -191,7 +192,7 @@ class TestTransform(object):
     def test_adjust_col_not_numeric_error(self):
         """Test that an exception is raised if the adjust_column is not numeric."""
 
-        df = ta.test_data.create_df_2()
+        df = d.create_df_2()
 
         mapping = {"b": {"a": 1.1, "b": 1.2, "c": 1.3, "d": 1.4, "e": 1.5, "f": 1.6}}
 
@@ -203,9 +204,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_1(), expected_df_1())
+        ta.pandas_helpers.row_by_row_params(d.create_df_1(), expected_df_1())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_1(), expected_df_1()
+            d.create_df_1(), expected_df_1()
         ),
     )
     def test_expected_output(self, df, expected):
@@ -225,9 +226,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_1(), expected_df_2())
+        ta.pandas_helpers.row_by_row_params(d.create_df_1(), expected_df_2())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_1(), expected_df_2()
+            d.create_df_1(), expected_df_2()
         ),
     )
     def test_non_specified_values_unchanged(self, df, expected):
@@ -247,9 +248,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.row_by_row_params(ta.test_data.create_df_5(), expected_df_3())
+        ta.pandas_helpers.row_by_row_params(d.create_df_5(), expected_df_3())
         + ta.pandas_helpers.index_preserved_params(
-            ta.test_data.create_df_5(), expected_df_3()
+            d.create_df_5(), expected_df_3()
         ),
     )
     def test_multiple_mappings_expected_output(self, df, expected):
@@ -270,7 +271,7 @@ class TestTransform(object):
     def test_mappings_unchanged(self):
         """Test that mappings is unchanged in transform."""
 
-        df = ta.test_data.create_df_1()
+        df = d.create_df_1()
 
         mapping = {"b": {"a": 1.1, "b": 1.2, "c": 1.3, "d": 1.4, "e": 1.5, "f": 1.6}}
 
