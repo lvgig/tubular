@@ -2,6 +2,12 @@
 
 ----
 
+## 0.3.0
+
+- Removed testing folder and updated tests to use helpers from `test-aide` package
+- Moved test_data.py to tests folder
+- Added `test-aide` to requirements-dev
+
 ## 0.2.15
 
 - Update NearestMeanResponseImputer to remove fallback to median imputation when no nulls present in a column
