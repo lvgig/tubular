@@ -15,7 +15,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=LogTransformer.__init__,
             expected_arguments=["self", "columns", "base", "add_1", "drop", "suffix"],
             expected_default_values=(None, False, True, "log"),
@@ -54,7 +54,7 @@ class TestInit(object):
 
         x = LogTransformer(columns="a")
 
-        ta.class_helpers.test_object_method(
+        ta.classes.test_object_method(
             obj=x, expected_method="transform", msg="transform"
         )
 
@@ -63,7 +63,7 @@ class TestInit(object):
 
         x = LogTransformer(columns="a")
 
-        ta.class_helpers.assert_inheritance(x, tubular.base.BaseTransformer)
+        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
@@ -75,7 +75,7 @@ class TestInit(object):
             }
         }
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -103,7 +103,7 @@ class TestInit(object):
 
         expected_attributes = {"base": 1, "add_1": True, "drop": False, "suffix": "new"}
 
-        ta.class_helpers.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes=expected_attributes,
             msg="Attributes for LogTransformer set in init",
@@ -180,7 +180,7 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=LogTransformer.transform, expected_arguments=["self", "X"]
         )
 
@@ -193,7 +193,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (d.create_df_3(),), "kwargs": {}}}
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
@@ -218,7 +218,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
     )
     def test_expected_output_1(self, df, expected):
         """Test that transform is giving the expected output when not adding one and dropping original columns."""
@@ -229,7 +229,7 @@ class TestTransform(object):
 
         df_transformed = x1.transform(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="LogTransformer transform not adding 1 and dropping original columns",
@@ -237,7 +237,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_3(), expected_df_2()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_2()),
     )
     def test_expected_output_2(self, df, expected):
         """Test that transform is giving the expected output when adding one and dropping original columns."""
@@ -246,7 +246,7 @@ class TestTransform(object):
 
         df_transformed = x1.transform(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="LogTransformer transform adding 1 and dropping original columns",
@@ -254,7 +254,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_3(), expected_df_3()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_3()),
     )
     def test_expected_output_3(self, df, expected):
         """Test that transform is giving the expected output when not adding one and not dropping original columns."""
@@ -265,7 +265,7 @@ class TestTransform(object):
 
         df_transformed = x1.transform(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="LogTransformer transform not adding 1 and dropping original columns",
@@ -273,7 +273,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_3(), expected_df_4()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_4()),
     )
     def test_expected_output_4(self, df, expected):
         """Test that transform is giving the expected output when adding one and not dropping original columns."""
@@ -284,7 +284,7 @@ class TestTransform(object):
 
         df_transformed = x1.transform(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="LogTransformer transform not adding 1 and dropping original columns",
@@ -292,7 +292,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_4(), expected_df_5()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_4(), expected_df_5()),
     )
     def test_expected_output_5(self, df, expected):
         """Test that transform is giving the expected output when adding one and not dropping
@@ -304,7 +304,7 @@ class TestTransform(object):
 
         df_transformed = x1.transform(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="LogTransformer transform not adding 1 and dropping original columns",
@@ -312,7 +312,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_4(), expected_df_6()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_4(), expected_df_6()),
     )
     def test_expected_output_6(self, df, expected):
         """Test that transform is giving the expected output when  not adding one and dropping
@@ -324,7 +324,7 @@ class TestTransform(object):
 
         df_transformed = x1.transform(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="LogTransformer transform should be using base, not adding 1, and not dropping original columns",

@@ -12,7 +12,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=ArbitraryImputer.__init__,
             expected_arguments=["self", "impute_value", "columns"],
             expected_default_values=None,
@@ -23,7 +23,7 @@ class TestInit(object):
 
         x = ArbitraryImputer(impute_value=1, columns="a")
 
-        ta.class_helpers.test_object_method(
+        ta.classes.test_object_method(
             obj=x, expected_method="transform", msg="transform"
         )
 
@@ -32,7 +32,7 @@ class TestInit(object):
 
         x = ArbitraryImputer(impute_value=1, columns="a")
 
-        ta.class_helpers.assert_inheritance(x, tubular.imputers.BaseImputer)
+        ta.classes.assert_inheritance(x, tubular.imputers.BaseImputer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
@@ -41,7 +41,7 @@ class TestInit(object):
             0: {"args": (), "kwargs": {"columns": "a", "verbose": True, "copy": True}}
         }
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -72,7 +72,7 @@ class TestInit(object):
 
         x = ArbitraryImputer(impute_value=value, columns="a")
 
-        ta.class_helpers.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={"impute_value": value, "impute_values_": {}},
             msg="Attributes for ArbitraryImputer set in init",
@@ -85,7 +85,7 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=ArbitraryImputer.transform, expected_arguments=["self", "X"]
         )
 
@@ -98,7 +98,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (["impute_value"],), "kwargs": {}}}
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
 
@@ -113,7 +113,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.imputers.BaseImputer, "transform", expected_call_args
         ):
 
@@ -150,7 +150,7 @@ class TestTransform(object):
 
         x.transform(df)
 
-        ta.class_helpers.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={"impute_value": value},
             msg="impute_value changed in transform",
@@ -165,7 +165,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "columns_check", expected_call_args
         ):
 

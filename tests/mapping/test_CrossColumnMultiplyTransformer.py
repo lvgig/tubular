@@ -14,7 +14,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=CrossColumnMultiplyTransformer.__init__,
             expected_arguments=["self", "adjust_column", "mappings"],
             expected_default_values=None,
@@ -25,7 +25,7 @@ class TestInit(object):
 
         x = CrossColumnMultiplyTransformer(mappings={"a": {"a": 1}}, adjust_column="b")
 
-        ta.class_helpers.test_object_method(
+        ta.classes.test_object_method(
             obj=x, expected_method="transform", msg="transform"
         )
 
@@ -34,7 +34,7 @@ class TestInit(object):
 
         x = CrossColumnMultiplyTransformer(mappings={"a": {"a": 1}}, adjust_column="b")
 
-        ta.class_helpers.assert_inheritance(x, tubular.mapping.BaseMappingTransformer)
+        ta.classes.assert_inheritance(x, tubular.mapping.BaseMappingTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseMappingTransformer.init."""
@@ -50,7 +50,7 @@ class TestInit(object):
             }
         }
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker,
             tubular.mapping.BaseMappingTransformer,
             "__init__",
@@ -86,7 +86,7 @@ class TestInit(object):
             mappings={"a": {"a": 1}}, adjust_column=value
         )
 
-        ta.class_helpers.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={"adjust_column": value},
             msg="Attributes for CrossColumnMultiplyTransformer set in init",
@@ -132,7 +132,7 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=CrossColumnMultiplyTransformer.transform,
             expected_arguments=["self", "X"],
             expected_default_values=None,
@@ -149,7 +149,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (["adjust_column"],), "kwargs": {}}}
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
 
@@ -166,7 +166,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker,
             tubular.mapping.BaseMappingTransformer,
             "transform",
@@ -204,7 +204,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_1(), expected_df_1()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_1(), expected_df_1()),
     )
     def test_expected_output(self, df, expected):
         """Test that transform is giving the expected output."""
@@ -215,7 +215,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_frame_equal_msg(
+        ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="expected output from cross column multiply transformer",
@@ -223,7 +223,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_1(), expected_df_2()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_1(), expected_df_2()),
     )
     def test_non_specified_values_unchanged(self, df, expected):
         """Test that values not specified in mappings are left unchanged in transform."""
@@ -234,7 +234,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_frame_equal_msg(
+        ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="expected output from cross column multiply transformer",
@@ -242,7 +242,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_5(), expected_df_3()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_5(), expected_df_3()),
     )
     def test_multiple_mappings_expected_output(self, df, expected):
         """Test that mappings by multiple columns are both applied in transform"""
@@ -253,7 +253,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_frame_equal_msg(
+        ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="expected output from cross column multiply transformer",
@@ -270,7 +270,7 @@ class TestTransform(object):
 
         x.transform(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=mapping,
             actual=x.mappings,
             msg="CrossColumnMultiplyTransformer.transform has changed self.mappings unexpectedly",

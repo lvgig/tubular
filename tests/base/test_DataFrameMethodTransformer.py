@@ -14,7 +14,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=DataFrameMethodTransformer.__init__,
             expected_arguments=[
                 "self",
@@ -33,7 +33,7 @@ class TestInit(object):
             new_column_name="a", pd_method_name="sum", columns=["b", "c"]
         )
 
-        ta.class_helpers.test_object_method(
+        ta.classes.test_object_method(
             obj=x, expected_method="transform", msg="transform"
         )
 
@@ -44,7 +44,7 @@ class TestInit(object):
             new_column_name="a", pd_method_name="sum", columns=["b", "c"]
         )
 
-        ta.class_helpers.assert_inheritance(x, tubular.base.BaseTransformer)
+        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
@@ -56,7 +56,7 @@ class TestInit(object):
             }
         }
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -141,7 +141,7 @@ class TestInit(object):
             new_column_name="a", pd_method_name="sum", columns=["b", "c"]
         )
 
-        ta.class_helpers.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={"new_column_name": "a", "pd_method_name": "sum"},
             msg="Attributes for DataFrameMethodTransformer set in init",
@@ -183,7 +183,7 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=DataFrameMethodTransformer.transform, expected_arguments=["self", "X"]
         )
 
@@ -198,7 +198,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (df.copy(),), "kwargs": {}}}
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
 
@@ -206,7 +206,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
     )
     def test_expected_output_single_columns_assignment(self, df, expected):
         """Test a single column output from transform gives expected results."""
@@ -220,7 +220,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="DataFrameMethodTransformer sum columns b and c",
@@ -228,7 +228,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_3(), expected_df_2()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_2()),
     )
     def test_expected_output_multi_columns_assignment(self, df, expected):
         """Test a multiple column output from transform gives expected results."""
@@ -242,7 +242,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="DataFrameMethodTransformer divide by 2 columns b and c",
@@ -299,14 +299,14 @@ class TestTransform(object):
         call_kwargs = call_args[1]
 
         # test keyword are as expected
-        ta.equality_helpers.assert_dict_equal_msg(
+        ta.equality.assert_dict_equal_msg(
             actual=call_kwargs,
             expected=pd_method_kwargs,
             msg_tag=f"""Keyword arg assert for {pd_method_name}""",
         )
 
         # test positional args are as expected
-        ta.equality_helpers.assert_list_tuple_equal_msg(
+        ta.equality.assert_list_tuple_equal_msg(
             actual=call_pos_args,
             expected=(df[columns],),
             msg_tag=f"""Positional arg assert for {pd_method_name}""",

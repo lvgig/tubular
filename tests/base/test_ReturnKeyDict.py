@@ -8,7 +8,7 @@ def test_inheritance():
 
     x = ReturnKeyDict()
 
-    ta.class_helpers.assert_inheritance(x, dict)
+    ta.classes.assert_inheritance(x, dict)
 
 
 def test_has___missing___method():
@@ -16,7 +16,7 @@ def test_has___missing___method():
 
     x = ReturnKeyDict()
 
-    ta.class_helpers.test_object_method(
+    ta.classes.test_object_method(
         x, "__missing__", "ReturnKeyDict does not have __missing__ method"
     )
 

@@ -13,7 +13,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=NominalToIntegerTransformer.__init__,
             expected_arguments=["self", "columns", "start_encoding"],
             expected_default_values=(None, 0),
@@ -24,13 +24,13 @@ class TestInit(object):
 
         x = NominalToIntegerTransformer()
 
-        ta.class_helpers.test_object_method(obj=x, expected_method="fit", msg="fit")
+        ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
 
-        ta.class_helpers.test_object_method(
+        ta.classes.test_object_method(
             obj=x, expected_method="transform", msg="transform"
         )
 
-        ta.class_helpers.test_object_method(
+        ta.classes.test_object_method(
             obj=x, expected_method="inverse_transform", msg="inverse_transform"
         )
 
@@ -39,7 +39,7 @@ class TestInit(object):
 
         x = NominalToIntegerTransformer()
 
-        ta.class_helpers.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
+        ta.classes.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
@@ -86,7 +86,7 @@ class TestInit(object):
 
         x = NominalToIntegerTransformer(start_encoding=value)
 
-        ta.class_helpers.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={"start_encoding": value},
             msg="Attributes for NominalToIntegerTransformer set in init",
@@ -99,7 +99,7 @@ class TestFit(object):
     def test_arguments(self):
         """Test that init fit expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=NominalToIntegerTransformer.fit,
             expected_arguments=["self", "X", "y"],
             expected_default_values=(None,),
@@ -138,7 +138,7 @@ class TestFit(object):
             expected_pos_args[0] == call_pos_args[0]
         ), "unexpected 1st positional arg in BaseTransformer.fit call"
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected_pos_args[1:3],
             call_pos_args[1:3],
             "unexpected 2nd, 3rd positional arg in BaseTransformer.fit call",
@@ -153,7 +153,7 @@ class TestFit(object):
 
         x.fit(df)
 
-        ta.class_helpers.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
                 "mappings": {
@@ -186,7 +186,7 @@ class TestFit(object):
 
         x.fit(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=d.create_df_1(),
             actual=df,
             msg="Check X not changing during fit",
@@ -212,7 +212,7 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=NominalToIntegerTransformer.transform, expected_arguments=["self", "X"]
         )
 
@@ -227,7 +227,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (["mappings"],), "kwargs": {}}}
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
 
@@ -244,7 +244,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
@@ -267,7 +267,7 @@ class TestTransform(object):
 
         x2.fit_transform(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=x.mappings,
             actual=x2.mappings,
             msg="Impute values not changed in transform",
@@ -293,7 +293,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_1(), expected_df_1()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_1(), expected_df_1()),
     )
     def test_expected_output(self, df, expected):
         """Test that the output is expected from transform."""
@@ -308,7 +308,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_frame_equal_msg(
+        ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in NominalToIntegerTransformer.transform",
@@ -321,7 +321,7 @@ class TestInverseTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=NominalToIntegerTransformer.inverse_transform,
             expected_arguments=["self", "X"],
         )
@@ -339,7 +339,7 @@ class TestInverseTransform(object):
 
         expected_call_args = {0: {"args": (["mappings"],), "kwargs": {}}}
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
 
@@ -347,7 +347,7 @@ class TestInverseTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_1(), d.create_df_1()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_1(), d.create_df_1()),
     )
     def test_expected_output(self, df, expected):
         """Test that transform then inverse_transform gets back to the original df."""
@@ -364,7 +364,7 @@ class TestInverseTransform(object):
 
         df_transformed_back = x.inverse_transform(df_transformed)
 
-        ta.equality_helpers.assert_frame_equal_msg(
+        ta.equality.assert_frame_equal_msg(
             actual=df_transformed_back,
             expected=expected,
             msg_tag="transform reverse does not get back to original",
@@ -407,7 +407,7 @@ class TestInverseTransform(object):
 
         x2.inverse_transform(df_transformed)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=x.mappings,
             actual=x2.mappings,
             msg="Impute values not changed in inverse_transform",

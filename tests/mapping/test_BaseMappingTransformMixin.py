@@ -14,7 +14,7 @@ class TestInit(object):
 
         x = BaseMappingTransformMixin()
 
-        ta.class_helpers.test_object_method(
+        ta.classes.test_object_method(
             obj=x, expected_method="transform", msg="transform method"
         )
 
@@ -23,7 +23,7 @@ class TestInit(object):
 
         x = BaseMappingTransformMixin()
 
-        ta.class_helpers.assert_inheritance(x, tubular.base.BaseTransformer)
+        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
 
 class TestTransform(object):
@@ -45,7 +45,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (["mappings"],), "kwargs": {}}}
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
 
@@ -67,7 +67,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
 
@@ -102,7 +102,7 @@ class TestTransform(object):
 
         expected_pos_args = (df["a"], mapping["a"])
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected_pos_args,
             call_pos_arg,
             "positional args in first pd.Series.map call not correct",
@@ -117,7 +117,7 @@ class TestTransform(object):
 
         expected_pos_args = (df["b"], mapping["b"])
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected_pos_args,
             call_pos_arg,
             "positional args in second pd.Series.map call not correct",

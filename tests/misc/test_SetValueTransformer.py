@@ -12,7 +12,7 @@ class TestInit:
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=SetValueTransformer.__init__,
             expected_arguments=["self", "columns", "value"],
             expected_default_values=None,
@@ -37,7 +37,7 @@ class TestInit:
             }
         }
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -67,7 +67,7 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=SetValueTransformer.transform,
             expected_arguments=["self", "X"],
             expected_default_values=None,
@@ -82,7 +82,7 @@ class TestTransform:
 
         expected_call_args = {0: {"args": (d.create_df_7(),), "kwargs": {}}}
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
 
@@ -90,7 +90,7 @@ class TestTransform:
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_2(), expected_df_1()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_2(), expected_df_1()),
     )
     def test_value_set_in_transform(self, df, expected):
         """Test that transform sets the value as expected."""
@@ -99,7 +99,7 @@ class TestTransform:
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             actual=df_transformed,
             expected=expected,
             msg="incorrect value after SetValueTransformer transform",

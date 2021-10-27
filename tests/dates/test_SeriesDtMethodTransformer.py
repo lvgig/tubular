@@ -12,7 +12,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=SeriesDtMethodTransformer.__init__,
             expected_arguments=[
                 "self",
@@ -31,7 +31,7 @@ class TestInit(object):
             new_column_name="a", pd_method_name="year", column="b"
         )
 
-        ta.class_helpers.test_object_method(
+        ta.classes.test_object_method(
             obj=x, expected_method="transform", msg="transform"
         )
 
@@ -42,7 +42,7 @@ class TestInit(object):
             new_column_name="a", pd_method_name="year", column="b"
         )
 
-        ta.class_helpers.assert_inheritance(x, tubular.base.BaseTransformer)
+        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
@@ -51,7 +51,7 @@ class TestInit(object):
             0: {"args": (), "kwargs": {"columns": "b", "verbose": True, "copy": False}}
         }
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -137,7 +137,7 @@ class TestInit(object):
             pd_method_kwargs={"d": 1},
         )
 
-        ta.class_helpers.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
                 "new_column_name": "a",
@@ -160,7 +160,7 @@ class TestInit(object):
             pd_method_kwargs={"d": 1},
         )
 
-        ta.class_helpers.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={"_callable": callable_attr},
             msg="_callable attribute for SeriesDtMethodTransformer set in init",
@@ -200,7 +200,7 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=SeriesDtMethodTransformer.transform, expected_arguments=["self", "X"]
         )
 
@@ -215,7 +215,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (d.create_datediff_test_df(),), "kwargs": {}}}
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
 
@@ -223,7 +223,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(
+        ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_1()
         ),
     )
@@ -239,7 +239,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_frame_equal_msg(
+        ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in SeriesDtMethodTransformer.transform with find, not overwriting original column",
@@ -247,7 +247,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(
+        ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_2()
         ),
     )
@@ -263,7 +263,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_frame_equal_msg(
+        ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in SeriesDtMethodTransformer.transform with pad, overwriting original column",
@@ -271,7 +271,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(
+        ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_3()
         ),
     )
@@ -287,7 +287,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_frame_equal_msg(
+        ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in SeriesDtMethodTransformer.transform with to_period",

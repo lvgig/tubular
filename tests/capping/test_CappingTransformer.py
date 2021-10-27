@@ -14,7 +14,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=CappingTransformer.__init__,
             expected_arguments=[
                 "self",
@@ -40,7 +40,7 @@ class TestInit(object):
 
         x = CappingTransformer(capping_values={"a": [1, 3]})
 
-        ta.class_helpers.test_object_method(
+        ta.classes.test_object_method(
             obj=x, expected_method=method_name, msg=method_name
         )
 
@@ -49,7 +49,7 @@ class TestInit(object):
 
         x = CappingTransformer(capping_values={"a": [1, 3]})
 
-        ta.class_helpers.assert_inheritance(x, tubular.base.BaseTransformer)
+        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_capping_values_quantiles_both_none_error(self):
         """Test that an exception is raised if both capping_values and quantiles are passed as None."""
@@ -97,7 +97,7 @@ class TestInit(object):
             }
         }
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -115,7 +115,7 @@ class TestInit(object):
             }
         }
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -133,7 +133,7 @@ class TestInit(object):
             }
         }
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker,
             tubular.capping.CappingTransformer,
             "check_capping_values_dict",
@@ -152,7 +152,7 @@ class TestInit(object):
             }
         }
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker,
             tubular.capping.CappingTransformer,
             "check_capping_values_dict",
@@ -168,7 +168,7 @@ class TestInit(object):
 
         x = CappingTransformer(capping_values=capping_values_dict)
 
-        ta.class_helpers.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
                 "capping_values": capping_values_dict,
@@ -186,7 +186,7 @@ class TestInit(object):
 
         x = CappingTransformer(quantiles=quantiles_dict)
 
-        ta.class_helpers.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
                 "quantiles": quantiles_dict,
@@ -204,7 +204,7 @@ class TestCheckCappingValuesDict(object):
     def test_arguments(self):
         """Test that check_capping_values_dict has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=CappingTransformer.check_capping_values_dict,
             expected_arguments=["self", "capping_values_dict", "dict_name"],
             expected_default_values=None,
@@ -327,7 +327,7 @@ class TestFit(object):
     def test_arguments(self):
         """Test that fit has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=CappingTransformer.fit,
             expected_arguments=["self", "X", "y"],
             expected_default_values=(None,),
@@ -358,7 +358,7 @@ class TestFit(object):
 
         expected_call_args = {0: {"args": (d.create_df_9(), None), "kwargs": {}}}
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "fit", expected_call_args
         ):
 
@@ -392,7 +392,7 @@ class TestFit(object):
             },
         }
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker,
             tubular.capping.CappingTransformer,
             "prepare_quantiles",
@@ -419,7 +419,7 @@ class TestFit(object):
             },
         }
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker,
             tubular.capping.CappingTransformer,
             "prepare_quantiles",
@@ -447,7 +447,7 @@ class TestFit(object):
 
         x.fit(df)
 
-        ta.class_helpers.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
                 "capping_values": {
@@ -490,7 +490,7 @@ class TestPrepareQuantiles(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=CappingTransformer.prepare_quantiles,
             expected_arguments=["self", "values", "quantiles", "sample_weight"],
             expected_default_values=(None,),
@@ -630,7 +630,7 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=CappingTransformer.transform, expected_arguments=["self", "X"]
         )
 
@@ -641,7 +641,7 @@ class TestTransform(object):
 
         x = CappingTransformer(capping_values={"a": [2, 5], "b": [-1, 8]})
 
-        with ta.function_helpers.assert_function_call_count(
+        with ta.functions.assert_function_call_count(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", 2
         ):
 
@@ -659,7 +659,7 @@ class TestTransform(object):
             1: {"args": (["_replacement_values"],), "kwargs": {}},
         }
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
 
@@ -674,7 +674,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (d.create_df_3(),), "kwargs": {}}}
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
@@ -695,7 +695,7 @@ class TestTransform(object):
 
         x.transform(df)
 
-        ta.class_helpers.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={"capping_values": capping_values_dict},
             msg="Attributes for CappingTransformer set in init",
@@ -703,7 +703,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
     )
     def test_expected_output_min_and_max_combinations(self, df, expected):
         """Test that capping is applied correctly in transform."""
@@ -714,7 +714,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_frame_equal_msg(
+        ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in CappingTransformer.transform",
@@ -722,7 +722,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(d.create_df_4(), expected_df_2()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_4(), expected_df_2()),
     )
     def test_non_cap_column_left_untouched(self, df, expected):
         """Test that capping is applied only to specific columns, others remain the same."""
@@ -731,7 +731,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_frame_equal_msg(
+        ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in CappingTransformer.transform, with columns meant to not be transformed",
@@ -814,7 +814,7 @@ class TestWeightedQuantile(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=CappingTransformer.weighted_quantile,
             expected_arguments=["self", "values", "quantiles", "sample_weight"],
             expected_default_values=(None,),

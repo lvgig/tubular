@@ -15,7 +15,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=DateDifferenceTransformer.__init__,
             expected_arguments=[
                 "self",
@@ -37,7 +37,7 @@ class TestInit(object):
             "column_upper",
         )
 
-        ta.class_helpers.test_object_method(
+        ta.classes.test_object_method(
             obj=x, expected_method="transform", msg="transform"
         )
 
@@ -46,7 +46,7 @@ class TestInit(object):
 
         x = DateDifferenceTransformer("column_lower", "column_upper")
 
-        ta.class_helpers.assert_inheritance(x, tubular.base.BaseTransformer)
+        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
@@ -62,7 +62,7 @@ class TestInit(object):
             }
         }
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -158,7 +158,7 @@ class TestInit(object):
             verbose=False,
         )
 
-        ta.class_helpers.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
                 "columns": ["dummy_1", "dummy_2"],
@@ -181,7 +181,7 @@ class TestInit(object):
             verbose=False,
         )
 
-        ta.class_helpers.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
                 "columns": ["dummy_1", "dummy_2"],
@@ -457,7 +457,7 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        ta.function_helpers.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=DateDifferenceTransformer.transform, expected_arguments=["self", "X"]
         )
 
@@ -477,7 +477,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (d.create_datediff_test_df(),), "kwargs": {}}}
 
-        with ta.function_helpers.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
@@ -489,7 +489,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(
+        ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_1()
         ),
     )
@@ -511,7 +511,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="Unexpected values in DateDifferenceYearTransformer.transform",
@@ -519,7 +519,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(
+        ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_2()
         ),
     )
@@ -541,7 +541,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="Unexpected values in DateDifferenceYearTransformer.transform",
@@ -549,7 +549,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(
+        ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_3()
         ),
     )
@@ -571,7 +571,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="Unexpected values in DateDifferenceYearTransformer.transform",
@@ -579,7 +579,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(
+        ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_4()
         ),
     )
@@ -601,7 +601,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="Unexpected values in DateDifferenceYearTransformer.transform",
@@ -609,7 +609,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(
+        ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_5()
         ),
     )
@@ -631,7 +631,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="Unexpected values in DateDifferenceYearTransformer.transform",
@@ -639,7 +639,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(
+        ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_6()
         ),
     )
@@ -661,7 +661,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="Unexpected values in DateDifferenceYearTransformer.transform",
@@ -669,7 +669,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas_helpers.adjusted_dataframe_params(
+        ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_nulls_df(), expected_df_7()
         ),
     )
@@ -687,7 +687,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality_helpers.assert_frame_equal_msg(
+        ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in DateDifferenceTransformer.transform (nulls)",
