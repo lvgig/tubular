@@ -8,6 +8,7 @@
 - Moved test_data.py to tests folder
 - Added `test-aide` to requirements-dev
 - Updated example notebooks to use California housing dataset from sklearn instead of Boston house prices dataset
+- Added `scaler_kwargs` as an empty attribute to the ScalingTransformer class to avoid an AttributeError raised by `sklearn`
 
 ## 0.2.15
 
