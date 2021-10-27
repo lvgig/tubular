@@ -7,6 +7,7 @@
 - Removed testing folder and updated tests to use helpers from `test-aide` package
 - Moved test_data.py to tests folder
 - Added `test-aide` to requirements-dev
+- Updated example notebooks to use California housing dataset from sklearn instead of Boston house prices dataset
 
 ## 0.2.15
 
