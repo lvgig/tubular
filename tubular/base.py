@@ -7,6 +7,10 @@ import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
+from itertools import chain, combinations
+from itertools import combinations_with_replacement as combinations_w_r
+from scipy.special import comb
+
 from tubular._version import __version__
 
 
@@ -410,5 +414,203 @@ class DataFrameMethodTransformer(BaseTransformer):
         X[self.new_column_name] = getattr(X[self.columns], self.pd_method_name)(
             **self.pd_method_kwargs
         )
+
+        return X
+
+
+class InteractionTransformer(BaseTransformer):
+    """
+    Interaction Transformer.
+
+        Parameters
+        ----------
+        columns : various
+        new_columns_name : various
+        min_degree : int
+        max_degree : int
+
+
+         Attributes
+        ----------
+        columns : various
+        new_columns_name : various
+        min_degree : int
+        max_degree : int
+
+    """
+
+    def __init__(
+        self,
+        columns=None,
+        new_columns_name=None,
+        min_degree=2,
+        max_degree=2,
+    ):
+
+        # **kwargs,
+
+        if columns is None:
+            self.columns = None
+        else:
+            if type(columns) is list:
+
+                for i, item in enumerate(columns):
+
+                    if not type(item) is str:
+
+                        raise TypeError(
+                            f"if columns is a list, all elements must be strings but got {type(item)} in position {i}"
+                        )
+
+            elif not type(columns) is str:
+
+                raise TypeError(
+                    f"unexpected type ({type(columns)}) for columns, must be str or list of strings"
+                )
+            self.columns = columns
+
+        if new_columns_name is None:
+            self.new_columns_name = None
+        else:
+            if type(new_columns_name) is list:
+
+                for i, item in enumerate(new_columns_name):
+
+                    if not type(item) is str:
+
+                        raise TypeError(
+                            f"if new_columns_name is a list, all elements must be strings but got {type(item)} in position {i}"
+                        )
+
+            elif not type(new_columns_name) is str:
+
+                raise TypeError(
+                    f"unexpected type ({type(new_columns_name)}) for new_column_name, must be str or list of strings"
+                )
+            self.new_columns_name = new_columns_name
+
+        if type(min_degree) is int:
+            if min_degree < 2:
+                raise ValueError(
+                    f"min_degree must be equal or greater than 2, got {str(min_degree)}"
+                )
+            else:
+                self.min_degree = min_degree
+        else:
+            raise TypeError(
+                f"unexpected type ({type(min_degree)}) for min_degree, must be int"
+            )
+        if type(max_degree) is int:
+            self.max_degree = max_degree
+            if min_degree > max_degree:
+                raise ValueError("max_degree must be equal or greater than min_degree")
+            else:
+                self.max_degree = max_degree
+        else:
+            raise TypeError(
+                f"unexpected type ({type(max_degree)}) for max_degree, must be int"
+            )
+
+        if new_columns_name is not None:
+            if len(new_columns_name) < max_degree:
+                raise ValueError(
+                    "max_degree must be equal or lower than the number of expected new_columns_name"
+                )
+
+        self.nb_combinations = -1
+        self.nb_feature_out = -1
+
+    @staticmethod
+    def _combinations(
+        n_features, min_degree, max_degree, interaction_only, include_bias
+    ):
+        # extract from sklearn code
+        comb = combinations if interaction_only else combinations_w_r
+        start = max(1, min_degree)
+        iter = chain.from_iterable(
+            comb(range(n_features), i) for i in range(start, max_degree + 1)
+        )
+        if include_bias:
+            iter = chain(comb(range(n_features), 0), iter)
+        return iter
+
+    @staticmethod
+    def _num_combinations(
+        n_features, min_degree, max_degree, interaction_only, include_bias
+    ):
+        """Calculate number of terms in polynomial expansion
+        This should be equivalent to counting the number of terms returned by
+        _combinations(...) but much faster.
+        """
+        # extract from sklearn code
+        if interaction_only:
+            combinations = sum(
+                [
+                    comb(n_features, i, exact=True)
+                    for i in range(max(1, min_degree), min(max_degree, n_features) + 1)
+                ]
+            )
+        else:
+            combinations = comb(n_features + max_degree, max_degree, exact=True) - 1
+            if min_degree > 0:
+                d = min_degree - 1
+                combinations -= comb(n_features + d, d, exact=True) - 1
+
+        if include_bias:
+            combinations += 1
+
+        return combinations
+
+    def transform(self, X):
+        """ """
+        if self.columns is None:
+            self.columns = X.columns.copy()
+
+        self.nb_combinations = self._num_combinations(
+            n_features=len(self.columns),
+            min_degree=self.min_degree,
+            max_degree=self.max_degree,
+            interaction_only=True,
+            include_bias=False,
+        )
+
+        self.nb_feature_out = self.nb_combinations + len(X)
+
+        # if max degree is greater than the length of columns provided, itertools only provide up to len of columns
+        interaction_combination_index = self._combinations(
+            n_features=len(self.columns),
+            min_degree=self.min_degree,
+            max_degree=self.max_degree,
+            interaction_only=True,
+            include_bias=False,
+        )
+        interaction_combination_colname = [
+            [self.columns[col_idx] for col_idx in interaction_combination]
+            for interaction_combination in interaction_combination_index
+        ]
+        if self.new_columns_name is None:
+            self.new_columns_name = [
+                " ".join(interaction_combination)
+                for interaction_combination in interaction_combination_colname
+            ]
+        else:
+            if type(self.new_columns_name) is not list:
+                self.new_columns_name = [self.new_columns_name]
+
+        # assert self.nb_combinations == len(
+        #    self.new_columns_name
+        # ), f"""Number of columns in new_columns_name ( = {str(len(self.new_columns_name))}) does not match expected number of combinations {str(self.nb_combinations)} """
+
+        for inter_idx in range(len(interaction_combination_colname)):
+            X = DataFrameMethodTransformer(
+                columns=interaction_combination_colname[inter_idx],
+                new_column_name=self.new_columns_name[inter_idx],
+                pd_method_name="product",
+                pd_method_kwargs={"axis": 1, "skipna": False},
+            ).transform(X)
+
+        # X[self.new_column_name] = getattr(X[self.columns], self.pd_method_name)(
+        #            **self.pd_method_kwargs
+        #        )
 
         return X
