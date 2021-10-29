@@ -2,6 +2,14 @@
 
 ----
 
+## 0.3.0
+
+- Removed testing folder and updated tests to use helpers from `test-aide` package
+- Moved test_data.py to tests folder
+- Added `test-aide` to requirements-dev
+- Updated example notebooks to use California housing dataset from sklearn instead of Boston house prices dataset
+- Added `scaler_kwargs` as an empty attribute to the ScalingTransformer class to avoid an AttributeError raised by `sklearn`
+
 ## 0.2.15
 
 - Update NearestMeanResponseImputer to remove fallback to median imputation when no nulls present in a column

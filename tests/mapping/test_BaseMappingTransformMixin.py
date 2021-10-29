@@ -1,6 +1,6 @@
 import pandas as pd
-import tubular.testing.test_data as d
-import tubular.testing.helpers as h
+import test_aide as ta
+import tests.test_data as d
 
 import tubular
 from tubular.mapping import BaseMappingTransformMixin
@@ -14,14 +14,16 @@ class TestInit(object):
 
         x = BaseMappingTransformMixin()
 
-        h.test_object_method(obj=x, expected_method="transform", msg="transform method")
+        ta.classes.test_object_method(
+            obj=x, expected_method="transform", msg="transform method"
+        )
 
     def test_inheritance(self):
         """Test that BaseMappingTransformMixin inherits from BaseTransformer."""
 
         x = BaseMappingTransformMixin()
 
-        h.assert_inheritance(x, tubular.base.BaseTransformer)
+        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
 
 class TestTransform(object):
@@ -43,7 +45,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (["mappings"],), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
 
@@ -65,7 +67,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
 
@@ -100,7 +102,7 @@ class TestTransform(object):
 
         expected_pos_args = (df["a"], mapping["a"])
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected_pos_args,
             call_pos_arg,
             "positional args in first pd.Series.map call not correct",
@@ -115,7 +117,7 @@ class TestTransform(object):
 
         expected_pos_args = (df["b"], mapping["b"])
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected_pos_args,
             call_pos_arg,
             "positional args in second pd.Series.map call not correct",
