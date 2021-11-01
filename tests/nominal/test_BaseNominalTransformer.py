@@ -1,6 +1,6 @@
 import pytest
-import tubular.testing.test_data as d
-import tubular.testing.helpers as h
+import test_aide as ta
+import tests.test_data as d
 
 import tubular
 from tubular.base import BaseTransformer
@@ -15,11 +15,11 @@ class TestInit(object):
 
         x = BaseNominalTransformer()
 
-        h.test_object_method(
+        ta.classes.test_object_method(
             obj=x, expected_method="columns_set_or_check", msg="columns_set_or_check"
         )
 
-        h.test_object_method(
+        ta.classes.test_object_method(
             obj=x, expected_method="check_mappable_rows", msg="check_mappable_rows"
         )
 
@@ -28,7 +28,7 @@ class TestInit(object):
 
         x = BaseNominalTransformer()
 
-        h.assert_inheritance(x, BaseTransformer)
+        ta.classes.assert_inheritance(x, BaseTransformer)
 
 
 class TestNominalColumnSetOrCheck(object):
@@ -45,7 +45,7 @@ class TestNominalColumnSetOrCheck(object):
 
         x.columns_set_or_check(df)
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=["b", "c"], actual=x.columns, msg="nominal columns getting"
         )
 
@@ -81,7 +81,7 @@ class TestNominalColumnSetOrCheck(object):
 
         expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "columns_check", expected_call_args
         ):
 

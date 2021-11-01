@@ -1,12 +1,11 @@
 import pytest
-import tubular.testing.test_data as d
-import tubular.testing.helpers as h
+import test_aide as ta
+import tests.test_data as d
+from collections import OrderedDict
+import pandas as pd
 
 import tubular
 from tubular.mapping import CrossColumnMappingTransformer
-from collections import OrderedDict
-
-import pandas as pd
 
 
 class TestInit(object):
@@ -15,7 +14,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=CrossColumnMappingTransformer.__init__,
             expected_arguments=["self", "adjust_column", "mappings"],
             expected_default_values=None,
@@ -26,14 +25,16 @@ class TestInit(object):
 
         x = CrossColumnMappingTransformer(mappings={"a": {"a": 1}}, adjust_column="b")
 
-        h.test_object_method(obj=x, expected_method="transform", msg="transform")
+        ta.classes.test_object_method(
+            obj=x, expected_method="transform", msg="transform"
+        )
 
     def test_inheritance(self):
         """Test that CrossColumnMappingTransformer inherits from BaseMappingTransformer."""
 
         x = CrossColumnMappingTransformer(mappings={"a": {"a": 1}}, adjust_column="b")
 
-        h.assert_inheritance(x, tubular.mapping.BaseMappingTransformer)
+        ta.classes.assert_inheritance(x, tubular.mapping.BaseMappingTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseMappingTransformer.init."""
@@ -49,7 +50,7 @@ class TestInit(object):
             }
         }
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker,
             tubular.mapping.BaseMappingTransformer,
             "__init__",
@@ -86,7 +87,7 @@ class TestInit(object):
 
         x = CrossColumnMappingTransformer(mappings={"a": {"a": 1}}, adjust_column=value)
 
-        h.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={"adjust_column": value},
             msg="Attributes for CrossColumnMappingTransformer set in init",
@@ -130,7 +131,7 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=CrossColumnMappingTransformer.transform,
             expected_arguments=["self", "X"],
             expected_default_values=None,
@@ -147,7 +148,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (["adjust_column"],), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
 
@@ -164,7 +165,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker,
             tubular.mapping.BaseMappingTransformer,
             "transform",
@@ -189,8 +190,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_1(), expected_df_1())
-        + h.index_preserved_params(d.create_df_1(), expected_df_1()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_1(), expected_df_1()),
     )
     def test_expected_output(self, df, expected):
         """Test that transform is giving the expected output."""
@@ -201,7 +201,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_frame_equal_msg(
+        ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="expected output from cross column mapping transformer",
@@ -209,8 +209,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_1(), expected_df_2())
-        + h.index_preserved_params(d.create_df_1(), expected_df_2()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_1(), expected_df_2()),
     )
     def test_non_specified_values_unchanged(self, df, expected):
         """Test that values not specified in mappings are left unchanged in transform."""
@@ -221,7 +220,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_frame_equal_msg(
+        ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="expected output from cross column mapping transformer",
@@ -229,8 +228,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_7(), expected_df_3())
-        + h.index_preserved_params(d.create_df_7(), expected_df_3()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_7(), expected_df_3()),
     )
     def test_multiple_mappings_ordered_dict(self, df, expected):
         """Test that mappings by multiple columns using an ordered dict gives the expected output in transform"""
@@ -244,7 +242,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_frame_equal_msg(
+        ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="expected output from cross column mapping transformer",
@@ -261,7 +259,7 @@ class TestTransform(object):
 
         x.transform(df)
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=mapping,
             actual=x.mappings,
             msg="CrossColumnMappingTransformer.transform has changed self.mappings unexpectedly",
