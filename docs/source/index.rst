@@ -10,7 +10,7 @@ Welcome to tubular's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   api
+   API Documentation <api>
 
 
 

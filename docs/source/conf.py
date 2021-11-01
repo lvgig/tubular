@@ -23,7 +23,7 @@ copyright = "2021, LV GI Data Science Team"
 author = "LV GI Data Science Team"
 
 # The full version, including alpha/beta/rc tags
-release = "0.2.15"
+release = "0.3.0"
 
 
 # -- General configuration ---------------------------------------------------
@@ -33,6 +33,7 @@ release = "0.2.15"
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",    
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx_rtd_theme",
