@@ -2,35 +2,34 @@
   <img src="https://github.com/lvgig/tubular/blob/feature/version_0_3_0/logo.png">
 </p>
 
-`tubular` implements transformers for pre processing steps commonly used in machine learning pipelines.
+`tubular` implements pre processing steps for tabular data commonly used in machine learning pipelines.
 
-The transformers are compatible with scikit-learn [Pipelines](https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html), having a `transform` method to apply the pre processing step to data and a `fit` method to learn the relevant information from the data, if applicable.
+The transformers are compatible with scikit-learn [Pipelines](https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html). Each has a `transform` method to apply the pre processing step to data and a `fit` method to learn the relevant information from the data, if applicable.
 
-The transformers in `tubular` work with data in [pandas DataFrames](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html).
+The transformers in `tubular` work with data in pandas [DataFrames](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html).
 
 There are a variety of transformers to assist with;
 
 - capping
+- dates
 - imputation
 - mapping
-- date differencing
 - categorical encoding
 - numeric operations
 
-Here is a simple example of capping 2 columns at a specified value;
+Here is a simple example of applying capping to two columns;
 
 ```python
 from tubular.capping import CappingTransformer
 import pandas as pd
-from sklearn.datasets import load_boston
+from sklearn.datasets import fetch_california_housing
 
-# load the boston dataset
-boston = load_boston()
-y = boston.target
-X = pd.DataFrame(boston.data, columns=boston.feature_names)
+# load the california housing dataset
+cali = fetch_california_housing()
+X = pd.DataFrame(cali['data'], columns=cali['feature_names'])
 
 # initialise a capping transformer for 2 columns
-capper = CappingTransformer(columns=['INDUS', 'RM'], cap_value_max = 20)
+capper = CappingTransformer(capping_values = {'AveOccup': [0, 10], 'HouseAge': [0, 50]})
 
 # transform the data
 X_capped = capper.transform(X)
@@ -38,27 +37,23 @@ X_capped = capper.transform(X)
 
 ## Installation
 
-tubular can be installed from PyPI simply with;
+The easiest way to get `tubular` is directly from [pypi](https://pypi.org/project/tubular/) with;
 
  `pip install tubular`
 
 ## Documentation
 
-To build local documentation, specify the environment variable $SPHINX_BUILD_DIR$, and then
-run from the `docs/` directory
+The documentation for `tubular` can be found on [readthedocs](https://tubular.readthedocs.io/en/latest/).
 
-```shell
-make apidoc
-make html
-```
+Instructions for building the docs locally can be found in [docs/README](https://github.com/lvgig/tubular/blob/master/docs/README.md).
 
 ## Examples
 
-To help get started there are example notebooks in the [examples](https://github.com/lvgig/tubular/tree/master/examples) folder that show how to use each transformer as well as an example of putting several together in a Pipeline.
+To help get started there are example notebooks in the [examples](https://github.com/lvgig/tubular/tree/master/examples) folder in the repo that show how to use each transformer.
 
 ## Build and test
 
-The test framework we are using for this project is [pytest](https://docs.pytest.org/en/stable/), to run the tests follow the steps below.
+The test framework we are using for this project is [pytest](https://docs.pytest.org/en/stable/). To build the package locally and run the tests follow the steps below.
 
 First clone the repo and move to the root directory;
 
@@ -67,13 +62,13 @@ git clone https://github.com/lvgig/tubular.git
 cd tubular
 ```
 
-Then install tubular in editable mode;
+Next install `tubular` and development dependencies;
 
 ```shell
-pip install -e . -r requirements-dev.txt
+pip install . -r requirements-dev.txt
 ```
 
-Then run the tests simply with pytest
+Finally run the test suite with `pytest`;
 
 ```shell
 pytest
@@ -81,6 +76,8 @@ pytest
 
 ## Contribute
 
-`tubular` is under active development, we're super excited if you're interested in contributing! See the `CONTRIBUTING.md` for the full details of our working practices.
+`tubular` is under active development, we're super excited if you're interested in contributing! 
+
+See the [CONTRIBUTING](https://github.com/lvgig/tubular/blob/master/CONTRIBUTING.md) file for the full details of our working practices.
 
 For bugs and feature requests please open an [issue](https://github.com/lvgig/tubular/issues).
