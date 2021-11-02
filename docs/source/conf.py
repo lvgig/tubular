@@ -24,6 +24,7 @@ author = "LV GI Data Science Team"
 
 # The full version, including alpha/beta/rc tags
 import tubular
+
 release = tubular.__version__
 
 
@@ -34,7 +35,7 @@ release = tubular.__version__
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.autosummary",    
+    "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx_rtd_theme",
