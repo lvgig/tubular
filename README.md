@@ -1,6 +1,6 @@
-# tubular
-
-----
+<p align="center">
+  <img src="https://github.com/lvgig/tubular/blob/feature/version_0_3_0/logo.png">
+</p>
 
 `tubular` implements transformers for pre processing steps commonly used in machine learning pipelines.
 
