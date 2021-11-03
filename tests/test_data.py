@@ -3,51 +3,6 @@
 import datetime
 import pandas as pd
 import numpy as np
-from pandas.api.types import CategoricalDtype
-from sklearn.datasets import load_boston
-
-
-def prepare_boston_df():
-
-    # load dataset from sklean
-    boston = load_boston()
-
-    # add missings
-    np.random.seed(555)
-    missing_loc = np.random.randint(10, size=(boston["data"].shape))
-    missing_loc[:, 2] = 1
-    missing_loc[:, 3] = 1
-    boston["data"][missing_loc == 0] = np.NaN
-
-    # add columns and response
-    boston_df = pd.DataFrame(boston["data"], columns=boston["feature_names"])
-    boston_df["target"] = boston["target"]
-
-    # add categorical variables (note cannot have nulls when converting to categorical when specifying levels)
-    boston_df["ZN_cat"] = boston_df["ZN"]
-    ZN_levels = boston_df["ZN_cat"].unique()
-    ZN_levels.sort()
-    ZN_levels = ZN_levels[np.logical_not(np.isnan(ZN_levels))]
-    boston_df["ZN_cat"] = boston_df["ZN_cat"].astype(
-        CategoricalDtype(categories=ZN_levels, ordered=True)
-    )
-    boston_df["ZN"] = boston_df["ZN"].astype(str)
-    boston_df.loc[boston_df["ZN"] == "nan", "ZN"] = np.NaN
-    boston_df["CHAS_cat"] = boston_df["CHAS"]
-    boston_df["CHAS_cat"] = boston_df["CHAS_cat"].astype("category")
-    boston_df["CHAS"] = boston_df["CHAS"].astype(str)
-    boston_df.loc[boston_df["CHAS"] == "nan", "CHAS"] = np.NaN
-    boston_df["RAD_cat"] = boston_df["RAD"]
-    RAD_levels = boston_df["RAD_cat"].unique()
-    RAD_levels.sort()
-    RAD_levels = RAD_levels[np.logical_not(np.isnan(RAD_levels))]
-    boston_df["RAD_cat"] = boston_df["RAD_cat"].astype(
-        CategoricalDtype(categories=RAD_levels, ordered=True)
-    )
-    boston_df["RAD"] = boston_df["RAD"].astype(str)
-    boston_df.loc[boston_df["RAD"] == "nan", "RAD"] = np.NaN
-
-    return boston_df
 
 
 def create_series_1(n=6):

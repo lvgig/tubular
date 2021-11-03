@@ -245,14 +245,14 @@ class TestFit(object):
     def test_fields_with_over_100_levels_error(self):
         """Test that OneHotEncodingTransformer.fit on fields with more than 100 levels raises error."""
 
-        df = d.prepare_boston_df()
-        df = df.loc[df["CRIM"].notnull(), ["CHAS_cat", "CRIM"]]
+        df = pd.DataFrame({"b": [i for i in range(101)]})
+        df["a"] = 1
 
-        x = OneHotEncodingTransformer(columns=["CHAS_cat", "CRIM"])
+        x = OneHotEncodingTransformer(columns=["a", "b"])
 
         with pytest.raises(
             ValueError,
-            match="column CRIM has over 100 unique values - consider another type of encoding",
+            match="column b has over 100 unique values - consider another type of encoding",
         ):
 
             x.fit(df)
