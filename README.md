@@ -12,6 +12,7 @@ Tubular pre-processing for machine learning!
 ![GitHub last commit](https://img.shields.io/github/last-commit/lvgig/tubular)
 ![GitHub issues](https://img.shields.io/github/issues/lvgig/tubular)
 ![Build](https://github.com/lvgig/tubular/actions/workflows/python-package.yml/badge.svg?branch=master)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/lvgig/tubular/HEAD?labpath=examples)
 
 `tubular` implements pre-processing steps for tabular data commonly used in machine learning pipelines.
 
@@ -61,6 +62,8 @@ Instructions for building the docs locally can be found in [docs/README](https:/
 ## Examples
 
 To help get started there are example notebooks in the [examples](https://github.com/lvgig/tubular/tree/master/examples) folder in the repo that show how to use each transformer.
+
+To open the example notebooks in [binder](https://mybinder.org/) click [here](https://mybinder.org/v2/gh/lvgig/tubular/HEAD?labpath=examples).
 
 ## Issues
 
