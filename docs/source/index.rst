@@ -12,6 +12,7 @@ Welcome to tubular's documentation!
 
    API Documentation <api>
    Changelog <changelog>
+   Code of Conduct <code-of-conduct>
 
 
 Indices and tables
