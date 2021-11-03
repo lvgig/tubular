@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/lvgig/tubular/blob/feature/version_0_3_0/logo.png">
+  <img src="https://github.com/lvgig/tubular/raw/main/logo.png">
 </p>
 
 `tubular` implements pre processing steps for tabular data commonly used in machine learning pipelines.
