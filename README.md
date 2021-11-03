@@ -11,7 +11,7 @@ Tubular pre-processing for machine learning!
 ![GitHub](https://img.shields.io/github/license/lvgig/tubular)
 ![GitHub last commit](https://img.shields.io/github/last-commit/lvgig/tubular)
 ![GitHub issues](https://img.shields.io/github/issues/lvgig/tubular)
-![Build](https://github.com/lvgig/tubular/actions/workflows/python-package.yml/badge.svg?branch=master)
+![Build](https://github.com/lvgig/tubular/actions/workflows/python-package.yml/badge.svg?branch=main)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/lvgig/tubular/HEAD?labpath=examples)
 
 `tubular` implements pre-processing steps for tabular data commonly used in machine learning pipelines.
@@ -57,11 +57,11 @@ The easiest way to get `tubular` is directly from [pypi](https://pypi.org/projec
 
 The documentation for `tubular` can be found on [readthedocs](https://tubular.readthedocs.io/en/latest/).
 
-Instructions for building the docs locally can be found in [docs/README](https://github.com/lvgig/tubular/blob/master/docs/README.md).
+Instructions for building the docs locally can be found in [docs/README](https://github.com/lvgig/tubular/blob/main/docs/README.md).
 
 ## Examples
 
-To help get started there are example notebooks in the [examples](https://github.com/lvgig/tubular/tree/master/examples) folder in the repo that show how to use each transformer.
+To help get started there are example notebooks in the [examples](https://github.com/lvgig/tubular/tree/main/examples) folder in the repo that show how to use each transformer.
 
 To open the example notebooks in [binder](https://mybinder.org/) click [here](https://mybinder.org/v2/gh/lvgig/tubular/HEAD?labpath=examples) or click on the `launch binder` shield above and then click on the directory button in the side bar to the left to navigate to the specific notebook.
 
@@ -96,4 +96,4 @@ pytest
 
 `tubular` is under active development, we're super excited if you're interested in contributing! 
 
-See the [CONTRIBUTING](https://github.com/lvgig/tubular/blob/master/CONTRIBUTING.md) file for the full details of our working practices.
+See the [CONTRIBUTING](https://github.com/lvgig/tubular/blob/main/CONTRIBUTING.md) file for the full details of our working practices.

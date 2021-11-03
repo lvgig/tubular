@@ -37,7 +37,7 @@ To configure ``pre-commit`` for your local repository run the following;
 
      pre-commit install
 
-If you are building the documentation locally you will need the `docs/requirements.txt <https://github.com/lvgig/tubular/blob/master/docs/requirements.txt>`_.
+If you are building the documentation locally you will need the `docs/requirements.txt <https://github.com/lvgig/tubular/blob/main/docs/requirements.txt>`_.
 
 General
 ^^^^^^^

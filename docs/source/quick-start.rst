@@ -22,7 +22,7 @@ The easiest way to get ``tubular`` is to install directly from ``pypi``;
 Examples
 ---------------------------------
 
-There are example notebooks available on `Github <https://github.com/lvgig/tubular/tree/master/examples/>`_ that demonstrate the functionality of each transformer.
+There are example notebooks available on `Github <https://github.com/lvgig/tubular/tree/main/examples/>`_ that demonstrate the functionality of each transformer.
 
 To open them in `binder <https://mybinder.org/>`_ click `here <https://mybinder.org/v2/gh/lvgig/tubular/HEAD?labpath=examples>`_. Once binder has loaded, click on the directory button in the side bar to the left and navigate to the notebook of interest.
 
@@ -31,7 +31,7 @@ Transformers summary
 
 Each of the modules in ``tubular`` contains transformers that deal with a specific type of data or problem.
 
-We are always looking for new functionality to improve the package so if you would like to add a new transformer create a pull request to let us know your idea then have a look at the `contributing guide <https://github.com/lvgig/tubular/blob/master/CONTRIBUTING.md>`_.
+We are always looking for new functionality to improve the package so if you would like to add a new transformer create a pull request to let us know your idea then have a look at the `contributing guide <https://github.com/lvgig/tubular/blob/main/CONTRIBUTING.md>`_.
 
 Base
 ^^^^
