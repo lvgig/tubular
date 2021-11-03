@@ -2,6 +2,13 @@
   <img src="https://github.com/lvgig/tubular/raw/main/logo.png">
 </p>
 
+![PyPI](https://img.shields.io/pypi/v/tubular?color=success&style=flat)
+![Read the Docs](https://img.shields.io/readthedocs/tubular)
+![GitHub](https://img.shields.io/github/license/lvgig/tubular)
+![GitHub last commit](https://img.shields.io/github/last-commit/lvgig/tubular)
+![GitHub issues](https://img.shields.io/github/issues/lvgig/tubular)
+![Build](https://github.com/lvgig/tubular/actions/workflows/python-package.yml/badge.svg?branch=master)
+
 `tubular` implements pre processing steps for tabular data commonly used in machine learning pipelines.
 
 The transformers are compatible with scikit-learn [Pipelines](https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html). Each has a `transform` method to apply the pre processing step to data and a `fit` method to learn the relevant information from the data, if applicable.
