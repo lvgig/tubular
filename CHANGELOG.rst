@@ -25,6 +25,8 @@ Added
 - Added ``test-aide`` package to ``requirements-dev.txt`` `#21 <https://github.com/lvgig/tubular/pull/21>`_
 - Added logo for the package `#22 <https://github.com/lvgig/tubular/pull/22>`_
 - Added ``pre-commit`` to the project to manage pre-commit hooks `#22 <https://github.com/lvgig/tubular/pull/22>`_
+- Added `quick-start guide <https://tubular.readthedocs.io/en/latest/quick-start.html>`_ to docs `#22 <https://github.com/lvgig/tubular/pull/22>`_
+- Added `code of conduct <https://tubular.readthedocs.io/en/latest/code-of-conduct.html>`_ for the project `#22 <https://github.com/lvgig/tubular/pull/22>`_
 
 Changed
 ^^^^^^^
@@ -32,7 +34,6 @@ Changed
 - Updated example notebooks to use California housing dataset from sklearn instead of Boston house prices dataset `#21 <https://github.com/lvgig/tubular/pull/21>`_
 - Changed ``changelog`` to be ``rst`` format and a changelog page added to docs `#22 <https://github.com/lvgig/tubular/pull/22>`_
 - Changed the default branch in the repository from ``master`` to ``main``
-- Added quick-start guide to docs `#22 <https://github.com/lvgig/tubular/pull/22>`_
 
 Removed
 ^^^^^^^
