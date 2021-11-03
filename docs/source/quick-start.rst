@@ -22,7 +22,7 @@ The easiest way to get ``tubular`` is to install directly from ``pypi``;
 Examples
 ---------------------------------
 
-There are example notebooks available on `Github <https://github.com/richardangell/pitci/tree/master/examples/>`_ that demonstrate the functionality of each transformer.
+There are example notebooks available on `Github <https://github.com/lvgig/tubular/tree/master/examples/>`_ that demonstrate the functionality of each transformer.
 
 To open them in `binder <https://mybinder.org/>`_ click `here <https://mybinder.org/v2/gh/lvgig/tubular/HEAD?labpath=examples>`_. Once binder has loaded, click on the directory button in the side bar to the left and navigate to the notebook of interest.
 
