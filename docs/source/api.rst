@@ -75,11 +75,11 @@ nominal module
     :toctree: api/
 
     nominal.BaseNominalTransformer
-    mapping.GroupRareLevelsTransformer   
-    mapping.MeanResponseTransformer      
-    mapping.NominalToIntegerTransformer
-    mapping.OrdinalEncoderTransformer
-    mapping.OneHotEncodingTransformer 
+    nominal.GroupRareLevelsTransformer   
+    nominal.MeanResponseTransformer      
+    nominal.NominalToIntegerTransformer
+    nominal.OrdinalEncoderTransformer
+    nominal.OneHotEncodingTransformer 
     
 numeric module
 ------------------
