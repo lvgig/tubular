@@ -10,6 +10,7 @@ Welcome to tubular's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   Quick Start <quick-start>
    API Documentation <api>
 
 .. toctree::

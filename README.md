@@ -63,7 +63,7 @@ Instructions for building the docs locally can be found in [docs/README](https:/
 
 To help get started there are example notebooks in the [examples](https://github.com/lvgig/tubular/tree/master/examples) folder in the repo that show how to use each transformer.
 
-To open the example notebooks in [binder](https://mybinder.org/) click [here](https://mybinder.org/v2/gh/lvgig/tubular/HEAD?labpath=examples).
+To open the example notebooks in [binder](https://mybinder.org/) click [here](https://mybinder.org/v2/gh/lvgig/tubular/HEAD?labpath=examples) or click on the `launch binder` shield above and then click on the directory button in the side bar to the left to navigate to the specific notebook.
 
 ## Issues
 
