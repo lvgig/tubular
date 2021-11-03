@@ -11,7 +11,12 @@ Welcome to tubular's documentation!
    :caption: Contents:
 
    API Documentation <api>
+
+.. toctree::
+   :maxdepth: 1
+
    Changelog <changelog>
+   Contributing <contributing>
    Code of Conduct <code-of-conduct>
 
 
