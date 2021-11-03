@@ -1,6 +1,6 @@
 import pytest
-import tubular.testing.test_data as d
-import tubular.testing.helpers as h
+import test_aide as ta
+import tests.test_data as d
 
 import tubular
 from tubular.misc import SetValueTransformer
@@ -12,7 +12,7 @@ class TestInit:
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=SetValueTransformer.__init__,
             expected_arguments=["self", "columns", "value"],
             expected_default_values=None,
@@ -37,7 +37,7 @@ class TestInit:
             }
         }
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -67,7 +67,7 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=SetValueTransformer.transform,
             expected_arguments=["self", "X"],
             expected_default_values=None,
@@ -82,7 +82,7 @@ class TestTransform:
 
         expected_call_args = {0: {"args": (d.create_df_7(),), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
 
@@ -90,8 +90,7 @@ class TestTransform:
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_2(), expected_df_1())
-        + h.index_preserved_params(d.create_df_2(), expected_df_1()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_2(), expected_df_1()),
     )
     def test_value_set_in_transform(self, df, expected):
         """Test that transform sets the value as expected."""
@@ -100,7 +99,7 @@ class TestTransform:
 
         df_transformed = x.transform(df)
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             actual=df_transformed,
             expected=expected,
             msg="incorrect value after SetValueTransformer transform",

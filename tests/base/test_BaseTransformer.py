@@ -1,9 +1,9 @@
 import pytest
+import test_aide as ta
+import tests.test_data as d
+from unittest import mock
 import pandas
 import re
-import tubular.testing.test_data as d
-import tubular.testing.helpers as h
-from unittest import mock
 
 import tubular
 from tubular.base import BaseTransformer
@@ -15,7 +15,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=BaseTransformer.__init__,
             expected_arguments=["self", "columns", "copy", "verbose"],
             expected_default_values=(None, True, False),
@@ -33,7 +33,7 @@ class TestInit(object):
             "copy": True,
         }
 
-        h.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes=expected_attributes,
             msg="Default attributes set in init",
@@ -50,7 +50,7 @@ class TestInit(object):
 
         x = BaseTransformer(**expected_attributes)
 
-        h.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes=expected_attributes,
             msg="Attributes set in init from passed values",
@@ -63,7 +63,7 @@ class TestInit(object):
 
         expected_attributes = {"columns": ["a"]}
 
-        h.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes=expected_attributes,
             msg="String put in list for columns",
@@ -74,15 +74,17 @@ class TestInit(object):
 
         x = BaseTransformer()
 
-        h.test_object_method(obj=x, expected_method="fit", msg="fit")
+        ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
 
-        h.test_object_method(obj=x, expected_method="transform", msg="transform")
+        ta.classes.test_object_method(
+            obj=x, expected_method="transform", msg="transform"
+        )
 
-        h.test_object_method(
+        ta.classes.test_object_method(
             obj=x, expected_method="columns_set_or_check", msg="columns_set_or_check"
         )
 
-        h.test_object_method(
+        ta.classes.test_object_method(
             obj=x, expected_method="columns_check", msg="columns_check"
         )
 
@@ -128,7 +130,7 @@ class TestFit(object):
     def test_arguments(self):
         """Test that fit has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=BaseTransformer.fit,
             expected_arguments=["self", "X", "y"],
             expected_default_values=(None,),
@@ -185,7 +187,7 @@ class TestFit(object):
 
         expected_call_args = {0: {"args": (df,), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "columns_set_or_check",
@@ -230,7 +232,7 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=BaseTransformer.transform, expected_arguments=["self", "X"]
         )
 
@@ -243,7 +245,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (df,), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "columns_check", expected_call_args
         ):
 
@@ -267,7 +269,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, pandas.DataFrame, "copy", expected_call_args, return_value=df
         ):
 
@@ -286,8 +288,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_1(), d.create_df_1())
-        + h.index_preserved_params(d.create_df_1(), d.create_df_1()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_1(), d.create_df_1()),
     )
     def test_X_returned(self, df, expected):
         """Test that X is returned from transform."""
@@ -296,7 +297,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(X=df)
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="Check X returned from transform",
@@ -309,7 +310,7 @@ class TestColumnsCheck(object):
     def test_arguments(self):
         """Test that columns_check has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=BaseTransformer.columns_check, expected_arguments=["self", "X"]
         )
 
@@ -366,7 +367,7 @@ class TestColumnsSetOrCheck(object):
     def test_arguments(self):
         """Test that columns_set_or_check has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=BaseTransformer.columns_set_or_check, expected_arguments=["self", "X"]
         )
 
@@ -388,7 +389,7 @@ class TestColumnsSetOrCheck(object):
 
         x.columns_set_or_check(X=df)
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=list(df.columns.values),
             actual=x.columns,
             msg="x.columns set when None",
@@ -417,7 +418,7 @@ class TestCheckIsFitted(object):
             call_1_pos_args = call_1_args[0]
             call_1_kwargs = call_1_args[1]
 
-            h.assert_dict_equal_msg(
+            ta.equality.assert_dict_equal_msg(
                 actual=call_1_kwargs,
                 expected={},
                 msg_tag="Keyword arg assert for tubular.base.check_is_fitted",

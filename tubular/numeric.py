@@ -281,6 +281,8 @@ class ScalingTransformer(BaseTransformer):
 
             self.scaler = StandardScaler(**scaler_kwargs)
 
+        self.scaler_kwargs = None
+
         super().__init__(columns=columns, **kwargs)
 
     def check_numeric_columns(self, X):
