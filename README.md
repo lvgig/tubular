@@ -2,6 +2,10 @@
   <img src="https://github.com/lvgig/tubular/raw/main/logo.png">
 </p>
 
+Tubular pre-processing for machine learning!
+
+----
+
 ![PyPI](https://img.shields.io/pypi/v/tubular?color=success&style=flat)
 ![Read the Docs](https://img.shields.io/readthedocs/tubular)
 ![GitHub](https://img.shields.io/github/license/lvgig/tubular)
@@ -9,11 +13,11 @@
 ![GitHub issues](https://img.shields.io/github/issues/lvgig/tubular)
 ![Build](https://github.com/lvgig/tubular/actions/workflows/python-package.yml/badge.svg?branch=master)
 
-`tubular` implements pre processing steps for tabular data commonly used in machine learning pipelines.
+`tubular` implements pre-processing steps for tabular data commonly used in machine learning pipelines.
 
-The transformers are compatible with scikit-learn [Pipelines](https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html). Each has a `transform` method to apply the pre processing step to data and a `fit` method to learn the relevant information from the data, if applicable.
+The transformers are compatible with [scikit-learn](https://scikit-learn.org/) [Pipelines](https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html). Each has a `transform` method to apply the pre-processing step to data and a `fit` method to learn the relevant information from the data, if applicable.
 
-The transformers in `tubular` work with data in pandas [DataFrames](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html).
+The transformers in `tubular` work with data in [pandas](https://pandas.pydata.org/) [DataFrames](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html).
 
 There are a variety of transformers to assist with;
 
@@ -58,6 +62,10 @@ Instructions for building the docs locally can be found in [docs/README](https:/
 
 To help get started there are example notebooks in the [examples](https://github.com/lvgig/tubular/tree/master/examples) folder in the repo that show how to use each transformer.
 
+## Issues
+
+For bugs and feature requests please open an [issue](https://github.com/lvgig/tubular/issues).
+
 ## Build and test
 
 The test framework we are using for this project is [pytest](https://docs.pytest.org/en/stable/). To build the package locally and run the tests follow the steps below.
@@ -86,5 +94,3 @@ pytest
 `tubular` is under active development, we're super excited if you're interested in contributing! 
 
 See the [CONTRIBUTING](https://github.com/lvgig/tubular/blob/master/CONTRIBUTING.md) file for the full details of our working practices.
-
-For bugs and feature requests please open an [issue](https://github.com/lvgig/tubular/issues).
