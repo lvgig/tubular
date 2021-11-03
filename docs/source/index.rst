@@ -11,7 +11,7 @@ Welcome to tubular's documentation!
    :caption: Contents:
 
    API Documentation <api>
-
+   Changelog <changelog>
 
 
 Indices and tables
