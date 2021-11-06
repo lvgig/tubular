@@ -141,11 +141,7 @@ class TestFit(object):
             call_kwargs == expected_kwargs
         ), "unexpected kwargs in BaseTransformer.fit call"
 
-        expected_pos_args = (
-            x,
-            d.create_MeanResponseTransformer_test_df(),
-            None,
-        )
+        expected_pos_args = (x, d.create_MeanResponseTransformer_test_df(), None)
 
         assert len(expected_pos_args) == len(
             call_pos_args
@@ -197,7 +193,7 @@ class TestFit(object):
         x = MeanResponseTransformer(response_column="a", columns=["b", "d", "f"])
 
         x.fit(df)
-        
+
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
@@ -339,10 +335,7 @@ class TestTransform(object):
         x.fit(df)
 
         expected_call_args = {
-            0: {
-                "args": (d.create_MeanResponseTransformer_test_df(),),
-                "kwargs": {},
-            }
+            0: {"args": (d.create_MeanResponseTransformer_test_df(),), "kwargs": {}}
         }
 
         with ta.functions.assert_function_call(
