@@ -197,14 +197,14 @@ class TestFit(object):
         x = MeanResponseTransformer(response_column="a", columns=["b", "d", "f"])
 
         x.fit(df)
-
+        
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
                 "mappings": {
-                    "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
-                    "d": {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6},
-                    "f": {False: 2, True: 5},
+                    "b": {"a": 1.0, "b": 2.0, "c": 3.0, "d": 4.0, "e": 5.0, "f": 6.0},
+                    "d": {1: 1.0, 2: 2.0, 3: 3.0, 4: 4.0, 5: 5.0, 6: 6.0},
+                    "f": {False: 2.0, True: 5.0},
                 }
             },
             msg="mappings attribute",
@@ -277,7 +277,7 @@ class TestTransform(object):
 
         df = pd.DataFrame(
             {
-                "a": [1, 2, 3, 4, 5, 6],
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
                 "b": [1, 2, 3, 4, 5, 6],
                 "c": ["a", "b", "c", "d", "e", "f"],
                 "d": [1, 2, 3, 4, 5, 6],
@@ -295,7 +295,7 @@ class TestTransform(object):
 
         df = pd.DataFrame(
             {
-                "a": [1, 2, 3, 4, 5, 6, np.NaN],
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],
                 "b": [1, 2, 3, 4, 5, 6, np.NaN],
                 "c": ["a", "b", "c", "d", "e", "f", np.NaN],
             }
