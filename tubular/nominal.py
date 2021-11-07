@@ -471,9 +471,6 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
     Parameters
     ----------
-    response_column : str
-        Response column to use to encode the categorical levels.
-
     columns : None or str or list, default = None
         Columns to transform, if the default of None is supplied all object and category
         columns in X are used.
@@ -486,9 +483,6 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
     Attributes
     ----------
-    response_column : str
-        Response column to use to encode the categorical levels.
-
     weights_column : str or None
         Weights column to use when calculating the mean response.
 
@@ -498,11 +492,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
     """
 
-    def __init__(self, response_column, columns=None, weights_column=None, **kwargs):
-
-        if type(response_column) is not str:
-
-            raise TypeError("response_column should be a str")
+    def __init__(self, columns=None, weights_column=None, **kwargs):
 
         if weights_column is not None:
 
@@ -510,18 +500,11 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
                 raise TypeError("weights_column should be a str")
 
-            if weights_column == response_column:
-
-                raise ValueError(
-                    "weights_column and response_column are the same column"
-                )
-
-        self.response_column = response_column
         self.weights_column = weights_column
 
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
 
-    def fit(self, X, y=None):
+    def fit(self, X, y):
         """Identify mapping of categorical levels to mean response values.
 
         If the user specified the weights_column arg in when initialising the transformer
@@ -533,8 +516,8 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             Data to with catgeorical variable columns to transform and also containing response_column
             column.
 
-        y : None or pd.DataFrame or pd.Series, default = None
-            Optional argument only required for the transformer to work with sklearn pipelines.
+        y : pd.Series
+            Response variable or target.
 
         """
 
@@ -542,38 +525,35 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         self.mappings = {}
 
-        if self.response_column not in X.columns.values:
-
-            raise ValueError(f"response {self.response_column} not in X")
-
         if self.weights_column is not None:
 
             if self.weights_column not in X.columns.values:
 
                 raise ValueError(f"weights column {self.weights_column} not in X")
 
-        response_null_count = X[self.response_column].isnull().sum()
+        response_null_count = y.isnull().sum()
 
         if response_null_count > 0:
 
-            raise ValueError(
-                f"{self.response_column} in X has {response_null_count} null values"
-            )
+            raise ValueError(f"y has {response_null_count} null values")
+
+        X_y = self._combine_X_y(X, y)
+        response_column = "_temporary_response"
 
         for c in self.columns:
 
             if self.weights_column is None:
 
-                self.mappings[c] = X.groupby([c])[self.response_column].mean().to_dict()
+                self.mappings[c] = X_y.groupby([c])[response_column].mean().to_dict()
 
             else:
 
-                groupby_sum = X.groupby([c])[
-                    [self.response_column, self.weights_column]
+                groupby_sum = X_y.groupby([c])[
+                    [response_column, self.weights_column]
                 ].sum()
 
                 self.mappings[c] = (
-                    groupby_sum[self.response_column] / groupby_sum[self.weights_column]
+                    groupby_sum[response_column] / groupby_sum[self.weights_column]
                 ).to_dict()
 
         return self
