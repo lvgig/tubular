@@ -21,11 +21,11 @@ Each individual change should have a link to the pull request after the descript
 
 Changed
 ^^^^^^^
-- Updated version of ``black`` used in the ``pre-commit-config`` to ``21.9b0``
+- Updated version of ``black`` used in the ``pre-commit-config`` to ``21.9b0`` `#25 <https://github.com/lvgig/tubular/pull/25>`_
 
 Fixed
 ^^^^^
-- Changed data values used in some tests for MeanResponseTransformer so the test no longer depends on pandas <1.3.0 or >=1.3.0, `required due to change in pandas behaviour with groupby mean <https://pandas.pydata.org/docs/whatsnew/v1.3.0.html#float-result-for-groupby-mean-groupby-median-and-groupby-var>`_
+- Changed data values used in some tests for MeanResponseTransformer so the test no longer depends on pandas <1.3.0 or >=1.3.0, `required due to change in pandas behaviour with groupby mean <https://pandas.pydata.org/docs/whatsnew/v1.3.0.html#float-result-for-groupby-mean-groupby-median-and-groupby-var>`_ `#25 <https://github.com/lvgig/tubular/pull/25>`_
 
 0.3.0 (2021-11-03)
 ------------------
