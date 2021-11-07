@@ -91,14 +91,14 @@ class TestInit(object):
     def test_verbose_non_bool_error(self):
         """Test an error is raised if verbose is not specified as a bool."""
 
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError, match="verbose must be a bool"):
 
             BaseTransformer(verbose=1)
 
     def test_copy_non_bool_error(self):
         """Test an error is raised if copy is not specified as a bool."""
 
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError, match="copy must be a bool"):
 
             BaseTransformer(copy=1)
 
@@ -112,14 +112,24 @@ class TestInit(object):
     def test_columns_list_element_error(self):
         """Test an error is raised if columns list contains non-string elements."""
 
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                "each element of columns should be a single (string) column name"
+            ),
+        ):
 
             BaseTransformer(columns=[[], "a"])
 
     def test_columns_non_string_error(self):
         """Test an error is raised if columns is not passed as a string."""
 
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                "columns must be a string or list with the columns to be pre-processed (if specified)"
+            ),
+        ):
 
             BaseTransformer(columns=1)
 
@@ -152,7 +162,7 @@ class TestFit(object):
 
         x = BaseTransformer(columns="a")
 
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError, match="X should be a pd.DataFrame"):
 
             x.fit("a")
 
@@ -240,7 +250,7 @@ class TestTransform(object):
 
         x = BaseTransformer(columns="a")
 
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError, match="X should be a pd.DataFrame"):
 
             x.transform(X=[1, 2, 3, 4, 5, 6])
 
@@ -303,7 +313,7 @@ class TestColumnsCheck(object):
 
         x = BaseTransformer(columns="a")
 
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError, match="X should be a pd.DataFrame"):
 
             x.columns_check(X=[1, 2, 3, 4, 5, 6])
 
@@ -329,7 +339,7 @@ class TestColumnsCheck(object):
 
         x.columns = "a"
 
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError, match="self.columns should be a list"):
 
             x.columns_check(X=df)
 
@@ -360,7 +370,7 @@ class TestColumnsSetOrCheck(object):
 
         x = BaseTransformer(columns="a")
 
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError, match="X should be a pd.DataFrame"):
 
             x.columns_set_or_check(X=[1, 2, 3, 4, 5, 6])
 

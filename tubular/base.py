@@ -55,7 +55,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         if not isinstance(verbose, bool):
 
-            raise ValueError("verbose must be a bool")
+            raise TypeError("verbose must be a bool")
 
         else:
 
@@ -86,21 +86,21 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
                     if not isinstance(c, str):
 
-                        raise ValueError(
-                            "each element of columns should be a single column name"
+                        raise TypeError(
+                            "each element of columns should be a single (string) column name"
                         )
 
                 self.columns = columns
 
             else:
 
-                raise ValueError(
+                raise TypeError(
                     "columns must be a string or list with the columns to be pre-processed (if specified)"
                 )
 
         if not isinstance(copy, bool):
 
-            raise ValueError("copy must be a bool")
+            raise TypeError("copy must be a bool")
 
         else:
 
@@ -247,7 +247,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         if not isinstance(X, pd.DataFrame):
 
-            raise ValueError("X should be a pd.DataFrame")
+            raise TypeError("X should be a pd.DataFrame")
 
         if self.columns is None:
 
@@ -255,7 +255,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         if not isinstance(self.columns, list):
 
-            raise ValueError("self.columns should be a list")
+            raise TypeError("self.columns should be a list")
 
         for c in self.columns:
 
@@ -277,7 +277,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         if not isinstance(X, pd.DataFrame):
 
-            raise ValueError("X should be a pd.DataFrame")
+            raise TypeError("X should be a pd.DataFrame")
 
         if self.columns is None:
 
