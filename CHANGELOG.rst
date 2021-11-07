@@ -16,6 +16,17 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+0.3.1 (unreleased)
+------------------
+
+Changed
+^^^^^^^
+- Updated version of ``black`` used in the ``pre-commit-config`` to ``21.9b0``
+
+Fixed
+^^^^^
+- Changed data values used in some tests for MeanResponseTransformer so the test no longer depends on pandas <1.3.0 or >=1.3.0, `required due to change in pandas behaviour with groupby mean <https://pandas.pydata.org/docs/whatsnew/v1.3.0.html#float-result-for-groupby-mean-groupby-median-and-groupby-var>`_
+
 0.3.0 (2021-11-03)
 ------------------
 
