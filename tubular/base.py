@@ -4,6 +4,7 @@ from. These transformers contain key checks to be applied in all cases.
 """
 
 import pandas as pd
+import warnings
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
@@ -143,6 +144,48 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
                 raise ValueError(f"y is empty; {y.shape}")
 
         return self
+
+    def _combine_X_y(self, X, y):
+        """Combine X and y by adding a new column with the values of y to a copy of X.
+
+        The new column response column will be called `_temporary_response`.
+
+        This method can be used by transformers that need to use the response, y, together
+        with the explanatory variables, X, in their `fit` methods.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data containing explanatory variables.
+
+        y : pd.Series
+            Response variable.
+
+        """
+
+        if not isinstance(X, pd.DataFrame):
+
+            raise TypeError("X should be a pd.DataFrame")
+
+        if not isinstance(y, pd.Series):
+
+            raise TypeError("y should be a pd.Series")
+
+        if X.shape[0] != y.shape[0]:
+
+            raise ValueError(
+                f"X and y have different numbers of rows ({X.shape[0]} vs {y.shape[0]})"
+            )
+
+        if not (X.index == y.index).all():
+
+            warnings.warn("X and y do not have equal indexes")
+
+        X_y = X.copy()
+
+        X_y["_temporary_response"] = y.values
+
+        return X_y
 
     def transform(self, X):
         """Base transformer transform method; checks X type (pandas DataFrame only) and copies data if requested.

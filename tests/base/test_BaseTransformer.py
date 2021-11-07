@@ -419,3 +419,77 @@ class TestCheckIsFitted(object):
             assert (
                 call_1_pos_args[1] == attributes
             ), f"Incorrect second positional arg in check_is_fitted call -\n  Expected: {attributes}\n  Actual: {call_1_pos_args[1]}"
+
+
+class TestCombineXy:
+    """Tests for the BaseTransformer._combine_X_y method."""
+
+    def test_arguments(self):
+        """Test that columns_check has expected arguments."""
+
+        ta.functions.test_function_arguments(
+            func=BaseTransformer._combine_X_y, expected_arguments=["self", "X", "y"]
+        )
+
+    def test_X_not_DataFrame_error(self):
+        """Test an exception is raised if X is not a pd.DataFrame."""
+
+        x = BaseTransformer(columns=["a"])
+
+        with pytest.raises(TypeError, match="X should be a pd.DataFrame"):
+
+            x._combine_X_y(X=1, y=pandas.Series([1, 2]))
+
+    def test_y_not_Series_error(self):
+        """Test an exception is raised if y is not a pd.Series."""
+
+        x = BaseTransformer(columns=["a"])
+
+        with pytest.raises(TypeError, match="y should be a pd.Series"):
+
+            x._combine_X_y(X=pandas.DataFrame({"a": [1, 2]}), y=1)
+
+    def test_X_and_y_different_number_of_rows_error(self):
+        """Test an exception is raised if X and y have different numbers of rows."""
+
+        x = BaseTransformer(columns=["a"])
+
+        with pytest.raises(
+            ValueError,
+            match=re.escape("X and y have different numbers of rows (2 vs 1)"),
+        ):
+
+            x._combine_X_y(X=pandas.DataFrame({"a": [1, 2]}), y=pandas.Series([2]))
+
+    def test_X_and_y_different_indexes_warning(self):
+        """Test a warning is raised if X and y have different indexes, but the output is still X and y."""
+
+        x = BaseTransformer(columns=["a"])
+
+        with pytest.warns(UserWarning, match="X and y do not have equal indexes"):
+
+            result = x._combine_X_y(
+                X=pandas.DataFrame({"a": [1, 2]}, index=[1, 2]), y=pandas.Series([2, 4])
+            )
+
+        expected_output = pandas.DataFrame(
+            {"a": [1, 2], "_temporary_response": [2, 4]}, index=[1, 2]
+        )
+
+        pandas.testing.assert_frame_equal(result, expected_output)
+
+    def test_output_same_indexes(self):
+        """Test output is correct if X and y have the same index."""
+
+        x = BaseTransformer(columns=["a"])
+
+        result = x._combine_X_y(
+            X=pandas.DataFrame({"a": [1, 2]}, index=[1, 2]),
+            y=pandas.Series([2, 4], index=[1, 2]),
+        )
+
+        expected_output = pandas.DataFrame(
+            {"a": [1, 2], "_temporary_response": [2, 4]}, index=[1, 2]
+        )
+
+        pandas.testing.assert_frame_equal(result, expected_output)
