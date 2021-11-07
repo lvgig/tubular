@@ -207,7 +207,7 @@ class TestFit(object):
 
         with pytest.raises(ValueError, match=re.escape("y is empty; (0,)")):
 
-            x.fit(X=df, y=pandas.Series(name="b"))
+            x.fit(X=df, y=pandas.Series(name="b", dtype=object))
 
 
 class TestTransform(object):
