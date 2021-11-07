@@ -134,21 +134,9 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         if y is not None:
 
-            if isinstance(y, pd.DataFrame):
+            if not isinstance(y, pd.Series):
 
-                if y.shape[1] > 1:
-
-                    raise ValueError(
-                        "multi-column DataFrame passed for y, expecting 1 column"
-                    )
-
-            elif isinstance(y, pd.Series):
-
-                pass
-
-            else:
-
-                raise ValueError("unexpected type for y")
+                raise TypeError("unexpected type for y, should be a pd.Series")
 
             if not y.shape[0] > 0:
 
