@@ -16,6 +16,21 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+0.3.1 (unreleased)
+------------------
+
+Changed
+^^^^^^^
+- Change ``y`` argument in fit to only accept ``pd.Series`` objects `#26 <https://github.com/lvgig/tubular/pull/26>`_
+- Add new ``_combine_X_y`` method to ``BaseTransformer`` which cbinds X and y `#26 <https://github.com/lvgig/tubular/pull/26>`_
+- Update ``MeanResponseTransformer`` to use ``y`` arg in ``fit`` and remove setting ``response_column`` in init `#26 <https://github.com/lvgig/tubular/pull/26>`_
+- Update ``OrdinalEncoderTransformer`` to use ``y`` arg in ``fit`` and remove setting ``response_column`` in init `#26 <https://github.com/lvgig/tubular/pull/26>`_
+- Update ``NearestMeanResponseImputer`` to use ``y`` arg in ``fit`` and remove setting ``response_column`` in init `#26 <https://github.com/lvgig/tubular/pull/26>`_
+
+Fixed
+^^^^^
+- ``BaseTransformer`` now correctly raises ``TypeError`` exceptions instead of ``ValueError`` when input values are the wrong type `#26 <https://github.com/lvgig/tubular/pull/26>`_
+
 0.3.0 (2021-11-03)
 ------------------
 
