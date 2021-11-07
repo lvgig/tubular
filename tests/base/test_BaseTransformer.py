@@ -156,25 +156,16 @@ class TestFit(object):
 
             x.fit("a")
 
-    def test_y_multi_col_df_error(self):
-        """Test an error is raised if y is passed as a multi column pd.DataFrame."""
-
-        df = d.create_df_1()
-
-        x = BaseTransformer(columns="a")
-
-        with pytest.raises(ValueError):
-
-            x.fit(X=df, y=df)
-
     def test_non_pd_type_error(self):
-        """Test an error is raised if y is not passed as a pd.DataFrame or pd.Series."""
+        """Test an error is raised if y is not passed as a pd.Series."""
 
         df = d.create_df_1()
 
         x = BaseTransformer(columns="a")
 
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            TypeError, match="unexpected type for y, should be a pd.Series"
+        ):
 
             x.fit(X=df, y=[1, 2, 3, 4, 5, 6])
 
@@ -207,23 +198,16 @@ class TestFit(object):
 
             x.fit(X=df)
 
-    @pytest.mark.parametrize(
-        "y, error_message",
-        [
-            (pandas.Series(name="b"), "y is empty; (0,)"),
-            (pandas.DataFrame(columns=["b"]), "y is empty; (0, 1)"),
-        ],
-    )
-    def test_y_no_rows_error(self, y, error_message):
+    def test_y_no_rows_error(self):
         """Test an error is raised if X has no rows."""
 
         x = BaseTransformer(columns="a")
 
         df = pandas.DataFrame({"a": 1}, index=[0])
 
-        with pytest.raises(ValueError, match=re.escape(error_message)):
+        with pytest.raises(ValueError, match=re.escape("y is empty; (0,)")):
 
-            x.fit(X=df, y=y)
+            x.fit(X=df, y=pandas.Series(name="b"))
 
 
 class TestTransform(object):
