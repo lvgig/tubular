@@ -313,6 +313,9 @@ class DataFrameMethodTransformer(BaseTransformer):
     pd_method_kwargs : dict, default = {}
         A dictionary of keyword arguments to be passed to the pd.DataFrame method when it is called.
 
+    drop_original : bool, default = False
+        Should original columns be dropped?
+
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.__init__().
 
@@ -328,7 +331,13 @@ class DataFrameMethodTransformer(BaseTransformer):
     """
 
     def __init__(
-        self, new_column_name, pd_method_name, columns, pd_method_kwargs={}, **kwargs
+        self,
+        new_column_name,
+        pd_method_name,
+        columns,
+        pd_method_kwargs={},
+        drop_original=False,
+        **kwargs,
     ):
 
         super().__init__(columns=columns, **kwargs)
@@ -371,9 +380,16 @@ class DataFrameMethodTransformer(BaseTransformer):
                         f"unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
                     )
 
+        if not type(drop_original) is bool:
+
+            raise TypeError(
+                f"unexpected type ({type(drop_original)}) for drop_original, expecting bool"
+            )
+
         self.new_column_name = new_column_name
         self.pd_method_name = pd_method_name
         self.pd_method_kwargs = pd_method_kwargs
+        self.drop_original = drop_original
 
         try:
 
@@ -410,5 +426,9 @@ class DataFrameMethodTransformer(BaseTransformer):
         X[self.new_column_name] = getattr(X[self.columns], self.pd_method_name)(
             **self.pd_method_kwargs
         )
+
+        if self.drop_original:
+
+            X.drop(self.columns, axis=1, inplace=True)
 
         return X

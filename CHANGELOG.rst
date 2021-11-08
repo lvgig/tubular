@@ -22,6 +22,7 @@ Each individual change should have a link to the pull request after the descript
 Changed
 ^^^^^^^
 - Updated version of ``black`` used in the ``pre-commit-config`` to ``21.9b0`` `#25 <https://github.com/lvgig/tubular/pull/25>`_
+- Modified ``DataFrameMethodTransformer`` to add the possibility of drop original columns `#24 <https://github.com/lvgig/tubular/pull/24>`_
 
 Fixed
 ^^^^^
