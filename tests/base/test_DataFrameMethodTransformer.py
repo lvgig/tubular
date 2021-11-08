@@ -22,8 +22,9 @@ class TestInit(object):
                 "pd_method_name",
                 "columns",
                 "pd_method_kwargs",
+                "drop_original",
             ],
-            expected_default_values=({},),
+            expected_default_values=({}, False),
         )
 
     def test_class_methods(self):
@@ -122,6 +123,18 @@ class TestInit(object):
                 pd_method_kwargs={"a": 1, 2: "b"},
             )
 
+        with pytest.raises(
+            TypeError,
+            match=r"unexpected type \(\<class 'int'\>\) for drop_original, expecting bool",
+        ):
+
+            DataFrameMethodTransformer(
+                new_column_name="a",
+                pd_method_name="sum",
+                columns=["b", "c"],
+                drop_original=30,
+            )
+
     def test_exception_raised_non_pandas_method_passed(self):
         """Test and exception is raised if a non pd.DataFrame method is passed for pd_method_name."""
 
@@ -138,12 +151,19 @@ class TestInit(object):
         """Test that the values passed for new_column_name, pd_method_name are saved to attributes on the object."""
 
         x = DataFrameMethodTransformer(
-            new_column_name="a", pd_method_name="sum", columns=["b", "c"]
+            new_column_name="a",
+            pd_method_name="sum",
+            columns=["b", "c"],
+            drop_original=True,
         )
 
         ta.classes.test_object_attributes(
             obj=x,
-            expected_attributes={"new_column_name": "a", "pd_method_name": "sum"},
+            expected_attributes={
+                "new_column_name": "a",
+                "pd_method_name": "sum",
+                "drop_original": True,
+            },
             msg="Attributes for DataFrameMethodTransformer set in init",
         )
 
@@ -253,27 +273,9 @@ class TestTransform(object):
         [
             (d.create_df_3(), ["d", "e"], "div", ["b", "c"], {"other": 2}),
             (d.create_df_3(), "d", "sum", ["b", "c"], {"axis": 1}),
-            (
-                d.create_df_3(),
-                ["d", "e"],
-                "cumprod",
-                ["b", "c"],
-                {"axis": 1},
-            ),
-            (
-                d.create_df_3(),
-                ["d", "e", "f"],
-                "mod",
-                ["a", "b", "c"],
-                {"other": 2},
-            ),
-            (
-                d.create_df_3(),
-                ["d", "e", "f"],
-                "le",
-                ["a", "b", "c"],
-                {"other": 0},
-            ),
+            (d.create_df_3(), ["d", "e"], "cumprod", ["b", "c"], {"axis": 1}),
+            (d.create_df_3(), ["d", "e", "f"], "mod", ["a", "b", "c"], {"other": 2}),
+            (d.create_df_3(), ["d", "e", "f"], "le", ["a", "b", "c"], {"other": 0}),
             (d.create_df_3(), ["d", "e"], "abs", ["a", "b"], {}),
         ],
     )
@@ -311,3 +313,43 @@ class TestTransform(object):
             expected=(df[columns],),
             msg_tag=f"""Positional arg assert for {pd_method_name}""",
         )
+
+    def test_original_columns_dropped_when_specified(self):
+        """Test DataFrameMethodTransformer.transform drops original columns get when specified."""
+
+        df = d.create_df_3()
+
+        x = DataFrameMethodTransformer(
+            new_column_name="a_b_sum",
+            pd_method_name="sum",
+            columns=["a", "b"],
+            drop_original=True,
+        )
+
+        x.fit(df)
+
+        df_transformed = x.transform(df)
+
+        assert ("a" not in df_transformed.columns.values) and (
+            "b" not in df_transformed.columns.values
+        ), "original columns not dropped"
+
+    def test_original_columns_kept_when_specified(self):
+        """Test DataFrameMethodTransformer.transform keeps original columns when specified."""
+
+        df = d.create_df_3()
+
+        x = DataFrameMethodTransformer(
+            new_column_name="a_b_sum",
+            pd_method_name="sum",
+            columns=["a", "b"],
+            drop_original=False,
+        )
+
+        x.fit(df)
+
+        df_transformed = x.transform(df)
+
+        assert ("a" in df_transformed.columns.values) and (
+            "b" in df_transformed.columns.values
+        ), "original columns not kept"
