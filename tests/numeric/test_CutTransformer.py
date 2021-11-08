@@ -136,7 +136,11 @@ class TestTransform(object):
 
         df = d.create_df_9()
 
-        df["d"] = pd.Series(["c", "b", "a", "d", "e", "f"], dtype="category")
+        df["d"] = pd.Categorical(
+            values=["c", "b", "a", "d", "e", "f"],
+            categories=["a", "b", "c", "d", "e", "f"],
+            ordered=True,
+        )
 
         return df
 
@@ -219,7 +223,6 @@ class TestTransform(object):
             new_column_name="d",
             cut_kwargs={
                 "bins": [0, 1, 2, 3, 4, 5, 6],
-                "ordered": False,
                 "labels": ["a", "b", "c", "d", "e", "f"],
             },
         )
