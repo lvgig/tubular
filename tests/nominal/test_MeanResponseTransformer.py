@@ -141,11 +141,7 @@ class TestFit(object):
             call_kwargs == expected_kwargs
         ), "unexpected kwargs in BaseTransformer.fit call"
 
-        expected_pos_args = (
-            x,
-            d.create_MeanResponseTransformer_test_df(),
-            None,
-        )
+        expected_pos_args = (x, d.create_MeanResponseTransformer_test_df(), None)
 
         assert len(expected_pos_args) == len(
             call_pos_args
@@ -202,9 +198,9 @@ class TestFit(object):
             obj=x,
             expected_attributes={
                 "mappings": {
-                    "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
-                    "d": {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6},
-                    "f": {False: 2, True: 5},
+                    "b": {"a": 1.0, "b": 2.0, "c": 3.0, "d": 4.0, "e": 5.0, "f": 6.0},
+                    "d": {1: 1.0, 2: 2.0, 3: 3.0, 4: 4.0, 5: 5.0, 6: 6.0},
+                    "f": {False: 2.0, True: 5.0},
                 }
             },
             msg="mappings attribute",
@@ -277,7 +273,7 @@ class TestTransform(object):
 
         df = pd.DataFrame(
             {
-                "a": [1, 2, 3, 4, 5, 6],
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
                 "b": [1, 2, 3, 4, 5, 6],
                 "c": ["a", "b", "c", "d", "e", "f"],
                 "d": [1, 2, 3, 4, 5, 6],
@@ -295,7 +291,7 @@ class TestTransform(object):
 
         df = pd.DataFrame(
             {
-                "a": [1, 2, 3, 4, 5, 6, np.NaN],
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],
                 "b": [1, 2, 3, 4, 5, 6, np.NaN],
                 "c": ["a", "b", "c", "d", "e", "f", np.NaN],
             }
@@ -339,10 +335,7 @@ class TestTransform(object):
         x.fit(df)
 
         expected_call_args = {
-            0: {
-                "args": (d.create_MeanResponseTransformer_test_df(),),
-                "kwargs": {},
-            }
+            0: {"args": (d.create_MeanResponseTransformer_test_df(),), "kwargs": {}}
         }
 
         with ta.functions.assert_function_call(
