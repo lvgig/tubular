@@ -111,7 +111,7 @@ class ArbitraryImputer(BaseImputer):
 
                 if self.impute_value not in X[c].cat.categories:
 
-                    X[c].cat.add_categories(self.impute_value, inplace=True)
+                    X[c] = X[c].cat.add_categories(self.impute_value)
 
             self.impute_values_[c] = self.impute_value
 
