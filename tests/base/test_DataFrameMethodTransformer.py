@@ -330,13 +330,9 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_equal_dispatch(
-            expected=["a", "b"],
-            actual=[
-                x for x in df.columns.values if x not in df_transformed.columns.values
-            ],
-            msg="original columns not dropped",
-        )
+        assert "a" not in df_transformed.columns.values, "original columns not dropped"
+
+        assert "b" not in df_transformed.columns.values, "original columns not dropped"
 
     def test_original_columns_kept_when_specified(self):
         """Test DataFrameMethodTransformer.transform keeps original columns when specified."""
@@ -354,8 +350,6 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_equal_dispatch(
-            expected=list(set()),
-            actual=list(set(["a", "b"]) - set(df_transformed.columns)),
-            msg="original columns not kept",
-        )
+        assert "a" in df_transformed.columns.values, "original columns not kept"
+
+        assert "b" in df_transformed.columns.values, "original columns not kept"
