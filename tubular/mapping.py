@@ -149,13 +149,11 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
 
     def __init__(self, mappings, **kwargs):
 
-        return_key_mappings = copy.deepcopy(mappings)
-
         for k, v in mappings.items():
 
-            if type(v) is dict:
+            if isinstance(v, dict):
 
-                return_key_mappings[k] = ReturnKeyDict(v)
+                mappings[k] = ReturnKeyDict(v)
 
             else:
 
@@ -163,7 +161,7 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
                     f"each item in mappings should be a dict but got type {type(v)} for key {k}"
                 )
 
-        BaseMappingTransformer.__init__(self, mappings=return_key_mappings, **kwargs)
+        BaseMappingTransformer.__init__(self, mappings=mappings, **kwargs)
 
     def transform(self, X):
         """Transfrom the input data X according to the mappings in the mappings attribute dict.
