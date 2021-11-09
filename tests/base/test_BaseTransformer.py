@@ -91,14 +91,14 @@ class TestInit(object):
     def test_verbose_non_bool_error(self):
         """Test an error is raised if verbose is not specified as a bool."""
 
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError, match="verbose must be a bool"):
 
             BaseTransformer(verbose=1)
 
     def test_copy_non_bool_error(self):
         """Test an error is raised if copy is not specified as a bool."""
 
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError, match="copy must be a bool"):
 
             BaseTransformer(copy=1)
 
@@ -112,14 +112,24 @@ class TestInit(object):
     def test_columns_list_element_error(self):
         """Test an error is raised if columns list contains non-string elements."""
 
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                "each element of columns should be a single (string) column name"
+            ),
+        ):
 
             BaseTransformer(columns=[[], "a"])
 
     def test_columns_non_string_error(self):
         """Test an error is raised if columns is not passed as a string."""
 
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                "columns must be a string or list with the columns to be pre-processed (if specified)"
+            ),
+        ):
 
             BaseTransformer(columns=1)
 
@@ -152,29 +162,20 @@ class TestFit(object):
 
         x = BaseTransformer(columns="a")
 
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError, match="X should be a pd.DataFrame"):
 
             x.fit("a")
 
-    def test_y_multi_col_df_error(self):
-        """Test an error is raised if y is passed as a multi column pd.DataFrame."""
-
-        df = d.create_df_1()
-
-        x = BaseTransformer(columns="a")
-
-        with pytest.raises(ValueError):
-
-            x.fit(X=df, y=df)
-
     def test_non_pd_type_error(self):
-        """Test an error is raised if y is not passed as a pd.DataFrame or pd.Series."""
+        """Test an error is raised if y is not passed as a pd.Series."""
 
         df = d.create_df_1()
 
         x = BaseTransformer(columns="a")
 
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            TypeError, match="unexpected type for y, should be a pd.Series"
+        ):
 
             x.fit(X=df, y=[1, 2, 3, 4, 5, 6])
 
@@ -207,23 +208,16 @@ class TestFit(object):
 
             x.fit(X=df)
 
-    @pytest.mark.parametrize(
-        "y, error_message",
-        [
-            (pandas.Series(name="b"), "y is empty; (0,)"),
-            (pandas.DataFrame(columns=["b"]), "y is empty; (0, 1)"),
-        ],
-    )
-    def test_y_no_rows_error(self, y, error_message):
+    def test_y_no_rows_error(self):
         """Test an error is raised if X has no rows."""
 
         x = BaseTransformer(columns="a")
 
         df = pandas.DataFrame({"a": 1}, index=[0])
 
-        with pytest.raises(ValueError, match=re.escape(error_message)):
+        with pytest.raises(ValueError, match=re.escape("y is empty; (0,)")):
 
-            x.fit(X=df, y=y)
+            x.fit(X=df, y=pandas.Series(name="b", dtype=object))
 
 
 class TestTransform(object):
@@ -256,7 +250,7 @@ class TestTransform(object):
 
         x = BaseTransformer(columns="a")
 
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError, match="X should be a pd.DataFrame"):
 
             x.transform(X=[1, 2, 3, 4, 5, 6])
 
@@ -319,7 +313,7 @@ class TestColumnsCheck(object):
 
         x = BaseTransformer(columns="a")
 
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError, match="X should be a pd.DataFrame"):
 
             x.columns_check(X=[1, 2, 3, 4, 5, 6])
 
@@ -345,7 +339,7 @@ class TestColumnsCheck(object):
 
         x.columns = "a"
 
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError, match="self.columns should be a list"):
 
             x.columns_check(X=df)
 
@@ -376,7 +370,7 @@ class TestColumnsSetOrCheck(object):
 
         x = BaseTransformer(columns="a")
 
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError, match="X should be a pd.DataFrame"):
 
             x.columns_set_or_check(X=[1, 2, 3, 4, 5, 6])
 
@@ -435,3 +429,77 @@ class TestCheckIsFitted(object):
             assert (
                 call_1_pos_args[1] == attributes
             ), f"Incorrect second positional arg in check_is_fitted call -\n  Expected: {attributes}\n  Actual: {call_1_pos_args[1]}"
+
+
+class TestCombineXy:
+    """Tests for the BaseTransformer._combine_X_y method."""
+
+    def test_arguments(self):
+        """Test that columns_check has expected arguments."""
+
+        ta.functions.test_function_arguments(
+            func=BaseTransformer._combine_X_y, expected_arguments=["self", "X", "y"]
+        )
+
+    def test_X_not_DataFrame_error(self):
+        """Test an exception is raised if X is not a pd.DataFrame."""
+
+        x = BaseTransformer(columns=["a"])
+
+        with pytest.raises(TypeError, match="X should be a pd.DataFrame"):
+
+            x._combine_X_y(X=1, y=pandas.Series([1, 2]))
+
+    def test_y_not_Series_error(self):
+        """Test an exception is raised if y is not a pd.Series."""
+
+        x = BaseTransformer(columns=["a"])
+
+        with pytest.raises(TypeError, match="y should be a pd.Series"):
+
+            x._combine_X_y(X=pandas.DataFrame({"a": [1, 2]}), y=1)
+
+    def test_X_and_y_different_number_of_rows_error(self):
+        """Test an exception is raised if X and y have different numbers of rows."""
+
+        x = BaseTransformer(columns=["a"])
+
+        with pytest.raises(
+            ValueError,
+            match=re.escape("X and y have different numbers of rows (2 vs 1)"),
+        ):
+
+            x._combine_X_y(X=pandas.DataFrame({"a": [1, 2]}), y=pandas.Series([2]))
+
+    def test_X_and_y_different_indexes_warning(self):
+        """Test a warning is raised if X and y have different indexes, but the output is still X and y."""
+
+        x = BaseTransformer(columns=["a"])
+
+        with pytest.warns(UserWarning, match="X and y do not have equal indexes"):
+
+            result = x._combine_X_y(
+                X=pandas.DataFrame({"a": [1, 2]}, index=[1, 2]), y=pandas.Series([2, 4])
+            )
+
+        expected_output = pandas.DataFrame(
+            {"a": [1, 2], "_temporary_response": [2, 4]}, index=[1, 2]
+        )
+
+        pandas.testing.assert_frame_equal(result, expected_output)
+
+    def test_output_same_indexes(self):
+        """Test output is correct if X and y have the same index."""
+
+        x = BaseTransformer(columns=["a"])
+
+        result = x._combine_X_y(
+            X=pandas.DataFrame({"a": [1, 2]}, index=[1, 2]),
+            y=pandas.Series([2, 4], index=[1, 2]),
+        )
+
+        expected_output = pandas.DataFrame(
+            {"a": [1, 2], "_temporary_response": [2, 4]}, index=[1, 2]
+        )
+
+        pandas.testing.assert_frame_equal(result, expected_output)

@@ -268,55 +268,45 @@ class NearestMeanResponseImputer(BaseImputer):
     """Class to impute missing values with; the value for which the average response is closest
     to the average response for the unknown levels.
 
-    If no nulls are present in the column to impute then there is the option to use the median
-    instead, in which case the transformer acts the same as the MedianImputer.
-
     Parameters
     ----------
-    response_column : str
-        Response column used to determine the value to impute with. The average response for
-        each level of every column is calculated. The level which has the closest average response
-        to the average response of the unknown levels is selected as the imputation value.
     columns : None or str or list, default = None
         Columns to impute, if the default of None is supplied all columns in X are used
         when the transform method is called.
+
     """
 
-    def __init__(self, response_column, columns=None, **kwds):
-
-        if not type(response_column) is str:
-
-            raise TypeError("response_column must be a str")
-
-        self.response_column = response_column
+    def __init__(self, columns=None, **kwds):
 
         super().__init__(columns=columns, **kwds)
 
-    def fit(self, X, y=None):
-        """Calculate mean or median values to impute with.
+    def fit(self, X, y):
+        """Calculate mean values to impute with.
 
         Parameters
         ----------
         X : pd.DataFrame
             Data to fit the transformer on.
-        y : None or pd.DataFrame or pd.Series, default = None
-            Not required.
+
+        y : pd.Series
+            Response column used to determine the value to impute with. The average response for
+            each level of every column is calculated. The level which has the closest average response
+            to the average response of the unknown levels is selected as the imputation value.
 
         """
 
         super().fit(X, y)
 
-        if not pd.api.types.is_numeric_dtype(X[self.response_column]):
+        n_nulls = y.isnull().sum()
 
-            raise ValueError("dtypes in response_column must be numeric.")
+        if n_nulls > 0:
 
-        if X[self.response_column].isnull().sum() > 0:
-
-            raise ValueError(
-                f"Response column ({self.response_column}) has null values."
-            )
+            raise ValueError(f"y has {n_nulls} null values")
 
         self.impute_values_ = {}
+
+        X_y = self._combine_X_y(X, y)
+        response_column = "_temporary_response"
 
         for c in self.columns:
 
@@ -331,13 +321,13 @@ class NearestMeanResponseImputer(BaseImputer):
             else:
 
                 mean_response_by_levels = pd.DataFrame(
-                    X.loc[~c_nulls].groupby(c)[self.response_column].mean()
+                    X_y.loc[~c_nulls].groupby(c)[response_column].mean()
                 ).reset_index()
 
-                mean_response_nulls = X.loc[c_nulls, self.response_column].mean()
+                mean_response_nulls = X_y.loc[c_nulls, response_column].mean()
 
                 mean_response_by_levels["abs_diff_response"] = np.abs(
-                    mean_response_by_levels[self.response_column] - mean_response_nulls
+                    mean_response_by_levels[response_column] - mean_response_nulls
                 )
 
                 # take first value having the minimum difference in terms of average response

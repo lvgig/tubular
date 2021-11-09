@@ -16,6 +16,36 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+0.3.1 (2021-11-09)
+------------------
+
+Added
+^^^^^
+- Added ``tests/test_transformers.py`` file with test to be applied all transformers `#30 <https://github.com/lvgig/tubular/pull/30>`_
+
+Changed
+^^^^^^^
+- Set min ``pandas`` version to 1.0.0 in ``requirements.txt``, ``requirements-dev.txt``, and ``docs/requirements.txt`` `#31 <https://github.com/lvgig/tubular/pull/31>`_
+- Changed ``y`` argument in fit to only accept ``pd.Series`` objects `#26 <https://github.com/lvgig/tubular/pull/26>`_
+- Added new ``_combine_X_y`` method to ``BaseTransformer`` which cbinds X and y `#26 <https://github.com/lvgig/tubular/pull/26>`_
+- Updated ``MeanResponseTransformer`` to use ``y`` arg in ``fit`` and remove setting ``response_column`` in init `#26 <https://github.com/lvgig/tubular/pull/26>`_
+- Updated ``OrdinalEncoderTransformer`` to use ``y`` arg in ``fit`` and remove setting ``response_column`` in init `#26 <https://github.com/lvgig/tubular/pull/26>`_
+- Updated ``NearestMeanResponseImputer`` to use ``y`` arg in ``fit`` and remove setting ``response_column`` in init `#26 <https://github.com/lvgig/tubular/pull/26>`_
+- Updated version of ``black`` used in the ``pre-commit-config`` to ``21.9b0`` `#25 <https://github.com/lvgig/tubular/pull/25>`_
+- Modified ``DataFrameMethodTransformer`` to add the possibility of drop original columns `#24 <https://github.com/lvgig/tubular/pull/24>`_
+
+Fixed
+^^^^^
+- Added attributes to date and numeric transformers to allow transformer to be printed `#30 <https://github.com/lvgig/tubular/pull/30>`_
+- Removed copy of mappings in ``MappingTransformer`` to allow transformer to work with sklearn.base.clone `#30 <https://github.com/lvgig/tubular/pull/30>`_
+- Changed data values used in some tests for ``MeanResponseTransformer`` so the test no longer depends on pandas <1.3.0 or >=1.3.0, required due to `change <https://pandas.pydata.org/docs/whatsnew/v1.3.0.html#float-result-for-groupby-mean-groupby-median-and-groupby-var>`_ `#25 <https://github.com/lvgig/tubular/pull/25>`_  in pandas behaviour with groupby mean
+- ``BaseTransformer`` now correctly raises ``TypeError`` exceptions instead of ``ValueError`` when input values are the wrong type `#26 <https://github.com/lvgig/tubular/pull/26>`_
+- Updated version of ``black`` used in the ``pre-commit-config`` to ``21.9b0`` `#25 <https://github.com/lvgig/tubular/pull/25>`_
+
+Removed
+^^^^^^^
+- Removed ``pytest`` and ``pytest-mock`` from ``requirements.txt`` `#31 <https://github.com/lvgig/tubular/pull/31>`_
+
 0.3.0 (2021-11-03)
 ------------------
 
