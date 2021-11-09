@@ -121,6 +121,7 @@ class TestInit(object):
         ta.classes.test_object_attributes(
             obj=to_dt,
             expected_attributes={
+                "column": 'b',
                 "columns": ["b"],
                 "new_column_name": "a",
                 "to_datetime_kwargs": {"a": 1, "b": 2},

@@ -17,12 +17,7 @@ class TestInit(object):
 
         ta.functions.test_function_arguments(
             func=CutTransformer.__init__,
-            expected_arguments=[
-                "self",
-                "column",
-                "new_column_name",
-                "cut_kwargs",
-            ],
+            expected_arguments=['self', 'column', 'new_column_name', 'cut_kwargs'],
             expected_default_values=({},),
         )
 
@@ -48,11 +43,7 @@ class TestInit(object):
         expected_call_args = {
             0: {
                 "args": (),
-                "kwargs": {
-                    "columns": ["a"],
-                    "copy": True,
-                    "verbose": False,
-                },
+                "kwargs": {'columns': ['a'], 'copy': True, 'verbose': False},
             }
         }
 
@@ -120,6 +111,7 @@ class TestInit(object):
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
+                "column": 'b',
                 "columns": ["b"],
                 "new_column_name": "a",
                 "cut_kwargs": {"a": 1, "b": 2},

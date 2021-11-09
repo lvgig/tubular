@@ -161,6 +161,9 @@ class TestInit(object):
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
+                "column_lower": "a",
+                "column_between": "b",
+                "column_upper": "c",
                 "columns": ["a", "b", "c"],
                 "new_column_name": "d",
                 "lower_inclusive": False,
