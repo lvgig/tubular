@@ -227,8 +227,8 @@ class TestInit(object):
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
-                "column_lower" : "dummy_1",
-                "column_upper" : "dummy_2",
+                "column_lower": "dummy_1",
+                "column_upper": "dummy_2",
                 "new_column_name": value_1,
                 "drop_cols": value_2,
                 "missing_replacement": "dummy_3",

@@ -4,7 +4,6 @@ This module contains transformers that apply different types of mappings to colu
 
 import pandas as pd
 import numpy as np
-import copy
 from collections import OrderedDict
 
 from tubular.base import BaseTransformer, ReturnKeyDict

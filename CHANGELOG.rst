@@ -16,20 +16,20 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
-0.3.1 (unreleased)
+0.3.1 (unreleased) 
 ------------------
 
 Changed
 ^^^^^^^
 - Updated version of ``black`` used in the ``pre-commit-config`` to ``21.9b0`` `#25 <https://github.com/lvgig/tubular/pull/25>`_
 - Modified ``DataFrameMethodTransformer`` to add the possibility of drop original columns `#24 <https://github.com/lvgig/tubular/pull/24>`_
-- Added test file to be used on all transformers
+- Added test file to be used on all transformers #30 <https://github.com/lvgig/tubular/pull/30>`_
 
 Fixed
 ^^^^^
 - Changed data values used in some tests for MeanResponseTransformer so the test no longer depends on pandas <1.3.0 or >=1.3.0, `required due to change in pandas behaviour with groupby mean <https://pandas.pydata.org/docs/whatsnew/v1.3.0.html#float-result-for-groupby-mean-groupby-median-and-groupby-var>`_ `#25 <https://github.com/lvgig/tubular/pull/25>`_
-- Added attributes to date and numeric transformers to allow transformer to be printed out
-- Removed copy of mappings in mapping transformer to allow transformer to work with sklearn.base.clone
+- Added attributes to date and numeric transformers to allow transformer to be printed out #30 <https://github.com/lvgig/tubular/pull/30>`_
+- Removed copy of mappings in mapping transformer to allow transformer to work with sklearn.base.clone #30 <https://github.com/lvgig/tubular/pull/30>`_
 
 0.3.0 (2021-11-03)
 ------------------

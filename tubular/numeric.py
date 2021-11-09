@@ -197,7 +197,7 @@ class CutTransformer(BaseTransformer):
         self.cut_kwargs = cut_kwargs
         self.new_column_name = new_column_name
 
-        # This attribute is not for use in any method, use 'columns' instead. 
+        # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.
         self.column = column
 
@@ -285,7 +285,7 @@ class ScalingTransformer(BaseTransformer):
 
             self.scaler = StandardScaler(**scaler_kwargs)
 
-        # This attribute is not for use in any method 
+        # This attribute is not for use in any method
         # Here only as a fix to allow string representation of transformer.
         self.scaler_kwargs = scaler_kwargs
         self.scaler_type = scaler_type

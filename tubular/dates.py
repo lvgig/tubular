@@ -39,7 +39,7 @@ class DateDiffLeapYearTransformer(BaseTransformer):
     column_lower : str
         Name of date column to subtract. This attribute is not for use in any method,
         use 'columns' instead. Here only as a fix to allow string representation of transformer.
-    
+
     column_upper : str
         Name of date column to subtract from. This attribute is not for use in any method,
         use 'columns instead. Here only as a fix to allow string representation of transformer.
@@ -89,7 +89,7 @@ class DateDiffLeapYearTransformer(BaseTransformer):
         self.drop_cols = drop_cols
         self.missing_replacement = missing_replacement
 
-        # This attribute is not for use in any method, use 'columns' instead. 
+        # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.
         self.column_lower = column_lower
         self.column_upper = column_upper
@@ -249,7 +249,7 @@ class DateDifferenceTransformer(BaseTransformer):
 
         super().__init__(columns=columns, copy=copy, verbose=verbose)
 
-        # This attribute is not for use in any method, use 'columns' instead. 
+        # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.
         self.column_lower = column_lower
         self.column_upper = column_upper
@@ -325,7 +325,7 @@ class ToDatetimeTransformer(BaseTransformer):
         self.to_datetime_kwargs = to_datetime_kwargs
         self.new_column_name = new_column_name
 
-        # This attribute is not for use in any method, use 'columns' instead. 
+        # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.
         self.column = column
 
@@ -465,7 +465,7 @@ class SeriesDtMethodTransformer(BaseTransformer):
 
             self._callable = False
 
-        # This attribute is not for use in any method, use 'columns' instead. 
+        # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.
         self.column = column
 
@@ -542,7 +542,7 @@ class BetweenDatesTransformer(BaseTransformer):
     column_lower : str
         Name of date column to subtract. This attribute is not for use in any method,
         use 'columns' instead. Here only as a fix to allow string representation of transformer.
-    
+
     column_upper : str
         Name of date column to subtract from. This attribute is not for use in any method,
         use 'columns instead. Here only as a fix to allow string representation of transformer.
@@ -550,7 +550,7 @@ class BetweenDatesTransformer(BaseTransformer):
     column_between : str
         Name of column to check if it's values fall between column_lower and column_upper. This attribute
         is not for use in any method, use 'columns instead. Here only as a fix to allow string representation of transformer.
-    
+
     columns : list
         Contains the names of the columns to compare in the order [column_lower, column_between
         column_upper].
@@ -601,7 +601,7 @@ class BetweenDatesTransformer(BaseTransformer):
 
         super().__init__(columns=[column_lower, column_between, column_upper], **kwargs)
 
-        # This attribute is not for use in any method, use 'columns' instead. 
+        # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.
         self.column_lower = column_lower
         self.column_upper = column_upper
