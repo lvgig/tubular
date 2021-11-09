@@ -42,11 +42,7 @@ class TestInit(object):
         expected_call_args = {
             0: {
                 "args": (),
-                "kwargs": {
-                    "mappings": {"a": {"a": 1}},
-                    "verbose": True,
-                    "copy": True,
-                },
+                "kwargs": {"mappings": {"a": {"a": 1}}, "verbose": True, "copy": True},
             }
         }
 
