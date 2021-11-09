@@ -36,6 +36,17 @@ class DateDiffLeapYearTransformer(BaseTransformer):
 
     Attributes
     ----------
+    column_lower : str
+        Name of date column to subtract. This attribute is not for use in any method,
+        use 'columns' instead. Here only as a fix to allow string representation of transformer.
+    
+    column_upper : str
+        Name of date column to subtract from. This attribute is not for use in any method,
+        use 'columns instead. Here only as a fix to allow string representation of transformer.
+
+    columns : list
+        List containing column names for transformation in format [column_lower, column_upper]
+
     new_column_name : str
         Column name for the year column calculated in the transform method.
 
@@ -77,6 +88,11 @@ class DateDiffLeapYearTransformer(BaseTransformer):
         self.new_column_name = new_column_name
         self.drop_cols = drop_cols
         self.missing_replacement = missing_replacement
+
+        # This attribute is not for use in any method, use 'columns' instead. 
+        # Here only as a fix to allow string representation of transformer.
+        self.column_lower = column_lower
+        self.column_upper = column_upper
 
     def calculate_age(self, row):
         """Function to calculate age from two date columns in a pd.DataFrame.
@@ -233,6 +249,11 @@ class DateDifferenceTransformer(BaseTransformer):
 
         super().__init__(columns=columns, copy=copy, verbose=verbose)
 
+        # This attribute is not for use in any method, use 'columns' instead. 
+        # Here only as a fix to allow string representation of transformer.
+        self.column_lower = column_lower
+        self.column_upper = column_upper
+
     def transform(self, X):
         """Calculate the difference between the given fields in the specified units.
 
@@ -304,6 +325,10 @@ class ToDatetimeTransformer(BaseTransformer):
         self.to_datetime_kwargs = to_datetime_kwargs
         self.new_column_name = new_column_name
 
+        # This attribute is not for use in any method, use 'columns' instead. 
+        # Here only as a fix to allow string representation of transformer.
+        self.column = column
+
         super().__init__(columns=[column], **kwargs)
 
     def transform(self, X):
@@ -360,6 +385,13 @@ class SeriesDtMethodTransformer(BaseTransformer):
 
     Attributes
     ----------
+    column : str
+        Name of column to apply transformer to. This attribute is not for use in any method,
+        use 'columns instead. Here only as a fix to allow string representation of transformer.
+
+    columns : str
+        Column name for transformation.
+
     new_column_name : str
         The name of the column or columns to be assigned to the output of running the
         pandas method in transform.
@@ -433,6 +465,10 @@ class SeriesDtMethodTransformer(BaseTransformer):
 
             self._callable = False
 
+        # This attribute is not for use in any method, use 'columns' instead. 
+        # Here only as a fix to allow string representation of transformer.
+        self.column = column
+
     def transform(self, X):
         """Transform specific column on input pandas.DataFrame (X) using the given pandas.Series.dt method and
         assign the output back to column in X.
@@ -503,6 +539,18 @@ class BetweenDatesTransformer(BaseTransformer):
 
     Attributes
     ----------
+    column_lower : str
+        Name of date column to subtract. This attribute is not for use in any method,
+        use 'columns' instead. Here only as a fix to allow string representation of transformer.
+    
+    column_upper : str
+        Name of date column to subtract from. This attribute is not for use in any method,
+        use 'columns instead. Here only as a fix to allow string representation of transformer.
+
+    column_between : str
+        Name of column to check if it's values fall between column_lower and column_upper. This attribute
+        is not for use in any method, use 'columns instead. Here only as a fix to allow string representation of transformer.
+    
     columns : list
         Contains the names of the columns to compare in the order [column_lower, column_between
         column_upper].
@@ -552,6 +600,12 @@ class BetweenDatesTransformer(BaseTransformer):
         self.upper_inclusive = upper_inclusive
 
         super().__init__(columns=[column_lower, column_between, column_upper], **kwargs)
+
+        # This attribute is not for use in any method, use 'columns' instead. 
+        # Here only as a fix to allow string representation of transformer.
+        self.column_lower = column_lower
+        self.column_upper = column_upper
+        self.column_between = column_between
 
     def transform(self, X):
         """Transform - creates column indicating if middle date is between the other two

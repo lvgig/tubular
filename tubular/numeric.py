@@ -197,6 +197,10 @@ class CutTransformer(BaseTransformer):
         self.cut_kwargs = cut_kwargs
         self.new_column_name = new_column_name
 
+        # This attribute is not for use in any method, use 'columns' instead. 
+        # Here only as a fix to allow string representation of transformer.
+        self.column = column
+
         super().__init__(columns=[column], **kwargs)
 
     def transform(self, X):
@@ -281,7 +285,9 @@ class ScalingTransformer(BaseTransformer):
 
             self.scaler = StandardScaler(**scaler_kwargs)
 
-        self.scaler_kwargs = None
+        # This attribute is not for use in any method 
+        # Here only as a fix to allow string representation of transformer.
+        self.scaler_kwargs = scaler_kwargs
 
         super().__init__(columns=columns, **kwargs)
 
