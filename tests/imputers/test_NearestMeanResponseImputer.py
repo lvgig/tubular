@@ -16,7 +16,7 @@ class TestInit(object):
 
         ta.functions.test_function_arguments(
             func=NearestMeanResponseImputer.__init__,
-            expected_arguments=["self", "response_column", "columns"],
+            expected_arguments=["self", "columns"],
             expected_default_values=(None,),
         )
 
@@ -34,7 +34,7 @@ class TestInit(object):
     def test_inheritance(self):
         """Test that NearestMeanResponseImputer inherits from BaseImputer."""
 
-        x = NearestMeanResponseImputer(response_column="c", columns=None)
+        x = NearestMeanResponseImputer(columns=None)
 
         ta.classes.assert_inheritance(x, tubular.imputers.BaseImputer)
 
@@ -49,33 +49,7 @@ class TestInit(object):
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
-            NearestMeanResponseImputer(
-                response_column="c",
-                columns=None,
-                verbose=True,
-                copy=True,
-            )
-
-    def test_response_column_not_str_error(self):
-        """Test that an exception is raised if response_column is not str"""
-
-        with pytest.raises(TypeError, match="response_column must be a str"):
-
-            NearestMeanResponseImputer(response_column=0)
-
-    def test_values_passed_in_init_set_to_attribute(self):
-        """Test that the values passed in init are saved in an attribute of the same name."""
-
-        x = NearestMeanResponseImputer(
-            response_column="c",
-            columns="a",
-        )
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={"response_column": "c"},
-            msg="Attributes for NearestMeanResponseImputer set in init",
-        )
+            NearestMeanResponseImputer(columns=None, verbose=True, copy=True)
 
 
 class TestFit(object):
@@ -87,7 +61,7 @@ class TestFit(object):
         ta.functions.test_function_arguments(
             func=NearestMeanResponseImputer.fit,
             expected_arguments=["self", "X", "y"],
-            expected_default_values=(None,),
+            expected_default_values=None,
         )
 
     def test_super_fit_called(self, mocker):
@@ -95,13 +69,13 @@ class TestFit(object):
 
         df = d.create_NearestMeanResponseImputer_test_df()
 
-        x = NearestMeanResponseImputer(response_column="c", columns=["a", "b"])
+        x = NearestMeanResponseImputer(columns=["a", "b"])
 
         expected_call_args = {
             0: {
                 "args": (
                     d.create_NearestMeanResponseImputer_test_df(),
-                    None,
+                    d.create_NearestMeanResponseImputer_test_df()["c"],
                 ),
                 "kwargs": {},
             }
@@ -111,33 +85,18 @@ class TestFit(object):
             mocker, tubular.base.BaseTransformer, "fit", expected_call_args
         ):
 
-            x.fit(df)
-
-    def test_non_numeric_response_column_error(self):
-        """Test an error is raised if response_column is non-numeric"""
-
-        df = pd.DataFrame(
-            {"a": [1, 2, 3, 4, 5], "b": [5, 4, 3, 2, 1], "c": ["a", "b", "c", "d", "e"]}
-        )
-
-        x = NearestMeanResponseImputer(response_column="c", columns=["a", "b"])
-
-        with pytest.raises(
-            ValueError, match="dtypes in response_column must be numeric."
-        ):
-
-            x.fit(df)
+            x.fit(df, df["c"])
 
     def test_null_values_in_response_error(self):
         """Test an error is raised if the response column contains null entries."""
 
         df = d.create_df_3()
 
-        x = NearestMeanResponseImputer(response_column="c", columns=["a", "b"])
+        x = NearestMeanResponseImputer(columns=["a", "b"])
 
-        with pytest.raises(ValueError, match=r"Response column \(c\) has null values."):
+        with pytest.raises(ValueError, match="y has 1 null values"):
 
-            x.fit(df)
+            x.fit(df, df["c"])
 
     def test_columns_with_no_nulls_error(self):
         """Test an error is raised if a non-response column contains no nulls."""
@@ -146,23 +105,23 @@ class TestFit(object):
             {"a": [1, 2, 3, 4, 5], "b": [5, 4, 3, 2, 1], "c": [3, 2, 1, 4, 5]}
         )
 
-        x = NearestMeanResponseImputer(response_column="c", columns=["a", "b"])
+        x = NearestMeanResponseImputer(columns=["a", "b"])
 
         with pytest.raises(
             ValueError,
             match="Column a has no missing values, cannot use this transformer.",
         ):
 
-            x.fit(df)
+            x.fit(df, df["c"])
 
     def test_fit_returns_self(self):
         """Test fit returns self?"""
 
         df = d.create_NearestMeanResponseImputer_test_df()
 
-        x = NearestMeanResponseImputer(response_column="c", columns=["a", "b"])
+        x = NearestMeanResponseImputer(columns=["a", "b"])
 
-        x_fitted = x.fit(df)
+        x_fitted = x.fit(df, df["c"])
 
         assert (
             x_fitted is x
@@ -173,9 +132,9 @@ class TestFit(object):
 
         df = d.create_NearestMeanResponseImputer_test_df()
 
-        x = NearestMeanResponseImputer(response_column="c", columns=["a", "b"])
+        x = NearestMeanResponseImputer(columns=["a", "b"])
 
-        x.fit(df)
+        x.fit(df, df["c"])
 
         ta.equality.assert_equal_dispatch(
             expected=d.create_NearestMeanResponseImputer_test_df(),
@@ -188,9 +147,9 @@ class TestFit(object):
 
         df = d.create_NearestMeanResponseImputer_test_df()
 
-        x = NearestMeanResponseImputer(response_column="c", columns=["a", "b"])
+        x = NearestMeanResponseImputer(columns=["a", "b"])
 
-        x.fit(df)
+        x.fit(df, df["c"])
 
         ta.classes.test_object_attributes(
             obj=x,
@@ -211,9 +170,9 @@ class TestFit(object):
             }
         )
 
-        x = NearestMeanResponseImputer(response_column="c", columns=["a", "b"])
+        x = NearestMeanResponseImputer(columns=["a", "b"])
 
-        x.fit(df)
+        x.fit(df, df["c"])
 
         ta.classes.test_object_attributes(
             obj=x,
@@ -274,9 +233,9 @@ class TestTransform(object):
 
         df = d.create_NearestMeanResponseImputer_test_df()
 
-        x = NearestMeanResponseImputer(response_column="c", columns=["a", "b"])
+        x = NearestMeanResponseImputer(columns=["a", "b"])
 
-        x.fit(df)
+        x.fit(df, df["c"])
 
         expected_call_args = {0: {"args": (["impute_values_"],), "kwargs": {}}}
 
@@ -291,15 +250,12 @@ class TestTransform(object):
 
         df = d.create_NearestMeanResponseImputer_test_df()
 
-        x = NearestMeanResponseImputer(response_column="c", columns=["a", "b"])
+        x = NearestMeanResponseImputer(columns=["a", "b"])
 
-        x.fit(df)
+        x.fit(df, df["c"])
 
         expected_call_args = {
-            0: {
-                "args": (d.create_NearestMeanResponseImputer_test_df(),),
-                "kwargs": {},
-            }
+            0: {"args": (d.create_NearestMeanResponseImputer_test_df(),), "kwargs": {}}
         }
 
         with ta.functions.assert_function_call(
@@ -317,7 +273,7 @@ class TestTransform(object):
     def test_nulls_imputed_correctly(self, df, expected):
         """Test missing values are filled with the correct values."""
 
-        x = NearestMeanResponseImputer(response_column="c", columns=["a", "b"])
+        x = NearestMeanResponseImputer(columns=["a", "b"])
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
         x.impute_values_ = {"a": 2.0, "b": 3.0}
@@ -339,7 +295,7 @@ class TestTransform(object):
     def test_nulls_imputed_correctly2(self, df, expected):
         """Test missing values are filled with the correct values - and unrelated columns are unchanged."""
 
-        x = NearestMeanResponseImputer(response_column="c", columns="a")
+        x = NearestMeanResponseImputer(columns="a")
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
         x.impute_values_ = {"a": 2.0}
@@ -361,7 +317,7 @@ class TestTransform(object):
     def test_nulls_imputed_correctly3(self, df, expected):
         """Test missing values are filled with the correct values - with median value from separate dataframe."""
 
-        x = NearestMeanResponseImputer(response_column="c", columns="a")
+        x = NearestMeanResponseImputer(columns="a")
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
         x.impute_values_ = {"a": 2.0}
@@ -379,13 +335,13 @@ class TestTransform(object):
 
         df = d.create_NearestMeanResponseImputer_test_df()
 
-        x = NearestMeanResponseImputer(response_column="c", columns=["a", "b"])
+        x = NearestMeanResponseImputer(columns=["a", "b"])
 
-        x.fit(df)
+        x.fit(df, df["c"])
 
-        x2 = NearestMeanResponseImputer(response_column="c", columns=["a", "b"])
+        x2 = NearestMeanResponseImputer(columns=["a", "b"])
 
-        x2.fit(df)
+        x2.fit(df, df["c"])
 
         x2.transform(df)
 
