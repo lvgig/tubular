@@ -197,6 +197,10 @@ class CutTransformer(BaseTransformer):
         self.cut_kwargs = cut_kwargs
         self.new_column_name = new_column_name
 
+        # This attribute is not for use in any method, use 'columns' instead.
+        # Here only as a fix to allow string representation of transformer.
+        self.column = column
+
         super().__init__(columns=[column], **kwargs)
 
     def transform(self, X):
@@ -233,7 +237,7 @@ class ScalingTransformer(BaseTransformer):
     columns : str, list or None
         Name of the columns to apply scaling to.
 
-    scaler : str
+    scaler_type : str
         Type of scaler to use, must be one of 'min_max', 'max_abs' or 'standard'. The corresponding
         sklearn.preprocessing scaler used in each case is MinMaxScaler, MaxAbsScaler or StandardScaler.
 
@@ -245,7 +249,7 @@ class ScalingTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, columns, scaler, scaler_kwargs={}, **kwargs):
+    def __init__(self, columns, scaler_type, scaler_kwargs={}, **kwargs):
 
         if not type(scaler_kwargs) is dict:
 
@@ -265,21 +269,26 @@ class ScalingTransformer(BaseTransformer):
 
         allowed_scaler_values = ["min_max", "max_abs", "standard"]
 
-        if scaler not in allowed_scaler_values:
+        if scaler_type not in allowed_scaler_values:
 
-            raise ValueError(f"scaler should be one of; {allowed_scaler_values}")
+            raise ValueError(f"scaler_type should be one of; {allowed_scaler_values}")
 
-        if scaler == "min_max":
+        if scaler_type == "min_max":
 
             self.scaler = MinMaxScaler(**scaler_kwargs)
 
-        elif scaler == "max_abs":
+        elif scaler_type == "max_abs":
 
             self.scaler = MaxAbsScaler(**scaler_kwargs)
 
-        elif scaler == "standard":
+        elif scaler_type == "standard":
 
             self.scaler = StandardScaler(**scaler_kwargs)
+
+        # This attribute is not for use in any method
+        # Here only as a fix to allow string representation of transformer.
+        self.scaler_kwargs = scaler_kwargs
+        self.scaler_type = scaler_type
 
         super().__init__(columns=columns, **kwargs)
 

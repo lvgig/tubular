@@ -8,4 +8,3 @@ from tubular import misc
 from tubular import nominal
 from tubular import numeric
 from tubular import strings
-from tubular import testing

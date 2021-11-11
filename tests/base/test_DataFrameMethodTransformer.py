@@ -1,11 +1,11 @@
 import pytest
-import tubular.testing.test_data as d
-import tubular.testing.helpers as h
+import test_aide as ta
+import tests.test_data as d
+import pandas as pd
+import numpy as np
 
 import tubular
 from tubular.base import DataFrameMethodTransformer
-import pandas as pd
-import numpy as np
 
 
 class TestInit(object):
@@ -14,7 +14,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=DataFrameMethodTransformer.__init__,
             expected_arguments=[
                 "self",
@@ -22,8 +22,9 @@ class TestInit(object):
                 "pd_method_name",
                 "columns",
                 "pd_method_kwargs",
+                "drop_original",
             ],
-            expected_default_values=({},),
+            expected_default_values=({}, False),
         )
 
     def test_class_methods(self):
@@ -33,7 +34,9 @@ class TestInit(object):
             new_column_name="a", pd_method_name="sum", columns=["b", "c"]
         )
 
-        h.test_object_method(obj=x, expected_method="transform", msg="transform")
+        ta.classes.test_object_method(
+            obj=x, expected_method="transform", msg="transform"
+        )
 
     def test_inheritance(self):
         """Test that DataFrameMethodTransformer inherits from BaseTransformer."""
@@ -42,7 +45,7 @@ class TestInit(object):
             new_column_name="a", pd_method_name="sum", columns=["b", "c"]
         )
 
-        h.assert_inheritance(x, tubular.base.BaseTransformer)
+        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
@@ -54,7 +57,7 @@ class TestInit(object):
             }
         }
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -120,6 +123,18 @@ class TestInit(object):
                 pd_method_kwargs={"a": 1, 2: "b"},
             )
 
+        with pytest.raises(
+            TypeError,
+            match=r"unexpected type \(\<class 'int'\>\) for drop_original, expecting bool",
+        ):
+
+            DataFrameMethodTransformer(
+                new_column_name="a",
+                pd_method_name="sum",
+                columns=["b", "c"],
+                drop_original=30,
+            )
+
     def test_exception_raised_non_pandas_method_passed(self):
         """Test and exception is raised if a non pd.DataFrame method is passed for pd_method_name."""
 
@@ -136,12 +151,19 @@ class TestInit(object):
         """Test that the values passed for new_column_name, pd_method_name are saved to attributes on the object."""
 
         x = DataFrameMethodTransformer(
-            new_column_name="a", pd_method_name="sum", columns=["b", "c"]
+            new_column_name="a",
+            pd_method_name="sum",
+            columns=["b", "c"],
+            drop_original=True,
         )
 
-        h.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
-            expected_attributes={"new_column_name": "a", "pd_method_name": "sum"},
+            expected_attributes={
+                "new_column_name": "a",
+                "pd_method_name": "sum",
+                "drop_original": True,
+            },
             msg="Attributes for DataFrameMethodTransformer set in init",
         )
 
@@ -181,7 +203,7 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=DataFrameMethodTransformer.transform, expected_arguments=["self", "X"]
         )
 
@@ -196,7 +218,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (df.copy(),), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
 
@@ -204,8 +226,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_3(), expected_df_1())
-        + h.index_preserved_params(d.create_df_3(), expected_df_1()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
     )
     def test_expected_output_single_columns_assignment(self, df, expected):
         """Test a single column output from transform gives expected results."""
@@ -219,7 +240,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="DataFrameMethodTransformer sum columns b and c",
@@ -227,8 +248,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_3(), expected_df_2())
-        + h.index_preserved_params(d.create_df_3(), expected_df_2()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_2()),
     )
     def test_expected_output_multi_columns_assignment(self, df, expected):
         """Test a multiple column output from transform gives expected results."""
@@ -242,7 +262,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="DataFrameMethodTransformer divide by 2 columns b and c",
@@ -281,15 +301,55 @@ class TestTransform(object):
         call_kwargs = call_args[1]
 
         # test keyword are as expected
-        h.assert_dict_equal_msg(
+        ta.equality.assert_dict_equal_msg(
             actual=call_kwargs,
             expected=pd_method_kwargs,
             msg_tag=f"""Keyword arg assert for {pd_method_name}""",
         )
 
         # test positional args are as expected
-        h.assert_list_tuple_equal_msg(
+        ta.equality.assert_list_tuple_equal_msg(
             actual=call_pos_args,
             expected=(df[columns],),
             msg_tag=f"""Positional arg assert for {pd_method_name}""",
         )
+
+    def test_original_columns_dropped_when_specified(self):
+        """Test DataFrameMethodTransformer.transform drops original columns get when specified."""
+
+        df = d.create_df_3()
+
+        x = DataFrameMethodTransformer(
+            new_column_name="a_b_sum",
+            pd_method_name="sum",
+            columns=["a", "b"],
+            drop_original=True,
+        )
+
+        x.fit(df)
+
+        df_transformed = x.transform(df)
+
+        assert ("a" not in df_transformed.columns.values) and (
+            "b" not in df_transformed.columns.values
+        ), "original columns not dropped"
+
+    def test_original_columns_kept_when_specified(self):
+        """Test DataFrameMethodTransformer.transform keeps original columns when specified."""
+
+        df = d.create_df_3()
+
+        x = DataFrameMethodTransformer(
+            new_column_name="a_b_sum",
+            pd_method_name="sum",
+            columns=["a", "b"],
+            drop_original=False,
+        )
+
+        x.fit(df)
+
+        df_transformed = x.transform(df)
+
+        assert ("a" in df_transformed.columns.values) and (
+            "b" in df_transformed.columns.values
+        ), "original columns not kept"

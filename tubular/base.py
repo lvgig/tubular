@@ -4,6 +4,7 @@ from. These transformers contain key checks to be applied in all cases.
 """
 
 import pandas as pd
+import warnings
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
@@ -58,7 +59,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         if not isinstance(verbose, bool):
 
-            raise ValueError("verbose must be a bool")
+            raise TypeError("verbose must be a bool")
 
         else:
 
@@ -89,21 +90,21 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
                     if not isinstance(c, str):
 
-                        raise ValueError(
-                            "each element of columns should be a single column name"
+                        raise TypeError(
+                            "each element of columns should be a single (string) column name"
                         )
 
                 self.columns = columns
 
             else:
 
-                raise ValueError(
+                raise TypeError(
                     "columns must be a string or list with the columns to be pre-processed (if specified)"
                 )
 
         if not isinstance(copy, bool):
 
-            raise ValueError("copy must be a bool")
+            raise TypeError("copy must be a bool")
 
         else:
 
@@ -138,27 +139,57 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         if y is not None:
 
-            if isinstance(y, pd.DataFrame):
+            if not isinstance(y, pd.Series):
 
-                if y.shape[1] > 1:
-
-                    raise ValueError(
-                        "multi-column DataFrame passed for y, expecting 1 column"
-                    )
-
-            elif isinstance(y, pd.Series):
-
-                pass
-
-            else:
-
-                raise ValueError("unexpected type for y")
+                raise TypeError("unexpected type for y, should be a pd.Series")
 
             if not y.shape[0] > 0:
 
                 raise ValueError(f"y is empty; {y.shape}")
 
         return self
+
+    def _combine_X_y(self, X, y):
+        """Combine X and y by adding a new column with the values of y to a copy of X.
+
+        The new column response column will be called `_temporary_response`.
+
+        This method can be used by transformers that need to use the response, y, together
+        with the explanatory variables, X, in their `fit` methods.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data containing explanatory variables.
+
+        y : pd.Series
+            Response variable.
+
+        """
+
+        if not isinstance(X, pd.DataFrame):
+
+            raise TypeError("X should be a pd.DataFrame")
+
+        if not isinstance(y, pd.Series):
+
+            raise TypeError("y should be a pd.Series")
+
+        if X.shape[0] != y.shape[0]:
+
+            raise ValueError(
+                f"X and y have different numbers of rows ({X.shape[0]} vs {y.shape[0]})"
+            )
+
+        if not (X.index == y.index).all():
+
+            warnings.warn("X and y do not have equal indexes")
+
+        X_y = X.copy()
+
+        X_y["_temporary_response"] = y.values
+
+        return X_y
 
     def transform(self, X):
         """Base transformer transform method; checks X type (pandas DataFrame only) and copies data if requested.
@@ -220,7 +251,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         if not isinstance(X, pd.DataFrame):
 
-            raise ValueError("X should be a pd.DataFrame")
+            raise TypeError("X should be a pd.DataFrame")
 
         if self.columns is None:
 
@@ -228,7 +259,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         if not isinstance(self.columns, list):
 
-            raise ValueError("self.columns should be a list")
+            raise TypeError("self.columns should be a list")
 
         for c in self.columns:
 
@@ -250,7 +281,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         if not isinstance(X, pd.DataFrame):
 
-            raise ValueError("X should be a pd.DataFrame")
+            raise TypeError("X should be a pd.DataFrame")
 
         if self.columns is None:
 
@@ -317,6 +348,9 @@ class DataFrameMethodTransformer(BaseTransformer):
     pd_method_kwargs : dict, default = {}
         A dictionary of keyword arguments to be passed to the pd.DataFrame method when it is called.
 
+    drop_original : bool, default = False
+        Should original columns be dropped?
+
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.__init__().
 
@@ -332,7 +366,13 @@ class DataFrameMethodTransformer(BaseTransformer):
     """
 
     def __init__(
-        self, new_column_name, pd_method_name, columns, pd_method_kwargs={}, **kwargs
+        self,
+        new_column_name,
+        pd_method_name,
+        columns,
+        pd_method_kwargs={},
+        drop_original=False,
+        **kwargs,
     ):
 
         super().__init__(columns=columns, **kwargs)
@@ -375,9 +415,16 @@ class DataFrameMethodTransformer(BaseTransformer):
                         f"unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
                     )
 
+        if not type(drop_original) is bool:
+
+            raise TypeError(
+                f"unexpected type ({type(drop_original)}) for drop_original, expecting bool"
+            )
+
         self.new_column_name = new_column_name
         self.pd_method_name = pd_method_name
         self.pd_method_kwargs = pd_method_kwargs
+        self.drop_original = drop_original
 
         try:
 
@@ -414,6 +461,10 @@ class DataFrameMethodTransformer(BaseTransformer):
         X[self.new_column_name] = getattr(X[self.columns], self.pd_method_name)(
             **self.pd_method_kwargs
         )
+
+        if self.drop_original:
+
+            X.drop(self.columns, axis=1, inplace=True)
 
         return X
 

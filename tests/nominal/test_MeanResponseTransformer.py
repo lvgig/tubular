@@ -1,7 +1,6 @@
 import pytest
-import tubular.testing.test_data as d
-import tubular.testing.helpers as h
-
+import test_aide as ta
+import tests.test_data as d
 import pandas as pd
 import numpy as np
 
@@ -15,9 +14,9 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=MeanResponseTransformer.__init__,
-            expected_arguments=["self", "response_column", "columns", "weights_column"],
+            expected_arguments=["self", "columns", "weights_column"],
             expected_default_values=(None, None),
         )
 
@@ -26,25 +25,25 @@ class TestInit(object):
 
         x = MeanResponseTransformer(response_column="a")
 
-        h.test_object_method(obj=x, expected_method="fit", msg="fit")
+        ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
 
-        h.test_object_method(obj=x, expected_method="transform", msg="transform")
+        ta.classes.test_object_method(
+            obj=x, expected_method="transform", msg="transform"
+        )
 
     def test_inheritance(self):
         """Test that NominalToIntegerTransformer inherits from BaseNominalTransformer."""
 
         x = MeanResponseTransformer(response_column="a")
 
-        h.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
+        ta.classes.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
 
         spy = mocker.spy(tubular.base.BaseTransformer, "__init__")
 
-        x = MeanResponseTransformer(
-            response_column="a", columns=None, verbose=True, copy=True
-        )
+        x = MeanResponseTransformer(columns=None, verbose=True, copy=True)
 
         assert (
             spy.call_count == 1
@@ -70,13 +69,6 @@ class TestInit(object):
             expected_pos_args == call_pos_args
         ), "unexpected positional args in BaseTransformer.__init__ call"
 
-    def test_response_column_not_str_error(self):
-        """Test that an exception is raised if response_column is not a str."""
-
-        with pytest.raises(TypeError, match="response_column should be a str"):
-
-            MeanResponseTransformer(response_column=1)
-
     def test_weights_column_not_str_error(self):
         """Test that an exception is raised if weights_column is not a str."""
 
@@ -84,23 +76,14 @@ class TestInit(object):
 
             MeanResponseTransformer(response_column="a", weights_column=1)
 
-    def test_response_weights_column_equal_error(self):
-        """Test that an exception is raised if weights_column and response_column are equal."""
-
-        with pytest.raises(
-            ValueError, match="weights_column and response_column are the same column"
-        ):
-
-            MeanResponseTransformer(response_column="a", weights_column="a")
-
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that the values passed in init are saved in an attribute of the same name."""
 
-        x = MeanResponseTransformer(response_column="aaa")
+        x = MeanResponseTransformer(weights_column="aaa")
 
-        h.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
-            expected_attributes={"response_column": "aaa"},
+            expected_attributes={"weights_column": "aaa"},
             msg="Attributes for MeanResponseTransformer set in init",
         )
 
@@ -111,10 +94,10 @@ class TestFit(object):
     def test_arguments(self):
         """Test that init fit expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=MeanResponseTransformer.fit,
             expected_arguments=["self", "X", "y"],
-            expected_default_values=(None,),
+            expected_default_values=None,
         )
 
     def test_super_fit_called(self, mocker):
@@ -122,11 +105,11 @@ class TestFit(object):
 
         df = d.create_MeanResponseTransformer_test_df()
 
-        x = MeanResponseTransformer(response_column="a", columns="b")
+        x = MeanResponseTransformer(columns="b")
 
         spy = mocker.spy(tubular.base.BaseTransformer, "fit")
 
-        x.fit(df)
+        x.fit(df, df["a"])
 
         assert spy.call_count == 1, "unexpected number of calls to BaseTransformer.fit"
 
@@ -140,20 +123,20 @@ class TestFit(object):
             call_kwargs == expected_kwargs
         ), "unexpected kwargs in BaseTransformer.fit call"
 
-        expected_pos_args = (x, d.create_MeanResponseTransformer_test_df(), None)
+        expected_pos_args = (
+            x,
+            d.create_MeanResponseTransformer_test_df(),
+            d.create_MeanResponseTransformer_test_df()["a"],
+        )
 
         assert len(expected_pos_args) == len(
             call_pos_args
         ), "unexpected # positional args in BaseTransformer.fit call"
 
-        assert (
-            expected_pos_args[0] == call_pos_args[0]
-        ), "unexpected 1st positional arg in BaseTransformer.fit call"
-
-        h.assert_equal_dispatch(
-            expected_pos_args[1:3],
-            call_pos_args[1:3],
-            "unexpected 2nd, 3rd positional arg in BaseTransformer.fit call",
+        ta.equality.assert_equal_dispatch(
+            expected_pos_args,
+            call_pos_args,
+            "unexpected arguments in BaseTransformer.fit call",
         )
 
     def test_fit_returns_self(self):
@@ -161,9 +144,9 @@ class TestFit(object):
 
         df = d.create_MeanResponseTransformer_test_df()
 
-        x = MeanResponseTransformer(response_column="a", columns="b")
+        x = MeanResponseTransformer(columns="b")
 
-        x_fitted = x.fit(df)
+        x_fitted = x.fit(df, df["a"])
 
         assert (
             x_fitted is x
@@ -174,11 +157,11 @@ class TestFit(object):
 
         df = d.create_MeanResponseTransformer_test_df()
 
-        x = MeanResponseTransformer(response_column="a", columns="b")
+        x = MeanResponseTransformer(columns="b")
 
-        x.fit(df)
+        x.fit(df, df["a"])
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=d.create_MeanResponseTransformer_test_df(),
             actual=df,
             msg="Check X not changing during fit",
@@ -189,17 +172,17 @@ class TestFit(object):
 
         df = d.create_MeanResponseTransformer_test_df()
 
-        x = MeanResponseTransformer(response_column="a", columns=["b", "d", "f"])
+        x = MeanResponseTransformer(columns=["b", "d", "f"])
 
-        x.fit(df)
+        x.fit(df, df["a"])
 
-        h.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
                 "mappings": {
-                    "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
-                    "d": {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6},
-                    "f": {False: 2, True: 5},
+                    "b": {"a": 1.0, "b": 2.0, "c": 3.0, "d": 4.0, "e": 5.0, "f": 6.0},
+                    "d": {1: 1.0, 2: 2.0, 3: 3.0, 4: 4.0, 5: 5.0, 6: 6.0},
+                    "f": {False: 2.0, True: 5.0},
                 }
             },
             msg="mappings attribute",
@@ -210,13 +193,11 @@ class TestFit(object):
 
         df = d.create_MeanResponseTransformer_test_df()
 
-        x = MeanResponseTransformer(
-            response_column="a", weights_column="e", columns=["b", "d", "f"]
-        )
+        x = MeanResponseTransformer(weights_column="e", columns=["b", "d", "f"])
 
-        x.fit(df)
+        x.fit(df, df["a"])
 
-        h.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
                 "mappings": {
@@ -228,40 +209,27 @@ class TestFit(object):
             msg="mappings attribute",
         )
 
-    def test_response_column_missing_error(self):
-        """Test that an exception is raised if response_column is not present in data."""
-
-        df = d.create_MeanResponseTransformer_test_df()
-
-        x = MeanResponseTransformer(response_column="z", columns=["b", "d", "f"])
-
-        with pytest.raises(ValueError, match="response z not in X"):
-
-            x.fit(df)
-
     def test_weights_column_missing_error(self):
         """Test that an exception is raised if weights_column is specified but not present in data for fit."""
 
         df = d.create_MeanResponseTransformer_test_df()
 
-        x = MeanResponseTransformer(
-            response_column="a", weights_column="z", columns=["b", "d", "f"]
-        )
+        x = MeanResponseTransformer(weights_column="z", columns=["b", "d", "f"])
 
         with pytest.raises(ValueError, match="weights column z not in X"):
 
-            x.fit(df)
+            x.fit(df, df["a"])
 
     def test_response_column_nulls_error(self):
         """Test that an exception is raised if nulls are present in response_column."""
 
         df = d.create_df_4()
 
-        x = MeanResponseTransformer(response_column="a", columns=["b"])
+        x = MeanResponseTransformer(columns=["b"])
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="y has 1 null values"):
 
-            x.fit(df)
+            x.fit(df, df["a"])
 
 
 class TestTransform(object):
@@ -272,7 +240,7 @@ class TestTransform(object):
 
         df = pd.DataFrame(
             {
-                "a": [1, 2, 3, 4, 5, 6],
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
                 "b": [1, 2, 3, 4, 5, 6],
                 "c": ["a", "b", "c", "d", "e", "f"],
                 "d": [1, 2, 3, 4, 5, 6],
@@ -290,7 +258,7 @@ class TestTransform(object):
 
         df = pd.DataFrame(
             {
-                "a": [1, 2, 3, 4, 5, 6, np.NaN],
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],
                 "b": [1, 2, 3, 4, 5, 6, np.NaN],
                 "c": ["a", "b", "c", "d", "e", "f", np.NaN],
             }
@@ -303,7 +271,7 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=MeanResponseTransformer.transform, expected_arguments=["self", "X"]
         )
 
@@ -312,13 +280,13 @@ class TestTransform(object):
 
         df = d.create_MeanResponseTransformer_test_df()
 
-        x = MeanResponseTransformer(response_column="a", columns="b")
+        x = MeanResponseTransformer(columns="b")
 
-        x.fit(df)
+        x.fit(df, df["a"])
 
         expected_call_args = {0: {"args": (["mappings"],), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
 
@@ -329,15 +297,15 @@ class TestTransform(object):
 
         df = d.create_MeanResponseTransformer_test_df()
 
-        x = MeanResponseTransformer(response_column="a", columns="b")
+        x = MeanResponseTransformer(columns="b")
 
-        x.fit(df)
+        x.fit(df, df["a"])
 
         expected_call_args = {
             0: {"args": (d.create_MeanResponseTransformer_test_df(),), "kwargs": {}}
         }
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
@@ -352,17 +320,17 @@ class TestTransform(object):
 
         df = d.create_MeanResponseTransformer_test_df()
 
-        x = MeanResponseTransformer(response_column="a", columns="b")
+        x = MeanResponseTransformer(columns="b")
 
-        x.fit(df)
+        x.fit(df, df["a"])
 
-        x2 = MeanResponseTransformer(response_column="a", columns="b")
+        x2 = MeanResponseTransformer(columns="b")
 
-        x2.fit(df)
+        x2.fit(df, df["a"])
 
         x2.transform(df)
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=x.mappings,
             actual=x2.mappings,
             msg="Mean response values not changed in transform",
@@ -370,8 +338,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_MeanResponseTransformer_test_df(), expected_df_1())
-        + h.index_preserved_params(
+        ta.pandas.adjusted_dataframe_params(
             d.create_MeanResponseTransformer_test_df(), expected_df_1()
         ),
     )
@@ -389,7 +356,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_frame_equal_msg(
+        ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in MeanResponseTransformer.transform",
@@ -400,9 +367,9 @@ class TestTransform(object):
 
         df = d.create_MeanResponseTransformer_test_df()
 
-        x = MeanResponseTransformer(response_column="a", columns=["b", "d", "f"])
+        x = MeanResponseTransformer(columns=["b", "d", "f"])
 
-        x.fit(df)
+        x.fit(df, df["a"])
 
         df["b"] = "z"
 

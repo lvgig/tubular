@@ -1,11 +1,11 @@
 import pytest
-import tubular.testing.test_data as d
-import tubular.testing.helpers as h
+import test_aide as ta
+import tests.test_data as d
+import pandas as pd
+import numpy as np
 
 import tubular
 from tubular.imputers import BaseImputer
-import pandas as pd
-import numpy as np
 
 
 class TestInit:
@@ -16,14 +16,16 @@ class TestInit:
 
         x = BaseImputer()
 
-        h.test_object_method(obj=x, expected_method="transform", msg="transform")
+        ta.classes.test_object_method(
+            obj=x, expected_method="transform", msg="transform"
+        )
 
     def test_inheritance(self):
         """Test that BaseImputer inherits from BaseTransformer."""
 
         x = BaseImputer()
 
-        h.assert_inheritance(x, tubular.base.BaseTransformer)
+        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
 
 class TestTransform:
@@ -77,14 +79,13 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=BaseImputer.transform, expected_arguments=["self", "X"]
         )
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_2(), expected_df_1())
-        + h.index_preserved_params(d.create_df_2(), expected_df_1()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_2(), expected_df_1()),
     )
     def test_expected_output_1(self, df, expected):
         """Test that transform is giving the expected output when applied to float column."""
@@ -95,7 +96,7 @@ class TestTransform:
 
         df_transformed = x1.transform(df)
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="ArbitraryImputer transform col a",
@@ -103,8 +104,7 @@ class TestTransform:
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_2(), expected_df_2())
-        + h.index_preserved_params(d.create_df_2(), expected_df_2()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_2(), expected_df_2()),
     )
     def test_expected_output_2(self, df, expected):
         """Test that transform is giving the expected output when applied to object column."""
@@ -115,7 +115,7 @@ class TestTransform:
 
         df_transformed = x1.transform(df)
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="ArbitraryImputer transform col b",
@@ -123,8 +123,7 @@ class TestTransform:
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_2(), expected_df_3())
-        + h.index_preserved_params(d.create_df_2(), expected_df_3()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_2(), expected_df_3()),
     )
     def test_expected_output_3(self, df, expected):
         """Test that transform is giving the expected output when applied to object and categorical columns."""
@@ -135,7 +134,7 @@ class TestTransform:
 
         df_transformed = x1.transform(df)
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="ArbitraryImputer transform col b, c",
@@ -151,7 +150,7 @@ class TestTransform:
 
         expected_call_args = {0: {"args": (["impute_values_"],), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
 
@@ -168,7 +167,7 @@ class TestTransform:
 
         expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
 

@@ -1,12 +1,11 @@
 import pytest
-import tubular.testing.test_data as d
-import tubular.testing.helpers as h
+import test_aide as ta
+import tests.test_data as d
+import pandas as pd
 
 import tubular
 from tubular.mapping import MappingTransformer
 from tubular.base import ReturnKeyDict
-
-import pandas as pd
 
 
 class TestInit(object):
@@ -15,7 +14,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=MappingTransformer.__init__,
             expected_arguments=["self", "mappings"],
             expected_default_values=None,
@@ -26,15 +25,17 @@ class TestInit(object):
 
         x = MappingTransformer(mappings={"a": {"a": 1}})
 
-        h.test_object_method(obj=x, expected_method="transform", msg="transform")
+        ta.classes.test_object_method(
+            obj=x, expected_method="transform", msg="transform"
+        )
 
     def test_inheritance(self):
         """Test that MappingTransformer inherits from BaseMappingTransformer and BaseMappingTransformMixin."""
 
         x = MappingTransformer(mappings={"a": {"a": 1}})
 
-        h.assert_inheritance(x, tubular.mapping.BaseMappingTransformer)
-        h.assert_inheritance(x, tubular.mapping.BaseMappingTransformMixin)
+        ta.classes.assert_inheritance(x, tubular.mapping.BaseMappingTransformer)
+        ta.classes.assert_inheritance(x, tubular.mapping.BaseMappingTransformMixin)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseMappingTransformer.init."""
@@ -84,7 +85,7 @@ class TestInit(object):
 
         x = MappingTransformer(mappings=mappings)
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected_mappings,
             x.mappings,
             "mappings attribute not correctly converted sub dicts to ReturnKeyDict",
@@ -127,7 +128,7 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=MappingTransformer.transform,
             expected_arguments=["self", "X"],
             expected_default_values=None,
@@ -169,7 +170,7 @@ class TestTransform(object):
             expected_pos_args[0] == call_pos_args[0]
         ), "unexpected 1st positional arg in BaseMappingTransformMixin.transform call"
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected_pos_args[1],
             call_pos_args[1],
             "unexpected 2ns positional arg in BaseMappingTransformMixin.transform call",
@@ -177,8 +178,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_1(), expected_df_1())
-        + h.index_preserved_params(d.create_df_1(), expected_df_1()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_1(), expected_df_1()),
     )
     def test_expected_output(self, df, expected):
         """Test that transform is giving the expected output."""
@@ -192,7 +192,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_frame_equal_msg(
+        ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="expected output from mapping transformer",
@@ -200,8 +200,7 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_df_1(), expected_df_2())
-        + h.index_preserved_params(d.create_df_1(), expected_df_2()),
+        ta.pandas.adjusted_dataframe_params(d.create_df_1(), expected_df_2()),
     )
     def test_non_specified_values_unchanged(self, df, expected):
         """Test that values not specified in mappings are left unchanged in transform."""
@@ -212,7 +211,7 @@ class TestTransform(object):
 
         df_transformed = x.transform(df)
 
-        h.assert_frame_equal_msg(
+        ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
             expected=expected,
             msg_tag="expected output from mapping transformer",
@@ -237,7 +236,7 @@ class TestTransform(object):
 
         x.transform(df)
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             actual=x.mappings,
             expected=preserve_original_value_mapping,
             msg="MappingTransformer.transform has changed self.mappings unexpectedly",

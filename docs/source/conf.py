@@ -23,7 +23,9 @@ copyright = "2021, LV GI Data Science Team"
 author = "LV GI Data Science Team"
 
 # The full version, including alpha/beta/rc tags
-release = "0.2.15"
+import tubular
+
+release = tubular.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -33,6 +35,7 @@ release = "0.2.15"
 # ones.
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
     "sphinx_rtd_theme",
@@ -53,6 +56,9 @@ exclude_patterns = []
 # a list of builtin themes.
 #
 html_theme = "sphinx_rtd_theme"
+
+# logo to appear in the top left home page box
+html_logo = "../../logo-small.png"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

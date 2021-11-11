@@ -1,13 +1,13 @@
 import pytest
-import tubular.testing.test_data as d
-import tubular.testing.helpers as h
+import test_aide as ta
+import tests.test_data as d
 import datetime
-
-import tubular
-from tubular.dates import ToDatetimeTransformer
 import pandas
 import pandas as pd
 import numpy as np
+
+import tubular
+from tubular.dates import ToDatetimeTransformer
 
 
 class TestInit(object):
@@ -16,7 +16,7 @@ class TestInit(object):
     def test_arguments(self):
         """Test that init has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=ToDatetimeTransformer.__init__,
             expected_arguments=[
                 "self",
@@ -32,14 +32,16 @@ class TestInit(object):
 
         to_dt = ToDatetimeTransformer(column="a", new_column_name="b")
 
-        h.test_object_method(obj=to_dt, expected_method="transform", msg="transform")
+        ta.classes.test_object_method(
+            obj=to_dt, expected_method="transform", msg="transform"
+        )
 
     def test_inheritance(self):
         """Test that ToDatetimeTransformer inherits from BaseTransformer."""
 
         to_dt = ToDatetimeTransformer(column="a", new_column_name="b")
 
-        h.assert_inheritance(to_dt, tubular.base.BaseTransformer)
+        ta.classes.assert_inheritance(to_dt, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
@@ -55,7 +57,7 @@ class TestInit(object):
             }
         }
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
@@ -116,9 +118,10 @@ class TestInit(object):
             to_datetime_kwargs={"a": 1, "b": 2},
         )
 
-        h.test_object_attributes(
+        ta.classes.test_object_attributes(
             obj=to_dt,
             expected_attributes={
+                "column": "b",
                 "columns": ["b"],
                 "new_column_name": "a",
                 "to_datetime_kwargs": {"a": 1, "b": 2},
@@ -161,7 +164,7 @@ class TestTransform(object):
     def test_arguments(self):
         """Test that transform has expected arguments."""
 
-        h.test_function_arguments(
+        ta.functions.test_function_arguments(
             func=ToDatetimeTransformer.transform, expected_arguments=["self", "X"]
         )
 
@@ -174,7 +177,7 @@ class TestTransform(object):
 
         expected_call_args = {0: {"args": (d.create_datediff_test_df(),), "kwargs": {}}}
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
@@ -185,7 +188,7 @@ class TestTransform(object):
             to_dt.transform(df)
 
     def test_to_datetime_call(self, mocker):
-        """Test the call to pd.to_datetime is as expected."""
+        """Test the call to pandas.to_datetime is as expected."""
 
         df = d.create_to_datetime_test_df()
 
@@ -200,7 +203,7 @@ class TestTransform(object):
             }
         }
 
-        with h.assert_function_call(
+        with ta.functions.assert_function_call(
             mocker,
             pandas,
             "to_datetime",
@@ -231,8 +234,9 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        h.row_by_row_params(d.create_to_datetime_test_df(), expected_df_1())
-        + h.index_preserved_params(d.create_to_datetime_test_df(), expected_df_1()),
+        ta.pandas.adjusted_dataframe_params(
+            d.create_to_datetime_test_df(), expected_df_1()
+        ),
     )
     def test_expected_output(self, df, expected):
         """Test input data is transformed as expected."""
@@ -248,7 +252,7 @@ class TestTransform(object):
         df_transformed = to_dt_1.transform(df)
         df_transformed = to_dt_2.transform(df_transformed)
 
-        h.assert_equal_dispatch(
+        ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=df_transformed,
             msg="ToDatetimeTransformer.transform output",

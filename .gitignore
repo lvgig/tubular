@@ -1,6 +1,3 @@
-# output folder to log test runs
-tests/outputs/
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
