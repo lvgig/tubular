@@ -140,6 +140,7 @@ class TestInit(object):
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
+                "column": "b",
                 "new_column_name": "a",
                 "pd_method_name": "year",
                 "pd_method_kwargs": {"d": 1},

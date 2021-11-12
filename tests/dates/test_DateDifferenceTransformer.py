@@ -184,6 +184,8 @@ class TestInit(object):
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
+                "column_lower": "dummy_1",
+                "column_upper": "dummy_2",
                 "columns": ["dummy_1", "dummy_2"],
                 "new_column_name": "dummy_2_dummy_1_datediff_Y",
                 "units": "Y",

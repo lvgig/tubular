@@ -248,7 +248,7 @@ def create_MeanResponseTransformer_test_df():
 
     df = pd.DataFrame(
         {
-            "a": [1, 2, 3, 4, 5, 6],
+            "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
             "b": ["a", "b", "c", "d", "e", "f"],
             "c": ["a", "b", "c", "d", "e", "f"],
             "d": [1, 2, 3, 4, 5, 6],
