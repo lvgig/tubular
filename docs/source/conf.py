@@ -23,7 +23,7 @@ copyright = "2021, LV GI Data Science Team"
 author = "LV GI Data Science Team"
 
 # The full version, including alpha/beta/rc tags
-import tubular
+import tubular  # noqa
 
 release = tubular.__version__
 
@@ -49,6 +49,12 @@ templates_path = ["_templates"]
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
+autodoc_default_flags = ["members", "inherited-members", "show-inheritance"]
+autodoc_default_options = {
+    "members": True,
+    "inherited-members": True,
+    "show-inheritance": True,
+}
 
 # -- Options for HTML output -------------------------------------------------
 
