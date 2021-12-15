@@ -42,20 +42,29 @@ class TestInit(object):
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
-    # def test_super_init_called(self, mocker):
-    #      """Test that init calls BaseTransformer.init."""
-    #
-    #      expected_call_args = {
-    #          0: {
-    #              "args": (),
-    #              "kwargs": {"columns": ["b", "c"],"verbose": True, "copy": False},
-    #          }
-    #      }
-    #
-    #      with ta.functions.assert_function_call(
-    #          mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
-    #      ):
-    #          InteractionTransformer(columns=["b", "c"],min_degree=2,max_degree=2, copy=False, verbose=True)
+    def test_super_init_called(self, mocker):
+        """Test that init calls BaseTransformer.init."""
+
+        expected_call_args = {
+            0: {
+                "args": (),
+                "kwargs": {"columns": ["b", "c"], "verbose": True, "copy": False},
+            }
+        }
+
+        with ta.functions.assert_function_call(
+            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+        ):
+            try:
+                InteractionTransformer(
+                    columns=["b", "c"],
+                    min_degree=2,
+                    max_degree=2,
+                    copy=False,
+                    verbose=True,
+                )
+            except AttributeError:
+                pass
 
     def test_invalid_input_type_errors(self):
         """Test that an exceptions are raised for invalid input types."""

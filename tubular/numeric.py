@@ -10,7 +10,6 @@ from sklearn.preprocessing import (
     StandardScaler,
     PolynomialFeatures,
 )
-import sklearn as sk
 
 from tubular.base import BaseTransformer
 
@@ -463,14 +462,7 @@ class InteractionTransformer(BaseTransformer):
         """
         X = super().transform(X)
 
-        if int(sk.__version__.split(".")[0]) == 0:
-            interaction_combination_index = PolynomialFeatures._combinations(
-                n_features=self.nb_features_to_interact,
-                degree=self.max_degree,
-                interaction_only=True,
-                include_bias=False,
-            )
-        else:
+        try:
             interaction_combination_index = PolynomialFeatures._combinations(
                 n_features=self.nb_features_to_interact,
                 min_degree=self.min_degree,
@@ -478,6 +470,20 @@ class InteractionTransformer(BaseTransformer):
                 interaction_only=True,
                 include_bias=False,
             )
+        except TypeError as err:
+            if (
+                str(err)
+                == "_combinations() got an unexpected keyword argument 'min_degree'"
+            ):
+                interaction_combination_index = PolynomialFeatures._combinations(
+                    n_features=self.nb_features_to_interact,
+                    degree=self.max_degree,
+                    interaction_only=True,
+                    include_bias=False,
+                )
+            else:
+                raise err
+
         # if max degree is greater than the length of columns provided, itertools only provide up to len of columns
         interaction_combination_colname = [
             [self.columns[col_idx] for col_idx in interaction_combination]
