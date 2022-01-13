@@ -116,7 +116,15 @@ class TestInit(object):
             )
 
     def test_invalid_input_value_errors(self):
-        """Test and exception is raised if non-string columns and non-int degrees are provided."""
+        """Test and exception is raised if degrees or columns provided are inconsistent."""
+        with pytest.raises(
+            ValueError,
+            match=r"""umber of columns must be equal or greater than 2, got 1 column.""",
+        ):
+
+            InteractionTransformer(
+                columns=["A"],
+            )
 
         with pytest.raises(
             ValueError,
@@ -138,6 +146,17 @@ class TestInit(object):
                 columns=["A", "B", "C"],
                 min_degree=3,
                 max_degree=2,
+            )
+        # NEW
+        with pytest.raises(
+            ValueError,
+            match=r"""max_degree must be equal or lower than number of columns""",
+        ):
+
+            InteractionTransformer(
+                columns=["A", "B", "C"],
+                min_degree=3,
+                max_degree=4,
             )
 
     def test_attributes_set(self):
@@ -250,23 +269,6 @@ class TestTransform(object):
 
     @pytest.mark.parametrize(
         "df, expected",
-        ta.pandas.adjusted_dataframe_params(d.create_df_3(), d.create_df_3()),
-    )
-    def test_expected_output_single_column_assignment(self, df, expected):
-        """Test a single column assignment from transform gives expected results."""
-
-        x = InteractionTransformer(columns="a")
-
-        df_transformed = x.transform(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="InteractionTransformer one single column values",
-        )
-
-    @pytest.mark.parametrize(
-        "df, expected",
         ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_2()),
     )
     def test_expected_output_multiple_columns_assignment(self, df, expected):
@@ -280,39 +282,4 @@ class TestTransform(object):
             expected=expected,
             actual=df_transformed,
             msg="InteractionTransformer one single column values",
-        )
-
-    @pytest.mark.parametrize(
-        "df, expected",
-        ta.pandas.adjusted_dataframe_params(d.create_df_3(), d.create_df_3()),
-    )
-    def test_expected_output_min_degree_greater_than_columns(self, df, expected):
-        """Test min degree and columns assignment from transform gives expected results."""
-
-        # Not similar result depending on sklearn version
-        # x = InteractionTransformer(columns=["a", "b"], min_degree=3, max_degree=3)
-        #
-        # df_transformed = x.transform(df)
-        #
-        # ta.equality.assert_equal_dispatch(
-        #     expected=expected,
-        #     actual=df_transformed,
-        #     msg="InteractionTransformer min degree greater than nb columns",
-        # )
-
-    @pytest.mark.parametrize(
-        "df, expected",
-        ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_2()),
-    )
-    def test_expected_output_max_degree_greater_than_columns(self, df, expected):
-        """Test max degree and columns assignment from transform gives expected results."""
-
-        x = InteractionTransformer(columns=["a", "b"], min_degree=2, max_degree=4)
-
-        df_transformed = x.transform(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="InteractionTransformer max degree greater than nb columns",
         )

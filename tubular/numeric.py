@@ -417,6 +417,11 @@ class InteractionTransformer(BaseTransformer):
 
         super().__init__(columns=columns, **kwargs)
 
+        if len(columns) < 2:
+            raise ValueError(
+                f"number of columns must be equal or greater than 2, got {str(len(columns))} column."
+            )
+
         if type(min_degree) is int:
             if min_degree < 2:
                 raise ValueError(
@@ -429,9 +434,14 @@ class InteractionTransformer(BaseTransformer):
                 f"unexpected type ({type(min_degree)}) for min_degree, must be int"
             )
         if type(max_degree) is int:
-            self.max_degree = max_degree
             if min_degree > max_degree:
                 raise ValueError("max_degree must be equal or greater than min_degree")
+            else:
+                self.max_degree = max_degree
+            if max_degree > len(columns):
+                raise ValueError(
+                    "max_degree must be equal or lower than number of columns"
+                )
             else:
                 self.max_degree = max_degree
         else:
@@ -484,7 +494,6 @@ class InteractionTransformer(BaseTransformer):
             else:
                 raise err
 
-        # if max degree is greater than the length of columns provided, itertools only provide up to len of columns
         interaction_combination_colname = [
             [self.columns[col_idx] for col_idx in interaction_combination]
             for interaction_combination in interaction_combination_index
