@@ -119,7 +119,7 @@ class TestInit(object):
         """Test and exception is raised if degrees or columns provided are inconsistent."""
         with pytest.raises(
             ValueError,
-            match=r"""umber of columns must be equal or greater than 2, got 1 column.""",
+            match=r"""number of columns must be equal or greater than 2, got 1 column.""",
         ):
 
             InteractionTransformer(
