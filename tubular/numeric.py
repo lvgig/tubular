@@ -450,6 +450,12 @@ class InteractionTransformer(BaseTransformer):
                 )
             else:
                 self.max_degree = max_degree
+            if max_degree > len(columns):
+                raise ValueError(
+                    "max_degree must be equal or lower than number of columns"
+                )
+            else:
+                self.max_degree = max_degree
         else:
             raise TypeError(
                 f"{self.classname()}: unexpected type ({type(max_degree)}) for max_degree, must be int"
