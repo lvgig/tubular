@@ -4,7 +4,12 @@ This module contains transformers that apply numeric functions.
 
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, StandardScaler
+from sklearn.preprocessing import (
+    MinMaxScaler,
+    MaxAbsScaler,
+    StandardScaler,
+    PolynomialFeatures,
+)
 
 from tubular.base import BaseTransformer
 
@@ -359,5 +364,151 @@ class ScalingTransformer(BaseTransformer):
         X = self.check_numeric_columns(X)
 
         X[self.columns] = self.scaler.transform(X[self.columns])
+
+        return X
+
+
+class InteractionTransformer(BaseTransformer):
+    """Transformer that generates interaction features.
+    Transformer generates a new column  for all combinations from the selected columns up to the maximum degree
+    provided. (For sklearn version higher than 1.0.0>, only interaction of a degree higher or equal to the minimum
+    degree would be computed).
+    Each interaction column consists of the product of the specific combination of columns.
+    Ex: with 3 columns provided ["a","b","c"], if max degree is 3, the total possible combinations are :
+    - of degree 1 : ["a","b","c"]
+    - of degree 2 : ["a b","b c","a c"]
+    - of degree 3 : ["a b c"]
+
+        Parameters
+        ----------
+        columns : None or list or str
+            Columns to apply the transformer to. If a str is passed this is put into a list. Value passed
+            in columns is saved in the columns attribute on the object. Note this has no default value so
+            the user has to specify the columns when initialising the transformer. This is avoid likely
+            when the user forget to set columns, in this case all columns would be picked up when super
+            transform runs.
+        min_degree : int
+            minimum degree of interaction features to be considered. For example if min_degree=3, only interaction
+            columns from at least 3 columns would be generated. NB- only applies if sklearn version is 1.0.0>=
+        max_degree : int
+            maximum degree of interaction features to be considered. For example if max_degree=3, only interaction
+            columns from up to 3 columns would be generated.
+
+
+         Attributes
+        ----------
+        min_degree : int
+            minimum degree of interaction features to be considered
+        max_degree : int
+            maximum degree of interaction features to be considered
+        nb_features_to_interact : int
+            number of selected columns from which interactions should be computed. (=len(columns))
+        nb_combinations : int
+            number of new interaction features
+        interaction_colname : list
+            names of each new interaction feature. The name of an interaction feature is the combinations of previous
+            column names joined with a whitespace. Interaction feature of ["col1","col2","col3] would be "col1 col2 col3".
+        nb_feature_out : int
+            number of total columns of transformed dataset, including new interaction features
+
+    """
+
+    def __init__(self, columns, min_degree=2, max_degree=2, **kwargs):
+
+        super().__init__(columns=columns, **kwargs)
+
+        if len(columns) < 2:
+            raise ValueError(
+                f"number of columns must be equal or greater than 2, got {str(len(columns))} column."
+            )
+
+        if type(min_degree) is int:
+            if min_degree < 2:
+                raise ValueError(
+                    f"min_degree must be equal or greater than 2, got {str(min_degree)}"
+                )
+            else:
+                self.min_degree = min_degree
+        else:
+            raise TypeError(
+                f"unexpected type ({type(min_degree)}) for min_degree, must be int"
+            )
+        if type(max_degree) is int:
+            if min_degree > max_degree:
+                raise ValueError("max_degree must be equal or greater than min_degree")
+            else:
+                self.max_degree = max_degree
+            if max_degree > len(columns):
+                raise ValueError(
+                    "max_degree must be equal or lower than number of columns"
+                )
+            else:
+                self.max_degree = max_degree
+        else:
+            raise TypeError(
+                f"unexpected type ({type(max_degree)}) for max_degree, must be int"
+            )
+
+        self.nb_features_to_interact = len(self.columns)
+        self.nb_combinations = -1
+        self.interaction_colname = []
+        self.nb_feature_out = -1
+
+    def transform(self, X):
+        """Generate from input pandas DataFrame (X) new interaction features using the "product" pandas.DataFrame method
+         and add this column or columns in X.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data to transform.
+
+        Returns
+        -------
+        X : pd.DataFrame
+            Input X with additional column or columns (self.interaction_colname) added. These contain the output of
+            running the  product pandas DataFrame method on identified combinations.
+
+        """
+        X = super().transform(X)
+
+        try:
+            interaction_combination_index = PolynomialFeatures._combinations(
+                n_features=self.nb_features_to_interact,
+                min_degree=self.min_degree,
+                max_degree=self.max_degree,
+                interaction_only=True,
+                include_bias=False,
+            )
+        except TypeError as err:
+            if (
+                str(err)
+                == "_combinations() got an unexpected keyword argument 'min_degree'"
+            ):
+                interaction_combination_index = PolynomialFeatures._combinations(
+                    n_features=self.nb_features_to_interact,
+                    degree=self.max_degree,
+                    interaction_only=True,
+                    include_bias=False,
+                )
+            else:
+                raise err
+
+        interaction_combination_colname = [
+            [self.columns[col_idx] for col_idx in interaction_combination]
+            for interaction_combination in interaction_combination_index
+        ]
+        self.nb_combinations = len(interaction_combination_colname)
+        self.nb_feature_out = self.nb_combinations + len(X)
+
+        self.interaction_colname = [
+            " ".join(interaction_combination)
+            for interaction_combination in interaction_combination_colname
+        ]
+
+        for inter_idx in range(len(interaction_combination_colname)):
+            X[self.interaction_colname[inter_idx]] = X[
+                interaction_combination_colname[inter_idx]
+            ].product(axis=1, skipna=False)
 
         return X
