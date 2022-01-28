@@ -89,7 +89,8 @@ numeric module
 
     numeric.LogTransformer
     numeric.CutTransformer   
-    numeric.ScalingTransformer   
+    numeric.ScalingTransformer
+    numeric.InteractionTransformer
  
 strings module
 ------------------

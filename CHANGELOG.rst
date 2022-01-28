@@ -16,6 +16,14 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+0.3.2 (2022-01-13)
+------------------
+
+Added
+^^^^^
+- Added InteractionTransformer in ``tubular/numeric.py``, associated tests with ``tests/numeric/test_InteractionTransformer.py`` file and examples with ``examples/numeric/InteractionTransformer.ipynb`` file.`#38 <https://github.com/lvgig/tubular/pull/38>`_
+
+
 0.3.1 (2021-11-09)
 ------------------
 
