@@ -16,6 +16,14 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+
+0.X.0 (2022-11-17)
+------------------
+
+Changed
+^^^^^^^
+- Removed kwargs argument from ``BaseTransformer`` due to its parent classes not needing it.  This was generating that wrong arguments (typos or unrequired) were passed silently. For instance, in case of the wrong ``columns`` the default behaviour was to use all possible columns (depending on the actual transformer), which generated undesirable effects. `#43 <https://github.com/lvgig/tubular/pull/43>`_
+
 0.3.2 (2022-01-13)
 ------------------
 
