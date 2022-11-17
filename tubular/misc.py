@@ -14,16 +14,19 @@ class SetValueTransformer(BaseTransformer):
     value : various
         Value to set.
 
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+    copy : bool
+        True if X should be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
 
     """
 
-    def __init__(self, columns, value, **kwargs):
+    def __init__(self, columns, value, copy=True, verbose=False):
 
         self.value = value
 
-        super().__init__(columns=columns, **kwargs)
+        super().__init__(columns=columns, copy=copy, verbose=verbose)
 
     def transform(self, X):
         """Set columns to value.

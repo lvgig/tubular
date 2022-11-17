@@ -8,7 +8,7 @@ from tubular.base import BaseTransformer
 
 
 class SeriesStrMethodTransformer(BaseTransformer):
-    """Tranformer that applies a pandas.Series.str method.
+    """Transformer that applies a pandas.Series.str method.
 
     Transformer assigns the output of the method to a new column. It is possible to
     supply other key word arguments to the transform method, which will be passed to the
@@ -52,8 +52,11 @@ class SeriesStrMethodTransformer(BaseTransformer):
     """
 
     def __init__(
-        self, new_column_name, pd_method_name, columns, pd_method_kwargs={}, **kwargs
+        self, new_column_name, pd_method_name, columns, pd_method_kwargs=None,
+            copy=True, verbose=False
     ):
+        if pd_method_kwargs is None:
+            pd_method_kwargs = dict()
 
         if type(columns) is list:
 
@@ -63,7 +66,7 @@ class SeriesStrMethodTransformer(BaseTransformer):
                     f"columns arg should contain only 1 column name but got {len(columns)}"
                 )
 
-        super().__init__(columns=columns, **kwargs)
+        super().__init__(columns=columns, copy=copy, verbose=verbose)
 
         if type(new_column_name) is not str:
 

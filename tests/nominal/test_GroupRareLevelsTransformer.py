@@ -23,8 +23,10 @@ class TestInit(object):
                 "weight",
                 "rare_level_name",
                 "record_rare_levels",
+                "copy",
+                "verbose"
             ],
-            expected_default_values=(None, 0.01, None, "rare", True),
+            expected_default_values=(None, 0.01, None, "rare", True, True, False),
         )
 
     def test_class_methods(self):
@@ -203,7 +205,7 @@ class TestFit(object):
 
         df = d.create_df_6()
 
-        x = GroupRareLevelsTransformer(columns=["b"], cut_off_percent=0.3, weights="a")
+        x = GroupRareLevelsTransformer(columns=["b"], cut_off_percent=0.3, weight="a")
 
         x.fit(df)
 
@@ -218,7 +220,7 @@ class TestFit(object):
 
         df = d.create_df_6()
 
-        x = GroupRareLevelsTransformer(columns=["c"], cut_off_percent=0.2, weights="a")
+        x = GroupRareLevelsTransformer(columns=["c"], cut_off_percent=0.2, weight="a")
 
         x.fit(df)
 

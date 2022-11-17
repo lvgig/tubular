@@ -13,7 +13,7 @@ from tubular._version import __version__
 
 
 class BaseTransformer(TransformerMixin, BaseEstimator):
-    """Base tranformer class which all other transformers in the package inherit from.
+    """Base transformer class which all other transformers in the package inherit from.
 
     Provides fit and transform methods (required by sklearn transformers), simple input checking
     and functionality to copy X prior to transform.
@@ -25,22 +25,19 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         in columns is saved in the columns attribute on the object.
 
     copy : bool, default = True
-        Should X be copied before tansforms are applied?
+        Should X be copied before transforms are applied?
 
     verbose : bool, default = False
         Should statements be printed when methods are run?
 
-    **kwds
-        Arbitrary keyword arguments.
-
     Attributes
     ----------
     columns : list or None
-        Either a list of str values giving which columns in a input pandas.DataFrame the transformer
+        Either a list of str values giving which columns in an input pandas.DataFrame the transformer
         will be applied to - or None.
 
     copy : bool
-        Should X be copied before tansforms are applied?
+        Should X be copied before transforms are applied?
 
     verbose : bool
         Print statements to show which methods are being run or not.
@@ -50,7 +47,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
     """
 
-    def __init__(self, columns=None, copy=True, verbose=False, **kwargs):
+    def __init__(self, columns=None, copy=True, verbose=False):
 
         self.version_ = __version__
 
@@ -189,9 +186,11 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         return X_y
 
     def transform(self, X):
-        """Base transformer transform method; checks X type (pandas DataFrame only) and copies data if requested.
+        """Base transformer transform method; checks X type (pandas DataFrame only)
+        and copies data if requested.
 
-        Transform calls the columns_check method which will check columns in columns attribute are in X.
+        Transform calls the columns_check method which will check columns in
+        columns attribute are in X.
 
         Parameters
         ----------
@@ -229,7 +228,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         Parameters
         ----------
-        attributes : List
+        attribute : List
             List of str values giving names of attribute to check exist on self.
 
         """
@@ -315,7 +314,7 @@ class ReturnKeyDict(dict):
 
 
 class DataFrameMethodTransformer(BaseTransformer):
-    """Tranformer that applies a pandas.DataFrame method.
+    """Transformer that applies a pandas.DataFrame method.
 
     Transformer assigns the output of the method to a new column or columns. It is possible to
     supply other key word arguments to the transform method, which will be passed to the
@@ -348,8 +347,11 @@ class DataFrameMethodTransformer(BaseTransformer):
     drop_original : bool, default = False
         Should original columns be dropped?
 
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.__init__().
+    copy : bool
+        True if X should be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
 
     Attributes
     ----------
@@ -367,12 +369,16 @@ class DataFrameMethodTransformer(BaseTransformer):
         new_column_name,
         pd_method_name,
         columns,
-        pd_method_kwargs={},
+        pd_method_kwargs=None,
         drop_original=False,
-        **kwargs,
+        copy=True,
+        verbose=False,
     ):
 
-        super().__init__(columns=columns, **kwargs)
+        super().__init__(columns=columns, copy=copy, verbose=verbose)
+
+        if pd_method_kwargs is None:
+            pd_method_kwargs = dict()
 
         if type(new_column_name) is list:
 
@@ -435,10 +441,11 @@ class DataFrameMethodTransformer(BaseTransformer):
             ) from err
 
     def transform(self, X):
-        """Transform input pandas DataFrame (X) using the given pandas.DataFrame method and assign the output
-        back to column or columns in X.
+        """Transform input pandas DataFrame (X) using the given pandas.DataFrame
+        method and assign the output back to column or columns in X.
 
-        Any keyword arguments set in the pd_method_kwargs attribute are passed onto the pandas DataFrame method when calling it.
+        Any keyword arguments set in the pd_method_kwargs attribute are passed
+        onto the pandas DataFrame method when calling it.
 
         Parameters
         ----------
@@ -448,8 +455,8 @@ class DataFrameMethodTransformer(BaseTransformer):
         Returns
         -------
         X : pd.DataFrame
-            Input X with additional column or columns (self.new_column_name) added. These contain the output of
-            running the pandas DataFrame method.
+            Input X with additional column or columns (self.new_column_name) added.
+            These contain the output of running the pandas DataFrame method.
 
         """
 

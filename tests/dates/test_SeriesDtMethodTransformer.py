@@ -20,8 +20,10 @@ class TestInit(object):
                 "pd_method_name",
                 "column",
                 "pd_method_kwargs",
+                "copy",
+                "verbose"
             ],
-            expected_default_values=({},),
+            expected_default_values=(None, True, False),
         )
 
     def test_class_methods(self):

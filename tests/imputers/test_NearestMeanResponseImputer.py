@@ -16,14 +16,14 @@ class TestInit(object):
 
         ta.functions.test_function_arguments(
             func=NearestMeanResponseImputer.__init__,
-            expected_arguments=["self", "columns"],
-            expected_default_values=(None,),
+            expected_arguments=["self", "columns", "copy", "verbose"],
+            expected_default_values=(None, True, False),
         )
 
     def test_class_methods(self):
         """Test that NearestMeanResponseImputer has fit and transform methods."""
 
-        x = NearestMeanResponseImputer(response_column="c", columns=None)
+        x = NearestMeanResponseImputer(columns=None)
 
         ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
 

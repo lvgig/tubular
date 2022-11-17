@@ -23,8 +23,10 @@ class TestInit(object):
                 "column",
                 "new_column_name",
                 "to_datetime_kwargs",
+                "copy",
+                "verbose"
             ],
-            expected_default_values=({},),
+            expected_default_values=(None, True, False),
         )
 
     def test_class_methods(self):

@@ -89,8 +89,11 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         {'A': 0, 'B': 1, 'C': 3} etc.. or if start_encoding = 5 then the same encoding would be
         {'A': 5, 'B': 6, 'C': 7}. Can be positive or negative.
 
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+    copy : bool
+        True if X should be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
 
     Attributes
     ----------
@@ -107,9 +110,9 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
 
     """
 
-    def __init__(self, columns=None, start_encoding=0, **kwargs):
+    def __init__(self, columns=None, start_encoding=0, copy=True, verbose=False):
 
-        BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
+        BaseNominalTransformer.__init__(self, columns=columns, copy=copy, verbose=verbose)
 
         if not isinstance(start_encoding, int):
 
@@ -216,7 +219,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
     """Transformer to group together rare levels of nominal variables into a new level,
     labelled 'rare' (by default).
 
-    Rare levels are defined by a cut off percentage, which can either be based on the
+    Rare levels are defined by a cut-off percentage, which can either be based on the
     number of rows or sum of weights. Any levels below this cut off value will be
     grouped into the rare level.
 
@@ -244,8 +247,11 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         Care should be taken if working with nominal variables with many levels as this could potentially
         result in many being stored in this attribute.
 
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+    copy : bool
+        True if should X be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
 
     Attributes
     ----------
@@ -283,10 +289,11 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         weight=None,
         rare_level_name="rare",
         record_rare_levels=True,
-        **kwargs,
+        copy=True,
+        verbose=False,
     ):
 
-        super().__init__(columns=columns, **kwargs)
+        super().__init__(columns=columns, copy=copy, verbose=verbose)
 
         if not isinstance(cut_off_percent, float):
 
@@ -478,8 +485,11 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
     weights_column : str or None
         Weights column to use when calculating the mean response.
 
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+    copy : bool
+        True if X should be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
 
     Attributes
     ----------
@@ -492,7 +502,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
     """
 
-    def __init__(self, columns=None, weights_column=None, **kwargs):
+    def __init__(self, columns=None, weights_column=None, copy=True, verbose=False):
 
         if weights_column is not None:
 
@@ -502,7 +512,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         self.weights_column = weights_column
 
-        BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
+        BaseNominalTransformer.__init__(self, columns=columns, copy=copy, verbose=verbose)
 
     def fit(self, X, y):
         """Identify mapping of categorical levels to mean response values.
@@ -602,8 +612,11 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
     weights_column : str or None
         Weights column to use when calculating the mean response.
 
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+    copy : bool
+        True if should X be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
 
     Attributes
     ----------
@@ -616,7 +629,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
 
     """
 
-    def __init__(self, columns=None, weights_column=None, **kwargs):
+    def __init__(self, columns=None, weights_column=None, copy=True, verbose=False):
 
         if weights_column is not None:
 
@@ -626,7 +639,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
 
         self.weights_column = weights_column
 
-        BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
+        BaseNominalTransformer.__init__(self, columns=columns, copy=copy, verbose=verbose)
 
     def fit(self, X, y):
         """Identify mapping of categorical levels to rank-ordered integer values by target-mean in ascending order.
@@ -760,7 +773,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         Should warnings/checkmarks get displayed?
 
     **kwargs
-        Arbitrary keyword arguments passed onto sklearn OneHotEncoder.init method.
+        Keyword arguments to be passed to sklearn OneHotEncoder.init method.
 
     Attributes
     ----------
@@ -789,7 +802,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         # Set attributes for scikit-learn'S OneHotEncoder
         OneHotEncoder.__init__(self, sparse=False, handle_unknown="ignore", **kwargs)
 
-        # Set other class attrributes
+        # Set other class attributes
         self.separator = separator
         self.drop_original = drop_original
 

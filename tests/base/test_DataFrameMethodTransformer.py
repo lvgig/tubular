@@ -23,8 +23,10 @@ class TestInit(object):
                 "columns",
                 "pd_method_kwargs",
                 "drop_original",
+                "copy",
+                "verbose"
             ],
-            expected_default_values=({}, False),
+            expected_default_values=(None, False, True, False),
         )
 
     def test_class_methods(self):

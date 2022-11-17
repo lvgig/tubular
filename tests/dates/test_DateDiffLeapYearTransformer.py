@@ -86,8 +86,10 @@ class TestInit(object):
                 "new_column_name",
                 "drop_cols",
                 "missing_replacement",
+                "copy",
+                "verbose"
             ],
-            expected_default_values=(None,),
+            expected_default_values=(None, True, False),
         )
 
     def test_class_methods(self):

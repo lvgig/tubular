@@ -20,8 +20,11 @@ class BaseMappingTransformer(BaseTransformer):
         example the following dict {'a': {1: 2, 3: 4}, 'b': {'a': 1, 'b': 2}} would specify
         a mapping for column a of 1->2, 3->4 and a mapping for column b of 'a'->1, b->2.
 
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+    copy : bool
+        True if X should be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
 
     Attributes
     ----------
@@ -31,7 +34,7 @@ class BaseMappingTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, mappings, **kwargs):
+    def __init__(self, mappings, copy=True, verbose=False):
 
         if isinstance(mappings, dict):
 
@@ -55,7 +58,7 @@ class BaseMappingTransformer(BaseTransformer):
 
         columns = list(mappings.keys())
 
-        super().__init__(columns=columns, **kwargs)
+        super().__init__(columns=columns, copy=copy, verbose=verbose)
 
     def transform(self, X):
         """Base mapping transformer transform method.  Checks that the mappings

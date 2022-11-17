@@ -15,8 +15,8 @@ class TestInit(object):
 
         ta.functions.test_function_arguments(
             func=NominalToIntegerTransformer.__init__,
-            expected_arguments=["self", "columns", "start_encoding"],
-            expected_default_values=(None, 0),
+            expected_arguments=["self", "columns", "start_encoding", "copy", "verbose"],
+            expected_default_values=(None, 0, True, False),
         )
 
     def test_class_methods(self):

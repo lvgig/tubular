@@ -19,7 +19,7 @@ class TestInit(object):
         """List of transformers in tubular to be used in subsequent tests."""
 
         list_of_transformers = [
-            base.BaseTransformer(columns=["a"]),
+            base.BaseTransformer(columns=["a"], copy=True, verbose=False),
             base.DataFrameMethodTransformer(
                 new_column_name="a", pd_method_name="sum", columns="b"
             ),
@@ -41,15 +41,15 @@ class TestInit(object):
                 column_between="c",
                 new_column_name="c",
             ),
-            imputers.BaseImputer(),
+            imputers.BaseImputer(columns=None, copy=True, verbose=False),
             imputers.ArbitraryImputer(impute_value=1, columns="a"),
             imputers.MedianImputer(columns="a"),
             imputers.MeanImputer(columns="a"),
             imputers.ModeImputer(columns="a"),
-            imputers.NearestMeanResponseImputer(response_column="a"),
+            imputers.NearestMeanResponseImputer(columns="a"),
             imputers.NullIndicator(columns="a"),
             mapping.BaseMappingTransformer(mappings={"a": {1: 2, 3: 4}}),
-            mapping.BaseMappingTransformMixin(),
+            mapping.BaseMappingTransformMixin(columns=None, copy=True, verbose=False),
             mapping.MappingTransformer(mappings={"a": {1: 2, 3: 4}}),
             mapping.CrossColumnMappingTransformer(
                 adjust_column="b", mappings={"a": {1: 2, 3: 4}}
@@ -61,11 +61,11 @@ class TestInit(object):
                 adjust_column="b", mappings={"a": {1: 2, 3: 4}}
             ),
             misc.SetValueTransformer(columns="a", value=1),
-            nominal.BaseNominalTransformer(),
+            nominal.BaseNominalTransformer(columns=None, copy=True, verbose=False),
             nominal.NominalToIntegerTransformer(columns="a"),
             nominal.GroupRareLevelsTransformer(columns="a"),
-            nominal.MeanResponseTransformer(columns="a", response_column="b"),
-            nominal.OrdinalEncoderTransformer(columns="a", response_column="b"),
+            nominal.MeanResponseTransformer(columns="a"),
+            nominal.OrdinalEncoderTransformer(columns="a"),
             nominal.OneHotEncodingTransformer(columns="a"),
             numeric.LogTransformer(columns="a"),
             numeric.CutTransformer(column="a", new_column_name="b"),

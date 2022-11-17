@@ -53,8 +53,11 @@ class ArbitraryImputer(BaseImputer):
         Columns to impute, if the default of None is supplied all columns in X are used
         when the transform method is called.
 
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+    copy : bool
+        True if X should be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
 
     Attributes
     ----------
@@ -63,13 +66,13 @@ class ArbitraryImputer(BaseImputer):
 
     """
 
-    def __init__(self, impute_value, columns, **kwargs):
+    def __init__(self, impute_value, columns, copy=True, verbose=False):
 
         if columns is None:
 
             raise ValueError("columns must be specified in init for ArbitraryImputer")
 
-        super().__init__(columns=columns, **kwargs)
+        super().__init__(columns=columns, copy=copy, verbose=verbose)
 
         if (
             not isinstance(impute_value, int)
@@ -129,8 +132,11 @@ class MedianImputer(BaseImputer):
         Columns to impute, if the default of None is supplied all columns in X are used
         when the transform method is called.
 
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+    copy : bool
+        True if X should be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
 
     Attributes
     ----------
@@ -140,9 +146,9 @@ class MedianImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns=None, **kwargs):
+    def __init__(self, columns=None, copy=True, verbose=False):
 
-        super().__init__(columns=columns, **kwargs)
+        super().__init__(columns=columns, copy=copy, verbose=verbose)
 
     def fit(self, X, y=None):
         """Calculate median values to impute with from X.
@@ -177,8 +183,11 @@ class MeanImputer(BaseImputer):
         Columns to impute, if the default of None is supplied all columns in X are used
         when the transform method is called.
 
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+    copy : bool
+        True if X should be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
 
     Attributes
     ----------
@@ -188,9 +197,9 @@ class MeanImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns=None, **kwargs):
+    def __init__(self, columns=None, copy=True, verbose=False):
 
-        super().__init__(columns=columns, **kwargs)
+        super().__init__(columns=columns, copy=copy, verbose=verbose)
 
     def fit(self, X, y=None):
         """Calculate mean values to impute with from X.
@@ -225,8 +234,11 @@ class ModeImputer(BaseImputer):
         Columns to impute, if the default of None is supplied all columns in X are used
         when the transform method is called.
 
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+    copy : bool
+        True if X should be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
 
     Attributes
     ----------
@@ -236,9 +248,9 @@ class ModeImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns=None, **kwargs):
+    def __init__(self, columns=None, copy=True, verbose=False):
 
-        super().__init__(columns=columns, **kwargs)
+        super().__init__(columns=columns, copy=copy, verbose=verbose)
 
     def fit(self, X, y=None):
         """Calculate mode values to impute with from X.
@@ -276,9 +288,9 @@ class NearestMeanResponseImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns=None, **kwds):
+    def __init__(self, columns=None, copy=True, verbose=False):
 
-        super().__init__(columns=columns, **kwds)
+        super().__init__(columns=columns, copy=copy, verbose=verbose)
 
     def fit(self, X, y):
         """Calculate mean values to impute with.
@@ -349,11 +361,17 @@ class NullIndicator(BaseTransformer):
         Columns to produce indicator columns for, if the default of None is supplied all columns in X are used
         when the transform method is called.
 
+    copy : bool
+        True if X should be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
+
     """
 
-    def __init__(self, columns=None, **kwds):
+    def __init__(self, columns=None, copy=True, verbose=False):
 
-        super().__init__(columns=columns, **kwds)
+        super().__init__(columns=columns, copy=copy, verbose=verbose)
 
     def transform(self, X):
         """Create new columns indicating the position of null values for each variable in self.columns.

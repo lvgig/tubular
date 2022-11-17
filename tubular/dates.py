@@ -31,8 +31,11 @@ class DateDiffLeapYearTransformer(BaseTransformer):
         Value to output if either the lower date value or the upper date value are
         missing. Default value is None.
 
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+    copy : bool
+        True if X should be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
 
     Attributes
     ----------
@@ -62,7 +65,8 @@ class DateDiffLeapYearTransformer(BaseTransformer):
         new_column_name,
         drop_cols,
         missing_replacement=None,
-        **kwargs,
+        copy=True,
+        verbose=False,
     ):
 
         if not isinstance(column_lower, str):
@@ -83,7 +87,7 @@ class DateDiffLeapYearTransformer(BaseTransformer):
                     "if not None, missing_replacement should be an int, float or string"
                 )
 
-        super().__init__(columns=[column_lower, column_upper], **kwargs)
+        super().__init__(columns=[column_lower, column_upper], copy=copy, verbose=verbose)
 
         self.new_column_name = new_column_name
         self.drop_cols = drop_cols
@@ -289,12 +293,18 @@ class ToDatetimeTransformer(BaseTransformer):
     to_datetime_kwargs : dict, default = {}
         A dictionary of keyword arguments to be passed to the pd.to_datetime method when it is called in transform.
 
-    **kwargs
-        Arbitrary keyword arguments passed onto pd.to_datetime().
+    copy : bool
+        True if X should be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
 
     """
 
-    def __init__(self, column, new_column_name, to_datetime_kwargs={}, **kwargs):
+    def __init__(self, column, new_column_name, to_datetime_kwargs=None, copy=True, verbose=False):
+
+        if to_datetime_kwargs is None:
+            to_datetime_kwargs = dict()
 
         if not type(column) is str:
 
@@ -329,7 +339,7 @@ class ToDatetimeTransformer(BaseTransformer):
         # Here only as a fix to allow string representation of transformer.
         self.column = column
 
-        super().__init__(columns=[column], **kwargs)
+        super().__init__(columns=[column], copy=copy, verbose=verbose)
 
     def transform(self, X):
         """Convert specified column to datetime using pd.to_datetime.
@@ -351,7 +361,7 @@ class ToDatetimeTransformer(BaseTransformer):
 
 
 class SeriesDtMethodTransformer(BaseTransformer):
-    """Tranformer that applies a pandas.Series.dt method.
+    """Transformer that applies a pandas.Series.dt method.
 
     Transformer assigns the output of the method to a new column. It is possible to
     supply other key word arguments to the transform method, which will be passed to the
@@ -402,17 +412,26 @@ class SeriesDtMethodTransformer(BaseTransformer):
     pd_method_kwargs : dict
         Dictionary of keyword arguments to call the pd.Series.dt method with.
 
+    copy : bool
+        True if X should be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
+
     """
 
     def __init__(
-        self, new_column_name, pd_method_name, column, pd_method_kwargs={}, **kwargs
+        self, new_column_name, pd_method_name, column, pd_method_kwargs=None, copy=True, verbose=False
     ):
+
+        if pd_method_kwargs is None:
+            pd_method_kwargs = dict()
 
         if type(column) is not str:
 
             raise TypeError(f"column should be a str but got {type(column)}")
 
-        super().__init__(columns=column, **kwargs)
+        super().__init__(columns=column, copy=copy, verbose=verbose)
 
         if type(new_column_name) is not str:
 
@@ -526,16 +545,19 @@ class BetweenDatesTransformer(BaseTransformer):
     new_column_name : str
         Name for new column to be added to X.
 
-    lower_inclusive : bool, defualt = True
+    lower_inclusive : bool, default = True
         If lower_inclusive is True the comparison to column_lower will be column_lower <=
         column_between, otherwise the comparison will be column_lower < column_between.
 
-    upper_inclusive : bool, defualt = True
+    upper_inclusive : bool, default = True
         If upper_inclusive is True the comparison to column_upper will be column_between <=
         column_upper, otherwise the comparison will be column_between < column_upper.
 
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.__init__().
+    copy : bool
+        True if X should be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
 
     Attributes
     ----------
@@ -574,7 +596,8 @@ class BetweenDatesTransformer(BaseTransformer):
         new_column_name,
         lower_inclusive=True,
         upper_inclusive=True,
-        **kwargs,
+        copy=True,
+        verbose=False
     ):
 
         if type(column_lower) is not str:
@@ -599,7 +622,8 @@ class BetweenDatesTransformer(BaseTransformer):
         self.lower_inclusive = lower_inclusive
         self.upper_inclusive = upper_inclusive
 
-        super().__init__(columns=[column_lower, column_between, column_upper], **kwargs)
+        super().__init__(columns=[column_lower, column_between, column_upper],
+                         copy=copy, verbose=verbose)
 
         # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.

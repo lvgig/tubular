@@ -17,8 +17,9 @@ class TestInit(object):
 
         ta.functions.test_function_arguments(
             func=LogTransformer.__init__,
-            expected_arguments=["self", "columns", "base", "add_1", "drop", "suffix"],
-            expected_default_values=(None, False, True, "log"),
+            expected_arguments=["self", "columns", "base", "add_1", "drop", "suffix",
+                                "copy", "verbose"],
+            expected_default_values=(None, False, True, "log", True, False),
         )
 
     def test_base_type_error(self):
@@ -32,7 +33,6 @@ class TestInit(object):
             LogTransformer(
                 columns=["a"],
                 base="a",
-                new_column_name="b",
             )
 
     def test_base_not_strictly_positive_error(self):
@@ -46,7 +46,6 @@ class TestInit(object):
             LogTransformer(
                 columns=["a"],
                 base=0,
-                new_column_name="b",
             )
 
     def test_class_methods(self):

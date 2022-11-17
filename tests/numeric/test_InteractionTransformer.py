@@ -22,8 +22,10 @@ class TestInit(object):
                 "columns",
                 "min_degree",
                 "max_degree",
+                "copy",
+                "verbose"
             ],
-            expected_default_values=(2, 2),
+            expected_default_values=(2, 2, True, False),
         )
 
     def test_class_methods(self):

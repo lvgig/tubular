@@ -25,8 +25,10 @@ class TestInit(object):
                 "new_column_name",
                 "lower_inclusive",
                 "upper_inclusive",
+                "copy",
+                "verbose"
             ],
-            expected_default_values=(True, True),
+            expected_default_values=(True, True, True, False),
         )
 
     def test_inheritance(self):

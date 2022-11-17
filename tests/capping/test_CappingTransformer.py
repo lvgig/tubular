@@ -21,8 +21,10 @@ class TestInit(object):
                 "capping_values",
                 "quantiles",
                 "weights_column",
+                "copy",
+                "verbose"
             ],
-            expected_default_values=(None, None, None),
+            expected_default_values=(None, None, None, True, False),
         )
 
     @pytest.mark.parametrize(
@@ -193,6 +195,8 @@ class TestInit(object):
                 "weights_column": None,
                 "capping_values": {},
                 "_replacement_values": {},
+                "copy": True,
+                "verbose": False
             },
             msg="quantiles attribute for CappingTransformer set in init",
         )
@@ -353,7 +357,8 @@ class TestFit(object):
         df = d.create_df_9()
 
         x = CappingTransformer(
-            quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
+            quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c",
+            copy=True, verbose=False
         )
 
         expected_call_args = {0: {"args": (d.create_df_9(), None), "kwargs": {}}}
@@ -370,7 +375,8 @@ class TestFit(object):
         df = d.create_df_9()
 
         x = CappingTransformer(
-            quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
+            quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c",
+            copy=True, verbose=False
         )
 
         expected_call_args = {
@@ -406,7 +412,8 @@ class TestFit(object):
 
         df = d.create_df_9()
 
-        x = CappingTransformer(quantiles={"a": [0.1, 1], "b": [0.5, None]})
+        x = CappingTransformer(quantiles={"a": [0.1, 1], "b": [0.5, None]},
+                               copy=True, verbose=False)
 
         expected_call_args = {
             0: {
@@ -435,7 +442,8 @@ class TestFit(object):
         df = d.create_df_9()
 
         x = CappingTransformer(
-            quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column=weights_column
+            quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column=weights_column,
+            copy=True, verbose=False
         )
 
         mocked_return_values = [["aaaa", "bbbb"], [1234, None]]
@@ -470,7 +478,8 @@ class TestFit(object):
         df = d.create_df_9()
 
         x = CappingTransformer(
-            quantiles={"a": quantiles}, weights_column=weights_column
+            quantiles={"a": quantiles}, weights_column=weights_column,
+            copy=True, verbose=False
         )
 
         try:

@@ -14,8 +14,8 @@ class TestInit(object):
 
         ta.functions.test_function_arguments(
             func=ArbitraryImputer.__init__,
-            expected_arguments=["self", "impute_value", "columns"],
-            expected_default_values=None,
+            expected_arguments=["self", "impute_value", "columns", "copy", "verbose"],
+            expected_default_values=(True, False),
         )
 
     def test_class_methods(self):

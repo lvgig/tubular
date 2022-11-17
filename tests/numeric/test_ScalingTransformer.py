@@ -16,8 +16,9 @@ class TestInit(object):
 
         ta.functions.test_function_arguments(
             func=ScalingTransformer.__init__,
-            expected_arguments=["self", "columns", "scaler_type", "scaler_kwargs"],
-            expected_default_values=({},),
+            expected_arguments=["self", "columns", "scaler_type", "scaler_kwargs",
+                                "copy", "verbose"],
+            expected_default_values=(None, True, False),
         )
 
     def test_inheritance(self):

@@ -16,8 +16,8 @@ class TestInit(object):
 
         ta.functions.test_function_arguments(
             func=MedianImputer.__init__,
-            expected_arguments=["self", "columns"],
-            expected_default_values=(None,),
+            expected_arguments=["self", "columns", "copy", "verbose"],
+            expected_default_values=(None, True, False),
         )
 
     def test_class_methods(self):

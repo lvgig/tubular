@@ -57,10 +57,11 @@ class LogTransformer(BaseTransformer):
     """
 
     def __init__(
-        self, columns, base=None, add_1=False, drop=True, suffix="log", **kwargs
+        self, columns, base=None, add_1=False, drop=True, suffix="log",
+            copy=True, verbose=False
     ):
 
-        super().__init__(columns=columns, **kwargs)
+        super().__init__(columns=columns, copy=copy, verbose=verbose)
 
         if base is not None:
             if not isinstance(base, (int, float)):
@@ -166,12 +167,18 @@ class CutTransformer(BaseTransformer):
     cut_kwargs : dict, default = {}
         A dictionary of keyword arguments to be passed to the pd.cut method when it is called in transform.
 
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init().
+    copy : bool
+        True if X should be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
 
     """
 
-    def __init__(self, column, new_column_name, cut_kwargs={}, **kwargs):
+    def __init__(self, column, new_column_name, cut_kwargs=None, copy=True, verbose=False):
+
+        if cut_kwargs is None:
+            cut_kwargs = dict()
 
         if not type(column) is str:
 
@@ -206,7 +213,7 @@ class CutTransformer(BaseTransformer):
         # Here only as a fix to allow string representation of transformer.
         self.column = column
 
-        super().__init__(columns=[column], **kwargs)
+        super().__init__(columns=[column], copy=copy, verbose=verbose)
 
     def transform(self, X):
         """Discretise specified column using pd.cut.
@@ -249,12 +256,18 @@ class ScalingTransformer(BaseTransformer):
     scaler_kwargs : dict, default = {}
         A dictionary of keyword arguments to be passed to the scaler object when it is initialised.
 
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init().
+    copy : bool
+        True if X should be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
 
     """
 
-    def __init__(self, columns, scaler_type, scaler_kwargs={}, **kwargs):
+    def __init__(self, columns, scaler_type, scaler_kwargs=None, copy=True, verbose=False):
+
+        if scaler_kwargs is None:
+            scaler_kwargs = dict()
 
         if not type(scaler_kwargs) is dict:
 
@@ -295,7 +308,7 @@ class ScalingTransformer(BaseTransformer):
         self.scaler_kwargs = scaler_kwargs
         self.scaler_type = scaler_type
 
-        super().__init__(columns=columns, **kwargs)
+        super().__init__(columns=columns, copy=copy, verbose=verbose)
 
     def check_numeric_columns(self, X):
         """Method to check all columns (specicifed in self.columns) in X are all numeric.
@@ -393,6 +406,12 @@ class InteractionTransformer(BaseTransformer):
         max_degree : int
             maximum degree of interaction features to be considered. For example if max_degree=3, only interaction
             columns from up to 3 columns would be generated.
+        copy : bool
+            True if X should be copied before transforms are applied, False otherwise
+
+        verbose : bool
+            True to print statements to show which methods are being run or not.
+
 
 
          Attributes
@@ -413,9 +432,9 @@ class InteractionTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, columns, min_degree=2, max_degree=2, **kwargs):
+    def __init__(self, columns, min_degree=2, max_degree=2, copy=True, verbose=False):
 
-        super().__init__(columns=columns, **kwargs)
+        super().__init__(columns=columns, copy=copy, verbose=verbose)
 
         if len(columns) < 2:
             raise ValueError(

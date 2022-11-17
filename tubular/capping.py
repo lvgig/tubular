@@ -5,7 +5,7 @@ This module contains a transformer that applies capping to numeric columns.
 import pandas as pd
 import numpy as np
 import warnings
-import copy
+from copy import deepcopy
 
 from tubular.base import BaseTransformer
 
@@ -40,8 +40,11 @@ class CappingTransformer(BaseTransformer):
         Optional weights column argument that can be used in combination with quantiles. Not used
         if capping_values is supplied. Allows weighted quantiles to be calculated.
 
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+    copy : bool
+        True if X should be copied before transforms are applied, False otherwise
+
+    verbose : bool
+        True to print statements to show which methods are being run or not.
 
     Attributes
     ----------
@@ -61,7 +64,7 @@ class CappingTransformer(BaseTransformer):
     """
 
     def __init__(
-        self, capping_values=None, quantiles=None, weights_column=None, **kwargs
+        self, capping_values=None, quantiles=None, weights_column=None, copy=True, verbose=False
     ):
 
         if capping_values is None and quantiles is None:
@@ -83,7 +86,7 @@ class CappingTransformer(BaseTransformer):
 
             self.capping_values = capping_values
 
-            super().__init__(columns=list(capping_values.keys()), **kwargs)
+            super().__init__(columns=list(capping_values.keys()), copy=copy, verbose=verbose)
 
         if quantiles is not None:
 
@@ -103,11 +106,11 @@ class CappingTransformer(BaseTransformer):
 
             self.capping_values = {}
 
-            super().__init__(columns=list(quantiles.keys()), **kwargs)
+            super().__init__(columns=list(quantiles.keys()), copy=copy, verbose=verbose)
 
         self.quantiles = quantiles
         self.weights_column = weights_column
-        self._replacement_values = copy.deepcopy(self.capping_values)
+        self._replacement_values = deepcopy(self.capping_values)
 
     def check_capping_values_dict(self, capping_values_dict, dict_name):
         """Performs checks on a dictionary passed to ."""
@@ -205,7 +208,7 @@ class CappingTransformer(BaseTransformer):
 
             warnings.warn("quantiles not set so no fitting done in CappingTransformer")
 
-        self._replacement_values = copy.deepcopy(self.capping_values)
+        self._replacement_values = deepcopy(self.capping_values)
 
         return self
 

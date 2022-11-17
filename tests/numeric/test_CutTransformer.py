@@ -17,8 +17,8 @@ class TestInit(object):
 
         ta.functions.test_function_arguments(
             func=CutTransformer.__init__,
-            expected_arguments=["self", "column", "new_column_name", "cut_kwargs"],
-            expected_default_values=({},),
+            expected_arguments=["self", "column", "new_column_name", "cut_kwargs", "copy", "verbose"],
+            expected_default_values=(None, True, False),
         )
 
     def test_class_methods(self):

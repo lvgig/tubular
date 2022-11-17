@@ -14,8 +14,8 @@ class TestInit:
 
         ta.functions.test_function_arguments(
             func=SetValueTransformer.__init__,
-            expected_arguments=["self", "columns", "value"],
-            expected_default_values=None,
+            expected_arguments=["self", "columns", "value", "copy", "verbose"],
+            expected_default_values=(True, False),
         )
 
     def test_inheritance(self):
