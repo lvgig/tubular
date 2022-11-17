@@ -112,7 +112,9 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
 
     def __init__(self, columns=None, start_encoding=0, copy=True, verbose=False):
 
-        BaseNominalTransformer.__init__(self, columns=columns, copy=copy, verbose=verbose)
+        BaseNominalTransformer.__init__(
+            self, columns=columns, copy=copy, verbose=verbose
+        )
 
         if not isinstance(start_encoding, int):
 
@@ -512,7 +514,9 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         self.weights_column = weights_column
 
-        BaseNominalTransformer.__init__(self, columns=columns, copy=copy, verbose=verbose)
+        BaseNominalTransformer.__init__(
+            self, columns=columns, copy=copy, verbose=verbose
+        )
 
     def fit(self, X, y):
         """Identify mapping of categorical levels to mean response values.
@@ -639,7 +643,9 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
 
         self.weights_column = weights_column
 
-        BaseNominalTransformer.__init__(self, columns=columns, copy=copy, verbose=verbose)
+        BaseNominalTransformer.__init__(
+            self, columns=columns, copy=copy, verbose=verbose
+        )
 
     def fit(self, X, y):
         """Identify mapping of categorical levels to rank-ordered integer values by target-mean in ascending order.

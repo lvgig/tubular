@@ -64,7 +64,12 @@ class CappingTransformer(BaseTransformer):
     """
 
     def __init__(
-        self, capping_values=None, quantiles=None, weights_column=None, copy=True, verbose=False
+        self,
+        capping_values=None,
+        quantiles=None,
+        weights_column=None,
+        copy=True,
+        verbose=False,
     ):
 
         if capping_values is None and quantiles is None:
@@ -86,7 +91,9 @@ class CappingTransformer(BaseTransformer):
 
             self.capping_values = capping_values
 
-            super().__init__(columns=list(capping_values.keys()), copy=copy, verbose=verbose)
+            super().__init__(
+                columns=list(capping_values.keys()), copy=copy, verbose=verbose
+            )
 
         if quantiles is not None:
 

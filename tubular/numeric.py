@@ -57,8 +57,14 @@ class LogTransformer(BaseTransformer):
     """
 
     def __init__(
-        self, columns, base=None, add_1=False, drop=True, suffix="log",
-            copy=True, verbose=False
+        self,
+        columns,
+        base=None,
+        add_1=False,
+        drop=True,
+        suffix="log",
+        copy=True,
+        verbose=False,
     ):
 
         super().__init__(columns=columns, copy=copy, verbose=verbose)
@@ -175,7 +181,9 @@ class CutTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, column, new_column_name, cut_kwargs=None, copy=True, verbose=False):
+    def __init__(
+        self, column, new_column_name, cut_kwargs=None, copy=True, verbose=False
+    ):
 
         if cut_kwargs is None:
             cut_kwargs = dict()
@@ -264,7 +272,9 @@ class ScalingTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, columns, scaler_type, scaler_kwargs=None, copy=True, verbose=False):
+    def __init__(
+        self, columns, scaler_type, scaler_kwargs=None, copy=True, verbose=False
+    ):
 
         if scaler_kwargs is None:
             scaler_kwargs = dict()

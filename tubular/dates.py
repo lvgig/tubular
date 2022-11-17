@@ -87,7 +87,9 @@ class DateDiffLeapYearTransformer(BaseTransformer):
                     "if not None, missing_replacement should be an int, float or string"
                 )
 
-        super().__init__(columns=[column_lower, column_upper], copy=copy, verbose=verbose)
+        super().__init__(
+            columns=[column_lower, column_upper], copy=copy, verbose=verbose
+        )
 
         self.new_column_name = new_column_name
         self.drop_cols = drop_cols
@@ -301,7 +303,9 @@ class ToDatetimeTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, column, new_column_name, to_datetime_kwargs=None, copy=True, verbose=False):
+    def __init__(
+        self, column, new_column_name, to_datetime_kwargs=None, copy=True, verbose=False
+    ):
 
         if to_datetime_kwargs is None:
             to_datetime_kwargs = dict()
@@ -421,7 +425,13 @@ class SeriesDtMethodTransformer(BaseTransformer):
     """
 
     def __init__(
-        self, new_column_name, pd_method_name, column, pd_method_kwargs=None, copy=True, verbose=False
+        self,
+        new_column_name,
+        pd_method_name,
+        column,
+        pd_method_kwargs=None,
+        copy=True,
+        verbose=False,
     ):
 
         if pd_method_kwargs is None:
@@ -597,7 +607,7 @@ class BetweenDatesTransformer(BaseTransformer):
         lower_inclusive=True,
         upper_inclusive=True,
         copy=True,
-        verbose=False
+        verbose=False,
     ):
 
         if type(column_lower) is not str:
@@ -622,8 +632,11 @@ class BetweenDatesTransformer(BaseTransformer):
         self.lower_inclusive = lower_inclusive
         self.upper_inclusive = upper_inclusive
 
-        super().__init__(columns=[column_lower, column_between, column_upper],
-                         copy=copy, verbose=verbose)
+        super().__init__(
+            columns=[column_lower, column_between, column_upper],
+            copy=copy,
+            verbose=verbose,
+        )
 
         # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.

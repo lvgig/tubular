@@ -52,8 +52,13 @@ class SeriesStrMethodTransformer(BaseTransformer):
     """
 
     def __init__(
-        self, new_column_name, pd_method_name, columns, pd_method_kwargs=None,
-            copy=True, verbose=False
+        self,
+        new_column_name,
+        pd_method_name,
+        columns,
+        pd_method_kwargs=None,
+        copy=True,
+        verbose=False,
     ):
         if pd_method_kwargs is None:
             pd_method_kwargs = dict()
