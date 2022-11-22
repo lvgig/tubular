@@ -15,6 +15,11 @@ Subsections for each version can be one of the following;
 - ``Security`` in case of vulnerabilities.
 
 Each individual change should have a link to the pull request after the description of the change.
+0.3.3 (Unreleased)
+
+Fixed
+- updated black version to 22.3.0 and flake8 version to 5.0.4 to fix compatibility issues `#45 <https://github.com/lvgig/tubular/pull/45>`_
+
 
 0.3.2 (2022-01-13)
 ------------------
