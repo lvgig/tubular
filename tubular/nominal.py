@@ -478,6 +478,10 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
     weights_column : str or None
         Weights column to use when calculating the mean response.
 
+    prior : int, default = 0
+        Regularisation parameter, can be thought of roughly as the size a category should be in order for
+        its statistics to be considered reliable (hence default value of 0 means no regularisation).
+
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
 
@@ -492,7 +496,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
     """
 
-    def __init__(self, columns=None, weights_column=None, **kwargs):
+    def __init__(self, columns=None, weights_column=None, prior=0, **kwargs):
 
         if weights_column is not None:
 
@@ -500,9 +504,44 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
                 raise TypeError("weights_column should be a str")
 
+        if type(prior) is not int:
+
+            raise TypeError("prior should be a int")
+
+        if not prior >= 0:
+            raise ValueError("prior should be positive int")
+
         self.weights_column = weights_column
+        self.prior = prior
+        # TODO: set default prior to None and refactor to only use prior regularisation when it is set?
 
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
+
+    def _prior_regularisation(self, target_means, cat_freq):
+        """Regularise encoding values by pushing encodings of infrequent categories towards the global mean.  If prior is zero this will return target means unnchanged.
+
+        Parameters
+        ----------
+        target_means : pd.Series
+            Series containing group means for levels of column in data
+
+        cat_freq : str
+            Series containing group sizes for levels of column in data
+
+        Returns
+        -------
+        regularised : pd.Series
+            Series of regularised encoding values
+        """
+
+        self.check_is_fitted(["global_mean"])
+
+        regularised = (
+            target_means.multiply(cat_freq, axis="index")
+            + self.global_mean * self.prior
+        ).divide(cat_freq + self.prior, axis="index")
+
+        return regularised
 
     def fit(self, X, y):
         """Identify mapping of categorical levels to mean response values.
@@ -540,20 +579,44 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         X_y = self._combine_X_y(X, y)
         response_column = "_temporary_response"
 
+        if self.weights_column is None:
+
+            self.global_mean = X_y[response_column].mean()
+
+        else:
+
+            X_y["weighted_response"] = X_y[response_column].multiply(
+                X_y[self.weights_column]
+            )
+
+            self.global_mean = (
+                X_y["weighted_response"].sum() / X_y[self.weights_column].sum()
+            )
+
         for c in self.columns:
 
             if self.weights_column is None:
 
-                self.mappings[c] = X_y.groupby([c])[response_column].mean().to_dict()
+                group_means = X_y.groupby(c)[response_column].mean()
+
+                group_counts = X_y.groupby(c)[response_column].size()
+
+                self.mappings[c] = self._prior_regularisation(
+                    group_means, group_counts
+                ).to_dict()
 
             else:
 
                 groupby_sum = X_y.groupby([c])[
-                    [response_column, self.weights_column]
+                    ["weighted_response", self.weights_column]
                 ].sum()
 
-                self.mappings[c] = (
-                    groupby_sum[response_column] / groupby_sum[self.weights_column]
+                group_weight = groupby_sum[self.weights_column]
+
+                group_means = groupby_sum["weighted_response"] / group_weight
+
+                self.mappings[c] = self._prior_regularisation(
+                    group_means, group_weight
                 ).to_dict()
 
         return self
