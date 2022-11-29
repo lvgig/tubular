@@ -518,7 +518,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
 
     def _prior_regularisation(self, target_means, cat_freq):
-        """Regularise encoding values by pushing encodings of infrequent categories towards the global mean.  If prior is zero this will return target means unnchanged.
+        """Regularise encoding values by pushing encodings of infrequent categories towards the global mean.  If prior is zero this will return target_means unaltered.
 
         Parameters
         ----------
