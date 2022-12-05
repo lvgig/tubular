@@ -197,7 +197,9 @@ class MedianImputer(BaseImputer):
 
         else:
 
-            self.impute_values_[c] = X[c].median()
+            for c in self.columns:
+
+                self.impute_values_[c] = X[c].median()
 
         return self
 
