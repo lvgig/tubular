@@ -16,8 +16,11 @@ class TestInit(object):
 
         ta.functions.test_function_arguments(
             func=ModeImputer.__init__,
-            expected_arguments=["self", "columns"],
-            expected_default_values=(None,),
+            expected_arguments=["self", "columns", "weight"],
+            expected_default_values=(
+                None,
+                None,
+            ),
         )
 
     def test_class_methods(self):
@@ -51,6 +54,16 @@ class TestInit(object):
 
             ModeImputer(columns=None, verbose=True, copy=True)
 
+    def test_weight_not_str_error(self):
+        """Test that an exception is raised if weight is not str or None"""
+
+        with pytest.raises(
+            ValueError,
+            match="ModeImputer: weight should be a single column \(str\)",  # noqa
+        ):
+
+            ModeImputer(weight=0)
+
 
 class TestFit(object):
     """Tests for ModeImputer.fit()"""
@@ -79,6 +92,24 @@ class TestFit(object):
 
             x.fit(df)
 
+    def test_check_weights_column_called(self, mocker):
+        """Test that fit calls BaseTransformer.check_weights_column - when weights are used."""
+
+        df = d.create_df_9()
+
+        x = ModeImputer(columns=["a", "b"], weight="c")
+
+        expected_call_args = {0: {"args": (d.create_df_9(), "c"), "kwargs": {}}}
+
+        with ta.functions.assert_function_call(
+            mocker,
+            tubular.base.BaseTransformer,
+            "check_weights_column",
+            expected_call_args,
+        ):
+
+            x.fit(df)
+
     def test_learnt_values(self):
         """Test that the impute values learnt during fit are expected."""
 
@@ -95,6 +126,28 @@ class TestFit(object):
                     "a": df["a"].mode()[0],
                     "b": df["b"].mode()[0],
                     "c": df["c"].mode()[0],
+                }
+            },
+            msg="impute_values_ attribute",
+        )
+
+    def test_learnt_values_weighted_df(self):
+        """Test that the impute values learnt during fit are expected when df is weighted."""
+
+        df = d.create_weighted_imputers_test_df()
+
+        x = ModeImputer(columns=["a", "b", "c", "d"], weight="weight")
+
+        x.fit(df)
+
+        ta.classes.test_object_attributes(
+            obj=x,
+            expected_attributes={
+                "impute_values_": {
+                    "a": np.float64(5.0),
+                    "b": "e",
+                    "c": "f",
+                    "d": np.float64(1.0),
                 }
             },
             msg="impute_values_ attribute",

@@ -238,6 +238,26 @@ def create_large_half_null_df(n_col=1000):
     return data_df
 
 
+def create_weighted_imputers_test_df():
+    """Create DataFrame to use imputer tests that correct values are imputed for weighted dataframes
+
+    weight column contains the weights between 0 and 1
+    """
+
+    df = pd.DataFrame(
+        {
+            "a": [1.0, 1.0, 1.0, 3.0, 5.0, 5.0],
+            "b": ["a", "a", "a", "d", "e", "e"],
+            "c": ["a", "a", np.nan, np.nan, np.nan, "f"],
+            "d": [1.0, 5.0, 3.0, np.nan, np.nan, 1.0],
+            "response": [0, 1, 0, 1, 1, 1],
+            "weight": [0.1, 0.1, 0.8, 0.5, 0.9, 0.8],
+        }
+    )
+
+    return df
+
+
 def create_MeanResponseTransformer_test_df():
     """Create DataFrame to use MeanResponseTransformer tests that correct values are
 
