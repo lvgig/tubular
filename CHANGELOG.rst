@@ -19,6 +19,10 @@ Each individual change should have a link to the pull request after the descript
 0.3.3 (Unreleased)
 ------------------
 
+Added
+^^^^^
+- added support for weights to mean, median and mode imputers `#47 <https://github.com/lvgig/tubular/pull/47>`_
+
 Fixed
 ^^^^^
 - updated black version to 22.3.0 and flake8 version to 5.0.4 to fix compatibility issues `#45 <https://github.com/lvgig/tubular/pull/45>`_
