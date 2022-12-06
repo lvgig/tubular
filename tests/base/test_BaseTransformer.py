@@ -286,7 +286,7 @@ class TestTransform(object):
         df = pandas.DataFrame(columns=["a"])
 
         with pytest.raises(
-            ValueError, match=re.escape("BaseTransformer:X has no rows; (0, 1)")
+            ValueError, match=re.escape("BaseTransformer: X has no rows; (0, 1)")
         ):
 
             x.transform(df)
