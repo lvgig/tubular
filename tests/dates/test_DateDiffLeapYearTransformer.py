@@ -20,7 +20,9 @@ class TestCalculateAge(object):
             column_lower="a", column_upper="b", new_column_name="c", drop_cols=True
         )
 
-        with pytest.raises(TypeError, match="DateDiffLeapYearTransformer: row should be a pd.Series"):
+        with pytest.raises(
+            TypeError, match="DateDiffLeapYearTransformer: row should be a pd.Series"
+        ):
 
             date_transformer.calculate_age(row=row)
 
@@ -149,7 +151,9 @@ class TestInit(object):
     def test_column_lower_type_error(self):
         """Test that an exception is raised if column_lower is not a str."""
 
-        with pytest.raises(TypeError, match="DateDiffLeapYearTransformer: column_lower should be a str"):
+        with pytest.raises(
+            TypeError, match="DateDiffLeapYearTransformer: column_lower should be a str"
+        ):
 
             DateDiffLeapYearTransformer(
                 column_lower=123,
@@ -161,7 +165,9 @@ class TestInit(object):
     def test_column_upper_type_error(self):
         """Test that an exception is raised if column_upper is not a str."""
 
-        with pytest.raises(TypeError, match="DateDiffLeapYearTransformer: column_upper should be a str"):
+        with pytest.raises(
+            TypeError, match="DateDiffLeapYearTransformer: column_upper should be a str"
+        ):
 
             DateDiffLeapYearTransformer(
                 column_lower="dummy_1",
@@ -173,7 +179,10 @@ class TestInit(object):
     def test_new_column_name_type_error(self):
         """Test that an exception is raised if new_column_name is not a str."""
 
-        with pytest.raises(TypeError, match="DateDiffLeapYearTransformer: new_column_name should be a str"):
+        with pytest.raises(
+            TypeError,
+            match="DateDiffLeapYearTransformer: new_column_name should be a str",
+        ):
 
             DateDiffLeapYearTransformer(
                 column_lower="dummy_1",
@@ -185,7 +194,9 @@ class TestInit(object):
     def test_drop_cols_type_error(self):
         """Test that an exception is raised if drop_cols is not a bool."""
 
-        with pytest.raises(TypeError, match="DateDiffLeapYearTransformer: drop_cols should be a bool"):
+        with pytest.raises(
+            TypeError, match="DateDiffLeapYearTransformer: drop_cols should be a bool"
+        ):
 
             DateDiffLeapYearTransformer(
                 column_lower="dummy_1",

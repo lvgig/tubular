@@ -211,7 +211,8 @@ class TestTransform(object):
         x = LogTransformer(columns=["a", "b", "c"])
 
         with pytest.raises(
-            TypeError, match=r"LogTransformer: The following columns are not numeric in X; \['b', 'c'\]"
+            TypeError,
+            match=r"LogTransformer: The following columns are not numeric in X; \['b', 'c'\]",
         ):
 
             x.transform(df)

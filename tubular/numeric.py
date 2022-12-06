@@ -66,7 +66,9 @@ class LogTransformer(BaseTransformer):
             if not isinstance(base, (int, float)):
                 raise ValueError(f"{self.classname()}: base should be numeric or None")
             if not base > 0:
-                raise ValueError(f"{self.classname()}: base should be strictly positive")
+                raise ValueError(
+                    f"{self.classname()}: base should be strictly positive"
+                )
 
         self.base = base
         self.add_1 = add_1
@@ -276,7 +278,9 @@ class ScalingTransformer(BaseTransformer):
 
         if scaler_type not in allowed_scaler_values:
 
-            raise ValueError(f"{self.classname()}: scaler_type should be one of; {allowed_scaler_values}")
+            raise ValueError(
+                f"{self.classname()}: scaler_type should be one of; {allowed_scaler_values}"
+            )
 
         if scaler_type == "min_max":
 
@@ -435,7 +439,9 @@ class InteractionTransformer(BaseTransformer):
             )
         if type(max_degree) is int:
             if min_degree > max_degree:
-                raise ValueError(f"{self.classname()}: max_degree must be equal or greater than min_degree")
+                raise ValueError(
+                    f"{self.classname()}: max_degree must be equal or greater than min_degree"
+                )
             else:
                 self.max_degree = max_degree
             if max_degree > len(columns):

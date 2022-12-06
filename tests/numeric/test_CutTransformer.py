@@ -71,7 +71,9 @@ class TestInit(object):
     def test_new_column_name_type_error(self):
         """Test that an exception is raised if new_column_name is not a str."""
 
-        with pytest.raises(TypeError, match="CutTransformer: new_column_name must be a str"):
+        with pytest.raises(
+            TypeError, match="CutTransformer: new_column_name must be a str"
+        ):
 
             CutTransformer(column="b", new_column_name=1)
 
@@ -235,7 +237,8 @@ class TestTransform(object):
         x = CutTransformer(column="b", new_column_name="d")
 
         with pytest.raises(
-            TypeError, match="CutTransformer: b should be a numeric dtype but got object"
+            TypeError,
+            match="CutTransformer: b should be a numeric dtype but got object",
         ):
 
             x.transform(df)

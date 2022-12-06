@@ -114,7 +114,9 @@ class CappingTransformer(BaseTransformer):
 
         if type(capping_values_dict) is not dict:
 
-            raise TypeError(f"{self.classname()}: {dict_name} should be dict of columns and capping values")
+            raise TypeError(
+                f"{self.classname()}: {dict_name} should be dict of columns and capping values"
+            )
 
         for k, cap_values in capping_values_dict.items():
 
@@ -162,7 +164,9 @@ class CappingTransformer(BaseTransformer):
 
             if all([cap_value is None for cap_value in cap_values]):
 
-                raise ValueError(f"{self.classname()}: both values are None for key {k}")
+                raise ValueError(
+                    f"{self.classname()}: both values are None for key {k}"
+                )
 
     def fit(self, X, y=None):
         """Learn capping values from input data X.
@@ -203,7 +207,9 @@ class CappingTransformer(BaseTransformer):
 
         else:
 
-            warnings.warn(f"{self.classname()}: quantiles not set so no fitting done in CappingTransformer")
+            warnings.warn(
+                f"{self.classname()}: quantiles not set so no fitting done in CappingTransformer"
+            )
 
         self._replacement_values = copy.deepcopy(self.capping_values)
 
@@ -331,7 +337,9 @@ class CappingTransformer(BaseTransformer):
             raise ValueError(f"{self.classname()}: negative weights in sample weights")
 
         if sample_weight.sum() <= 0:
-            raise ValueError(f"{self.classname()}: total sample weights are not greater than 0")
+            raise ValueError(
+                f"{self.classname()}: total sample weights are not greater than 0"
+            )
 
         values = np.array(values)
         quantiles = np.array(quantiles)

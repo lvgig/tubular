@@ -138,7 +138,9 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
             if not isinstance(y, pd.Series):
 
-                raise TypeError(f"{self.classname()}: unexpected type for y, should be a pd.Series")
+                raise TypeError(
+                    f"{self.classname()}: unexpected type for y, should be a pd.Series"
+                )
 
             if not y.shape[0] > 0:
 

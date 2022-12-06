@@ -67,7 +67,9 @@ class ArbitraryImputer(BaseImputer):
 
         if columns is None:
 
-            raise ValueError(f"{self.classname()}: columns must be specified in init for ArbitraryImputer")
+            raise ValueError(
+                f"{self.classname()}: columns must be specified in init for ArbitraryImputer"
+            )
 
         super().__init__(columns=columns, **kwargs)
 

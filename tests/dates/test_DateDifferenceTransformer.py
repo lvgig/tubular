@@ -76,7 +76,9 @@ class TestInit(object):
     def test_column_lower_type_error(self):
         """Test that an exception is raised if column_lower is not a str."""
 
-        with pytest.raises(TypeError, match="DateDifferenceTransformer: column_lower must be a str"):
+        with pytest.raises(
+            TypeError, match="DateDifferenceTransformer: column_lower must be a str"
+        ):
 
             DateDifferenceTransformer(
                 column_lower=123,
@@ -90,7 +92,9 @@ class TestInit(object):
     def test_column_2_type_error(self):
         """Test that an exception is raised if column_upper is not a str."""
 
-        with pytest.raises(TypeError, match="DateDifferenceTransformer: column_upper must be a str"):
+        with pytest.raises(
+            TypeError, match="DateDifferenceTransformer: column_upper must be a str"
+        ):
 
             DateDifferenceTransformer(
                 column_lower="dummy_1",
@@ -104,7 +108,9 @@ class TestInit(object):
     def test_new_column_name_type_error(self):
         """Test that an exception is raised if new_column_name is not a str."""
 
-        with pytest.raises(TypeError, match="DateDifferenceTransformer: new_column_name must be a str"):
+        with pytest.raises(
+            TypeError, match="DateDifferenceTransformer: new_column_name must be a str"
+        ):
 
             DateDifferenceTransformer(
                 column_lower="dummy_1",
@@ -118,7 +124,9 @@ class TestInit(object):
     def test_units_type_error(self):
         """Test that an exception is raised if new_column_name is not a str."""
 
-        with pytest.raises(TypeError, match="DateDifferenceTransformer: units must be a str"):
+        with pytest.raises(
+            TypeError, match="DateDifferenceTransformer: units must be a str"
+        ):
 
             DateDifferenceTransformer(
                 column_lower="dummy_1",

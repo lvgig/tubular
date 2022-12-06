@@ -81,7 +81,9 @@ class TestInit(object):
     def test_new_column_name_type_error(self):
         """Test that an exception is raised if new_column_name is not a str."""
 
-        with pytest.raises(TypeError, match="SeriesDtMethodTransformer: new_column_name must be a str"):
+        with pytest.raises(
+            TypeError, match="SeriesDtMethodTransformer: new_column_name must be a str"
+        ):
 
             ToDatetimeTransformer(column="b", new_column_name=1)
 

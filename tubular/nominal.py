@@ -40,7 +40,9 @@ class BaseNominalTransformer(BaseTransformer):
 
             if not len(columns) > 0:
 
-                raise ValueError(f"{self.classname()}: no object or category columns in X")
+                raise ValueError(
+                    f"{self.classname()}: no object or category columns in X"
+                )
 
             self.columns = columns
 
@@ -302,7 +304,9 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
             if not isinstance(weight, str):
 
-                raise ValueError(f"{self.classname()}: weight should be a single column (str)")
+                raise ValueError(
+                    f"{self.classname()}: weight should be a single column (str)"
+                )
 
         self.weight = weight
 
@@ -529,13 +533,17 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
             if self.weights_column not in X.columns.values:
 
-                raise ValueError(f"{self.classname()}: weights column {self.weights_column} not in X")
+                raise ValueError(
+                    f"{self.classname()}: weights column {self.weights_column} not in X"
+                )
 
         response_null_count = y.isnull().sum()
 
         if response_null_count > 0:
 
-            raise ValueError(f"{self.classname()}: y has {response_null_count} null values")
+            raise ValueError(
+                f"{self.classname()}: y has {response_null_count} null values"
+            )
 
         X_y = self._combine_X_y(X, y)
         response_column = "_temporary_response"
@@ -653,13 +661,17 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
 
             if self.weights_column not in X.columns.values:
 
-                raise ValueError(f"{self.classname()}: weights column {self.weights_column} not in X")
+                raise ValueError(
+                    f"{self.classname()}: weights column {self.weights_column} not in X"
+                )
 
         response_null_count = y.isnull().sum()
 
         if response_null_count > 0:
 
-            raise ValueError(f"{self.classname()}: y has {response_null_count} null values")
+            raise ValueError(
+                f"{self.classname()}: y has {response_null_count} null values"
+            )
 
         X_y = self._combine_X_y(X, y)
         response_column = "_temporary_response"
@@ -814,7 +826,10 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
             if X[c].isnull().sum() > 0:
 
-                raise ValueError(f"{self.classname()}: column %s has nulls - replace before proceeding" % c)
+                raise ValueError(
+                    f"{self.classname()}: column %s has nulls - replace before proceeding"
+                    % c
+                )
 
         # Check each field has less than 100 categories/levels
         for c in self.columns:
@@ -859,7 +874,10 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
             if X[c].isnull().sum() > 0:
 
-                raise ValueError(f"{self.classname()}: column %s has nulls - replace before proceeding" % c)
+                raise ValueError(
+                    f"{self.classname()}: column %s has nulls - replace before proceeding"
+                    % c
+                )
 
         X = BaseNominalTransformer.transform(self, X)
 
@@ -900,7 +918,8 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
                 if len(unseen_levels) > 0:
 
                     warnings.warn(
-                        f"{self.classname()}: column %s has unseen categories: %s" % (c, unseen_levels)
+                        f"{self.classname()}: column %s has unseen categories: %s"
+                        % (c, unseen_levels)
                     )
 
         # Drop original columns

@@ -410,7 +410,9 @@ class SeriesDtMethodTransformer(BaseTransformer):
 
         if type(column) is not str:
 
-            raise TypeError(f"{self.classname()}: column should be a str but got {type(column)}")
+            raise TypeError(
+                f"{self.classname()}: column should be a str but got {type(column)}"
+            )
 
         super().__init__(columns=column, **kwargs)
 

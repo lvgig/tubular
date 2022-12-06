@@ -259,7 +259,9 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
 
         if self.adjust_column not in X.columns.values:
 
-            raise ValueError(f"{self.classname()}: variable {self.adjust_column} is not in X")
+            raise ValueError(
+                f"{self.classname()}: variable {self.adjust_column} is not in X"
+            )
 
         for i in self.columns:
 
@@ -319,7 +321,9 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
 
                 if type(k) not in [int, float]:
 
-                    raise TypeError(f"{self.classname()}: mapping values must be numeric")
+                    raise TypeError(
+                        f"{self.classname()}: mapping values must be numeric"
+                    )
 
         self.adjust_column = adjust_column
 
@@ -344,7 +348,9 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
 
         if self.adjust_column not in X.columns.values:
 
-            raise ValueError(f"{self.classname()}: variable {self.adjust_column} is not in X")
+            raise ValueError(
+                f"{self.classname()}: variable {self.adjust_column} is not in X"
+            )
 
         if not pd.api.types.is_numeric_dtype(X[self.adjust_column]):
 
@@ -412,7 +418,9 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
 
                 if type(k) not in [int, float]:
 
-                    raise TypeError(f"{self.classname()}: mapping values must be numeric")
+                    raise TypeError(
+                        f"{self.classname()}: mapping values must be numeric"
+                    )
 
         self.adjust_column = adjust_column
 
@@ -437,12 +445,16 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
 
         if self.adjust_column not in X.columns.values:
 
-            raise ValueError(f"{self.classname()}: variable " + self.adjust_column + " is not in X")
+            raise ValueError(
+                f"{self.classname()}: variable " + self.adjust_column + " is not in X"
+            )
 
         if not pd.api.types.is_numeric_dtype(X[self.adjust_column]):
 
             raise TypeError(
-                f"{self.classname()}: variable " + self.adjust_column + " must have numeric dtype."
+                f"{self.classname()}: variable "
+                + self.adjust_column
+                + " must have numeric dtype."
             )
 
         for i in self.columns:

@@ -72,7 +72,9 @@ class TestInit(object):
     def test_weights_column_not_str_error(self):
         """Test that an exception is raised if weights_column is not a str."""
 
-        with pytest.raises(TypeError, match="MeanResponseTransformer: weights_column should be a str"):
+        with pytest.raises(
+            TypeError, match="MeanResponseTransformer: weights_column should be a str"
+        ):
 
             MeanResponseTransformer(response_column="a", weights_column=1)
 
@@ -216,7 +218,9 @@ class TestFit(object):
 
         x = MeanResponseTransformer(weights_column="z", columns=["b", "d", "f"])
 
-        with pytest.raises(ValueError, match="MeanResponseTransformer: weights column z not in X"):
+        with pytest.raises(
+            ValueError, match="MeanResponseTransformer: weights column z not in X"
+        ):
 
             x.fit(df, df["a"])
 
@@ -227,7 +231,9 @@ class TestFit(object):
 
         x = MeanResponseTransformer(columns=["b"])
 
-        with pytest.raises(ValueError, match="MeanResponseTransformer: y has 1 null values"):
+        with pytest.raises(
+            ValueError, match="MeanResponseTransformer: y has 1 null values"
+        ):
 
             x.fit(df, df["a"])
 

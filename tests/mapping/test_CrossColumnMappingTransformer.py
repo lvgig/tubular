@@ -60,7 +60,10 @@ class TestInit(object):
     def test_adjust_columns_non_string_error(self):
         """Test that an exception is raised if adjust_column is not a string."""
 
-        with pytest.raises(TypeError, match="CrossColumnMappingTransformer: adjust_column should be a string"):
+        with pytest.raises(
+            TypeError,
+            match="CrossColumnMappingTransformer: adjust_column should be a string",
+        ):
 
             CrossColumnMappingTransformer(mappings={"a": {"a": 1}}, adjust_column=1)
 
@@ -180,7 +183,9 @@ class TestTransform(object):
 
         x = CrossColumnMappingTransformer(mappings=mapping, adjust_column="c")
 
-        with pytest.raises(ValueError, match="CrossColumnMappingTransformer: variable c is not in X"):
+        with pytest.raises(
+            ValueError, match="CrossColumnMappingTransformer: variable c is not in X"
+        ):
 
             x.transform(df)
 

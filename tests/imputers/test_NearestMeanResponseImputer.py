@@ -94,7 +94,9 @@ class TestFit(object):
 
         x = NearestMeanResponseImputer(columns=["a", "b"])
 
-        with pytest.raises(ValueError, match="NearestMeanResponseImputer: y has 1 null values"):
+        with pytest.raises(
+            ValueError, match="NearestMeanResponseImputer: y has 1 null values"
+        ):
 
             x.fit(df, df["c"])
 

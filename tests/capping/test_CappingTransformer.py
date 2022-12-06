@@ -314,7 +314,9 @@ class TestCheckCappingValuesDict(object):
 
         x = CappingTransformer(capping_values={"a": [1, 3], "b": [None, -1]})
 
-        with pytest.raises(ValueError, match="CappingTransformer: both values are None for key a"):
+        with pytest.raises(
+            ValueError, match="CappingTransformer: both values are None for key a"
+        ):
 
             x.check_capping_values_dict(
                 capping_values_dict={"a": [None, None], "b": [None, 1]}, dict_name="eee"
@@ -745,7 +747,8 @@ class TestTransform(object):
         x = CappingTransformer(capping_values={"a": [2, 5], "b": [-1, 8], "c": [-1, 8]})
 
         with pytest.raises(
-            TypeError, match=r"CappingTransformer: The following columns are not numeric in X; \['b', 'c'\]"
+            TypeError,
+            match=r"CappingTransformer: The following columns are not numeric in X; \['b', 'c'\]",
         ):
 
             x.transform(df)
@@ -874,7 +877,8 @@ class TestWeightedQuantile(object):
         x = CappingTransformer(capping_values={"a": [2, 10]})
 
         with pytest.raises(
-            ValueError, match="CappingTransformer: total sample weights are not greater than 0"
+            ValueError,
+            match="CappingTransformer: total sample weights are not greater than 0",
         ):
 
             x.weighted_quantile([2, 3, 4, 5], [0, 1], [0, 0])
@@ -884,7 +888,9 @@ class TestWeightedQuantile(object):
 
         x = CappingTransformer(capping_values={"a": [2, 10]})
 
-        with pytest.raises(ValueError, match="CappingTransformer: null values in sample weights"):
+        with pytest.raises(
+            ValueError, match="CappingTransformer: null values in sample weights"
+        ):
 
             x.weighted_quantile([2, 3, 4, 5], [0, 1], [3, np.NaN])
 
@@ -893,11 +899,15 @@ class TestWeightedQuantile(object):
 
         x = CappingTransformer(capping_values={"a": [2, 10]})
 
-        with pytest.raises(ValueError, match="CappingTransformer: infinite values in sample weights"):
+        with pytest.raises(
+            ValueError, match="CappingTransformer: infinite values in sample weights"
+        ):
 
             x.weighted_quantile([2, 3, 4, 5], [0, 1], [2, np.inf])
 
-        with pytest.raises(ValueError, match="CappingTransformer: infinite values in sample weights"):
+        with pytest.raises(
+            ValueError, match="CappingTransformer: infinite values in sample weights"
+        ):
 
             x.weighted_quantile([2, 3, 4, 5], [0, 1], [1, -np.inf])
 
@@ -906,6 +916,8 @@ class TestWeightedQuantile(object):
 
         x = CappingTransformer(capping_values={"a": [2, 10]})
 
-        with pytest.raises(ValueError, match="CappingTransformer: negative weights in sample weights"):
+        with pytest.raises(
+            ValueError, match="CappingTransformer: negative weights in sample weights"
+        ):
 
             x.weighted_quantile([2, 3, 4, 5], [0, 1], [2, -0.01])
