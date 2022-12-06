@@ -105,7 +105,7 @@ class TestCheckMappableRows:
 
         with pytest.raises(
             ValueError,
-            match="nulls would be introduced into column b from levels not present in mapping",
+            match="BaseNominalTransformer: nulls would be introduced into column b from levels not present in mapping",
         ):
 
             x.check_mappable_rows(df)
