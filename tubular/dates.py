@@ -66,21 +66,21 @@ class DateDiffLeapYearTransformer(BaseTransformer):
     ):
 
         if not isinstance(column_lower, str):
-            raise TypeError("column_lower should be a str")
+            raise TypeError(f"{self.classname()}: column_lower should be a str")
 
         if not isinstance(column_upper, str):
-            raise TypeError("column_upper should be a str")
+            raise TypeError(f"{self.classname()}: column_upper should be a str")
 
         if not isinstance(new_column_name, str):
-            raise TypeError("new_column_name should be a str")
+            raise TypeError(f"{self.classname()}: new_column_name should be a str")
 
         if not isinstance(drop_cols, bool):
-            raise TypeError("drop_cols should be a bool")
+            raise TypeError(f"{self.classname()}: drop_cols should be a bool")
 
         if missing_replacement:
             if not type(missing_replacement) in [int, float, str]:
                 raise TypeError(
-                    "if not None, missing_replacement should be an int, float or string"
+                    f"{self.classname()}: if not None, missing_replacement should be an int, float or string"
                 )
 
         super().__init__(columns=[column_lower, column_upper], **kwargs)
@@ -113,7 +113,7 @@ class DateDiffLeapYearTransformer(BaseTransformer):
         """
 
         if not isinstance(row, pd.Series):
-            raise TypeError("row should be a pd.Series")
+            raise TypeError(f"{self.classname()}: row should be a pd.Series")
 
         if (pd.isnull(row[self.columns[0]])) or (pd.isnull(row[self.columns[1]])):
             return self.missing_replacement
@@ -122,12 +122,12 @@ class DateDiffLeapYearTransformer(BaseTransformer):
 
             if not type(row[self.columns[1]]) in [datetime.date, datetime.datetime]:
                 raise TypeError(
-                    "upper column values should be datetime.datetime or datetime.date objects"
+                    f"{self.classname()}: upper column values should be datetime.datetime or datetime.date objects"
                 )
 
             if not type(row[self.columns[0]]) in [datetime.date, datetime.datetime]:
                 raise TypeError(
-                    "lower column values should be datetime.datetime or datetime.date objects"
+                    f"{self.classname()}: lower column values should be datetime.datetime or datetime.date objects"
                 )
 
             age = row[self.columns[1]].year - row[self.columns[0]].year
@@ -206,11 +206,11 @@ class DateDifferenceTransformer(BaseTransformer):
 
         if not type(column_lower) is str:
 
-            raise TypeError("column_lower must be a str")
+            raise TypeError(f"{self.classname()}: column_lower must be a str")
 
         if not type(column_upper) is str:
 
-            raise TypeError("column_upper must be a str")
+            raise TypeError(f"{self.classname()}: column_upper must be a str")
 
         columns = [column_lower, column_upper]
 
@@ -225,12 +225,12 @@ class DateDifferenceTransformer(BaseTransformer):
 
         if not type(units) is str:
 
-            raise TypeError("units must be a str")
+            raise TypeError(f"{self.classname()}: units must be a str")
 
         if units not in accepted_values_units:
 
             raise ValueError(
-                f"units must be one of {accepted_values_units}, got {units}"
+                f"{self.classname()}: units must be one of {accepted_values_units}, got {units}"
             )
 
         self.units = units
@@ -239,7 +239,7 @@ class DateDifferenceTransformer(BaseTransformer):
 
             if not type(new_column_name) is str:
 
-                raise TypeError("new_column_name must be a str")
+                raise TypeError(f"{self.classname()}: new_column_name must be a str")
 
             self.new_column_name = new_column_name
 
@@ -299,17 +299,17 @@ class ToDatetimeTransformer(BaseTransformer):
         if not type(column) is str:
 
             raise TypeError(
-                "column should be a single str giving the column to transform to datetime"
+                f"{self.classname()}: column should be a single str giving the column to transform to datetime"
             )
 
         if not type(new_column_name) is str:
 
-            raise TypeError("new_column_name must be a str")
+            raise TypeError(f"{self.classname()}: new_column_name must be a str")
 
         if not type(to_datetime_kwargs) is dict:
 
             raise TypeError(
-                f"to_datetime_kwargs should be a dict but got type {type(to_datetime_kwargs)}"
+                f"{self.classname()}: to_datetime_kwargs should be a dict but got type {type(to_datetime_kwargs)}"
             )
 
         else:
@@ -319,7 +319,7 @@ class ToDatetimeTransformer(BaseTransformer):
                 if not type(k) is str:
 
                     raise TypeError(
-                        f"unexpected type ({type(k)}) for to_datetime_kwargs key in position {i}, must be str"
+                        f"{self.classname()}: unexpected type ({type(k)}) for to_datetime_kwargs key in position {i}, must be str"
                     )
 
         self.to_datetime_kwargs = to_datetime_kwargs
@@ -410,26 +410,26 @@ class SeriesDtMethodTransformer(BaseTransformer):
 
         if type(column) is not str:
 
-            raise TypeError(f"column should be a str but got {type(column)}")
+            raise TypeError(f"{self.classname()}: column should be a str but got {type(column)}")
 
         super().__init__(columns=column, **kwargs)
 
         if type(new_column_name) is not str:
 
             raise TypeError(
-                f"unexpected type ({type(new_column_name)}) for new_column_name, must be str"
+                f"{self.classname()}: unexpected type ({type(new_column_name)}) for new_column_name, must be str"
             )
 
         if type(pd_method_name) is not str:
 
             raise TypeError(
-                f"unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
+                f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
             )
 
         if type(pd_method_kwargs) is not dict:
 
             raise TypeError(
-                f"pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
+                f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
             )
 
         else:
@@ -439,7 +439,7 @@ class SeriesDtMethodTransformer(BaseTransformer):
                 if not type(k) is str:
 
                     raise TypeError(
-                        f"unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
+                        f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
                     )
 
         self.new_column_name = new_column_name
@@ -454,7 +454,7 @@ class SeriesDtMethodTransformer(BaseTransformer):
         except Exception as err:
 
             raise AttributeError(
-                f"""error accessing "dt.{pd_method_name}" method on pd.Series object - pd_method_name should be a pd.Series.dt method"""
+                f"""{self.classname()}: error accessing "dt.{pd_method_name}" method on pd.Series object - pd_method_name should be a pd.Series.dt method"""
             ) from err
 
         if callable(getattr(ser.dt, pd_method_name)):
@@ -578,22 +578,22 @@ class BetweenDatesTransformer(BaseTransformer):
     ):
 
         if type(column_lower) is not str:
-            raise TypeError("column_lower should be str")
+            raise TypeError(f"{self.classname()}: column_lower should be str")
 
         if type(column_between) is not str:
-            raise TypeError("column_between should be str")
+            raise TypeError(f"{self.classname()}: column_between should be str")
 
         if type(column_upper) is not str:
-            raise TypeError("column_upper should be str")
+            raise TypeError(f"{self.classname()}: column_upper should be str")
 
         if type(new_column_name) is not str:
-            raise TypeError("new_column_name should be str")
+            raise TypeError(f"{self.classname()}: new_column_name should be str")
 
         if type(lower_inclusive) is not bool:
-            raise TypeError("lower_inclusive should be a bool")
+            raise TypeError(f"{self.classname()}: lower_inclusive should be a bool")
 
         if type(upper_inclusive) is not bool:
-            raise TypeError("upper_inclusive should be a bool")
+            raise TypeError(f"{self.classname()}: upper_inclusive should be a bool")
 
         self.new_column_name = new_column_name
         self.lower_inclusive = lower_inclusive
@@ -633,13 +633,13 @@ class BetweenDatesTransformer(BaseTransformer):
             if not pd.api.types.is_datetime64_dtype(X[col]):
 
                 raise TypeError(
-                    f"{col} should be datetime64[ns] type but got {X[col].dtype}"
+                    f"{self.classname()}: {col} should be datetime64[ns] type but got {X[col].dtype}"
                 )
 
         if not (X[self.columns[0]] <= X[self.columns[2]]).all():
 
             warnings.warn(
-                f"not all {self.columns[2]} are greater than or equal to {self.columns[0]}"
+                f"{self.classname()}: not all {self.columns[2]} are greater than or equal to {self.columns[0]}"
             )
 
         if self.lower_inclusive:
