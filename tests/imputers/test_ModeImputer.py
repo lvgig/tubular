@@ -179,6 +179,34 @@ class TestFit(object):
             msg="Check X not changing during fit",
         )
 
+    def expected_df_nan():
+        df = pd.DataFrame({"a": ["NaN", "NaN", "NaN"], "b": [None, None, None]})
+        return df
+
+    @pytest.mark.parametrize(
+        "df, expected",
+        ta.pandas.row_by_row_params(
+            pd.DataFrame({"a": [np.nan, np.nan, np.nan], "b": [None, None, None]}),
+            expected_df_nan(),
+        )
+        + ta.pandas.index_preserved_params(
+            pd.DataFrame({"a": [np.nan, np.nan, np.nan], "b": [None, None, None]}),
+            expected_df_nan(),
+        ),
+    )
+    def test_warning_mode_is_nan(self, df, expected):
+        """Test that warning is raised when mode is NaN"""
+
+        x = ModeImputer(columns=["a", "b"])
+
+        with pytest.warns(Warning, match="ModeImputer: The Mode of column a is NaN."):
+
+            x.fit(df)
+
+        with pytest.warns(Warning, match="ModeImputer: The Mode of column b is NaN."):
+
+            x.fit(df)
+
 
 class TestTransform(object):
     """Tests for ModeImputer.transform()."""

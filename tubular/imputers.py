@@ -4,6 +4,8 @@ This module contains transformers that deal with imputation of missing values.
 
 import pandas as pd
 import numpy as np
+import warnings
+
 
 from tubular.base import BaseTransformer
 
@@ -284,6 +286,8 @@ class MeanImputer(BaseImputer):
 class ModeImputer(BaseImputer):
     """Transformer to impute missing values with the mode of the supplied columns.
 
+    If mode is NaN, a warning will be raised.
+
     Parameters
     ----------
     columns : None or str or list, default = None
@@ -338,7 +342,17 @@ class ModeImputer(BaseImputer):
 
             for c in self.columns:
 
-                self.impute_values_[c] = X[c].mode()[0]
+                mode_value = X[c].mode(dropna=True)
+
+                if len(mode_value) == 0:
+
+                    self.impute_values_[c] = np.nan
+
+                    warnings.warn(f"ModeImputer: The Mode of column {c} is NaN.")
+
+                else:
+
+                    self.impute_values_[c] = mode_value[0]
 
         else:
 
