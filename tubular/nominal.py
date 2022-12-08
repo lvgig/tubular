@@ -40,7 +40,9 @@ class BaseNominalTransformer(BaseTransformer):
 
             if not len(columns) > 0:
 
-                raise ValueError("no object or category columns in X")
+                raise ValueError(
+                    f"{self.classname()}: no object or category columns in X"
+                )
 
             self.columns = columns
 
@@ -69,7 +71,7 @@ class BaseNominalTransformer(BaseTransformer):
             if mappable_rows < X.shape[0]:
 
                 raise ValueError(
-                    f"nulls would be introduced into column {c} from levels not present in mapping"
+                    f"{self.classname()}: nulls would be introduced into column {c} from levels not present in mapping"
                 )
 
 
@@ -113,7 +115,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
 
         if not isinstance(start_encoding, int):
 
-            raise ValueError("start_encoding should be an integer")
+            raise ValueError(f"{self.classname()}: start_encoding should be an integer")
 
         self.start_encoding = start_encoding
 
@@ -205,7 +207,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
             if (X.shape[0] - mappable_rows) > 0:
 
                 raise ValueError(
-                    "nulls introduced from levels not present in mapping for column: "
+                    f"{self.classname()}: nulls introduced from levels not present in mapping for column: "
                     + c
                 )
 
@@ -290,11 +292,11 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
         if not isinstance(cut_off_percent, float):
 
-            raise ValueError("cut_off_percent must be a float")
+            raise ValueError(f"{self.classname()}: cut_off_percent must be a float")
 
         if not ((cut_off_percent > 0) & (cut_off_percent < 1)):
 
-            raise ValueError("cut_off_percent must be > 0 and < 1")
+            raise ValueError(f"{self.classname()}: cut_off_percent must be > 0 and < 1")
 
         self.cut_off_percent = cut_off_percent
 
@@ -302,7 +304,9 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
             if not isinstance(weight, str):
 
-                raise ValueError("weight should be a single column (str)")
+                raise ValueError(
+                    f"{self.classname()}: weight should be a single column (str)"
+                )
 
         self.weight = weight
 
@@ -310,7 +314,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
         if not isinstance(record_rare_levels, bool):
 
-            raise ValueError("record_rare_levels must be a bool")
+            raise ValueError(f"{self.classname()}: record_rare_levels must be a bool")
 
         self.record_rare_levels = record_rare_levels
 
@@ -342,14 +346,14 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                 if pd.Series(self.rare_level_name).dtype != X[c].dtypes:
 
                     raise ValueError(
-                        "rare_level_name must be of the same type of the columns"
+                        f"{self.classname()}: rare_level_name must be of the same type of the columns"
                     )
 
         if self.weight is not None:
 
             if self.weight not in X.columns.values:
 
-                raise ValueError("weight " + self.weight + " not in X")
+                raise ValueError(f"{self.classname()}: weight {self.weight} not in X")
 
         self.mapping_ = {}
 
@@ -498,7 +502,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
             if type(weights_column) is not str:
 
-                raise TypeError("weights_column should be a str")
+                raise TypeError(f"{self.classname()}: weights_column should be a str")
 
         self.weights_column = weights_column
 
@@ -529,13 +533,17 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
             if self.weights_column not in X.columns.values:
 
-                raise ValueError(f"weights column {self.weights_column} not in X")
+                raise ValueError(
+                    f"{self.classname()}: weights column {self.weights_column} not in X"
+                )
 
         response_null_count = y.isnull().sum()
 
         if response_null_count > 0:
 
-            raise ValueError(f"y has {response_null_count} null values")
+            raise ValueError(
+                f"{self.classname()}: y has {response_null_count} null values"
+            )
 
         X_y = self._combine_X_y(X, y)
         response_column = "_temporary_response"
@@ -622,7 +630,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
 
             if type(weights_column) is not str:
 
-                raise TypeError("weights_column should be a str")
+                raise TypeError(f"{self.classname()}: weights_column should be a str")
 
         self.weights_column = weights_column
 
@@ -653,13 +661,17 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
 
             if self.weights_column not in X.columns.values:
 
-                raise ValueError(f"weights column {self.weights_column} not in X")
+                raise ValueError(
+                    f"{self.classname()}: weights column {self.weights_column} not in X"
+                )
 
         response_null_count = y.isnull().sum()
 
         if response_null_count > 0:
 
-            raise ValueError(f"y has {response_null_count} null values")
+            raise ValueError(
+                f"{self.classname()}: y has {response_null_count} null values"
+            )
 
         X_y = self._combine_X_y(X, y)
         response_column = "_temporary_response"
@@ -814,7 +826,10 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
             if X[c].isnull().sum() > 0:
 
-                raise ValueError("column %s has nulls - replace before proceeding" % c)
+                raise ValueError(
+                    f"{self.classname()}: column %s has nulls - replace before proceeding"
+                    % c
+                )
 
         # Check each field has less than 100 categories/levels
         for c in self.columns:
@@ -824,7 +839,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
             if len(levels) > 100:
 
                 raise ValueError(
-                    "column %s has over 100 unique values - consider another type of encoding"
+                    f"{self.classname()}: column %s has over 100 unique values - consider another type of encoding"
                     % c
                 )
 
@@ -859,7 +874,10 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
             if X[c].isnull().sum() > 0:
 
-                raise ValueError("column %s has nulls - replace before proceeding" % c)
+                raise ValueError(
+                    f"{self.classname()}: column %s has nulls - replace before proceeding"
+                    % c
+                )
 
         X = BaseNominalTransformer.transform(self, X)
 
@@ -900,7 +918,8 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
                 if len(unseen_levels) > 0:
 
                     warnings.warn(
-                        "column %s has unseen categories: %s" % (c, unseen_levels)
+                        f"{self.classname()}: column %s has unseen categories: %s"
+                        % (c, unseen_levels)
                     )
 
         # Drop original columns

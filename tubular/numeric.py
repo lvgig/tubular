@@ -64,9 +64,11 @@ class LogTransformer(BaseTransformer):
 
         if base is not None:
             if not isinstance(base, (int, float)):
-                raise ValueError("base should be numeric or None")
+                raise ValueError(f"{self.classname()}: base should be numeric or None")
             if not base > 0:
-                raise ValueError("base should be strictly positive")
+                raise ValueError(
+                    f"{self.classname()}: base should be strictly positive"
+                )
 
         self.base = base
         self.add_1 = add_1
@@ -105,7 +107,7 @@ class LogTransformer(BaseTransformer):
             )
 
             raise TypeError(
-                f"The following columns are not numeric in X; {non_numeric_columns}"
+                f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
             )
 
         new_column_names = [f"{column}_{self.suffix}" for column in self.columns]
@@ -115,7 +117,7 @@ class LogTransformer(BaseTransformer):
             if (X[self.columns] <= -1).sum().sum() > 0:
 
                 raise ValueError(
-                    "values less than or equal to 0 in columns (after adding 1), make greater than 0 before using transform"
+                    f"{self.classname()}: values less than or equal to 0 in columns (after adding 1), make greater than 0 before using transform"
                 )
 
             if self.base is None:
@@ -131,7 +133,7 @@ class LogTransformer(BaseTransformer):
             if (X[self.columns] <= 0).sum().sum() > 0:
 
                 raise ValueError(
-                    "values less than or equal to 0 in columns, make greater than 0 before using transform"
+                    f"{self.classname()}: values less than or equal to 0 in columns, make greater than 0 before using transform"
                 )
 
             if self.base is None:
@@ -176,17 +178,17 @@ class CutTransformer(BaseTransformer):
         if not type(column) is str:
 
             raise TypeError(
-                "column arg (name of column) should be a single str giving the column to discretise"
+                f"{self.classname()}: column arg (name of column) should be a single str giving the column to discretise"
             )
 
         if not type(new_column_name) is str:
 
-            raise TypeError("new_column_name must be a str")
+            raise TypeError(f"{self.classname()}: new_column_name must be a str")
 
         if not type(cut_kwargs) is dict:
 
             raise TypeError(
-                f"cut_kwargs should be a dict but got type {type(cut_kwargs)}"
+                f"{self.classname()}: cut_kwargs should be a dict but got type {type(cut_kwargs)}"
             )
 
         else:
@@ -196,7 +198,7 @@ class CutTransformer(BaseTransformer):
                 if not type(k) is str:
 
                     raise TypeError(
-                        f"unexpected type ({type(k)}) for cut_kwargs key in position {i}, must be str"
+                        f"{self.classname()}: unexpected type ({type(k)}) for cut_kwargs key in position {i}, must be str"
                     )
 
         self.cut_kwargs = cut_kwargs
@@ -223,7 +225,7 @@ class CutTransformer(BaseTransformer):
         if not pd.api.types.is_numeric_dtype(X[self.columns[0]]):
 
             raise TypeError(
-                f"{self.columns[0]} should be a numeric dtype but got {X[self.columns[0]].dtype}"
+                f"{self.classname()}: {self.columns[0]} should be a numeric dtype but got {X[self.columns[0]].dtype}"
             )
 
         X[self.new_column_name] = pd.cut(X[self.columns[0]], **self.cut_kwargs)
@@ -259,7 +261,7 @@ class ScalingTransformer(BaseTransformer):
         if not type(scaler_kwargs) is dict:
 
             raise TypeError(
-                f"scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
+                f"{self.classname()}: scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
             )
 
         else:
@@ -269,14 +271,16 @@ class ScalingTransformer(BaseTransformer):
                 if not type(k) is str:
 
                     raise TypeError(
-                        f"unexpected type ({type(k)}) for scaler_kwargs key in position {i}, must be str"
+                        f"{self.classname()}: unexpected type ({type(k)}) for scaler_kwargs key in position {i}, must be str"
                     )
 
         allowed_scaler_values = ["min_max", "max_abs", "standard"]
 
         if scaler_type not in allowed_scaler_values:
 
-            raise ValueError(f"scaler_type should be one of; {allowed_scaler_values}")
+            raise ValueError(
+                f"{self.classname()}: scaler_type should be one of; {allowed_scaler_values}"
+            )
 
         if scaler_type == "min_max":
 
@@ -318,7 +322,7 @@ class ScalingTransformer(BaseTransformer):
             )
 
             raise TypeError(
-                f"The following columns are not numeric in X; {non_numeric_columns}"
+                f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
             )
 
         return X
@@ -419,34 +423,36 @@ class InteractionTransformer(BaseTransformer):
 
         if len(columns) < 2:
             raise ValueError(
-                f"number of columns must be equal or greater than 2, got {str(len(columns))} column."
+                f"{self.classname()}: number of columns must be equal or greater than 2, got {str(len(columns))} column."
             )
 
         if type(min_degree) is int:
             if min_degree < 2:
                 raise ValueError(
-                    f"min_degree must be equal or greater than 2, got {str(min_degree)}"
+                    f"{self.classname()}: min_degree must be equal or greater than 2, got {str(min_degree)}"
                 )
             else:
                 self.min_degree = min_degree
         else:
             raise TypeError(
-                f"unexpected type ({type(min_degree)}) for min_degree, must be int"
+                f"{self.classname()}: unexpected type ({type(min_degree)}) for min_degree, must be int"
             )
         if type(max_degree) is int:
             if min_degree > max_degree:
-                raise ValueError("max_degree must be equal or greater than min_degree")
+                raise ValueError(
+                    f"{self.classname()}: max_degree must be equal or greater than min_degree"
+                )
             else:
                 self.max_degree = max_degree
             if max_degree > len(columns):
                 raise ValueError(
-                    "max_degree must be equal or lower than number of columns"
+                    f"{self.classname()}: max_degree must be equal or lower than number of columns"
                 )
             else:
                 self.max_degree = max_degree
         else:
             raise TypeError(
-                f"unexpected type ({type(max_degree)}) for max_degree, must be int"
+                f"{self.classname()}: unexpected type ({type(max_degree)}) for max_degree, must be int"
             )
 
         self.nb_features_to_interact = len(self.columns)
