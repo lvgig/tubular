@@ -665,7 +665,7 @@ class BetweenDatesTransformer(BaseTransformer):
         return X
 
 
-class DateTimeInfoExtractor(BaseTransformer):
+class DatetimeInfoExtractor(BaseTransformer):
     """Transformer to extract various features from datetime var
 
     Parameters

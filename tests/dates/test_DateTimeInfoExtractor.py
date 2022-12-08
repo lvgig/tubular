@@ -6,34 +6,34 @@ import tests.test_data as d
 import pandas as pd
 
 import tubular
-from tubular.dates import DateTimeInfoExtractor
+from tubular.dates import DatetimeInfoExtractor
 
 
 @pytest.fixture
 def timeofday_extractor():
-    return DateTimeInfoExtractor(columns=["a"], include=["timeofday"])
+    return DatetimeInfoExtractor(columns=["a"], include=["timeofday"])
 
 
 @pytest.fixture
 def timeofmonth_extractor():
-    return DateTimeInfoExtractor(columns=["a"], include=["timeofmonth"])
+    return DatetimeInfoExtractor(columns=["a"], include=["timeofmonth"])
 
 
 @pytest.fixture
 def timeofyear_extractor():
-    return DateTimeInfoExtractor(columns=["a"], include=["timeofyear"])
+    return DatetimeInfoExtractor(columns=["a"], include=["timeofyear"])
 
 
 @pytest.fixture
 def dayofweek_extractor():
-    return DateTimeInfoExtractor(columns=["a"], include=["dayofweek"])
+    return DatetimeInfoExtractor(columns=["a"], include=["dayofweek"])
 
 
 class TestExtractDatetimeInfoInit(object):
     def test_assert_inheritance(self):
         """Test that ExtractDatetimeInfo inherits from BaseTransformer."""
 
-        x = DateTimeInfoExtractor(columns=["a"])
+        x = DatetimeInfoExtractor(columns=["a"])
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
@@ -47,7 +47,7 @@ class TestExtractDatetimeInfoInit(object):
             "dayofweek",
         ]
         ta.functions.test_function_arguments(
-            func=DateTimeInfoExtractor.__init__,
+            func=DatetimeInfoExtractor.__init__,
             expected_arguments=["self", "columns", "include", "datetime_mappings"],
             expected_default_values=(
                 default_include,
@@ -69,12 +69,12 @@ class TestExtractDatetimeInfoInit(object):
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
 
-            DateTimeInfoExtractor(columns=["a"])
+            DatetimeInfoExtractor(columns=["a"])
 
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that the values passed in init are saved in an attribute of the same name."""
 
-        x = DateTimeInfoExtractor(
+        x = DatetimeInfoExtractor(
             columns=["a"],
             include=["timeofmonth", "timeofday"],
             datetime_mappings={"timeofday": {"am": range(0, 12), "pm": range(12, 24)}},
@@ -93,9 +93,9 @@ class TestExtractDatetimeInfoInit(object):
         )
 
     def test_class_methods(self):
-        """Test that DateTimeInfoExtractor has fit and transform methods."""
+        """Test that DatetimeInfoExtractor has fit and transform methods."""
 
-        x = DateTimeInfoExtractor(columns=["a"])
+        x = DatetimeInfoExtractor(columns=["a"])
 
         ta.classes.test_object_method(
             obj=x, expected_method="identify_timeofday", msg="identify_timeofday"
@@ -121,7 +121,7 @@ class TestExtractDatetimeInfoInit(object):
             TypeError,
             match="columns should be str or List",
         ):
-            DateTimeInfoExtractor(
+            DatetimeInfoExtractor(
                 columns=incorrect_type_columns, include=["timeofyear"]
             )
 
@@ -133,7 +133,7 @@ class TestExtractDatetimeInfoInit(object):
             TypeError,
             match="include should be List",
         ):
-            DateTimeInfoExtractor(columns=["a"], include=incorrect_type_include)
+            DatetimeInfoExtractor(columns=["a"], include=incorrect_type_include)
 
     def test_error_when_invalid_include_option(self):
         """Test that an exception is raised when include contains incorrect values"""
@@ -142,7 +142,7 @@ class TestExtractDatetimeInfoInit(object):
             ValueError,
             match=r'elements in include should be in \["timeofday", "timeofmonth", "timeofyear", "dayofweek"\]',
         ):
-            DateTimeInfoExtractor(
+            DatetimeInfoExtractor(
                 columns=["a"], include=["timeofday", "timeofmonth", "invalid_option"]
             )
 
@@ -158,7 +158,7 @@ class TestExtractDatetimeInfoInit(object):
             TypeError,
             match="datetime_mappings should be Dict",
         ):
-            DateTimeInfoExtractor(
+            DatetimeInfoExtractor(
                 columns=["a"], datetime_mappings=incorrect_type_datetime_mappings
             )
 
@@ -174,7 +174,7 @@ class TestExtractDatetimeInfoInit(object):
             TypeError,
             match="values in datetime_mappings should be dict",
         ):
-            DateTimeInfoExtractor(
+            DatetimeInfoExtractor(
                 columns=["a"], datetime_mappings=incorrect_type_datetime_mappings_values
             )
 
@@ -198,7 +198,7 @@ class TestExtractDatetimeInfoInit(object):
             ValueError,
             match="keys in datetime_mappings should be in include",
         ):
-            DateTimeInfoExtractor(
+            DatetimeInfoExtractor(
                 columns=["a"],
                 include=include,
                 datetime_mappings=incorrect_datetime_mappings_keys,
@@ -239,7 +239,7 @@ class TestExtractDatetimeInfoInit(object):
         """Test that error is raised when incomplete mappings are passed"""
 
         with pytest.raises(ValueError, match=expected_exception):
-            DateTimeInfoExtractor(columns=["a"], datetime_mappings=incomplete_mappings)
+            DatetimeInfoExtractor(columns=["a"], datetime_mappings=incomplete_mappings)
 
 
 class TestIdentifyTimeOfDay(object):
@@ -247,7 +247,7 @@ class TestIdentifyTimeOfDay(object):
         """Test that identify_timeofday has the expected arguments"""
 
     ta.functions.test_function_arguments(
-        func=DateTimeInfoExtractor.identify_timeofday,
+        func=DatetimeInfoExtractor.identify_timeofday,
         expected_arguments=["self", "hour"],
         expected_default_values=None,
     )
@@ -299,7 +299,7 @@ class TestIdentifyTimeOfMonth(object):
         """Test that identify_timeofmonth has the expected arguments"""
 
         ta.functions.test_function_arguments(
-            func=DateTimeInfoExtractor.identify_timeofmonth,
+            func=DatetimeInfoExtractor.identify_timeofmonth,
             expected_arguments=["self", "day"],
             expected_default_values=None,
         )
@@ -347,7 +347,7 @@ class TestIdentifyTimeOfYear(object):
         """Test that identify_timeofyear has the expected arguments"""
 
         ta.functions.test_function_arguments(
-            func=DateTimeInfoExtractor.identify_timeofyear,
+            func=DatetimeInfoExtractor.identify_timeofyear,
             expected_arguments=["self", "month"],
             expected_default_values=None,
         )
@@ -394,7 +394,7 @@ class TestIdentifyDayOfWeek(object):
         """Test that identify_dayofweek has the expected arguments"""
 
         ta.functions.test_function_arguments(
-            func=DateTimeInfoExtractor.identify_dayofweek,
+            func=DatetimeInfoExtractor.identify_dayofweek,
             expected_arguments=["self", "day"],
             expected_default_values=None,
         )
@@ -429,7 +429,7 @@ class TestTransform(object):
         """Test that init has the expected arguments"""
 
         ta.functions.test_function_arguments(
-            func=DateTimeInfoExtractor.transform,
+            func=DatetimeInfoExtractor.transform,
             expected_arguments=["self", "X"],
             expected_default_values=None,
         )
@@ -455,7 +455,7 @@ class TestTransform(object):
             return_value=df,
         ):
 
-            x = DateTimeInfoExtractor(columns=["a"], include=["dayofweek"])
+            x = DatetimeInfoExtractor(columns=["a"], include=["dayofweek"])
 
             x.transform(df)
 
@@ -464,7 +464,7 @@ class TestTransform(object):
 
         df = d.create_df_1()  # Mix of int values
 
-        x = DateTimeInfoExtractor(columns=["a"], include=["dayofweek"])
+        x = DatetimeInfoExtractor(columns=["a"], include=["dayofweek"])
 
         with pytest.raises(
             TypeError, match="values in {} should be datetime".format("a")
@@ -477,7 +477,7 @@ class TestTransform(object):
         df = d.create_date_test_df()
         df = df.astype("datetime64[ns]")
 
-        x = DateTimeInfoExtractor(columns=["b"], include=["timeofyear"])
+        x = DatetimeInfoExtractor(columns=["b"], include=["timeofyear"])
         transformed = x.transform(df)
 
         expected_output = pd.Series(
@@ -508,12 +508,12 @@ class TestTransform(object):
         df = d.create_date_test_df()
         df = df.astype("datetime64[ns]")
 
-        mocked_tod = mocker.spy(DateTimeInfoExtractor, "identify_timeofday")
-        mocked_toy = mocker.spy(DateTimeInfoExtractor, "identify_timeofyear")
-        mocked_tom = mocker.spy(DateTimeInfoExtractor, "identify_timeofmonth")
-        mocked_doy = mocker.spy(DateTimeInfoExtractor, "identify_dayofweek")
+        mocked_tod = mocker.spy(DatetimeInfoExtractor, "identify_timeofday")
+        mocked_toy = mocker.spy(DatetimeInfoExtractor, "identify_timeofyear")
+        mocked_tom = mocker.spy(DatetimeInfoExtractor, "identify_timeofmonth")
+        mocked_doy = mocker.spy(DatetimeInfoExtractor, "identify_dayofweek")
 
-        x = DateTimeInfoExtractor(
+        x = DatetimeInfoExtractor(
             columns=["b"],
             include=["timeofday", "timeofyear", "timeofmonth", "dayofweek"],
         )
@@ -530,7 +530,7 @@ class TestTransform(object):
         df = d.create_date_test_df()
         df = df.astype("datetime64[ns]")
 
-        x = DateTimeInfoExtractor(columns=["b"], include=["timeofmonth", "timeofyear"])
+        x = DatetimeInfoExtractor(columns=["b"], include=["timeofmonth", "timeofyear"])
         transformed = x.transform(df)
 
         expected = df.copy()
