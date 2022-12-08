@@ -49,6 +49,10 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         Version number (__version__ attribute from _version.py).
 
     """
+    
+    def classname(self):
+        """Method that returns the name of the current class when called"""
+        return type(self).__name__
 
     def __init__(self, columns=None, copy=True, verbose=False, **kwargs):
 
@@ -289,10 +293,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         else:
 
             self.columns_check(X)
-
-    def classname(self):
-        """Method that returns the name of the current class when called"""
-        return type(self).__name__
 
 
 class ReturnKeyDict(dict):
