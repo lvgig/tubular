@@ -49,7 +49,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         Version number (__version__ attribute from _version.py).
 
     """
-    
+
     def classname(self):
         """Method that returns the name of the current class when called"""
         return type(self).__name__
