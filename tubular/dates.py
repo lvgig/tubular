@@ -869,12 +869,16 @@ class DatetimeInfoExtractor(BaseTransformer):
             if not type(hour) is int:
                 raise TypeError(f"{self.classname()}: hour should be float or int")
 
-        if hour not in np.arange(0, 24, 1):
-            raise ValueError(
-                f"{self.classname()}: hour should be a whole value in 0-23"
-            )
+        if not np.isnan(hour):
+            if hour not in np.arange(0, 24, 1):
+                raise ValueError(
+                    f"{self.classname()}: hour should be a whole value in 0-23"
+                )
 
-        return self.timeofday_mapping[hour]
+        if np.isnan(hour):
+            return np.nan
+        else:
+            return self.timeofday_mapping[hour]
 
     def identify_timeofmonth(self, day):
         """Map timeofmonth from day
@@ -894,12 +898,16 @@ class DatetimeInfoExtractor(BaseTransformer):
             if not type(day) is int:
                 raise TypeError(f"{self.classname()}: day should be float or int")
 
-        if day not in np.arange(1, 32, 1):
-            raise ValueError(
-                f"{self.classname()}: day should be a whole number in 1-31"
-            )
+        if not np.isnan(day):
+            if day not in np.arange(1, 32, 1):
+                raise ValueError(
+                    f"{self.classname()}: day should be a whole number in 1-31"
+                )
 
-        return self.timeofmonth_mapping[day]
+        if np.isnan(day):
+            return np.nan
+        else:
+            return self.timeofmonth_mapping[day]
 
     def identify_timeofyear(self, month):
         """Map timeofyear from month
@@ -919,12 +927,16 @@ class DatetimeInfoExtractor(BaseTransformer):
             if not type(month) is int:
                 raise TypeError(f"{self.classname()}: month should be float or int")
 
-        if month not in np.arange(1, 13, 1):
-            raise ValueError(
-                f"{self.classname()}: month should be a whole number in 1-12"
-            )
+        if not np.isnan(month):
+            if month not in np.arange(1, 13, 1):
+                raise ValueError(
+                    f"{self.classname()}: month should be a whole number in 1-12"
+                )
 
-        return self.timeofyear_mapping[month]
+        if np.isnan(month):
+            return np.nan
+        else:
+            return self.timeofyear_mapping[month]
 
     def identify_dayofweek(self, day):
         """Map dayofweek from day
@@ -944,10 +956,14 @@ class DatetimeInfoExtractor(BaseTransformer):
             if not type(day) is int:
                 raise TypeError(f"{self.classname()}: day should be float or int")
 
-        if day not in np.arange(0, 7, 1):
-            raise ValueError(f"{self.classname()}: day should be in 0-6")
+        if not np.isnan(day):
+            if day not in np.arange(0, 7, 1):
+                raise ValueError(f"{self.classname()}: day should be in 0-6")
 
-        return self.dayofweek_mapping[day]
+        if np.isnan(day):
+            return np.nan
+        else:
+            return self.dayofweek_mapping[day]
 
     def transform(self, X):
         """Transform - Extracts new features from datetime variables
@@ -967,9 +983,12 @@ class DatetimeInfoExtractor(BaseTransformer):
 
         for col in self.columns:
             if not X[col].dtype.name == "datetime64[ns]":
-                raise TypeError(
-                    f"{self.classname()}: values in {col} should be datetime"
-                )
+                try:
+                    X[col] = X[col].dt.tz_localize(None)
+                except Exception:
+                    raise TypeError(
+                        f"{self.classname()}: values in {col} should be datetime"
+                    )
 
         for col in self.columns:
             if "timeofday" in self.include:

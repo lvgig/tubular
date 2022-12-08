@@ -4,6 +4,7 @@ import test_aide as ta
 import tests.test_data as d
 
 import pandas as pd
+import numpy as np
 
 import tubular
 from tubular.dates import DatetimeInfoExtractor
@@ -282,9 +283,7 @@ class TestIdentifyTimeOfDay(object):
             (23, "evening"),
         ],
     )
-    def test_correct_value_returned(
-        self, valid_hour, hour_time_of_day, timeofday_extractor
-    ):
+    def test_valid_inputs(self, valid_hour, hour_time_of_day, timeofday_extractor):
         """Trial test to check all in one go"""
 
         output = timeofday_extractor.identify_timeofday(valid_hour)
@@ -292,6 +291,14 @@ class TestIdentifyTimeOfDay(object):
         assert output == hour_time_of_day, "expected {}, output {}".format(
             hour_time_of_day, output
         )
+
+    def test_valid_nan_output(self, timeofday_extractor):
+        """Test that correct values are return with valid inputs"""
+        output = timeofday_extractor.identify_timeofday(np.nan)
+        print(output)
+        assert np.isnan(
+            output
+        ), f"passing np.nan should result in np.nan, instead received {output}"
 
 
 class TestIdentifyTimeOfMonth(object):
@@ -341,6 +348,13 @@ class TestIdentifyTimeOfMonth(object):
             day_time_of_month, output
         )
 
+    def test_valid_nan_output(self, timeofmonth_extractor):
+        """Test that correct values are return with valid inputs"""
+        output = timeofmonth_extractor.identify_timeofmonth(np.nan)
+        assert np.isnan(
+            output
+        ), f"passing np.nan should result in np.nan, instead received {output}"
+
 
 class TestIdentifyTimeOfYear(object):
     def test_arguments(self):
@@ -388,6 +402,13 @@ class TestIdentifyTimeOfYear(object):
             month_time_of_year, output
         )
 
+    def test_valid_nan_output(self, timeofyear_extractor):
+        """Test that correct values are return with valid inputs"""
+        output = timeofyear_extractor.identify_timeofyear(np.nan)
+        assert np.isnan(
+            output
+        ), f"passing np.nan should result in np.nan, instead recieved {output}"
+
 
 class TestIdentifyDayOfWeek(object):
     def test_arguments(self):
@@ -416,12 +437,25 @@ class TestIdentifyDayOfWeek(object):
             dayofweek_extractor.identify_dayofweek(incorrect_size_input)
 
     @pytest.mark.parametrize(
-        "valid_day, dayofweek", [(0, "monday"), (2, "wednesday"), (4, "friday")]
+        "valid_day, dayofweek",
+        [
+            (0, "monday"),
+            (2, "wednesday"),
+            (4, "friday"),
+            (6, "sunday"),
+        ],
     )
-    def test_not_weekend_output(self, valid_day, dayofweek, dayofweek_extractor):
+    def test_valid_inputs(self, valid_day, dayofweek, dayofweek_extractor):
         """Test that correct values are return with valid inputs"""
         output = dayofweek_extractor.identify_dayofweek(valid_day)
         assert output == dayofweek, "expected {}, output {}".format(dayofweek, output)
+
+    def test_valid_nan_output(self, dayofweek_extractor):
+        """Test that correct values are return with valid inputs"""
+        output = dayofweek_extractor.identify_dayofweek(np.nan)
+        assert np.isnan(
+            output
+        ), f"passing np.nan should result in np.nan, instead received {output}"
 
 
 class TestTransform(object):
@@ -528,6 +562,7 @@ class TestTransform(object):
         """Test that correct df is returned after transformation"""
 
         df = d.create_date_test_df()
+        df.loc[0, "b"] = np.nan
         df = df.astype("datetime64[ns]")
 
         x = DatetimeInfoExtractor(columns=["b"], include=["timeofmonth", "timeofyear"])
@@ -535,7 +570,7 @@ class TestTransform(object):
 
         expected = df.copy()
         expected["b_timeofmonth"] = [
-            "start",
+            np.nan,
             "end",
             "start",
             "start",
@@ -545,7 +580,7 @@ class TestTransform(object):
             "end",
         ]
         expected["b_timeofyear"] = [
-            "spring",
+            np.nan,
             "winter",
             "autumn",
             "autumn",
