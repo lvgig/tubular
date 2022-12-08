@@ -71,8 +71,8 @@ class TestInit(object):
             numeric.CutTransformer(column="a", new_column_name="b"),
             numeric.TwoColumnOperatorTransformer(
                 pd_method_name="add",
-                column1_name='a',
-                column2_name='b',
+                column1_name="a",
+                column2_name="b",
                 new_column_name="c",
             ),
             numeric.ScalingTransformer(columns="a", scaler_type="standard"),
