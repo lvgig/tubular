@@ -203,7 +203,7 @@ class TestFit(object):
 
         df = d.create_df_6()
 
-        x = GroupRareLevelsTransformer(columns=["b"], cut_off_percent=0.3, weights="a")
+        x = GroupRareLevelsTransformer(columns=["b"], cut_off_percent=0.3, weight="a")
 
         x.fit(df)
 
@@ -218,7 +218,7 @@ class TestFit(object):
 
         df = d.create_df_6()
 
-        x = GroupRareLevelsTransformer(columns=["c"], cut_off_percent=0.2, weights="a")
+        x = GroupRareLevelsTransformer(columns=["c"], cut_off_percent=0.2, weight="a")
 
         x.fit(df)
 

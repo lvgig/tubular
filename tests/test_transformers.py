@@ -46,7 +46,7 @@ class TestInit(object):
             imputers.MedianImputer(columns="a"),
             imputers.MeanImputer(columns="a"),
             imputers.ModeImputer(columns="a"),
-            imputers.NearestMeanResponseImputer(response_column="a"),
+            imputers.NearestMeanResponseImputer(columns="a"),
             imputers.NullIndicator(columns="a"),
             mapping.BaseMappingTransformer(mappings={"a": {1: 2, 3: 4}}),
             mapping.BaseMappingTransformMixin(),
@@ -64,8 +64,8 @@ class TestInit(object):
             nominal.BaseNominalTransformer(),
             nominal.NominalToIntegerTransformer(columns="a"),
             nominal.GroupRareLevelsTransformer(columns="a"),
-            nominal.MeanResponseTransformer(columns="a", response_column="b"),
-            nominal.OrdinalEncoderTransformer(columns="a", response_column="b"),
+            nominal.MeanResponseTransformer(columns="a"),
+            nominal.OrdinalEncoderTransformer(columns="a"),
             nominal.OneHotEncodingTransformer(columns="a"),
             numeric.LogTransformer(columns="a"),
             numeric.CutTransformer(column="a", new_column_name="b"),
@@ -91,6 +91,14 @@ class TestInit(object):
 
     @pytest.mark.parametrize("transformer", ListOfTransformers())
     def test_clone(self, transformer):
+        """
+        Test that transformer can be used in sklearn.base.clone function.
+        """
+
+        b.clone(transformer)
+
+    @pytest.mark.parametrize("transformer", ListOfTransformers())
+    def test_unexpected_kwarg(self, transformer):
         """
         Test that transformer can be used in sklearn.base.clone function.
         """

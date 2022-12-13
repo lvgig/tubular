@@ -23,7 +23,7 @@ class TestInit(object):
     def test_class_methods(self):
         """Test that MeanResponseTransformer has fit and transform methods."""
 
-        x = MeanResponseTransformer(response_column="a")
+        x = MeanResponseTransformer()
 
         ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
 
@@ -34,7 +34,7 @@ class TestInit(object):
     def test_inheritance(self):
         """Test that NominalToIntegerTransformer inherits from BaseNominalTransformer."""
 
-        x = MeanResponseTransformer(response_column="a")
+        x = MeanResponseTransformer()
 
         ta.classes.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
 
@@ -74,7 +74,7 @@ class TestInit(object):
 
         with pytest.raises(TypeError, match="weights_column should be a str"):
 
-            MeanResponseTransformer(response_column="a", weights_column=1)
+            MeanResponseTransformer(weights_column=1)
 
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that the values passed in init are saved in an attribute of the same name."""
@@ -345,7 +345,7 @@ class TestTransform(object):
     def test_expected_output(self, df, expected):
         """Test that the output is expected from transform."""
 
-        x = MeanResponseTransformer(response_column="a", columns=["b", "d", "f"])
+        x = MeanResponseTransformer(columns=["b", "d", "f"])
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
         x.mappings = {

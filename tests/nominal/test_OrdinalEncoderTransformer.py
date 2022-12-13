@@ -22,7 +22,7 @@ class TestInit(object):
     def test_class_methods(self):
         """Test that OrdinalEncoderTransformer has fit and transform methods."""
 
-        x = OrdinalEncoderTransformer(response_column="a")
+        x = OrdinalEncoderTransformer()
 
         ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
 
@@ -33,7 +33,7 @@ class TestInit(object):
     def test_inheritance(self):
         """Test that NominalToIntegerTransformer inherits from BaseNominalTransformer."""
 
-        x = OrdinalEncoderTransformer(response_column="a")
+        x = OrdinalEncoderTransformer()
 
         ta.classes.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
         ta.classes.assert_inheritance(x, tubular.mapping.BaseMappingTransformMixin)
