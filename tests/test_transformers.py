@@ -76,6 +76,7 @@ class TestInit(object):
                 columns="b",
                 pd_method_kwargs={"sub": "a"},
             ),
+            strings.StringConcatenator(columns=['a','b'], new_column='c'),
         ]
         return list_of_transformers
 
