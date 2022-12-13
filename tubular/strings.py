@@ -135,3 +135,56 @@ class SeriesStrMethodTransformer(BaseTransformer):
         )
 
         return X
+
+
+class StringConcatenator(BaseTransformer):
+    """
+    Transformer to concatenate values from a few columns into 1 string.
+
+    Parameters
+    ----------
+    columns : str or list of str
+        Columns to concatenate.
+    new_column : str, default = "new_column"
+        New column name
+    separator : str, default = " "
+        Separator for the new string value
+    """
+
+    def __init__(self, columns, new_column="new_column", separator=" "):
+
+        super().__init__(columns=columns, copy=True)
+
+        if not isinstance(new_column, str):
+            raise TypeError(f"{self.classname()}: new_column should be a str")
+
+        self.new_column = new_column
+
+        if not isinstance(separator, str):
+            raise TypeError(f"{self.classname()}: The separator should be a str")
+
+        self.separator = separator
+
+    def transform(self, X):
+        """
+        Concatenates values into one string.
+
+         Parameters
+        ----------
+        X : df
+            Data to concatenate values on.
+
+        Returns
+        -------
+        X : df
+            Returns a dataframe with concatenated values.
+
+        """
+
+        X = super().transform(X)
+
+        X[self.new_column] = (
+            X[self.columns].astype(str).apply(lambda x: self.separator.join(x), axis=1)
+        )
+
+        return X
