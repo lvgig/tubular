@@ -220,10 +220,15 @@ class TestFit(object):
             x.fit(X=df, y=pandas.Series(name="b", dtype=object))
 
     def test_unexpected_kwarg_error(self):
-        
-        with pytest.raises(TypeError, match=re.escape("__init__() got an unexpected keyword argument 'unexpected_kwarg'")):
 
-            x = BaseTransformer(columns="a", unexpected_kwarg='spanish inquisition')
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                "__init__() got an unexpected keyword argument 'unexpected_kwarg'"
+            ),
+        ):
+
+            BaseTransformer(columns="a", unexpected_kwarg="spanish inquisition")
 
 
 class TestTransform(object):
