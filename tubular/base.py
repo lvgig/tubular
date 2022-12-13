@@ -50,7 +50,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
     """
 
-    def __init__(self, columns=None, copy=True, verbose=False, **kwargs):
+    def __init__(self, columns=None, copy=True, verbose=False):
 
         self.version_ = __version__
 
