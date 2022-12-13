@@ -3,6 +3,7 @@ import test_aide as ta
 import tests.test_data as d
 import pandas as pd
 import numpy as np
+import re
 
 import tubular
 from tubular.base import DataFrameMethodTransformer
@@ -166,6 +167,17 @@ class TestInit(object):
             },
             msg="Attributes for DataFrameMethodTransformer set in init",
         )
+
+    def test_unexpected_kwarg_error(self):
+        
+        with pytest.raises(TypeError, match=re.escape("__init__() got an unexpected keyword argument 'unexpected_kwarg'")):
+
+            x = DataFrameMethodTransformer(
+            new_column_name="a",
+            pd_method_name="sum",
+            columns=["b", "c"],
+            drop_original=True,
+            unexpected_kwarg='spanish inquisition')
 
 
 class TestTransform(object):
