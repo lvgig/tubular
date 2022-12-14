@@ -75,7 +75,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"unexpected type \(\<class 'int'\>\) for pd_method_name, expecting str",
+            match=r"DataFrameMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_name, expecting str",
         ):
 
             DataFrameMethodTransformer(
@@ -84,7 +84,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"unexpected type \(\<class 'float'\>\) for new_column_name, must be str or list of strings",
+            match=r"DataFrameMethodTransformer: unexpected type \(\<class 'float'\>\) for new_column_name, must be str or list of strings",
         ):
 
             DataFrameMethodTransformer(
@@ -93,7 +93,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"if new_column_name is a list, all elements must be strings but got \<class 'float'\> in position 1",
+            match=r"DataFrameMethodTransformer: if new_column_name is a list, all elements must be strings but got \<class 'float'\> in position 1",
         ):
 
             DataFrameMethodTransformer(
@@ -102,7 +102,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"""pd_method_kwargs should be a dict but got type \<class 'int'\>""",
+            match=r"""DataFrameMethodTransformer: pd_method_kwargs should be a dict but got type \<class 'int'\>""",
         ):
 
             DataFrameMethodTransformer(
@@ -114,7 +114,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"""unexpected type \(\<class 'int'\>\) for pd_method_kwargs key in position 1, must be str""",
+            match=r"""DataFrameMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_kwargs key in position 1, must be str""",
         ):
 
             DataFrameMethodTransformer(
@@ -126,7 +126,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"unexpected type \(\<class 'int'\>\) for drop_original, expecting bool",
+            match=r"DataFrameMethodTransformer: unexpected type \(\<class 'int'\>\) for drop_original, expecting bool",
         ):
 
             DataFrameMethodTransformer(
@@ -141,7 +141,7 @@ class TestInit(object):
 
         with pytest.raises(
             AttributeError,
-            match="""error accessing "b" method on pd.DataFrame object - pd_method_name should be a pd.DataFrame method""",
+            match="""DataFrameMethodTransformer: error accessing "b" method on pd.DataFrame object - pd_method_name should be a pd.DataFrame method""",
         ):
 
             DataFrameMethodTransformer(

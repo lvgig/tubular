@@ -16,6 +16,18 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+0.3.3 (Unreleased)
+------------------
+
+Added
+^^^^^
+- added classname() method to BaseTransformer and prefixed all errors with classname call for easier debugging `#48 <https://github.com/lvgig/tubular/pull/48>`_
+
+Fixed
+^^^^^
+- updated black version to 22.3.0 and flake8 version to 5.0.4 to fix compatibility issues `#45 <https://github.com/lvgig/tubular/pull/45>`_
+
+
 0.3.2 (2022-01-13)
 ------------------
 

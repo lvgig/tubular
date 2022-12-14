@@ -68,7 +68,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"column should be a str but got \<class 'list'\>",
+            match=r"SeriesDtMethodTransformer: column should be a str but got \<class 'list'\>",
         ):
 
             SeriesDtMethodTransformer(
@@ -77,14 +77,14 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"unexpected type \(\<class 'int'\>\) for pd_method_name, expecting str",
+            match=r"SeriesDtMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_name, expecting str",
         ):
 
             SeriesDtMethodTransformer(new_column_name="a", pd_method_name=1, column="b")
 
         with pytest.raises(
             TypeError,
-            match=r"unexpected type \(\<class 'float'\>\) for new_column_name, must be str",
+            match=r"SeriesDtMethodTransformer: unexpected type \(\<class 'float'\>\) for new_column_name, must be str",
         ):
 
             SeriesDtMethodTransformer(
@@ -93,7 +93,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"""pd_method_kwargs should be a dict but got type \<class 'int'\>""",
+            match=r"""SeriesDtMethodTransformer: pd_method_kwargs should be a dict but got type \<class 'int'\>""",
         ):
 
             SeriesDtMethodTransformer(
@@ -105,7 +105,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"""unexpected type \(\<class 'int'\>\) for pd_method_kwargs key in position 1, must be str""",
+            match=r"""SeriesDtMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_kwargs key in position 1, must be str""",
         ):
 
             SeriesDtMethodTransformer(
@@ -120,7 +120,7 @@ class TestInit(object):
 
         with pytest.raises(
             AttributeError,
-            match="""error accessing "dt.b" method on pd.Series object - pd_method_name should be a pd.Series.dt method""",
+            match="""SeriesDtMethodTransformer: error accessing "dt.b" method on pd.Series object - pd_method_name should be a pd.Series.dt method""",
         ):
 
             SeriesDtMethodTransformer(

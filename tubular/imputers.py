@@ -67,7 +67,9 @@ class ArbitraryImputer(BaseImputer):
 
         if columns is None:
 
-            raise ValueError("columns must be specified in init for ArbitraryImputer")
+            raise ValueError(
+                f"{self.classname()}: columns must be specified in init for ArbitraryImputer"
+            )
 
         super().__init__(columns=columns, **kwargs)
 
@@ -78,7 +80,7 @@ class ArbitraryImputer(BaseImputer):
         ):
 
             raise ValueError(
-                "impute_value should be a single value (int, float or str)"
+                f"{self.classname()}: impute_value should be a single value (int, float or str)"
             )
 
         self.impute_values_ = {}
@@ -301,7 +303,7 @@ class NearestMeanResponseImputer(BaseImputer):
 
         if n_nulls > 0:
 
-            raise ValueError(f"y has {n_nulls} null values")
+            raise ValueError(f"{self.classname()}: y has {n_nulls} null values")
 
         self.impute_values_ = {}
 
@@ -315,7 +317,7 @@ class NearestMeanResponseImputer(BaseImputer):
             if c_nulls.sum() == 0:
 
                 raise ValueError(
-                    f"Column {c} has no missing values, cannot use this transformer."
+                    f"{self.classname()}: Column {c} has no missing values, cannot use this transformer."
                 )
 
             else:
