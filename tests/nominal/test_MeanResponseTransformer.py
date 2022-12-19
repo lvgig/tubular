@@ -127,7 +127,7 @@ class Test_prior_regularisation(object):
 
         expected_call_args = {0: {"args": (["global_mean"],), "kwargs": {}}}
 
-        x = MeanResponseTransformer(response_column="target")
+        x = MeanResponseTransformer()
 
         x.fit(pd.DataFrame({"a": ["1", "2"]}), pd.Series([2, 3]))
 
