@@ -317,7 +317,7 @@ class ModeImputer(BaseImputer):
 
             if not isinstance(weight, str):
 
-                raise ValueError("ModeImputer: weight should be a single column (str)")
+                raise ValueError("ModeImputer: weight should be a string or None")
 
         self.weight = weight
 

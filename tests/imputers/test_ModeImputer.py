@@ -54,15 +54,16 @@ class TestInit(object):
 
             ModeImputer(columns=None, verbose=True, copy=True)
 
-    def test_weight_not_str_error(self):
-        """Test that an exception is raised if weight is not str or None"""
+    @pytest.mark.parametrize("weight", (0, ["a"], {"a": 10}))
+    def test_weight_arg_errors(self, weight):
+        """Test that appropriate errors are throw for bad weight arg"""
 
         with pytest.raises(
             ValueError,
-            match="ModeImputer: weight should be a single column \(str\)",  # noqa
+            match="ModeImputer: weight should be a string or None",
         ):
 
-            ModeImputer(weight=0)
+            ModeImputer(columns=None, weight=weight)
 
 
 class TestFit(object):
