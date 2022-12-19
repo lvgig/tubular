@@ -64,7 +64,9 @@ class TestInit(object):
     def test_first_non_str_error(self):
         """Test that an exception is raised if column_lower not str."""
 
-        with pytest.raises(TypeError, match="column_lower should be str"):
+        with pytest.raises(
+            TypeError, match="BetweenDatesTransformer: column_lower should be str"
+        ):
 
             BetweenDatesTransformer(
                 column_lower=False,
@@ -76,7 +78,9 @@ class TestInit(object):
     def test_column_between_non_str_error(self):
         """Test that an exception is raised if column_between not str."""
 
-        with pytest.raises(TypeError, match="column_between should be str"):
+        with pytest.raises(
+            TypeError, match="BetweenDatesTransformer: column_between should be str"
+        ):
 
             BetweenDatesTransformer(
                 column_lower="a",
@@ -88,7 +92,9 @@ class TestInit(object):
     def test_column_upper_non_str_error(self):
         """Test that an exception is raised if column_upper not str."""
 
-        with pytest.raises(TypeError, match="column_upper should be str"):
+        with pytest.raises(
+            TypeError, match="BetweenDatesTransformer: column_upper should be str"
+        ):
 
             BetweenDatesTransformer(
                 column_lower="a",
@@ -100,7 +106,9 @@ class TestInit(object):
     def test_new_column_name_non_str_error(self):
         """Test that an exception is raised if new_column_name not str."""
 
-        with pytest.raises(TypeError, match="new_column_name should be str"):
+        with pytest.raises(
+            TypeError, match="BetweenDatesTransformer: new_column_name should be str"
+        ):
 
             BetweenDatesTransformer(
                 column_lower="a",
@@ -112,7 +120,9 @@ class TestInit(object):
     def test_lower_inclusive_non_bool_error(self):
         """Test that an exception is raised if lower_inclusive not a bool."""
 
-        with pytest.raises(TypeError, match="lower_inclusive should be a bool"):
+        with pytest.raises(
+            TypeError, match="BetweenDatesTransformer: lower_inclusive should be a bool"
+        ):
 
             BetweenDatesTransformer(
                 column_lower="a",
@@ -125,7 +135,9 @@ class TestInit(object):
     def test_upper_inclusive_non_bool_error(self):
         """Test that an exception is raised if upper_inclusive not a bool."""
 
-        with pytest.raises(TypeError, match="upper_inclusive should be a bool"):
+        with pytest.raises(
+            TypeError, match="BetweenDatesTransformer: upper_inclusive should be a bool"
+        ):
 
             BetweenDatesTransformer(
                 column_lower="a",
@@ -269,7 +281,8 @@ class TestTransform(object):
         )
 
         with pytest.raises(
-            TypeError, match=r"a should be datetime64\[ns\] type but got int64"
+            TypeError,
+            match=r"BetweenDatesTransformer: a should be datetime64\[ns\] type but got int64",
         ):
 
             x.transform(df)

@@ -98,7 +98,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=f"each item in mappings should be a dict but got type {type(1)} for key c",
+            match=f"MappingTransformer: each item in mappings should be a dict but got type {type(1)} for key c",
         ):
 
             MappingTransformer(mappings=mappings)
