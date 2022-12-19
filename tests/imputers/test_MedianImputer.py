@@ -377,3 +377,22 @@ class TestTransform(object):
             actual=x2.impute_values_,
             msg="Impute values not changed in transform",
         )
+
+    def test_learnt_values_not_modified_weights(self):
+        """Test that the impute_values_ from fit are not changed in transform - when using weights."""
+
+        df = d.create_df_9()
+
+        x = MedianImputer(columns=["a", "b"], weight="c")
+
+        x.fit(df)
+
+        x2 = MedianImputer(columns=["a", "b"], weight="c")
+
+        x2.fit_transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=x.impute_values_,
+            actual=x2.impute_values_,
+            msg="Impute values not changed in transform",
+        )

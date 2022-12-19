@@ -164,6 +164,17 @@ class TestFit(object):
 
         assert x_fitted is x, "Returned value from ModeImputer.fit not as expected."
 
+    def test_fit_returns_self_weighted(self):
+        """Test fit returns self?"""
+
+        df = d.create_df_9()
+
+        x = ModeImputer(columns="a", weight="c")
+
+        x_fitted = x.fit(df)
+
+        assert x_fitted is x, "Returned value from ModeImputer.fit not as expected."
+
     def test_fit_not_changing_data(self):
         """Test fit does not change X."""
 
@@ -175,6 +186,21 @@ class TestFit(object):
 
         ta.equality.assert_equal_dispatch(
             expected=d.create_df_1(),
+            actual=df,
+            msg="Check X not changing during fit",
+        )
+
+    def test_fit_not_changing_data_weighted(self):
+        """Test fit does not change X - when weights are used."""
+
+        df = d.create_df_9()
+
+        x = ModeImputer(columns="a", weight="c")
+
+        x.fit(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=d.create_df_9(),
             actual=df,
             msg="Check X not changing during fit",
         )
@@ -242,6 +268,17 @@ class TestTransform(object):
         for col in ["a"]:
 
             df[col].loc[df[col].isnull()] = df[col].mode()[0]
+
+        return df
+
+    def expected_df_3():
+        """Expected output for test_nulls_imputed_correctly_3."""
+
+        df = d.create_df_9()
+
+        for col in ["a"]:
+
+            df[col].loc[df[col].isnull()] = 6
 
         return df
 
@@ -326,6 +363,28 @@ class TestTransform(object):
             msg="Check nulls filled correctly in transform",
         )
 
+    @pytest.mark.parametrize(
+        "df, expected",
+        ta.pandas.row_by_row_params(d.create_df_9(), expected_df_3())
+        + ta.pandas.index_preserved_params(d.create_df_9(), expected_df_3()),
+    )
+    def test_nulls_imputed_correctly_3(self, df, expected):
+        """Test missing values are filled with the correct values - and unrelated columns are not changed
+        (when weight is used)."""
+
+        x = ModeImputer(columns=["a"], weight="c")
+
+        # set the impute values dict directly rather than fitting x on df so test works with helpers
+        x.impute_values_ = {"a": 6}
+
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=expected,
+            actual=df_transformed,
+            msg="Check nulls filled correctly in transform",
+        )
+
     def test_learnt_values_not_modified(self):
         """Test that the impute_values_ from fit are not changed in transform."""
 
@@ -336,6 +395,25 @@ class TestTransform(object):
         x.fit(df)
 
         x2 = ModeImputer(columns=["a", "b", "c"])
+
+        x2.fit_transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=x.impute_values_,
+            actual=x2.impute_values_,
+            msg="Impute values not changed in transform",
+        )
+
+    def test_learnt_values_not_modified_weights(self):
+        """Test that the impute_values_ from fit are not changed in transform - when using weights."""
+
+        df = d.create_df_9()
+
+        x = ModeImputer(columns=["a", "b"], weight="c")
+
+        x.fit(df)
+
+        x2 = ModeImputer(columns=["a", "b"], weight="c")
 
         x2.fit_transform(df)
 
