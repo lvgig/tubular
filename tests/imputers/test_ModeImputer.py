@@ -56,7 +56,7 @@ class TestInit(object):
 
     @pytest.mark.parametrize("weight", (0, ["a"], {"a": 10}))
     def test_weight_arg_errors(self, weight):
-        """Test that appropriate errors are throw for bad weight arg"""
+        """Test that appropriate errors are thrown for bad weight arg"""
 
         with pytest.raises(
             ValueError,
