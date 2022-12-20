@@ -60,14 +60,20 @@ class TestInit(object):
     def test_adjust_columns_non_string_error(self):
         """Test that an exception is raised if adjust_column is not a string."""
 
-        with pytest.raises(TypeError, match="adjust_column should be a string"):
+        with pytest.raises(
+            TypeError,
+            match="CrossColumnMultiplyTransformer: adjust_column should be a string",
+        ):
 
             CrossColumnMultiplyTransformer(mappings={"a": {"a": 1}}, adjust_column=1)
 
     def test_mapping_values_not_numeric_error(self):
         """Test that an exception is raised if mappings values are not numeric."""
 
-        with pytest.raises(TypeError, match="mapping values must be numeric"):
+        with pytest.raises(
+            TypeError,
+            match="CrossColumnMultiplyTransformer: mapping values must be numeric",
+        ):
 
             CrossColumnMultiplyTransformer(
                 mappings={"a": {"a": "b"}}, adjust_column="b"
@@ -181,7 +187,9 @@ class TestTransform(object):
 
         x = CrossColumnMultiplyTransformer(mappings=mapping, adjust_column="c")
 
-        with pytest.raises(ValueError, match="variable c is not in X"):
+        with pytest.raises(
+            ValueError, match="CrossColumnMultiplyTransformer: variable c is not in X"
+        ):
 
             x.transform(df)
 
@@ -194,7 +202,10 @@ class TestTransform(object):
 
         x = CrossColumnMultiplyTransformer(mappings=mapping, adjust_column="c")
 
-        with pytest.raises(TypeError, match="variable c must have numeric dtype."):
+        with pytest.raises(
+            TypeError,
+            match="CrossColumnMultiplyTransformer: variable c must have numeric dtype.",
+        ):
 
             x.transform(df)
 

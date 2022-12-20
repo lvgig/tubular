@@ -72,7 +72,7 @@ class TestInit(object):
 
         with pytest.raises(
             ValueError,
-            match="columns arg should contain only 1 column name but got 2",
+            match="SeriesStrMethodTransformer: columns arg should contain only 1 column name but got 2",
         ):
 
             SeriesStrMethodTransformer(
@@ -81,7 +81,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"unexpected type \(\<class 'int'\>\) for pd_method_name, expecting str",
+            match=r"SeriesStrMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_name, expecting str",
         ):
 
             SeriesStrMethodTransformer(
@@ -90,7 +90,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"unexpected type \(\<class 'float'\>\) for new_column_name, must be str",
+            match=r"SeriesStrMethodTransformer: unexpected type \(\<class 'float'\>\) for new_column_name, must be str",
         ):
 
             SeriesStrMethodTransformer(
@@ -99,7 +99,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"""pd_method_kwargs should be a dict but got type \<class 'int'\>""",
+            match=r"""SeriesStrMethodTransformer: pd_method_kwargs should be a dict but got type \<class 'int'\>""",
         ):
 
             SeriesStrMethodTransformer(
@@ -111,7 +111,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"""unexpected type \(\<class 'int'\>\) for pd_method_kwargs key in position 1, must be str""",
+            match=r"""SeriesStrMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_kwargs key in position 1, must be str""",
         ):
 
             SeriesStrMethodTransformer(
@@ -126,7 +126,7 @@ class TestInit(object):
 
         with pytest.raises(
             AttributeError,
-            match="""error accessing "str.b" method on pd.Series object - pd_method_name should be a pd.Series.str method""",
+            match="""SeriesStrMethodTransformer: error accessing "str.b" method on pd.Series object - pd_method_name should be a pd.Series.str method""",
         ):
 
             SeriesStrMethodTransformer(
