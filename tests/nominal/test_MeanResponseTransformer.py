@@ -29,7 +29,7 @@ class TestInit(object):
     def test_class_methods(self):
         """Test that MeanResponseTransformer has fit and transform methods."""
 
-        x = MeanResponseTransformer(response_column="a")
+        x = MeanResponseTransformer()
 
         ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
 
@@ -40,7 +40,7 @@ class TestInit(object):
     def test_inheritance(self):
         """Test that NominalToIntegerTransformer inherits from BaseNominalTransformer."""
 
-        x = MeanResponseTransformer(response_column="a")
+        x = MeanResponseTransformer()
 
         ta.classes.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
 
@@ -127,7 +127,7 @@ class Test_prior_regularisation(object):
 
         expected_call_args = {0: {"args": (["global_mean"],), "kwargs": {}}}
 
-        x = MeanResponseTransformer(response_column="target")
+        x = MeanResponseTransformer()
 
         x.fit(pd.DataFrame({"a": ["1", "2"]}), pd.Series([2, 3]))
 
@@ -612,7 +612,7 @@ class TestTransform(object):
     def test_expected_output(self, df, expected):
         """Test that the output is expected from transform."""
 
-        x = MeanResponseTransformer(response_column="a", columns=["b", "d", "f"])
+        x = MeanResponseTransformer(columns=["b", "d", "f"])
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
         x.mappings = {

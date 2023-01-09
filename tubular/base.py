@@ -30,9 +30,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
     verbose : bool, default = False
         Should statements be printed when methods are run?
 
-    **kwds
-        Arbitrary keyword arguments.
-
     Attributes
     ----------
     columns : list or None
@@ -54,7 +51,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         """Method that returns the name of the current class when called"""
         return type(self).__name__
 
-    def __init__(self, columns=None, copy=True, verbose=False, **kwargs):
+    def __init__(self, columns=None, copy=True, verbose=False):
 
         self.version_ = __version__
 
