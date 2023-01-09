@@ -2,7 +2,8 @@ import pytest
 import test_aide as ta
 import tests.test_data as d
 from unittest import mock
-import pandas
+import pandas as pd
+import numpy as np
 import re
 
 import tubular
@@ -205,7 +206,7 @@ class TestFit(object):
 
         x = BaseTransformer(columns="a")
 
-        df = pandas.DataFrame(columns=["a"])
+        df = pd.DataFrame(columns=["a"])
 
         with pytest.raises(
             ValueError, match=re.escape("BaseTransformer: X has no rows; (0, 1)")
@@ -218,13 +219,13 @@ class TestFit(object):
 
         x = BaseTransformer(columns="a")
 
-        df = pandas.DataFrame({"a": 1}, index=[0])
+        df = pd.DataFrame({"a": 1}, index=[0])
 
         with pytest.raises(
             ValueError, match=re.escape("BaseTransformer: y is empty; (0,)")
         ):
 
-            x.fit(X=df, y=pandas.Series(name="b", dtype=object))
+            x.fit(X=df, y=pd.Series(name="b", dtype=object))
 
 
 class TestTransform(object):
@@ -273,7 +274,7 @@ class TestTransform(object):
         expected_call_args = {0: {"args": (), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, pandas.DataFrame, "copy", expected_call_args, return_value=df
+            mocker, pd.DataFrame, "copy", expected_call_args, return_value=df
         ):
 
             x.transform(X=df)
@@ -283,7 +284,7 @@ class TestTransform(object):
 
         x = BaseTransformer(columns="a")
 
-        df = pandas.DataFrame(columns=["a"])
+        df = pd.DataFrame(columns=["a"])
 
         with pytest.raises(
             ValueError, match=re.escape("BaseTransformer: X has no rows; (0, 1)")
@@ -467,7 +468,7 @@ class TestCombineXy:
             TypeError, match="BaseTransformer: X should be a pd.DataFrame"
         ):
 
-            x._combine_X_y(X=1, y=pandas.Series([1, 2]))
+            x._combine_X_y(X=1, y=pd.Series([1, 2]))
 
     def test_y_not_Series_error(self):
         """Test an exception is raised if y is not a pd.Series."""
@@ -476,7 +477,7 @@ class TestCombineXy:
 
         with pytest.raises(TypeError, match="BaseTransformer: y should be a pd.Series"):
 
-            x._combine_X_y(X=pandas.DataFrame({"a": [1, 2]}), y=1)
+            x._combine_X_y(X=pd.DataFrame({"a": [1, 2]}), y=1)
 
     def test_X_and_y_different_number_of_rows_error(self):
         """Test an exception is raised if X and y have different numbers of rows."""
@@ -490,7 +491,7 @@ class TestCombineXy:
             ),
         ):
 
-            x._combine_X_y(X=pandas.DataFrame({"a": [1, 2]}), y=pandas.Series([2]))
+            x._combine_X_y(X=pd.DataFrame({"a": [1, 2]}), y=pd.Series([2]))
 
     def test_X_and_y_different_indexes_warning(self):
         """Test a warning is raised if X and y have different indexes, but the output is still X and y."""
@@ -502,14 +503,14 @@ class TestCombineXy:
         ):
 
             result = x._combine_X_y(
-                X=pandas.DataFrame({"a": [1, 2]}, index=[1, 2]), y=pandas.Series([2, 4])
+                X=pd.DataFrame({"a": [1, 2]}, index=[1, 2]), y=pd.Series([2, 4])
             )
 
-        expected_output = pandas.DataFrame(
+        expected_output = pd.DataFrame(
             {"a": [1, 2], "_temporary_response": [2, 4]}, index=[1, 2]
         )
 
-        pandas.testing.assert_frame_equal(result, expected_output)
+        pd.testing.assert_frame_equal(result, expected_output)
 
     def test_output_same_indexes(self):
         """Test output is correct if X and y have the same index."""
@@ -517,12 +518,62 @@ class TestCombineXy:
         x = BaseTransformer(columns=["a"])
 
         result = x._combine_X_y(
-            X=pandas.DataFrame({"a": [1, 2]}, index=[1, 2]),
-            y=pandas.Series([2, 4], index=[1, 2]),
+            X=pd.DataFrame({"a": [1, 2]}, index=[1, 2]),
+            y=pd.Series([2, 4], index=[1, 2]),
         )
 
-        expected_output = pandas.DataFrame(
+        expected_output = pd.DataFrame(
             {"a": [1, 2], "_temporary_response": [2, 4]}, index=[1, 2]
         )
 
-        pandas.testing.assert_frame_equal(result, expected_output)
+        pd.testing.assert_frame_equal(result, expected_output)
+
+
+class TestCheckWeightsColumn:
+    "tests for check_weights_column method"
+
+    def test_arguments(self):
+        """Test that columns_set_or_check has expected arguments."""
+
+        ta.functions.test_function_arguments(
+            func=BaseTransformer.check_weights_column,
+            expected_arguments=["X", "weights_column"],
+        )
+
+    def test_weight_not_in_X_error(self):
+        """Test an error is raised if weight is not in X."""
+
+        X = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
+
+        with pytest.raises(
+            ValueError, match=r"weight col \(c\) is not present in columns of data"
+        ):
+
+            BaseTransformer.check_weights_column(X, "c")
+
+    def test_weight_non_numeric_error(self):
+        """Test an error is raised if weight col is non-numeric"""
+
+        X = pd.DataFrame({"a": [1, 2], "b": ["a", "b"]})
+
+        with pytest.raises(ValueError, match="weight column must be numeric."):
+
+            BaseTransformer.check_weights_column(X, "b")
+
+    def test_weight_non_positive_error(self):
+        """Test an error is raised if weight col is non-positive"""
+
+        X = pd.DataFrame({"a": [1, 2], "b": [-1, 0]})
+
+        with pytest.raises(ValueError, match="weight column must be positive"):
+
+            BaseTransformer.check_weights_column(X, "b")
+
+    def test_weight_null_error(self):
+        """Test an error is raised if weight col is null"""
+
+        X = pd.DataFrame({"a": [1, 2], "b": [np.NaN, 0]})
+
+        with pytest.raises(ValueError, match="weight column must be non-null"):
+
+            BaseTransformer.check_weights_column(X, "b")

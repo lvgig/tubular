@@ -16,8 +16,11 @@ class TestInit(object):
 
         ta.functions.test_function_arguments(
             func=ModeImputer.__init__,
-            expected_arguments=["self", "columns"],
-            expected_default_values=(None,),
+            expected_arguments=["self", "columns", "weight"],
+            expected_default_values=(
+                None,
+                None,
+            ),
         )
 
     def test_class_methods(self):
@@ -51,6 +54,17 @@ class TestInit(object):
 
             ModeImputer(columns=None, verbose=True, copy=True)
 
+    @pytest.mark.parametrize("weight", (0, ["a"], {"a": 10}))
+    def test_weight_arg_errors(self, weight):
+        """Test that appropriate errors are thrown for bad weight arg"""
+
+        with pytest.raises(
+            ValueError,
+            match="ModeImputer: weight should be a string or None",
+        ):
+
+            ModeImputer(columns=None, weight=weight)
+
 
 class TestFit(object):
     """Tests for ModeImputer.fit()"""
@@ -79,6 +93,24 @@ class TestFit(object):
 
             x.fit(df)
 
+    def test_check_weights_column_called(self, mocker):
+        """Test that fit calls BaseTransformer.check_weights_column - when weights are used."""
+
+        df = d.create_df_9()
+
+        x = ModeImputer(columns=["a", "b"], weight="c")
+
+        expected_call_args = {0: {"args": (d.create_df_9(), "c"), "kwargs": {}}}
+
+        with ta.functions.assert_function_call(
+            mocker,
+            tubular.base.BaseTransformer,
+            "check_weights_column",
+            expected_call_args,
+        ):
+
+            x.fit(df)
+
     def test_learnt_values(self):
         """Test that the impute values learnt during fit are expected."""
 
@@ -100,12 +132,45 @@ class TestFit(object):
             msg="impute_values_ attribute",
         )
 
+    def test_learnt_values_weighted_df(self):
+        """Test that the impute values learnt during fit are expected when df is weighted."""
+
+        df = d.create_weighted_imputers_test_df()
+
+        x = ModeImputer(columns=["a", "b", "c", "d"], weight="weight")
+
+        x.fit(df)
+
+        ta.classes.test_object_attributes(
+            obj=x,
+            expected_attributes={
+                "impute_values_": {
+                    "a": np.float64(5.0),
+                    "b": "e",
+                    "c": "f",
+                    "d": np.float64(1.0),
+                }
+            },
+            msg="impute_values_ attribute",
+        )
+
     def test_fit_returns_self(self):
         """Test fit returns self?"""
 
         df = d.create_df_1()
 
         x = ModeImputer(columns="a")
+
+        x_fitted = x.fit(df)
+
+        assert x_fitted is x, "Returned value from ModeImputer.fit not as expected."
+
+    def test_fit_returns_self_weighted(self):
+        """Test fit returns self?"""
+
+        df = d.create_df_9()
+
+        x = ModeImputer(columns="a", weight="c")
 
         x_fitted = x.fit(df)
 
@@ -125,6 +190,49 @@ class TestFit(object):
             actual=df,
             msg="Check X not changing during fit",
         )
+
+    def test_fit_not_changing_data_weighted(self):
+        """Test fit does not change X - when weights are used."""
+
+        df = d.create_df_9()
+
+        x = ModeImputer(columns="a", weight="c")
+
+        x.fit(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=d.create_df_9(),
+            actual=df,
+            msg="Check X not changing during fit",
+        )
+
+    def expected_df_nan():
+        df = pd.DataFrame({"a": ["NaN", "NaN", "NaN"], "b": [None, None, None]})
+        return df
+
+    @pytest.mark.parametrize(
+        "df, expected",
+        ta.pandas.row_by_row_params(
+            pd.DataFrame({"a": [np.nan, np.nan, np.nan], "b": [None, None, None]}),
+            expected_df_nan(),
+        )
+        + ta.pandas.index_preserved_params(
+            pd.DataFrame({"a": [np.nan, np.nan, np.nan], "b": [None, None, None]}),
+            expected_df_nan(),
+        ),
+    )
+    def test_warning_mode_is_nan(self, df, expected):
+        """Test that warning is raised when mode is NaN"""
+
+        x = ModeImputer(columns=["a", "b"])
+
+        with pytest.warns(Warning, match="ModeImputer: The Mode of column a is NaN."):
+
+            x.fit(df)
+
+        with pytest.warns(Warning, match="ModeImputer: The Mode of column b is NaN."):
+
+            x.fit(df)
 
 
 class TestTransform(object):
@@ -161,6 +269,17 @@ class TestTransform(object):
         for col in ["a"]:
 
             df[col].loc[df[col].isnull()] = df[col].mode()[0]
+
+        return df
+
+    def expected_df_3():
+        """Expected output for test_nulls_imputed_correctly_3."""
+
+        df = d.create_df_9()
+
+        for col in ["a"]:
+
+            df[col].loc[df[col].isnull()] = 6
 
         return df
 
@@ -245,6 +364,28 @@ class TestTransform(object):
             msg="Check nulls filled correctly in transform",
         )
 
+    @pytest.mark.parametrize(
+        "df, expected",
+        ta.pandas.row_by_row_params(d.create_df_9(), expected_df_3())
+        + ta.pandas.index_preserved_params(d.create_df_9(), expected_df_3()),
+    )
+    def test_nulls_imputed_correctly_3(self, df, expected):
+        """Test missing values are filled with the correct values - and unrelated columns are not changed
+        (when weight is used)."""
+
+        x = ModeImputer(columns=["a"], weight="c")
+
+        # set the impute values dict directly rather than fitting x on df so test works with helpers
+        x.impute_values_ = {"a": 6}
+
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=expected,
+            actual=df_transformed,
+            msg="Check nulls filled correctly in transform",
+        )
+
     def test_learnt_values_not_modified(self):
         """Test that the impute_values_ from fit are not changed in transform."""
 
@@ -255,6 +396,25 @@ class TestTransform(object):
         x.fit(df)
 
         x2 = ModeImputer(columns=["a", "b", "c"])
+
+        x2.fit_transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=x.impute_values_,
+            actual=x2.impute_values_,
+            msg="Impute values not changed in transform",
+        )
+
+    def test_learnt_values_not_modified_weights(self):
+        """Test that the impute_values_ from fit are not changed in transform - when using weights."""
+
+        df = d.create_df_9()
+
+        x = ModeImputer(columns=["a", "b"], weight="c")
+
+        x.fit(df)
+
+        x2 = ModeImputer(columns=["a", "b"], weight="c")
 
         x2.fit_transform(df)
 

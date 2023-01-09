@@ -294,6 +294,40 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
             self.columns_check(X)
 
+    @staticmethod
+    def check_weights_column(X, weights_column):
+        """Helper method for validating weights column in dataframe
+
+        Args:
+            X (pd.DataFrame): df containing weight column
+            weights_column (str): name of weight column
+
+        """
+
+        if weights_column is not None:
+
+            # check if given weight is in columns
+            if weights_column not in X.columns:
+
+                raise ValueError(
+                    f"weight col ({weights_column}) is not present in columns of data"
+                )
+
+            # check weight is numeric
+            elif not pd.api.types.is_numeric_dtype(X[weights_column]):
+
+                raise ValueError("weight column must be numeric.")
+
+            # check weight is positive
+            elif not (X[weights_column] < 0).sum() == 0:
+
+                raise ValueError("weight column must be positive")
+
+            # check weight non-null
+            elif not (X[weights_column].isnull()).sum() == 0:
+
+                raise ValueError("weight column must be non-null")
+
 
 class ReturnKeyDict(dict):
     """Dict class that implements __missing__ method to return the key if it is not present in the dict
