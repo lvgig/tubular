@@ -30,9 +30,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
     verbose : bool, default = False
         Should statements be printed when methods are run?
 
-    **kwds
-        Arbitrary keyword arguments.
-
     Attributes
     ----------
     columns : list or None
