@@ -884,7 +884,7 @@ class DatetimeInfoExtractor(BaseTransformer):
         """
         Method to apply mappings for a specified interval ("timeofday", "timeofmonth", "timeofyear" or "dayofweek")
         from corresponding mapping attribute to a single value.
-        
+
         Parameters
         ----------
         interval : str
