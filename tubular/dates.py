@@ -692,6 +692,35 @@ class DatetimeInfoExtractor(BaseTransformer):
             timeofyear: 1-12
             dayofweek: 0-6
 
+        if in include but no mappings provided default values will be used as follows:
+           timeofday_mapping = {
+                "night": range(0, 6),  # Midnight - 6am
+                "morning": range(6, 12),  # 6am - Noon
+                "afternoon": range(12, 18),  # Noon - 6pm
+                "evening": range(18, 24),  # 6pm - Midnight
+            }
+            timeofmonth_mapping = {
+                "start": range(0, 11),
+                "middle": range(11, 21),
+                "end": range(21, 32),
+            }
+            timeofyear_mapping = {
+                "spring": range(3, 6),  # Mar, Apr, May
+                "summer": range(6, 9),  # Jun, Jul, Aug
+                "autumn": range(9, 12),  # Sep, Oct, Nov
+                "winter": [12, 1, 2],  # Dec, Jan, Feb
+            }
+            dayofweek_mapping = {
+                "monday": [0],
+                "tuesday": [1],
+                "wednesday": [2],
+                "thursday": [3],
+                "friday": [4],
+                "saturday": [5],
+                "sunday": [6],
+            }
+
+
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
 
