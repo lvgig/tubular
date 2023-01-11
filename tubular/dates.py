@@ -879,9 +879,13 @@ class DatetimeInfoExtractor(BaseTransformer):
         else:
             self.dayofweek_mapping = {}
 
-    def _map_values(self, value, interval):
+    def _map_values(self, value, interval: str):
 
-        """Parameters
+        """
+        Method to apply mappings for a specified interval ("timeofday", "timeofmonth", "timeofyear" or "dayofweek")
+        from corresponding mapping attribute to a single value.
+        
+        Parameters
         ----------
         interval : str
             the time period to map "timeofday", "timeofmonth", "timeofyear" or "dayofweek"
