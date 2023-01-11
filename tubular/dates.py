@@ -671,7 +671,7 @@ class DatetimeInfoExtractor(BaseTransformer):
     Parameters
     ----------
     columns : str or list
-        datetime columns
+        datetime columns to extract information from
 
     include : list of str, default = ["timeofday", "timeofmonth", "timeofyear", "dayofweek"]
         Which datetime categorical information to extract
