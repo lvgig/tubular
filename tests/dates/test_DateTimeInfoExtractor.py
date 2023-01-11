@@ -99,16 +99,7 @@ class TestExtractDatetimeInfoInit(object):
         x = DatetimeInfoExtractor(columns=["a"])
 
         ta.classes.test_object_method(
-            obj=x, expected_method="identify_timeofday", msg="identify_timeofday"
-        )
-        ta.classes.test_object_method(
-            obj=x, expected_method="identify_timeofmonth", msg="identify_timeofmonth"
-        )
-        ta.classes.test_object_method(
-            obj=x, expected_method="identify_timeofyear", msg="identify_timeofyear"
-        )
-        ta.classes.test_object_method(
-            obj=x, expected_method="identify_dayofweek", msg="identify_dayofweek"
+            obj=x, expected_method="_map_values", msg="_map_values"
         )
         ta.classes.test_object_method(
             obj=x, expected_method="transform", msg="transform"
@@ -231,13 +222,13 @@ class TestExtractDatetimeInfoInit(object):
             DatetimeInfoExtractor(columns=["a"], datetime_mappings=incomplete_mappings)
 
 
-class TestIdentifyTimeOfDay(object):
+class TestMapValues(object):
     def test_arguments(self):
         """Test that identify_timeofday has the expected arguments"""
 
     ta.functions.test_function_arguments(
-        func=DatetimeInfoExtractor.identify_timeofday,
-        expected_arguments=["self", "hour"],
+        func=DatetimeInfoExtractor._map_values,
+        expected_arguments=["self", "value", "interval"],
         expected_default_values=None,
     )
 
@@ -245,9 +236,11 @@ class TestIdentifyTimeOfDay(object):
     def test_incorrect_type_input(self, incorrect_type_input, timeofday_extractor):
         """Test that an error is raised if input is the wrong type"""
 
-        with pytest.raises(TypeError, match="hour should be float or int"):
+        with pytest.raises(
+            TypeError, match="DatetimeInfoExtractor: value should be float or int"
+        ):
 
-            timeofday_extractor.identify_timeofday(incorrect_type_input)
+            timeofday_extractor._map_values(incorrect_type_input, "timeofday")
 
     @pytest.mark.parametrize("incorrect_size_input", [-2, 30, 5.6, 11.2])
     def test_out_of_bounds_or_fractional_input(
@@ -255,8 +248,11 @@ class TestIdentifyTimeOfDay(object):
     ):
         """Test that an error is raised when value is outside of 0-23 range"""
 
-        with pytest.raises(ValueError, match="hour should be a whole value in 0-23"):
-            timeofday_extractor.identify_timeofday(incorrect_size_input)
+        with pytest.raises(
+            ValueError,
+            match="DatetimeInfoExtractor: value for timeofday mapping  in self._map_values should be an integer value in 0-23",
+        ):
+            timeofday_extractor._map_values(incorrect_size_input, "timeofday")
 
     @pytest.mark.parametrize(
         "valid_hour, hour_time_of_day",
@@ -271,49 +267,16 @@ class TestIdentifyTimeOfDay(object):
             (23, "evening"),
         ],
     )
-    def test_valid_inputs(self, valid_hour, hour_time_of_day, timeofday_extractor):
+    def test_valid_inputs_timeofday(
+        self, valid_hour, hour_time_of_day, timeofday_extractor
+    ):
         """Trial test to check all in one go"""
 
-        output = timeofday_extractor.identify_timeofday(valid_hour)
+        output = timeofday_extractor._map_values(valid_hour, "timeofday")
 
         assert output == hour_time_of_day, "expected {}, output {}".format(
             hour_time_of_day, output
         )
-
-    def test_valid_nan_output(self, timeofday_extractor):
-        """Test that correct values are return with valid inputs"""
-        output = timeofday_extractor.identify_timeofday(np.nan)
-        print(output)
-        assert np.isnan(
-            output
-        ), f"passing np.nan should result in np.nan, instead received {output}"
-
-
-class TestIdentifyTimeOfMonth(object):
-    def test_arguments(self):
-        """Test that identify_timeofmonth has the expected arguments"""
-
-        ta.functions.test_function_arguments(
-            func=DatetimeInfoExtractor.identify_timeofmonth,
-            expected_arguments=["self", "day"],
-            expected_default_values=None,
-        )
-
-    @pytest.mark.parametrize("incorrect_type_input", ["2", [1, 2]])
-    def test_incorrect_type_input(self, incorrect_type_input, timeofmonth_extractor):
-        """Test that an error is raised if input is the wrong type"""
-
-        with pytest.raises(TypeError, match="day should be float or int"):
-            timeofmonth_extractor.identify_timeofmonth(incorrect_type_input)
-
-    @pytest.mark.parametrize("incorrect_size_input", [-2, 40, 5.6, 11.2])
-    def test_out_of_bounds_or_fractional_input(
-        self, incorrect_size_input, timeofmonth_extractor
-    ):
-        """Test that an error is raised when value is outside of 1-31 range"""
-
-        with pytest.raises(ValueError, match="day should be a whole number in 1-31"):
-            timeofmonth_extractor.identify_timeofmonth(incorrect_size_input)
 
     @pytest.mark.parametrize(
         "valid_day, day_time_of_month",
@@ -329,46 +292,14 @@ class TestIdentifyTimeOfMonth(object):
             (31, "end"),
         ],
     )
-    def test_valid_inputs(self, valid_day, day_time_of_month, timeofmonth_extractor):
+    def test_valid_inputs_timeofmonth(
+        self, valid_day, day_time_of_month, timeofmonth_extractor
+    ):
         """Test that correct values are return with valid inputs"""
-        output = timeofmonth_extractor.identify_timeofmonth(valid_day)
+        output = timeofmonth_extractor._map_values(valid_day, "timeofmonth")
         assert output == day_time_of_month, "expected {}, output {}".format(
             day_time_of_month, output
         )
-
-    def test_valid_nan_output(self, timeofmonth_extractor):
-        """Test that correct values are return with valid inputs"""
-        output = timeofmonth_extractor.identify_timeofmonth(np.nan)
-        assert np.isnan(
-            output
-        ), f"passing np.nan should result in np.nan, instead received {output}"
-
-
-class TestIdentifyTimeOfYear(object):
-    def test_arguments(self):
-        """Test that identify_timeofyear has the expected arguments"""
-
-        ta.functions.test_function_arguments(
-            func=DatetimeInfoExtractor.identify_timeofyear,
-            expected_arguments=["self", "month"],
-            expected_default_values=None,
-        )
-
-    @pytest.mark.parametrize("incorrect_type_input", ["2", [1, 2]])
-    def test_incorrect_type_input(self, incorrect_type_input, timeofyear_extractor):
-        """Test that an error is raised if input is the wrong type"""
-
-        with pytest.raises(TypeError, match="month should be float or int"):
-            timeofyear_extractor.identify_timeofyear(incorrect_type_input)
-
-    @pytest.mark.parametrize("incorrect_size_input", [-2, 13, 5.6, 11.2])
-    def test_out_of_bounds_or_fractional_input(
-        self, incorrect_size_input, timeofyear_extractor
-    ):
-        """Test that an error is raised when value is outside of 1-12 range"""
-
-        with pytest.raises(ValueError, match="month should be a whole number in 1-12"):
-            timeofyear_extractor.identify_timeofyear(incorrect_size_input)
 
     @pytest.mark.parametrize(
         "valid_month, month_time_of_year",
@@ -383,46 +314,14 @@ class TestIdentifyTimeOfYear(object):
             (12, "winter"),
         ],
     )
-    def test_valid_inputs(self, valid_month, month_time_of_year, timeofyear_extractor):
+    def test_valid_inputs_timeofyear(
+        self, valid_month, month_time_of_year, timeofyear_extractor
+    ):
         """Test that correct values are return with valid inputs"""
-        output = timeofyear_extractor.identify_timeofyear(valid_month)
+        output = timeofyear_extractor._map_values(valid_month, "timeofyear")
         assert output == month_time_of_year, "expected {}, output {}".format(
             month_time_of_year, output
         )
-
-    def test_valid_nan_output(self, timeofyear_extractor):
-        """Test that correct values are return with valid inputs"""
-        output = timeofyear_extractor.identify_timeofyear(np.nan)
-        assert np.isnan(
-            output
-        ), f"passing np.nan should result in np.nan, instead recieved {output}"
-
-
-class TestIdentifyDayOfWeek(object):
-    def test_arguments(self):
-        """Test that identify_dayofweek has the expected arguments"""
-
-        ta.functions.test_function_arguments(
-            func=DatetimeInfoExtractor.identify_dayofweek,
-            expected_arguments=["self", "day"],
-            expected_default_values=None,
-        )
-
-    @pytest.mark.parametrize("incorrect_type_input", ["2", [1, 2]])
-    def test_incorrect_type_input(self, incorrect_type_input, dayofweek_extractor):
-        """Test that an error is raised if input is the wrong type"""
-
-        with pytest.raises(TypeError, match="day should be float or int"):
-            dayofweek_extractor.identify_dayofweek(incorrect_type_input)
-
-    @pytest.mark.parametrize("incorrect_size_input", [-2, 8, 5.6, 11.2])
-    def test_out_of_boundsor_fractional_input(
-        self, incorrect_size_input, dayofweek_extractor
-    ):
-        """Test that an error is raised when value is outside of 0-6 range"""
-
-        with pytest.raises(ValueError, match="day should be in 0-6"):
-            dayofweek_extractor.identify_dayofweek(incorrect_size_input)
 
     @pytest.mark.parametrize(
         "valid_day, dayofweek",
@@ -433,14 +332,15 @@ class TestIdentifyDayOfWeek(object):
             (6, "sunday"),
         ],
     )
-    def test_valid_inputs(self, valid_day, dayofweek, dayofweek_extractor):
+    def test_valid_inputs_dayofweek(self, valid_day, dayofweek, dayofweek_extractor):
         """Test that correct values are return with valid inputs"""
-        output = dayofweek_extractor.identify_dayofweek(valid_day)
+        output = dayofweek_extractor._map_values(valid_day, "dayofweek")
         assert output == dayofweek, "expected {}, output {}".format(dayofweek, output)
 
-    def test_valid_nan_output(self, dayofweek_extractor):
+    def test_valid_nan_output(self, timeofday_extractor):
         """Test that correct values are return with valid inputs"""
-        output = dayofweek_extractor.identify_dayofweek(np.nan)
+        output = timeofday_extractor._map_values(np.nan, "timeofday")
+        print(output)
         assert np.isnan(
             output
         ), f"passing np.nan should result in np.nan, instead received {output}"
@@ -523,17 +423,14 @@ class TestTransform(object):
             print_actual_and_expected=True,
         )
 
-    def test_intermediary_method_calls(self, mocker):
+    def test_map_values_calls(self, mocker):
         """Test all intermediary methods are being called correct number of times"""
 
         # df is 8 rows long so each intermediate function must have 8 calls
         df = d.create_date_test_df()
         df = df.astype("datetime64[ns]")
 
-        mocked_tod = mocker.spy(DatetimeInfoExtractor, "identify_timeofday")
-        mocked_toy = mocker.spy(DatetimeInfoExtractor, "identify_timeofyear")
-        mocked_tom = mocker.spy(DatetimeInfoExtractor, "identify_timeofmonth")
-        mocked_doy = mocker.spy(DatetimeInfoExtractor, "identify_dayofweek")
+        mocked_map_values = mocker.spy(DatetimeInfoExtractor, "_map_values")
 
         x = DatetimeInfoExtractor(
             columns=["b"],
@@ -541,10 +438,7 @@ class TestTransform(object):
         )
         x.transform(df)
 
-        assert mocked_tod.call_count == 8
-        assert mocked_toy.call_count == 8
-        assert mocked_tom.call_count == 8
-        assert mocked_doy.call_count == 8
+        assert mocked_map_values.call_count == 32
 
     def test_correct_df_returned(self):
         """Test that correct df is returned after transformation"""

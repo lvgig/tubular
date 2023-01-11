@@ -745,11 +745,11 @@ class DatetimeInfoExtractor(BaseTransformer):
 
         self.include = include
         self.datetime_mappings = datetime_mappings
-        mappings_provided = self.datetime_mappings.keys()
+        self.mappings_provided = self.datetime_mappings.keys()
 
         # Select correct mapping either from default or user input
 
-        if ("timeofday" in include) and ("timeofday" in mappings_provided):
+        if ("timeofday" in include) and ("timeofday" in self.mappings_provided):
             timeofday_mapping = self.datetime_mappings["timeofday"]
         elif "timeofday" in include:  # Choose default mapping
             timeofday_mapping = {
@@ -759,7 +759,7 @@ class DatetimeInfoExtractor(BaseTransformer):
                 "evening": range(18, 24),  # 6pm - Midnight
             }
 
-        if ("timeofmonth" in include) and ("timeofmonth" in mappings_provided):
+        if ("timeofmonth" in include) and ("timeofmonth" in self.mappings_provided):
             timeofmonth_mapping = self.datetime_mappings["timeofmonth"]
         elif "timeofmonth" in include:  # Choose default mapping
             timeofmonth_mapping = {
@@ -768,7 +768,7 @@ class DatetimeInfoExtractor(BaseTransformer):
                 "end": range(21, 32),
             }
 
-        if ("timeofyear" in include) and ("timeofyear" in mappings_provided):
+        if ("timeofyear" in include) and ("timeofyear" in self.mappings_provided):
             timeofyear_mapping = self.datetime_mappings["timeofyear"]
         elif "timeofyear" in include:  # Choose default mapping
             timeofyear_mapping = {
@@ -778,7 +778,7 @@ class DatetimeInfoExtractor(BaseTransformer):
                 "winter": [12, 1, 2],  # Dec, Jan, Feb
             }
 
-        if ("dayofweek" in include) and ("dayofweek" in mappings_provided):
+        if ("dayofweek" in include) and ("dayofweek" in self.mappings_provided):
             dayofweek_mapping = self.datetime_mappings["dayofweek"]
         elif "dayofweek" in include:  # Choose default mapping
             dayofweek_mapping = {
@@ -805,6 +805,8 @@ class DatetimeInfoExtractor(BaseTransformer):
                     )
                 )
             # Check if all hours in dictionary
+        else:
+            self.timeofday_mapping = {}
 
         if "timeofmonth" in include:
             self.timeofmonth_mapping = {
@@ -817,6 +819,8 @@ class DatetimeInfoExtractor(BaseTransformer):
                         set(range(1, 32)) - set(self.timeofmonth_mapping.keys()),
                     )
                 )
+        else:
+            self.timeofmonth_mapping = {}
 
         if "timeofyear" in include:
             self.timeofyear_mapping = {
@@ -829,6 +833,8 @@ class DatetimeInfoExtractor(BaseTransformer):
                         set(range(1, 13)) - set(self.timeofyear_mapping.keys()),
                     )
                 )
+        else:
+            self.timeofyear_mapping = {}
 
         if "dayofweek" in include:
             self.dayofweek_mapping = {
@@ -841,120 +847,59 @@ class DatetimeInfoExtractor(BaseTransformer):
                         set(range(7)) - set(self.dayofweek_mapping.keys()),
                     )
                 )
+        else:
+            self.dayofweek_mapping = {}
 
-    def identify_timeofday(self, hour):
-        """Map timeofday from hour
+    def _map_values(self, value, interval):
 
-        Parameters
+        """Parameters
         ----------
-        hour : numeric
-            Hour to map
+        interval : str
+            the time period to map "timeofday", "timeofmonth", "timeofyear" or "dayofweek"
+
+        value : float or int
+            the value to be mapped
+
 
         Returns
         -------
         str : str
-            Mapped hour
+            Mapped value
         """
 
-        if not type(hour) is float:
-            if not type(hour) is int:
-                raise TypeError(f"{self.classname()}: hour should be float or int")
+        if not type(value) is float:
+            if not type(value) is int:
+                raise TypeError(f"{self.classname()}: value should be float or int")
 
-        if not np.isnan(hour):
-            if hour not in np.arange(0, 24, 1):
+        errors = {
+            "timeofday": "0-23",
+            "dayofweek": "0-6",
+            "timeofmonth": "1-31",
+            "timeofyear": "1-12",
+        }
+        ranges = {
+            "timeofday": (0, 24, 1),
+            "dayofweek": (0, 7, 1),
+            "timeofmonth": (1, 32, 1),
+            "timeofyear": (1, 13, 1),
+        }
+        mappings = {
+            "timeofday": self.timeofday_mapping,
+            "dayofweek": self.dayofweek_mapping,
+            "timeofmonth": self.timeofmonth_mapping,
+            "timeofyear": self.timeofyear_mapping,
+        }
+
+        if not np.isnan(value):
+            if value not in np.arange(*ranges[interval]):
                 raise ValueError(
-                    f"{self.classname()}: hour should be a whole value in 0-23"
+                    f"{self.classname()}: value for {interval} mapping  in self._map_values should be an integer value in {errors[interval]}"
                 )
 
-        if np.isnan(hour):
+        if np.isnan(value):
             return np.nan
         else:
-            return self.timeofday_mapping[hour]
-
-    def identify_timeofmonth(self, day):
-        """Map timeofmonth from day
-
-        Parameters
-        ----------
-        day : numeric
-            Day to map
-
-        Returns
-        -------
-        str : str
-            Mapped day
-        """
-
-        if not type(day) is float:
-            if not type(day) is int:
-                raise TypeError(f"{self.classname()}: day should be float or int")
-
-        if not np.isnan(day):
-            if day not in np.arange(1, 32, 1):
-                raise ValueError(
-                    f"{self.classname()}: day should be a whole number in 1-31"
-                )
-
-        if np.isnan(day):
-            return np.nan
-        else:
-            return self.timeofmonth_mapping[day]
-
-    def identify_timeofyear(self, month):
-        """Map timeofyear from month
-
-        Parameters
-        ----------
-        month : numeric
-            Month to map
-
-        Returns
-        -------
-        str : str
-            Mapped month
-        """
-
-        if not type(month) is float:
-            if not type(month) is int:
-                raise TypeError(f"{self.classname()}: month should be float or int")
-
-        if not np.isnan(month):
-            if month not in np.arange(1, 13, 1):
-                raise ValueError(
-                    f"{self.classname()}: month should be a whole number in 1-12"
-                )
-
-        if np.isnan(month):
-            return np.nan
-        else:
-            return self.timeofyear_mapping[month]
-
-    def identify_dayofweek(self, day):
-        """Map dayofweek from day
-
-        Parameters
-        ----------
-        day : numeric
-            Day to map
-
-        Returns
-        -------
-        str : str
-            Mapped day
-        """
-
-        if not type(day) is float:
-            if not type(day) is int:
-                raise TypeError(f"{self.classname()}: day should be float or int")
-
-        if not np.isnan(day):
-            if day not in np.arange(0, 7, 1):
-                raise ValueError(f"{self.classname()}: day should be in 0-6")
-
-        if np.isnan(day):
-            return np.nan
-        else:
-            return self.dayofweek_mapping[day]
+            return mappings[interval][value]
 
     def transform(self, X):
         """Transform - Extracts new features from datetime variables
@@ -983,15 +928,23 @@ class DatetimeInfoExtractor(BaseTransformer):
 
         for col in self.columns:
             if "timeofday" in self.include:
-                X[col + "_timeofday"] = X[col].dt.hour.apply(self.identify_timeofday)
+                X[col + "_timeofday"] = X[col].dt.hour.apply(
+                    self._map_values, interval="timeofday"
+                )
 
             if "timeofmonth" in self.include:
-                X[col + "_timeofmonth"] = X[col].dt.day.apply(self.identify_timeofmonth)
+                X[col + "_timeofmonth"] = X[col].dt.day.apply(
+                    self._map_values, interval="timeofmonth"
+                )
 
             if "timeofyear" in self.include:
-                X[col + "_timeofyear"] = X[col].dt.month.apply(self.identify_timeofyear)
+                X[col + "_timeofyear"] = X[col].dt.month.apply(
+                    self._map_values, interval="timeofyear"
+                )
 
             if "dayofweek" in self.include:
-                X[col + "_dayofweek"] = X[col].dt.weekday.apply(self.identify_dayofweek)
+                X[col + "_dayofweek"] = X[col].dt.weekday.apply(
+                    self._map_values, interval="dayofweek"
+                )
 
         return X
