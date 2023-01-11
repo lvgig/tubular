@@ -713,11 +713,6 @@ class DatetimeInfoExtractor(BaseTransformer):
         **kwargs,
     ):
 
-        if not type(columns) is list:
-            if type(columns) is str:
-                columns = [columns]
-            else:
-                raise TypeError(f"{self.classname()}: columns should be str or List")
 
         if not type(include) is list:
             raise TypeError(f"{self.classname()}: include should be List")
