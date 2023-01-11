@@ -730,10 +730,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
                 )
             )
 
-        if (
-            (not isinstance(period, int))
-            and (not isinstance(period, float))
-        ):
+        if (not isinstance(period, int)) and (not isinstance(period, float)):
             raise TypeError(
                 "{}: period must be a int or float but got {}".format(
                     self.classname(), type(period)
