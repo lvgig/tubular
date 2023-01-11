@@ -759,9 +759,7 @@ class DatetimeInfoExtractor(BaseTransformer):
                 "evening": range(18, 24),  # 6pm - Midnight
             }
 
-        if ("timeofmonth" in include) and (
-            "timeofmonth" in mappings_provided
-        ):
+        if ("timeofmonth" in include) and ("timeofmonth" in mappings_provided):
             timeofmonth_mapping = self.datetime_mappings["timeofmonth"]
         elif "timeofmonth" in include:  # Choose default mapping
             timeofmonth_mapping = {
@@ -770,9 +768,7 @@ class DatetimeInfoExtractor(BaseTransformer):
                 "end": range(21, 32),
             }
 
-        if ("timeofyear" in include) and (
-            "timeofyear" in mappings_provided
-        ):
+        if ("timeofyear" in include) and ("timeofyear" in mappings_provided):
             timeofyear_mapping = self.datetime_mappings["timeofyear"]
         elif "timeofyear" in include:  # Choose default mapping
             timeofyear_mapping = {
