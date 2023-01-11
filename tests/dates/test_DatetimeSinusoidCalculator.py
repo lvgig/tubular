@@ -34,7 +34,7 @@ class TestDatetimeSinusoidCalculatorInit(object):
         )
 
     def test_class_methods(self, example_transformer):
-        """Test that DateDifferenceTransformer has a transform methods."""
+        """Test that DateDifferenceTransformer has a transform method."""
 
         ta.classes.test_object_method(
             obj=example_transformer, expected_method="transform", msg="transform"
@@ -104,7 +104,7 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 24,
             )
 
-    @pytest.mark.parametrize("incorrect_type_period", ["2", True, {"a": 4}, ["help"]])
+    @pytest.mark.parametrize("incorrect_type_period", ["2", {"a": 4}, ["help"]])
     def test_period_type_error(self, incorrect_type_period):
         """Test that an error is raised if period is not an int or a float"""
 
