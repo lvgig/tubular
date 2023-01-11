@@ -921,9 +921,9 @@ class DatetimeInfoExtractor(BaseTransformer):
             if not X[col].dtype.name == "datetime64[ns]":
                 try:
                     X[col] = X[col].dt.tz_localize(None)
-                except Exception:
+                except AttributeError:
                     raise TypeError(
-                        f"{self.classname()}: values in {col} should be datetime"
+                        f"{self.classname()}: values in {col} should be datetime64[ns]"
                     )
 
         for col in self.columns:
