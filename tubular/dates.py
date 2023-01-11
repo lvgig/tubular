@@ -745,10 +745,11 @@ class DatetimeInfoExtractor(BaseTransformer):
 
         self.include = include
         self.datetime_mappings = datetime_mappings
+        mappings_provided = self.datetime_mappings.keys()
 
         # Select correct mapping either from default or user input
 
-        if ("timeofday" in include) and ("timeofday" in self.datetime_mappings.keys()):
+        if ("timeofday" in include) and ("timeofday" in mappings_provided):
             timeofday_mapping = self.datetime_mappings["timeofday"]
         elif "timeofday" in include:  # Choose default mapping
             timeofday_mapping = {
@@ -759,7 +760,7 @@ class DatetimeInfoExtractor(BaseTransformer):
             }
 
         if ("timeofmonth" in include) and (
-            "timeofmonth" in self.datetime_mappings.keys()
+            "timeofmonth" in mappings_provided
         ):
             timeofmonth_mapping = self.datetime_mappings["timeofmonth"]
         elif "timeofmonth" in include:  # Choose default mapping
@@ -770,7 +771,7 @@ class DatetimeInfoExtractor(BaseTransformer):
             }
 
         if ("timeofyear" in include) and (
-            "timeofyear" in self.datetime_mappings.keys()
+            "timeofyear" in mappings_provided
         ):
             timeofyear_mapping = self.datetime_mappings["timeofyear"]
         elif "timeofyear" in include:  # Choose default mapping
@@ -781,7 +782,7 @@ class DatetimeInfoExtractor(BaseTransformer):
                 "winter": [12, 1, 2],  # Dec, Jan, Feb
             }
 
-        if ("dayofweek" in include) and ("dayofweek" in self.datetime_mappings.keys()):
+        if ("dayofweek" in include) and ("dayofweek" in mappings_provided):
             dayofweek_mapping = self.datetime_mappings["dayofweek"]
         elif "dayofweek" in include:  # Choose default mapping
             dayofweek_mapping = {
