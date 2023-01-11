@@ -713,7 +713,6 @@ class DatetimeInfoExtractor(BaseTransformer):
         **kwargs,
     ):
 
-
         if not type(include) is list:
             raise TypeError(f"{self.classname()}: include should be List")
 
@@ -734,8 +733,8 @@ class DatetimeInfoExtractor(BaseTransformer):
                 )
 
         if datetime_mappings != {}:
-            for key in datetime_mappings.keys():
-                if not type(datetime_mappings[key]) is dict:
+            for key, mapping in datetime_mappings.items():
+                if not type(mapping) is dict:
                     raise TypeError(
                         f"{self.classname()}: values in datetime_mappings should be dict"
                     )

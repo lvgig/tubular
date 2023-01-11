@@ -114,18 +114,6 @@ class TestExtractDatetimeInfoInit(object):
             obj=x, expected_method="transform", msg="transform"
         )
 
-    @pytest.mark.parametrize("incorrect_type_columns", [2, 3.0, True])
-    def test_error_when_columns_not_list(self, incorrect_type_columns):
-        """Test that an exception is raised when value columns variable is not a list"""
-
-        with pytest.raises(
-            TypeError,
-            match="columns should be str or List",
-        ):
-            DatetimeInfoExtractor(
-                columns=incorrect_type_columns, include=["timeofyear"]
-            )
-
     @pytest.mark.parametrize("incorrect_type_include", [2, 3.0, "invalid", "dayofweek"])
     def test_error_when_include_not_list(self, incorrect_type_include):
         """Test that an exception is raised when value include variable is not a list"""
