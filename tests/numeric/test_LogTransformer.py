@@ -32,7 +32,6 @@ class TestInit(object):
             LogTransformer(
                 columns=["a"],
                 base="a",
-                new_column_name="b",
             )
 
     def test_base_not_strictly_positive_error(self):
@@ -46,7 +45,6 @@ class TestInit(object):
             LogTransformer(
                 columns=["a"],
                 base=0,
-                new_column_name="b",
             )
 
     def test_class_methods(self):

@@ -23,7 +23,7 @@ class TestInit(object):
     def test_class_methods(self):
         """Test that NearestMeanResponseImputer has fit and transform methods."""
 
-        x = NearestMeanResponseImputer(response_column="c", columns=None)
+        x = NearestMeanResponseImputer(columns=None)
 
         ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
 

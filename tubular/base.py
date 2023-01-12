@@ -30,9 +30,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
     verbose : bool, default = False
         Should statements be printed when methods are run?
 
-    **kwds
-        Arbitrary keyword arguments.
-
     Attributes
     ----------
     columns : list or None
@@ -54,7 +51,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         """Method that returns the name of the current class when called"""
         return type(self).__name__
 
-    def __init__(self, columns=None, copy=True, verbose=False, **kwargs):
+    def __init__(self, columns=None, copy=True, verbose=False):
 
         self.version_ = __version__
 
@@ -293,6 +290,40 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         else:
 
             self.columns_check(X)
+
+    @staticmethod
+    def check_weights_column(X, weights_column):
+        """Helper method for validating weights column in dataframe
+
+        Args:
+            X (pd.DataFrame): df containing weight column
+            weights_column (str): name of weight column
+
+        """
+
+        if weights_column is not None:
+
+            # check if given weight is in columns
+            if weights_column not in X.columns:
+
+                raise ValueError(
+                    f"weight col ({weights_column}) is not present in columns of data"
+                )
+
+            # check weight is numeric
+            elif not pd.api.types.is_numeric_dtype(X[weights_column]):
+
+                raise ValueError("weight column must be numeric.")
+
+            # check weight is positive
+            elif not (X[weights_column] < 0).sum() == 0:
+
+                raise ValueError("weight column must be positive")
+
+            # check weight non-null
+            elif not (X[weights_column].isnull()).sum() == 0:
+
+                raise ValueError("weight column must be non-null")
 
 
 class ReturnKeyDict(dict):

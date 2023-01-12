@@ -667,6 +667,324 @@ class BetweenDatesTransformer(BaseTransformer):
         return X
 
 
+class DatetimeInfoExtractor(BaseTransformer):
+    """Transformer to extract various features from datetime var
+    
+    Parameters
+    ----------
+    columns : str or list
+        datetime columns to extract information from
+
+    include : list of str, default = ["timeofday", "timeofmonth", "timeofyear", "dayofweek"]
+        Which datetime categorical information to extract
+
+    datetime_mappings : dict, default = {}
+        Optional argument to define custom mappings for datetime values.
+        Keys of the dictionary must be contained in `include`
+        All possible values of each feature must be included in the mappings,
+        ie, a mapping for `dayofweek` must include all values 0-6;
+        datetime_mappings = {"dayofweek": {"week": [0, 1, 2, 3, 4],
+                                           "weekend": [5, 6]}}
+        The values for the mapping array must be iterable;
+        datetime_mappings = {"timeofday": {"am": range(0, 12),
+                                           "pm": range(12, 24)}}
+        The required ranges for each mapping are:
+            timeofday: 0-23
+            timeofmonth: 1-31
+            timeofyear: 1-12
+            dayofweek: 0-6
+
+        If in include but no mappings provided default values will be used as follows:
+           timeofday_mapping = {
+                "night": range(0, 6),  # Midnight - 6am
+                "morning": range(6, 12),  # 6am - Noon
+                "afternoon": range(12, 18),  # Noon - 6pm
+                "evening": range(18, 24),  # 6pm - Midnight
+            }
+            timeofmonth_mapping = {
+                "start": range(0, 11),
+                "middle": range(11, 21),
+                "end": range(21, 32),
+            }
+            timeofyear_mapping = {
+                "spring": range(3, 6),  # Mar, Apr, May
+                "summer": range(6, 9),  # Jun, Jul, Aug
+                "autumn": range(9, 12),  # Sep, Oct, Nov
+                "winter": [12, 1, 2],  # Dec, Jan, Feb
+            }
+            dayofweek_mapping = {
+                "monday": [0],
+                "tuesday": [1],
+                "wednesday": [2],
+                "thursday": [3],
+                "friday": [4],
+                "saturday": [5],
+                "sunday": [6],
+            }
+
+
+    **kwargs
+        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+
+    Attributes
+    ----------
+    include : list of str, default = ["timeofday", "timeofmonth", "timeofyear", "dayofweek"]
+        Which datetime categorical information to extract
+
+    datetime_mappings : dict, default = {}
+        Optional argument to define custom mappings for datetime values.
+ 
+    """
+
+    def __init__(
+        self,
+        columns,
+        include=["timeofday", "timeofmonth", "timeofyear", "dayofweek"],
+        datetime_mappings={},
+        **kwargs,
+    ):
+
+        if not type(include) is list:
+            raise TypeError(f"{self.classname()}: include should be List")
+
+        if not type(datetime_mappings) is dict:
+            raise TypeError(f"{self.classname()}: datetime_mappings should be Dict")
+
+        super().__init__(columns=columns, **kwargs)
+
+        for var in include:
+            if var not in [
+                "timeofday",
+                "timeofmonth",
+                "timeofyear",
+                "dayofweek",
+            ]:
+                raise ValueError(
+                    f'{self.classname()}: elements in include should be in ["timeofday", "timeofmonth", "timeofyear", "dayofweek"]'
+                )
+
+        if datetime_mappings != {}:
+            for key, mapping in datetime_mappings.items():
+                if not type(mapping) is dict:
+                    raise TypeError(
+                        f"{self.classname()}: values in datetime_mappings should be dict"
+                    )
+                if key not in include:
+                    raise ValueError(
+                        f"{self.classname()}: keys in datetime_mappings should be in include"
+                    )
+
+        self.include = include
+        self.datetime_mappings = datetime_mappings
+        self.mappings_provided = self.datetime_mappings.keys()
+
+        # Select correct mapping either from default or user input
+
+        if ("timeofday" in include) and ("timeofday" in self.mappings_provided):
+            timeofday_mapping = self.datetime_mappings["timeofday"]
+        elif "timeofday" in include:  # Choose default mapping
+            timeofday_mapping = {
+                "night": range(0, 6),  # Midnight - 6am
+                "morning": range(6, 12),  # 6am - Noon
+                "afternoon": range(12, 18),  # Noon - 6pm
+                "evening": range(18, 24),  # 6pm - Midnight
+            }
+
+        if ("timeofmonth" in include) and ("timeofmonth" in self.mappings_provided):
+            timeofmonth_mapping = self.datetime_mappings["timeofmonth"]
+        elif "timeofmonth" in include:  # Choose default mapping
+            timeofmonth_mapping = {
+                "start": range(0, 11),
+                "middle": range(11, 21),
+                "end": range(21, 32),
+            }
+
+        if ("timeofyear" in include) and ("timeofyear" in self.mappings_provided):
+            timeofyear_mapping = self.datetime_mappings["timeofyear"]
+        elif "timeofyear" in include:  # Choose default mapping
+            timeofyear_mapping = {
+                "spring": range(3, 6),  # Mar, Apr, May
+                "summer": range(6, 9),  # Jun, Jul, Aug
+                "autumn": range(9, 12),  # Sep, Oct, Nov
+                "winter": [12, 1, 2],  # Dec, Jan, Feb
+            }
+
+        if ("dayofweek" in include) and ("dayofweek" in self.mappings_provided):
+            dayofweek_mapping = self.datetime_mappings["dayofweek"]
+        elif "dayofweek" in include:  # Choose default mapping
+            dayofweek_mapping = {
+                "monday": [0],
+                "tuesday": [1],
+                "wednesday": [2],
+                "thursday": [3],
+                "friday": [4],
+                "saturday": [5],
+                "sunday": [6],
+            }
+
+        # Invert dictionaries for quicker lookup
+
+        if "timeofday" in include:
+            self.timeofday_mapping = {
+                vi: k for k, v in timeofday_mapping.items() for vi in v
+            }
+            if set(self.timeofday_mapping.keys()) != set(range(24)):
+                raise ValueError(
+                    "{}: timeofday mapping dictionary should contain mapping for all hours between 0-23. {} are missing".format(
+                        self.classname(),
+                        set(range(24)) - set(self.timeofday_mapping.keys()),
+                    )
+                )
+            # Check if all hours in dictionary
+        else:
+            self.timeofday_mapping = {}
+
+        if "timeofmonth" in include:
+            self.timeofmonth_mapping = {
+                vi: k for k, v in timeofmonth_mapping.items() for vi in v
+            }
+            if set(self.timeofmonth_mapping.keys()) != set(range(32)):
+                raise ValueError(
+                    "{}: timeofmonth mapping dictionary should contain mapping for all days between 1-31. {} are missing".format(
+                        self.classname(),
+                        set(range(1, 32)) - set(self.timeofmonth_mapping.keys()),
+                    )
+                )
+        else:
+            self.timeofmonth_mapping = {}
+
+        if "timeofyear" in include:
+            self.timeofyear_mapping = {
+                vi: k for k, v in timeofyear_mapping.items() for vi in v
+            }
+            if set(self.timeofyear_mapping.keys()) != set(range(1, 13)):
+                raise ValueError(
+                    "{}: timeofyear mapping dictionary should contain mapping for all months between 1-12. {} are missing".format(
+                        self.classname(),
+                        set(range(1, 13)) - set(self.timeofyear_mapping.keys()),
+                    )
+                )
+        else:
+            self.timeofyear_mapping = {}
+
+        if "dayofweek" in include:
+            self.dayofweek_mapping = {
+                vi: k for k, v in dayofweek_mapping.items() for vi in v
+            }
+            if set(self.dayofweek_mapping.keys()) != set(range(7)):
+                raise ValueError(
+                    "{}: dayofweek mapping dictionary should contain mapping for all days between 0-6. {} are missing".format(
+                        self.classname(),
+                        set(range(7)) - set(self.dayofweek_mapping.keys()),
+                    )
+                )
+        else:
+            self.dayofweek_mapping = {}
+
+    def _map_values(self, value, interval: str):
+
+        """
+        Method to apply mappings for a specified interval ("timeofday", "timeofmonth", "timeofyear" or "dayofweek")
+        from corresponding mapping attribute to a single value.
+
+        Parameters
+        ----------
+        interval : str
+            the time period to map "timeofday", "timeofmonth", "timeofyear" or "dayofweek"
+
+        value : float or int
+            the value to be mapped
+
+
+        Returns
+        -------
+        str : str
+            Mapped value
+        """
+
+        if not type(value) is float:
+            if not type(value) is int:
+                raise TypeError(f"{self.classname()}: value should be float or int")
+
+        errors = {
+            "timeofday": "0-23",
+            "dayofweek": "0-6",
+            "timeofmonth": "1-31",
+            "timeofyear": "1-12",
+        }
+        ranges = {
+            "timeofday": (0, 24, 1),
+            "dayofweek": (0, 7, 1),
+            "timeofmonth": (1, 32, 1),
+            "timeofyear": (1, 13, 1),
+        }
+        mappings = {
+            "timeofday": self.timeofday_mapping,
+            "dayofweek": self.dayofweek_mapping,
+            "timeofmonth": self.timeofmonth_mapping,
+            "timeofyear": self.timeofyear_mapping,
+        }
+
+        if not np.isnan(value):
+            if value not in np.arange(*ranges[interval]):
+                raise ValueError(
+                    f"{self.classname()}: value for {interval} mapping  in self._map_values should be an integer value in {errors[interval]}"
+                )
+
+        if np.isnan(value):
+            return np.nan
+        else:
+            return mappings[interval][value]
+
+    def transform(self, X):
+        """Transform - Extracts new features from datetime variables
+ 
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data with columns to extract info from.
+
+        Returns
+        -------
+        X : pd.DataFrame
+            Transformed input X with added columns of extracted information.
+        """
+
+        X = super().transform(X)
+
+        for col in self.columns:
+            if not X[col].dtype.name == "datetime64[ns]":
+                try:
+                    X[col] = X[col].dt.tz_localize(None)
+                except AttributeError:
+                    raise TypeError(
+                        f"{self.classname()}: values in {col} should be datetime64[ns]"
+                    )
+
+        for col in self.columns:
+            if "timeofday" in self.include:
+                X[col + "_timeofday"] = X[col].dt.hour.apply(
+                    self._map_values, interval="timeofday"
+                )
+
+            if "timeofmonth" in self.include:
+                X[col + "_timeofmonth"] = X[col].dt.day.apply(
+                    self._map_values, interval="timeofmonth"
+                )
+
+            if "timeofyear" in self.include:
+                X[col + "_timeofyear"] = X[col].dt.month.apply(
+                    self._map_values, interval="timeofyear"
+                )
+
+            if "dayofweek" in self.include:
+                X[col + "_dayofweek"] = X[col].dt.weekday.apply(
+                    self._map_values, interval="dayofweek"
+                )
+
+        return X
+
+
 class DatetimeSinusoidCalculator(BaseTransformer):
 
     """
@@ -703,7 +1021,6 @@ class DatetimeSinusoidCalculator(BaseTransformer):
 
     period : str or float, default = 2*np.pi
         The period of the output in the units specified above.
-
     """
 
     def __init__(
@@ -787,7 +1104,6 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         -------
         X : pd.DataFrame
             Input X with additional columns added, these are named "<method>_<original_column>"
-
         """
 
         X = super().transform(X)
@@ -810,3 +1126,5 @@ class DatetimeSinusoidCalculator(BaseTransformer):
                 )
 
         return X
+
+
