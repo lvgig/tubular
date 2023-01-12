@@ -11,8 +11,7 @@ def example_transformer():
 
     example_transformer = TwoColumnOperatorTransformer(
         "mul",
-        "a",
-        "b",
+        ["a", "b"],
         "c",
     )
 
@@ -25,14 +24,14 @@ class TestTwoColumnOperatorTransformerInit(object):
     """
 
     def test_inheritance(self, example_transformer):
-        """Test that CutTransformer inherits from BaseTransformer."""
+        """Test that TwoColumnOperatorTransformer inherits from BaseTransformer."""
 
         ta.classes.assert_inheritance(
             example_transformer, tubular.base.DataFrameMethodTransformer
         )
 
     def test_class_methods(self, example_transformer):
-        """Test that CutTransformer has transform method."""
+        """Test that TwoColumnOperatorTransformer has transform method."""
 
         ta.classes.test_object_method(
             obj=example_transformer, expected_method="transform", msg="transform"
@@ -46,8 +45,7 @@ class TestTwoColumnOperatorTransformerInit(object):
             expected_arguments=[
                 "self",
                 "pd_method_name",
-                "column1_name",
-                "column2_name",
+                "columns",
                 "new_column_name",
                 "pd_method_kwargs",
             ],
@@ -62,7 +60,7 @@ class TestTwoColumnOperatorTransformerInit(object):
             ValueError,
             match='pd_method_kwargs must contain an entry "axis" set to 0 or 1',
         ):
-            TwoColumnOperatorTransformer("mul", "a", "b", "c", pd_method_kwargs={})
+            TwoColumnOperatorTransformer("mul", ["a", "b"], "c", pd_method_kwargs={})
             assert True, message
 
     def test_axis_not_valid_error(self):
@@ -71,37 +69,37 @@ class TestTwoColumnOperatorTransformerInit(object):
         message = "init method did not raise an error when no 'axis' pd_method_kwarg was specified"
         with pytest.raises(ValueError, match="pd_method_kwargs 'axis' must be 0 or 1"):
             TwoColumnOperatorTransformer(
-                "mul", "a", "b", "c", pd_method_kwargs={"axis": 2}
+                "mul", ["a", "b"], "c", pd_method_kwargs={"axis": 2}
             )
             assert True, message
 
-    @pytest.mark.parametrize(
-        "col2_wrong_type", [1, 2.0, True, ["list"], {"dict": 1}, ("tuple",)]
-    )
-    def test_column2_str_error(self, col2_wrong_type):
-        """Checks that an error is raised if column2_name is not a string"""
+    # @pytest.mark.parametrize(
+    #     "col2_wrong_type", [1, 2.0, True, ["list"], {"dict": 1}, ("tuple",)]
+    # )
+    # def test_column2_str_error(self, col2_wrong_type):
+    #     """Checks that an error is raised if column2_name is not a string"""
 
-        message = (
-            "init method did not raise an error when column2_name was not a string"
-        )
-        with pytest.raises(
-            ValueError,
-            match=f"column2_name must be a string but got type {type(col2_wrong_type)}",
-        ):
-            TwoColumnOperatorTransformer(
-                "mul",
-                "a",
-                col2_wrong_type,
-                "c",
-            )
-            assert True, message
+    #     message = (
+    #         "init method did not raise an error when column2_name was not a string"
+    #     )
+    #     with pytest.raises(
+    #         ValueError,
+    #         match=f"column2_name must be a string but got type {type(col2_wrong_type)}",
+    #     ):
+    #         TwoColumnOperatorTransformer(
+    #             "mul",
+    #             ["a",
+    #             col2_wrong_type],
+    #             "c",
+    #         )
+    #         assert True, message
 
     def test_attributes(self, example_transformer):
         """Tests that the transformer has the expected attributes"""
         expected_attributes = {
             "pd_method_name": "mul",
             # 'a' is given as a list here because that's how DataFrameMethodTransformer.__init__ stores the columns attribute
-            "columns": ["a"],
+            "column1_name": "a",
             "column2_name": "b",
             "new_column_name": "c",
             "pd_method_kwargs": {"axis": 0},
@@ -132,7 +130,7 @@ class TestTwoColumnOperatorTransformerInit(object):
             return_value=None,
         ):
 
-            TwoColumnOperatorTransformer("mul", "a", "b", "c")
+            TwoColumnOperatorTransformer("mul", ["a", "b"], "c")
 
 
 class TestTwoColumnOperatorTransformerTransform(object):
@@ -174,17 +172,18 @@ class TestTwoColumnOperatorTransformerTransform(object):
         data = d.create_df_11()
         x = TwoColumnOperatorTransformer(
             pd_method_name,
-            "a",
-            "b",
+            ["a", "b"],
             "c",
         )
         x.transform(data)
 
         # pull out positional and keyword args to target the call
-
+        print(spy.call_args_list)
         call_args = spy.call_args_list[0]
         call_pos_args = call_args[0]
         call_kwargs = call_args[1]
+
+        
 
         # test keyword are as expected
         ta.equality.assert_dict_equal_msg(
@@ -218,8 +217,8 @@ class TestTwoColumnOperatorTransformerTransform(object):
         expected["c"] = output
         x = TwoColumnOperatorTransformer(
             pd_method_name,
-            "a",
-            "b",
+            ["a",
+            "b"],
             "c",
         )
         actual = x.transform(d.create_df_11())

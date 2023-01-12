@@ -268,8 +268,8 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         The name of the pandas.DataFrame method to be called.
 
     columns : list
-        The name of the 1st column in the operation stored as a string in a one element list. This is how the attribute is stored by
-        DataFrameMethodTransformer.__init__
+        list containing two string items: [column1_name, column2_name] The first will be operated upon by the 
+        chosen pandas method using the second.
 
     column2_name : str
         The name of the 2nd column in the operation.
@@ -285,8 +285,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
     def __init__(
         self,
         pd_method_name,
-        column1_name,
-        column2_name,
+        columns,
         new_column_name,
         pd_method_kwargs={"axis": 0},
         **kwargs,
@@ -305,17 +304,17 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
                 f"{self.classname()}: pd_method_kwargs 'axis' must be 0 or 1"
             )
 
-        if not type(column2_name) is str:
-            raise ValueError(
-                f"{self.classname()}: column2_name must be a string but got type {type(column2_name)}"
+        if not type(columns) is list:
+            if len(columns) != 2:
+                raise ValueError(
+                    f"{self.classname()}: columns must be a list containing two column names but got {columns}"
             )
 
-        self.column1_name = column1_name
-        self.column2_name = column2_name
+        self.column1_name = columns[0]
+        self.column2_name = columns[1]
 
         # call DataFrameMethodTransformer.__init__
         # This class will inherit all the below attributes from DataFrameMethodTransformer
-        # Note that columns will now be a list: [column1_name]
         super().__init__(
             new_column_name=new_column_name,
             pd_method_name=pd_method_name,
@@ -337,7 +336,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         # call BaseTransformer.transform
         X = super(DataFrameMethodTransformer, self).transform(X)
 
-        X[self.new_column_name] = getattr(X[self.columns], self.pd_method_name)(
+        X[self.new_column_name] = getattr(X[self.column1_name], self.pd_method_name)(
             X[self.column2_name], **self.pd_method_kwargs
         )
 
