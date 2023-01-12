@@ -268,7 +268,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         The name of the pandas.DataFrame method to be called.
 
     columns : list
-        list containing two string items: [column1_name, column2_name] The first will be operated upon by the 
+        list containing two string items: [column1_name, column2_name] The first will be operated upon by the
         chosen pandas method using the second.
 
     column2_name : str
@@ -308,7 +308,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
             if len(columns) != 2:
                 raise ValueError(
                     f"{self.classname()}: columns must be a list containing two column names but got {columns}"
-            )
+                )
 
         self.column1_name = columns[0]
         self.column2_name = columns[1]
@@ -318,7 +318,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         super().__init__(
             new_column_name=new_column_name,
             pd_method_name=pd_method_name,
-            columns=self.column1_name,
+            columns=columns,
             pd_method_kwargs=pd_method_kwargs,
             **kwargs,
         )
@@ -336,7 +336,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         # call BaseTransformer.transform
         X = super(DataFrameMethodTransformer, self).transform(X)
 
-        X[self.new_column_name] = getattr(X[self.column1_name], self.pd_method_name)(
+        X[self.new_column_name] = getattr(X[[self.column1_name]], self.pd_method_name)(
             X[self.column2_name], **self.pd_method_kwargs
         )
 

@@ -73,27 +73,6 @@ class TestTwoColumnOperatorTransformerInit(object):
             )
             assert True, message
 
-    # @pytest.mark.parametrize(
-    #     "col2_wrong_type", [1, 2.0, True, ["list"], {"dict": 1}, ("tuple",)]
-    # )
-    # def test_column2_str_error(self, col2_wrong_type):
-    #     """Checks that an error is raised if column2_name is not a string"""
-
-    #     message = (
-    #         "init method did not raise an error when column2_name was not a string"
-    #     )
-    #     with pytest.raises(
-    #         ValueError,
-    #         match=f"column2_name must be a string but got type {type(col2_wrong_type)}",
-    #     ):
-    #         TwoColumnOperatorTransformer(
-    #             "mul",
-    #             ["a",
-    #             col2_wrong_type],
-    #             "c",
-    #         )
-    #         assert True, message
-
     def test_attributes(self, example_transformer):
         """Tests that the transformer has the expected attributes"""
         expected_attributes = {
@@ -116,7 +95,7 @@ class TestTwoColumnOperatorTransformerInit(object):
                 "kwargs": {
                     "new_column_name": "c",
                     "pd_method_name": "mul",
-                    "columns": "a",
+                    "columns": ["a", "b"],
                     "pd_method_kwargs": {"axis": 0},
                 },
             }
@@ -183,8 +162,6 @@ class TestTwoColumnOperatorTransformerTransform(object):
         call_pos_args = call_args[0]
         call_kwargs = call_args[1]
 
-        
-
         # test keyword are as expected
         ta.equality.assert_dict_equal_msg(
             actual=call_kwargs,
@@ -217,8 +194,7 @@ class TestTwoColumnOperatorTransformerTransform(object):
         expected["c"] = output
         x = TwoColumnOperatorTransformer(
             pd_method_name,
-            ["a",
-            "b"],
+            ["a", "b"],
             "c",
         )
         actual = x.transform(d.create_df_11())
