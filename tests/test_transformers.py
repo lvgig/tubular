@@ -32,6 +32,7 @@ class TestInit(object):
                 column_lower="a", column_upper="b", new_column_name="c", units="D"
             ),
             dates.ToDatetimeTransformer(column="a", new_column_name="b"),
+            dates.DatetimeInfoExtractor(columns="a"),
             dates.SeriesDtMethodTransformer(
                 new_column_name="a", pd_method_name="month", column="b"
             ),
