@@ -42,6 +42,12 @@ class TestInit(object):
                 column_between="c",
                 new_column_name="c",
             ),
+            dates.DatetimeSinusoidCalculator(
+                "a",
+                "sin",
+                "month",
+                12,
+            ),
             imputers.BaseImputer(),
             imputers.ArbitraryImputer(impute_value=1, columns="a"),
             imputers.MedianImputer(columns="a"),

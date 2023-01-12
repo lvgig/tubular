@@ -7,6 +7,8 @@ import warnings
 import numpy as np
 import pandas as pd
 
+from typing import Union, List
+
 from tubular.base import BaseTransformer
 
 
@@ -692,7 +694,7 @@ class DatetimeInfoExtractor(BaseTransformer):
             timeofyear: 1-12
             dayofweek: 0-6
 
-        if in include but no mappings provided default values will be used as follows:
+        If in include but no mappings provided default values will be used as follows:
            timeofday_mapping = {
                 "night": range(0, 6),  # Midnight - 6am
                 "morning": range(6, 12),  # 6am - Noon
@@ -978,6 +980,149 @@ class DatetimeInfoExtractor(BaseTransformer):
             if "dayofweek" in self.include:
                 X[col + "_dayofweek"] = X[col].dt.weekday.apply(
                     self._map_values, interval="dayofweek"
+                )
+
+        return X
+
+
+class DatetimeSinusoidCalculator(BaseTransformer):
+
+    """
+    Transformer to derive a feature in a dataframe by calculating the
+    sine or cosine of a datetime column in a given unit (e.g hour), with the option to scale
+    period of the sine or cosine to match the natural period of the unit (e.g. 24).
+
+    Parameters
+    ----------
+    columns : str or list
+        Columns to take the sine or cosine of. Must be a datetime[64] column.
+
+    method : str or list
+        Argument to specify which function is to be calculated. Accepted values are 'sin', 'cos' or a list containing both.
+
+    units : str
+        Which time unit the calculation is to be carried out on. Accepted values are 'year', 'month',
+        'day', 'hour', 'minute', 'second', 'microsecond'.
+
+    period : int or float, default = 2*np.pi
+        The period of the output in the units specified above. To leave the period of the sinusoid output as 2 pi, specify 2*np.pi (or leave as default)
+
+    Attributes
+    -----------
+    columns : str or list
+        Columns to take the sine or cosine of.
+
+    method : str
+        The function to be calculated; either sin, cos or a list containing both.
+
+    units : str
+        Which time unit the calculation is to be carried out on. Will take any of 'year', 'month',
+        'day', 'hour', 'minute', 'second', 'microsecond'.
+
+    period : str or float, default = 2*np.pi
+        The period of the output in the units specified above.
+    """
+
+    def __init__(
+        self,
+        columns: Union[str, List[str]],
+        method: Union[str, List[str]],
+        units: str,
+        period: Union[int, float] = 2 * np.pi,
+    ):
+
+        super().__init__(columns, copy=True)
+
+        if not isinstance(method, str) and not isinstance(method, list):
+            raise TypeError(
+                "{}: method must be a string or list but got {}".format(
+                    self.classname(), type(method)
+                )
+            )
+
+        if not isinstance(units, str):
+            raise TypeError(
+                "{}: units must be a string but got {}".format(
+                    self.classname(), type(units)
+                )
+            )
+
+        if (not isinstance(period, int)) and (not isinstance(period, float)):
+            raise TypeError(
+                "{}: period must be a int or float but got {}".format(
+                    self.classname(), type(period)
+                )
+            )
+
+        valid_method_list = ["sin", "cos"]
+
+        if isinstance(method, str):
+            method_list = [method]
+        else:
+            method_list = method
+
+        for method in method_list:
+            if method not in valid_method_list:
+                raise ValueError(
+                    '{}: Invalid method {} supplied, should be "sin", "cos" or a list containing both'.format(
+                        self.classname(), method
+                    )
+                )
+
+        valid_unit_list = [
+            "year",
+            "month",
+            "day",
+            "hour",
+            "minute",
+            "second",
+            "microsecond",
+        ]
+
+        if units not in valid_unit_list:
+            raise ValueError(
+                "{}: Invalid units {} supplied, should be in {}".format(
+                    self.classname(), units, valid_unit_list
+                )
+            )
+
+        self.method = method_list
+        self.units = units
+        self.period = period
+
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Transform - creates column containing sine or cosine of another datetime column.
+
+        Which function is used is stored in the self.method attribute.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data to transform.
+
+        Returns
+        -------
+        X : pd.DataFrame
+            Input X with additional columns added, these are named "<method>_<original_column>"
+        """
+
+        X = super().transform(X)
+
+        for column in self.columns:
+            if not pd.api.types.is_datetime64_dtype(X[column]):
+
+                raise TypeError(
+                    f"{self.classname()} : {column} should be datetime64[ns] type but got {X[column].dtype}"
+                )
+
+            column_in_desired_unit = getattr(X[column].dt, self.units)
+
+            for method in self.method:
+
+                new_column_name = method + "_" + column
+
+                X[new_column_name] = getattr(np, method)(
+                    column_in_desired_unit * (2.0 * np.pi / self.period)
                 )
 
         return X
