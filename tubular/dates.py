@@ -669,7 +669,7 @@ class BetweenDatesTransformer(BaseTransformer):
 
 class DatetimeInfoExtractor(BaseTransformer):
     """Transformer to extract various features from datetime var
-    
+
     Parameters
     ----------
     columns : str or list
@@ -733,7 +733,7 @@ class DatetimeInfoExtractor(BaseTransformer):
 
     datetime_mappings : dict, default = {}
         Optional argument to define custom mappings for datetime values.
- 
+
     """
 
     def __init__(
@@ -938,7 +938,7 @@ class DatetimeInfoExtractor(BaseTransformer):
 
     def transform(self, X):
         """Transform - Extracts new features from datetime variables
- 
+
         Parameters
         ----------
         X : pd.DataFrame
@@ -1126,5 +1126,3 @@ class DatetimeSinusoidCalculator(BaseTransformer):
                 )
 
         return X
-
-
