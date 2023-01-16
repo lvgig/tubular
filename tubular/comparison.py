@@ -6,8 +6,6 @@ class EqualityChecker(BaseTransformer):
 
     """Transformer to check if two columns are equal.
 
-    This should be used to check if two columns are equal.
-
     Parameters
     ----------
     columns: list
