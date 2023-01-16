@@ -179,11 +179,7 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
         will be raised. This normally results from an incomplete mapping being provided,
         or a mix of dtypes causing pandas to default to the object dtype.
 
-        For columns with a 'category' dtype, conventional type comparisons do not work as they
-        category dtypes reflect the possible values on the category. This means that although
-        a mapping can maintain a category dtype, if the values in the column change it will
-        be registered as a different dtype. To address this a check is performed before the
-        warning is raised to ensure that it does not get raised in these cases.
+        For columns with a 'category' dtype the warning will not be raised.
 
         Parameters
         ----------
