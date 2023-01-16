@@ -339,7 +339,9 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         is_numeric = X[self.columns].apply(pd.api.types.is_numeric_dtype, axis=0)
 
         if not is_numeric.all():
-            raise TypeError(f"{self.classname()}: input columns in X must contain only numeric values")
+            raise TypeError(
+                f"{self.classname()}: input columns in X must contain only numeric values"
+            )
 
         X[self.new_column_name] = getattr(X[[self.column1_name]], self.pd_method_name)(
             X[self.column2_name], **self.pd_method_kwargs

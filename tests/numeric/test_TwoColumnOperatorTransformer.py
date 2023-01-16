@@ -55,23 +55,19 @@ class TestTwoColumnOperatorTransformerInit(object):
     def test_axis_not_present_error(self):
         """Checks that an error is raised if no axis element present in pd_method_kwargs dict"""
 
-        message = "init method did not raise an error when no 'axis' pd_method_kwarg was specified"
         with pytest.raises(
             ValueError,
             match='pd_method_kwargs must contain an entry "axis" set to 0 or 1',
         ):
             TwoColumnOperatorTransformer("mul", ["a", "b"], "c", pd_method_kwargs={})
-            assert True, message
 
     def test_axis_not_valid_error(self):
         """Checks that an error is raised if no axis element present in pd_method_kwargs dict"""
 
-        message = "init method did not raise an error when no 'axis' pd_method_kwarg was specified"
         with pytest.raises(ValueError, match="pd_method_kwargs 'axis' must be 0 or 1"):
             TwoColumnOperatorTransformer(
                 "mul", ["a", "b"], "c", pd_method_kwargs={"axis": 2}
             )
-            assert True, message
 
     def test_attributes(self, example_transformer):
         """Tests that the transformer has the expected attributes"""
@@ -206,10 +202,13 @@ class TestTwoColumnOperatorTransformerTransform(object):
 
     def test_non_numeric_error(self):
         x = TwoColumnOperatorTransformer(
-            'mul',
+            "mul",
             ["a", "b"],
             "c",
         )
-        
-        with pytest.raises(TypeError, match="TwoColumnOperatorTransformer: input columns in X must contain only numeric values"): 
+
+        with pytest.raises(
+            TypeError,
+            match="TwoColumnOperatorTransformer: input columns in X must contain only numeric values",
+        ):
             x.transform(d.create_df_8())
