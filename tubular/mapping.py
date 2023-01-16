@@ -165,7 +165,7 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
 
         BaseMappingTransformer.__init__(self, mappings=mappings, **kwargs)
 
-    def transform(self, X):
+    def transform(self, X, suppress_dtype_warning=False):
         """Transform the input data X according to the mappings in the mappings attribute dict.
 
         This method calls the BaseMappingTransformMixin.transform. Note, this transform method is
@@ -185,6 +185,9 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
         ----------
         X : pd.DataFrame
             Data with nominal columns to transform.
+
+        suppress_dtype_warning: Bool, default = False
+            Whether to suppress warnings about dtype changes
 
         Returns
         -------
@@ -216,24 +219,26 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
 
         mapped_dtypes = X[mapped_columns].dtypes
 
-        for col in mapped_columns:
+        if not suppress_dtype_warning:
 
-            col_mappings = pd.Series(self.mappings[col])
-            mapping_dtype = col_mappings.dtype
+            for col in mapped_columns:
 
-            if (mapped_dtypes[col] != mapping_dtype) and (
-                mapped_dtypes[col] != original_dtypes[col]
-            ):
+                col_mappings = pd.Series(self.mappings[col])
+                mapping_dtype = col_mappings.dtype
 
-                # Confirm the initial and end dtypes are not categories
-                if not (
-                    is_categorical_dtype(original_dtypes[col])
-                    and is_categorical_dtype(mapped_dtypes[col])
+                if (mapped_dtypes[col] != mapping_dtype) and (
+                    mapped_dtypes[col] != original_dtypes[col]
                 ):
 
-                    warnings.warn(
-                        f"{self.classname()}: This mapping changes {col} dtype from {original_dtypes[col]} to {mapped_dtypes[col]}. This is often caused by having multiple dtypes in one column, or by not mapping all values."
-                    )
+                    # Confirm the initial and end dtypes are not categories
+                    if not (
+                        is_categorical_dtype(original_dtypes[col])
+                        and is_categorical_dtype(mapped_dtypes[col])
+                    ):
+
+                        warnings.warn(
+                            f"{self.classname()}: This mapping changes {col} dtype from {original_dtypes[col]} to {mapped_dtypes[col]}. This is often caused by having multiple dtypes in one column, or by not mapping all values."
+                        )
 
         return X
 

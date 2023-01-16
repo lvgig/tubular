@@ -138,8 +138,8 @@ class TestTransform(object):
 
         ta.functions.test_function_arguments(
             func=MappingTransformer.transform,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
+            expected_arguments=["self", "X", "suppress_dtype_warning"],
+            expected_default_values=(False,),
         )
 
     def test_super_transform_call(self, mocker):
@@ -302,6 +302,25 @@ class TestTransform(object):
             match=f"MappingTransformer: This mapping changes {input_col_name} dtype from {input_col_type} to object. This is often caused by having multiple dtypes in one column, or by not mapping all values",
         ):
             x.transform(df)
+
+    @pytest.mark.parametrize(
+        "mapping, input_col_name, input_col_type",
+        [
+            ({"a": {1: True, 6: False}}, "a", "int64"),
+        ],
+    )
+    def test_unexpected_dtype_change_warning_suppressed(
+        self, mapping, input_col_name, input_col_type
+    ):
+
+        df = d.create_df_1()
+
+        x = MappingTransformer(mappings=mapping)
+
+        with pytest.warns(None) as warnings_record:
+            x.transform(df, suppress_dtype_warning=True)
+
+            assert len(warnings_record) == 0
 
     def test_category_dtype_is_conserved(self):
         """This is a separate test due to the behaviour of category dtypes
