@@ -203,3 +203,13 @@ class TestTwoColumnOperatorTransformerTransform(object):
             expected=expected,
             msg_tag="TwoColumnMethod transformer does not produce the expected output",
         )
+
+    def test_non_numeric_error(self):
+        x = TwoColumnOperatorTransformer(
+            'mul',
+            ["a", "b"],
+            "c",
+        )
+        
+        with pytest.raises(TypeError, match="TwoColumnOperatorTransformer: input columns in X must contain only numeric values"): 
+            x.transform(d.create_df_8())
