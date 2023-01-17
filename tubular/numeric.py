@@ -539,9 +539,8 @@ class PCATransformer(BaseTransformer):
         columns : None or list or str
             Columns to apply the transformer to. If a str is passed this is put into a list. Value passed
             in columns is saved in the columns attribute on the object. Note this has no default value so
-            the user has to specify the columns when initialising the transformer. This is avoid likely
-            when the user forget to set columns, in this case all columns would be picked up when super
-            transform runs.
+            the user has to specify the columns when initialising the transformer. When the user forget to set columns,
+            all columns would be picked up when super transform runs.
         n_components : int, float or 'mle', default=None
             Number of components to keep.
             if n_components is not set all components are kept::
