@@ -603,7 +603,7 @@ class PCATransformer(BaseTransformer):
         if type(n_components) is int:
             if n_components < 1:
                 raise ValueError(
-                    f"{self.classname()}:n_components must be positive got {str(n_components)}"
+                    f"{self.classname()}:n_components must be strictly positive got {str(n_components)}"
                 )
             else:
                 self.n_components = n_components

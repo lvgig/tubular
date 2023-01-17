@@ -87,7 +87,7 @@ class TestInit(object):
 
         with pytest.raises(
             ValueError,
-            match=r"""PCATransformer:n_components must be positive got -1""",
+            match=r"""PCATransformer:n_components must be strictly positive got -1""",
         ):
             PCATransformer(columns="b", n_components=-1)
 
