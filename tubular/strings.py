@@ -139,7 +139,7 @@ class SeriesStrMethodTransformer(BaseTransformer):
 
 class StringConcatenator(BaseTransformer):
     """
-    Transformer to concatenate values from a few columns into 1 string.
+    Transformer to combine data from specified columns, of mixed datatypes, into a new column containing one string.
 
     Parameters
     ----------
@@ -167,7 +167,7 @@ class StringConcatenator(BaseTransformer):
 
     def transform(self, X):
         """
-        Concatenates values into one string.
+        Combine data from specified columns, of mixed datatypes, into a new column containing one string.
 
          Parameters
         ----------
