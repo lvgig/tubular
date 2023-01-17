@@ -186,7 +186,7 @@ class TestFit(object):
 
         df = d.create_numeric_df_1()
 
-        x = PCATransformer(columns=["a", "b"], n_component=1)
+        x = PCATransformer(columns=["a", "b"], n_components=1)
 
         expected_call_args = {
             0: {"args": (d.create_numeric_df_1(), None), "kwargs": {}}
@@ -202,7 +202,7 @@ class TestFit(object):
 
         df = d.create_numeric_df_1()
 
-        x = PCATransformer(columns=["a", "b"], n_component=1)
+        x = PCATransformer(columns=["a", "b"], n_components=1)
 
         expected_call_args = {0: {"args": (d.create_numeric_df_1(),), "kwargs": {}}}
 
