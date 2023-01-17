@@ -23,7 +23,7 @@ class TestSetColumnDtypeInit(object):
             ],
             expected_default_values=None,
         )
-    
+
     def test_inheritance(self):
         """Test that SetColumnDtype inherits from tubular BaseTransformer."""
 
@@ -140,10 +140,7 @@ class TestSetColumnDtypeTransform(object):
         ta.pandas.row_by_row_params(base_df(), expected_df())
         + ta.pandas.index_preserved_params(base_df(), expected_df()),
     )
-    @pytest.mark.parametrize(
-        "dtype",
-        [float, 'float']
-    )
+    @pytest.mark.parametrize("dtype", [float, "float"])
     def test_expected_output(self, df, expected, dtype):
         """Test values are correctly set to float dtype"""
 
