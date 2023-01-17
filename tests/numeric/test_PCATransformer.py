@@ -406,10 +406,10 @@ class TestTransform(object):
         "svd_solver, svd_solver_output_str",
         [("full", "full"), ("arpack", "arpack"), ("randomized", "randomized")],
     )
-    def test_output_from_scaler_transform_set_to_columns(
+    def test_output_from_pca_transform_set_to_columns(
         self, mocker, svd_solver, svd_solver_output_str
     ):
-        """Test that the call to the pca.transform method."""
+        """Test that the call to the pca.transform method returns expected outputs."""
 
         df = d.create_numeric_df_1()
 
