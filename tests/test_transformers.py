@@ -70,6 +70,7 @@ class TestInit(object):
                 adjust_column="b", mappings={"a": {1: 2, 3: 4}}
             ),
             misc.SetValueTransformer(columns="a", value=1),
+            misc.SetColumnDtype(columns="a", dtype=str),
             nominal.BaseNominalTransformer(),
             nominal.NominalToIntegerTransformer(columns="a"),
             nominal.GroupRareLevelsTransformer(columns="a"),
