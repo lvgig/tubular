@@ -2,6 +2,7 @@
 import pytest
 import tubular.base as base
 import tubular.capping as capping
+import tubular.comparison as comparison
 import tubular.dates as dates
 import tubular.imputers as imputers
 import tubular.mapping as mapping
@@ -25,6 +26,7 @@ class TestInit(object):
             ),
             capping.CappingTransformer(capping_values={"a": [0.1, 0.2]}),
             capping.OutOfRangeNullTransformer(capping_values={"a": [0.1, 0.2]}),
+            comparison.EqualityChecker(columns=["a", "b"], new_col_name="c"),
             dates.DateDiffLeapYearTransformer(
                 column_lower="a", column_upper="b", new_column_name="c", drop_cols=True
             ),
