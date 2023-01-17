@@ -7,20 +7,6 @@ import tubular
 from tubular.numeric import PCATransformer
 
 
-def created_numeric_df_1():
-    """Example with numeric dataframe"""
-    df = pd.DataFrame(
-        {
-            "a": [34.48, 21.71, 32.83, 1.08, 32.93, 4.74, 2.76, 75.7, 14.08, 61.31],
-            "b": [12.03, 20.32, 24.12, 24.18, 68.99, 0.0, 0.0, 59.46, 11.02, 60.68],
-            "c": [17.06, 12.25, 19.15, 29.73, 1.98, 8.23, 15.22, 20.59, 3.82, 39.73],
-            "d": [25.94, 70.22, 72.94, 64.55, 0.41, 13.62, 30.22, 4.6, 67.13, 10.38],
-            "e": [94.3, 4.18, 51.7, 16.63, 2.6, 16.57, 3.51, 30.79, 66.19, 25.44],
-        }
-    )
-    return df
-
-
 class TestInit(object):
     """Tests for PCATransformer.init()."""
 
@@ -198,11 +184,13 @@ class TestFit(object):
     def test_super_fit_call(self, mocker):
         """Test the call to BaseTransformer.fit."""
 
-        df = created_numeric_df_1()
+        df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=["a", "b"], n_component=1)
 
-        expected_call_args = {0: {"args": (created_numeric_df_1(), None), "kwargs": {}}}
+        expected_call_args = {
+            0: {"args": (d.create_numeric_df_1(), None), "kwargs": {}}
+        }
 
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "fit", expected_call_args
@@ -212,18 +200,18 @@ class TestFit(object):
     def test_check_numeric_columns_call(self, mocker):
         """Test the call to PCATransformer.check_numeric_columns."""
 
-        df = created_numeric_df_1()
+        df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=["a", "b"], n_component=1)
 
-        expected_call_args = {0: {"args": (created_numeric_df_1(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_numeric_df_1(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
             mocker,
             tubular.numeric.PCATransformer,
             "check_numeric_columns",
             expected_call_args,
-            return_value=created_numeric_df_1(),
+            return_value=d.create_numeric_df_1(),
         ):
             x.fit(df)
 
@@ -234,7 +222,7 @@ class TestFit(object):
             match=r"""PCATransformer: n_components 10 must be between 1 and min\(n_samples 10, n_features 2\) is 2 with svd_solver 'arpack'""",
         ):
             # must be between 1 and min(n_samples 10, n_features 2) is 2 with svd_solver arpack
-            df = created_numeric_df_1()
+            df = d.create_numeric_df_1()
 
             x = PCATransformer(columns=["a", "b"], n_components=10, svd_solver="arpack")
 
@@ -243,7 +231,7 @@ class TestFit(object):
     def test_return_self(self):
         """Test that fit returns self."""
 
-        df = created_numeric_df_1()
+        df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=["a", "b"])
 
@@ -375,20 +363,20 @@ class TestTransform(object):
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
 
-        df = created_numeric_df_1()
+        df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=["a", "b"])
 
         x.fit(df)
 
-        expected_call_args = {0: {"args": (created_numeric_df_1(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_numeric_df_1(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
-            return_value=created_numeric_df_1(),
+            return_value=d.create_numeric_df_1(),
         ):
 
             x.transform(df)
@@ -396,20 +384,20 @@ class TestTransform(object):
     def test_check_numeric_columns_call(self, mocker):
         """Test the call to PCATransformer.check_numeric_columns."""
 
-        df = created_numeric_df_1()
+        df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=["a", "b"], copy=True)
 
         x.fit(df)
 
-        expected_call_args = {0: {"args": (created_numeric_df_1(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (d.create_numeric_df_1(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
-            return_value=created_numeric_df_1(),
+            return_value=d.create_numeric_df_1(),
         ):
 
             x.transform(df)
@@ -423,7 +411,7 @@ class TestTransform(object):
     ):
         """Test that the call to the pca.transform method."""
 
-        df = created_numeric_df_1()
+        df = d.create_numeric_df_1()
 
         x = PCATransformer(
             columns=["a", "b", "c"],
@@ -451,7 +439,7 @@ class TestTransform(object):
     def test_return_type(self, columns):
         """Test that transform returns a pd.DataFrame."""
 
-        df = created_numeric_df_1()
+        df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=columns, n_components=1)
 
