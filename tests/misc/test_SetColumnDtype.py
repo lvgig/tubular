@@ -8,7 +8,7 @@ import tests.test_data as d
 from tubular.misc import SetColumnDtype
 
 
-class TestSetColumnDtype(object):
+class TestSetColumnDtypeInit(object):
     """Tests for SetColumnDtype custom transformer."""
 
     def test_init_arguments(self):
@@ -23,22 +23,7 @@ class TestSetColumnDtype(object):
             ],
             expected_default_values=None,
         )
-
-    @pytest.mark.parametrize(
-        "method_name",
-        [
-            ("transform"),
-        ],
-    )
-    def test_class_methods(self, method_name):
-        """Test that SetColumnDtype has transform method."""
-
-        x = SetColumnDtype(columns=["a"], dtype=float)
-
-        ta.classes.test_object_method(
-            obj=x, expected_method=method_name, msg=method_name
-        )
-
+    
     def test_inheritance(self):
         """Test that SetColumnDtype inherits from tubular BaseTransformer."""
 
@@ -59,8 +44,41 @@ class TestSetColumnDtype(object):
         ):
             SetColumnDtype(columns=["a"], dtype=float)
 
+    def test_dtype_attribute_set(self):
+        """Test that the value passed in the value arg is set as an attribute of the same name."""
+
+        x = SetColumnDtype(columns=["a"], dtype=str)
+
+        assert x.dtype == str, "unexpected value set to dtype atttribute"
+
+    @pytest.mark.parametrize(
+        "invalid_dtype", ["STRING", "misc_invalid", "np.int", int()]
+    )
+    def test_invalid_dtype_error(self, invalid_dtype):
+
+        msg = f"SetColumnDtype: data type '{invalid_dtype}' not understood as a valid dtype"
+        with pytest.raises(TypeError, match=msg):
+            SetColumnDtype(columns=["a"], dtype=invalid_dtype)
+
+
+class TestSetColumnDtypeTransform(object):
+    @pytest.mark.parametrize(
+        "method_name",
+        [
+            ("transform"),
+        ],
+    )
+    def test_class_methods(self, method_name):
+        """Test that SetColumnDtype has transform method."""
+
+        x = SetColumnDtype(columns=["a"], dtype=float)
+
+        ta.classes.test_object_method(
+            obj=x, expected_method=method_name, msg=method_name
+        )
+
     def test_transform_arguments(self):
-        """Test that init has expected arguments."""
+        """Test that transform has expected arguments."""
 
         ta.functions.test_function_arguments(
             func=SetColumnDtype.transform,
@@ -122,7 +140,11 @@ class TestSetColumnDtype(object):
         ta.pandas.row_by_row_params(base_df(), expected_df())
         + ta.pandas.index_preserved_params(base_df(), expected_df()),
     )
-    def test_expected_output(self, df, expected):
+    @pytest.mark.parametrize(
+        "dtype",
+        [float, 'float']
+    )
+    def test_expected_output(self, df, expected, dtype):
         """Test values are correctly set to float dtype"""
 
         df["a"] = df["a"].astype(str)
@@ -130,7 +152,7 @@ class TestSetColumnDtype(object):
         df["c"] = df["c"].astype(int)
         df["d"] = df["d"].astype(str)
 
-        x = SetColumnDtype(columns=["a", "b", "c", "d"], dtype=float)
+        x = SetColumnDtype(columns=["a", "b", "c", "d"], dtype=dtype)
 
         df_transformed = x.transform(df)
 
@@ -139,12 +161,3 @@ class TestSetColumnDtype(object):
             actual=df_transformed,
             msg="Check values correctly converted to float",
         )
-
-    @pytest.mark.parametrize(
-        "invalid_dtype", ["STRING", "misc_invalid", "np.int", int()]
-    )
-    def test_invalid_dtype_error(self, invalid_dtype):
-
-        msg = f"SetColumnDtype: data type '{invalid_dtype}' not understood as a valid dtype"
-        with pytest.raises(TypeError, match=msg):
-            SetColumnDtype(columns=["a"], dtype=invalid_dtype)
