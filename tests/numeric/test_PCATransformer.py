@@ -87,9 +87,17 @@ class TestInit(object):
 
         with pytest.raises(
             ValueError,
-            match=r"""PCATransformer:n_components must be positive  got -1""",
+            match=r"""PCATransformer:n_components must be positive got -1""",
         ):
             PCATransformer(columns="b", n_components=-1)
+
+    def test_to_arpack_mle_value_error(self):
+        """Test that an exception is raised if svd solver is arpack and n_components is "mle"."""
+        with pytest.raises(
+            ValueError,
+            match=r"""PCATransformer: n_components='mle' cannot be a string with svd_solver='arpack'""",
+        ):
+            PCATransformer(columns="b", n_components="mle", svd_solver="arpack")
 
     def test_super_init_called(self, mocker):
         """Test that super.__init__ called."""
@@ -190,6 +198,19 @@ class TestFit(object):
             expected_call_args,
             return_value=created_numeric_df_1(),
         ):
+            x.fit(df)
+
+    def test_to_arpack_n_compontes_value_error(self):
+        """Test that an exception is raised if svd solver is arpack and n_components greater than nb samples or features."""
+        with pytest.raises(
+            ValueError,
+            match=r"""PCATransformer: n_components 10 must be between 1 and min\(n_samples 10, n_features 2\) is 2 with svd_solver arpack""",
+        ):
+            # must be between 1 and min(n_samples 10, n_features 2) is 2 with svd_solver arpack
+            df = created_numeric_df_1()
+
+            x = PCATransformer(columns=["a", "b"], n_components=10, svd_solver="arpack")
+
             x.fit(df)
 
     def test_return_self(self):

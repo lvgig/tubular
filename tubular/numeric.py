@@ -604,7 +604,7 @@ class PCATransformer(BaseTransformer):
         if type(n_components) is int:
             if n_components < 1:
                 raise ValueError(
-                    f"{self.classname()}:n_components must be positive  got {str(n_components)}"
+                    f"{self.classname()}:n_components must be positive got {str(n_components)}"
                 )
             else:
                 self.n_components = n_components
@@ -637,6 +637,11 @@ class PCATransformer(BaseTransformer):
                 raise TypeError(
                     f"{self.classname()}:unexpected type {type(random_state)} for random_state, must be int or None."
                 )
+
+        if (svd_solver == "arpack") and (n_components == "mle"):
+            raise ValueError(
+                f"{self.classname()}: n_components='mle' cannot be a string with svd_solver='arpack'"
+            )
 
         self.pca = PCA(
             n_components=self.n_components,
@@ -688,6 +693,14 @@ class PCATransformer(BaseTransformer):
         super().fit(X, y)
 
         X = self.check_numeric_columns(X)
+
+        if self.svd_solver == "arpack":
+            if 0 < self.n_components < min(X[self.columns].shape):
+                pass
+            else:
+                raise ValueError(
+                    f"""{self.classname()}: n_components {self.n_components} must be between 1 and min(n_samples {X[self.columns].shape[0]}, n_features {X[self.columns].shape[1]}) is {min(X[self.columns].shape)} with svd_solver arpack"""
+                )
 
         self.pca.fit(X[self.columns])
         self.n_components_ = self.pca.n_components_
