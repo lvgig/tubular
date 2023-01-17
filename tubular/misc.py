@@ -57,8 +57,9 @@ class SetColumnDtype(BaseTransformer):
     columns : str or list
         Columns to set dtype. Must be set or transform will not run.
 
-    dtype : type
-        Dtype to set columns to
+    dtype : type or string
+        dtype object to set columns to or a string interpretable as one by pd.api.types.pandas_dtype
+        e.g. float or 'float'
     """
 
     def __init__(self, columns, dtype):
