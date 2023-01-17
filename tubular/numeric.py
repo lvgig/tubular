@@ -11,7 +11,7 @@ from sklearn.preprocessing import (
     PolynomialFeatures,
 )
 
-from tubular.base import BaseTransformer
+from tubular.base import BaseTransformer, DataFrameMethodTransformer
 
 
 class LogTransformer(BaseTransformer):
@@ -229,6 +229,123 @@ class CutTransformer(BaseTransformer):
             )
 
         X[self.new_column_name] = pd.cut(X[self.columns[0]], **self.cut_kwargs)
+
+        return X
+
+
+class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
+
+    """
+    This transformer applies a pandas.DataFrame method to two columns (add, sub, mul, div, mod, pow).
+
+    Transformer assigns the output of the method to a new column. The method will be applied
+    in the form (column 1)operator(column 2), so order matters (if the method does not commute). It is possible to
+    supply other key word arguments to the transform method, which will be passed to the pandas.DataFrame method being called.
+
+    Parameters
+    ----------
+    pd_method_name : str
+        The name of the pandas.DataFrame method to be called.
+
+    column1_name : str
+        The name of the 1st column in the operation.
+
+    column2_name : str
+        The name of the 2nd column in the operation.
+
+    new_column_name : str
+        The name of the new column that the output is assigned to.
+
+    pd_method_kwargs : dict, default =  {'axis':0}
+        Dictionary of method kwargs to be passed to pandas.DataFrame method. Must contain an entry for axis, set to either 1 or 0.
+
+    **kwargs :
+        Arbitrary keyword arguments passed onto BaseTransformer.__init__().
+
+    Attributes
+    ----------
+    pd_method_name : str
+        The name of the pandas.DataFrame method to be called.
+
+    columns : list
+        list containing two string items: [column1_name, column2_name] The first will be operated upon by the
+        chosen pandas method using the second.
+
+    column2_name : str
+        The name of the 2nd column in the operation.
+
+    new_column_name : str
+        The name of the new column that the output is assigned to.
+
+    pd_method_kwargs : dict
+        Dictionary of method kwargs to be passed to pandas.DataFrame method.
+
+    """
+
+    def __init__(
+        self,
+        pd_method_name,
+        columns,
+        new_column_name,
+        pd_method_kwargs={"axis": 0},
+        **kwargs,
+    ):
+        """
+        Performs input checks not done in either DataFrameMethodTransformer.__init__ or BaseTransformer.__init__
+        """
+
+        if "axis" not in pd_method_kwargs.keys():
+            raise ValueError(
+                f'{self.classname()}: pd_method_kwargs must contain an entry "axis" set to 0 or 1'
+            )
+
+        if pd_method_kwargs["axis"] not in [0, 1]:
+            raise ValueError(
+                f"{self.classname()}: pd_method_kwargs 'axis' must be 0 or 1"
+            )
+
+        if not type(columns) is list:
+            if len(columns) != 2:
+                raise ValueError(
+                    f"{self.classname()}: columns must be a list containing two column names but got {columns}"
+                )
+
+        self.column1_name = columns[0]
+        self.column2_name = columns[1]
+
+        # call DataFrameMethodTransformer.__init__
+        # This class will inherit all the below attributes from DataFrameMethodTransformer
+        super().__init__(
+            new_column_name=new_column_name,
+            pd_method_name=pd_method_name,
+            columns=columns,
+            pd_method_kwargs=pd_method_kwargs,
+            **kwargs,
+        )
+
+    def transform(self, X):
+        """
+        Transform input data by applying the chosen method to the two specified columns
+
+        Args:
+            X (pd.DataFrame): Data to transform.
+
+        Returns:
+            pd.DataFrame: Input X with an additional column.
+        """
+        # call BaseTransformer.transform
+        X = super(DataFrameMethodTransformer, self).transform(X)
+
+        is_numeric = X[self.columns].apply(pd.api.types.is_numeric_dtype, axis=0)
+
+        if not is_numeric.all():
+            raise TypeError(
+                f"{self.classname()}: input columns in X must contain only numeric values"
+            )
+
+        X[self.new_column_name] = getattr(X[[self.column1_name]], self.pd_method_name)(
+            X[self.column2_name], **self.pd_method_kwargs
+        )
 
         return X
 

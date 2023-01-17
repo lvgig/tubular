@@ -76,6 +76,11 @@ class TestInit(object):
             nominal.OneHotEncodingTransformer(columns="a"),
             numeric.LogTransformer(columns="a"),
             numeric.CutTransformer(column="a", new_column_name="b"),
+            numeric.TwoColumnOperatorTransformer(
+                pd_method_name="add",
+                columns=["a", "b"],
+                new_column_name="c",
+            ),
             numeric.ScalingTransformer(columns="a", scaler_type="standard"),
             strings.SeriesStrMethodTransformer(
                 new_column_name="a",
