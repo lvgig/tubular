@@ -35,8 +35,9 @@ class TestInit(object):
                 "n_components",
                 "svd_solver",
                 "random_state",
+                "pca_column_prefix",
             ],
-            expected_default_values=(2, "auto", None),
+            expected_default_values=(2, "auto", None, "pca_"),
         )
 
     def test_inheritance(self):
@@ -72,6 +73,15 @@ class TestInit(object):
             match=r"""PCATransformer:unexpected type <class 'str'> for n_components, must be int, float \(0-1\) or equal to 'mle'.""",
         ):
             PCATransformer(columns="b", n_components="3")
+
+    def test_to_pca_prefix_type_error(self):
+        """Test that an exception is raised if pca_column_prefix is not str."""
+
+        with pytest.raises(
+            TypeError,
+            match=r"""PCATransformer:unexpected type <class 'int'> for pca_column_prefix, must be str""",
+        ):
+            PCATransformer(columns="b", n_components=2, pca_column_prefix=3)
 
     def test_to_svd_solver_value_error(self):
         """Test that an exception is raised if svd_solver is not one of the allowed values."""
@@ -253,7 +263,7 @@ def create_svd_sovler_output():
             "c": [17.06, 12.25, 19.15, 29.73, 1.98, 8.23, 15.22, 20.59, 3.82, 39.73],
             "d": [25.94, 70.22, 72.94, 64.55, 0.41, 13.62, 30.22, 4.6, 67.13, 10.38],
             "e": [94.3, 4.18, 51.7, 16.63, 2.6, 16.57, 3.51, 30.79, 66.19, 25.44],
-            "pca0": [
+            "pca_0": [
                 -7.0285210087721985,
                 -10.570772171093276,
                 0.7141476951788178,
@@ -265,7 +275,7 @@ def create_svd_sovler_output():
                 -23.564287941836838,
                 49.095834983588574,
             ],
-            "pca1": [
+            "pca_1": [
                 -14.719057085223534,
                 0.6588448890236053,
                 -6.504809368610448,
@@ -287,7 +297,7 @@ def create_svd_sovler_output():
             "c": [17.06, 12.25, 19.15, 29.73, 1.98, 8.23, 15.22, 20.59, 3.82, 39.73],
             "d": [25.94, 70.22, 72.94, 64.55, 0.41, 13.62, 30.22, 4.6, 67.13, 10.38],
             "e": [94.3, 4.18, 51.7, 16.63, 2.6, 16.57, 3.51, 30.79, 66.19, 25.44],
-            "pca0": [
+            "pca_0": [
                 -7.028521008772197,
                 -10.570772171093276,
                 0.7141476951788183,
@@ -299,7 +309,7 @@ def create_svd_sovler_output():
                 -23.564287941836838,
                 49.09583498358857,
             ],
-            "pca1": [
+            "pca_1": [
                 -14.71905708522353,
                 0.6588448890236093,
                 -6.504809368610448,
@@ -321,7 +331,7 @@ def create_svd_sovler_output():
             "c": [17.06, 12.25, 19.15, 29.73, 1.98, 8.23, 15.22, 20.59, 3.82, 39.73],
             "d": [25.94, 70.22, 72.94, 64.55, 0.41, 13.62, 30.22, 4.6, 67.13, 10.38],
             "e": [94.3, 4.18, 51.7, 16.63, 2.6, 16.57, 3.51, 30.79, 66.19, 25.44],
-            "pca0": [
+            "pca_0": [
                 -7.0285210087722,
                 -10.570772171093276,
                 0.7141476951788169,
@@ -333,7 +343,7 @@ def create_svd_sovler_output():
                 -23.564287941836838,
                 49.09583498358856,
             ],
-            "pca1": [
+            "pca_1": [
                 -14.71905708522354,
                 0.6588448890236054,
                 -6.5048093686104504,

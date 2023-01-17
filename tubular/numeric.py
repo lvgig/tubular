@@ -578,6 +578,9 @@ class PCATransformer(BaseTransformer):
             Used when the 'arpack' or 'randomized' solvers are used. Pass an int
             for reproducible results across multiple function calls.
             .. sklearn versionadded:: 0.18.0
+        pca_column_prefix : str, prefix added to each the n components features generated. Default is "pca_"
+            example: if n_components = 3, new columns would be 'pca_0','pca_1','pca_2'.
+
     Attributes
     ----------
 
@@ -595,7 +598,13 @@ class PCATransformer(BaseTransformer):
     """
 
     def __init__(
-        self, columns, n_components=2, svd_solver="auto", random_state=None, **kwargs
+        self,
+        columns,
+        n_components=2,
+        svd_solver="auto",
+        random_state=None,
+        pca_column_prefix="pca_",
+        **kwargs,
     ):
 
         super().__init__(columns=columns, **kwargs)
@@ -654,11 +663,20 @@ class PCATransformer(BaseTransformer):
                 f"{self.classname()}: n_components {n_components} cannot be a float with svd_solver='{svd_solver}'"
             )
 
+        if type(pca_column_prefix) is str:
+            self.pca_column_prefix = pca_column_prefix
+        else:
+            raise TypeError(
+                f"{self.classname()}:unexpected type {type(pca_column_prefix)} for pca_column_prefix, must be str"
+            )
+
         self.pca = PCA(
             n_components=self.n_components,
             svd_solver=self.svd_solver,
             random_state=self.random_state,
         )
+
+        self.pca_column_prefix = pca_column_prefix
         self.feature_names_out = None
         self.n_components_ = None
 
@@ -715,7 +733,9 @@ class PCATransformer(BaseTransformer):
 
         self.pca.fit(X[self.columns])
         self.n_components_ = self.pca.n_components_
-        self.feature_names_out = ["pca" + str(i) for i in range(self.n_components_)]
+        self.feature_names_out = [
+            self.pca_column_prefix + str(i) for i in range(self.n_components_)
+        ]
 
         return self
 
