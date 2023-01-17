@@ -69,7 +69,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"""PCATransformer:unexpected type <class 'str'> for n_components, must be int or equal to 'mle'.""",
+            match=r"""PCATransformer:unexpected type <class 'str'> for n_components, must be int, float \(0-1\) or equal to 'mle'.""",
         ):
             PCATransformer(columns="b", n_components="3")
 
@@ -91,6 +91,15 @@ class TestInit(object):
         ):
             PCATransformer(columns="b", n_components=-1)
 
+    def test_to_n_components_float_value_error(self):
+        """Test that an exception is raised if n_components is not one of the allowed float values."""
+
+        with pytest.raises(
+            ValueError,
+            match=r"""PCATransformer:n_components must be strictly positive and must be of type int when greater than or equal to 1. Got 1.4""",
+        ):
+            PCATransformer(columns="b", n_components=1.4)
+
     def test_to_arpack_mle_value_error(self):
         """Test that an exception is raised if svd solver is arpack and n_components is "mle"."""
         with pytest.raises(
@@ -98,6 +107,14 @@ class TestInit(object):
             match=r"""PCATransformer: n_components='mle' cannot be a string with svd_solver='arpack'""",
         ):
             PCATransformer(columns="b", n_components="mle", svd_solver="arpack")
+
+    def test_to_arpack_randomized_float_type_error(self):
+        """Test that an exception is raised if svd solver is arpack or randomized and n_components is float ."""
+        with pytest.raises(
+            TypeError,
+            match=r"""PCATransformer: n_components 0.3 cannot be a float with svd_solver='arpack'""",
+        ):
+            PCATransformer(columns="b", n_components=0.3, svd_solver="arpack")
 
     def test_super_init_called(self, mocker):
         """Test that super.__init__ called."""
@@ -204,7 +221,7 @@ class TestFit(object):
         """Test that an exception is raised if svd solver is arpack and n_components greater than nb samples or features."""
         with pytest.raises(
             ValueError,
-            match=r"""PCATransformer: n_components 10 must be between 1 and min\(n_samples 10, n_features 2\) is 2 with svd_solver arpack""",
+            match=r"""PCATransformer: n_components 10 must be between 1 and min\(n_samples 10, n_features 2\) is 2 with svd_solver 'arpack'""",
         ):
             # must be between 1 and min(n_samples 10, n_features 2) is 2 with svd_solver arpack
             df = created_numeric_df_1()

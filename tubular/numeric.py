@@ -607,12 +607,20 @@ class PCATransformer(BaseTransformer):
                 )
             else:
                 self.n_components = n_components
+        elif type(n_components) is float:
+            if 0 < n_components < 1:
+                self.n_components = n_components
+            else:
+                raise ValueError(
+                    f"{self.classname()}:n_components must be strictly positive and must be of type int when greater than or equal to 1. Got {str(n_components)}"
+                )
+
         else:
             if n_components == "mle":
                 self.n_components = n_components
             else:
                 raise TypeError(
-                    f"{self.classname()}:unexpected type {type(n_components)} for n_components, must be int or equal to 'mle'."
+                    f"{self.classname()}:unexpected type {type(n_components)} for n_components, must be int, float (0-1) or equal to 'mle'."
                 )
 
         if type(svd_solver) is str:
@@ -640,6 +648,10 @@ class PCATransformer(BaseTransformer):
         if (svd_solver == "arpack") and (n_components == "mle"):
             raise ValueError(
                 f"{self.classname()}: n_components='mle' cannot be a string with svd_solver='arpack'"
+            )
+        if (svd_solver in ["randomized", "arpack"]) and (type(n_components) is float):
+            raise TypeError(
+                f"{self.classname()}: n_components {n_components} cannot be a float with svd_solver='{svd_solver}'"
             )
 
         self.pca = PCA(
@@ -693,12 +705,12 @@ class PCATransformer(BaseTransformer):
 
         X = self.check_numeric_columns(X)
 
-        if self.svd_solver == "arpack":
-            if 0 < self.n_components < min(X[self.columns].shape):
+        if self.n_components != "mle":
+            if 0 < self.n_components <= min(X[self.columns].shape):
                 pass
             else:
                 raise ValueError(
-                    f"""{self.classname()}: n_components {self.n_components} must be between 1 and min(n_samples {X[self.columns].shape[0]}, n_features {X[self.columns].shape[1]}) is {min(X[self.columns].shape)} with svd_solver arpack"""
+                    f"""{self.classname()}: n_components {self.n_components} must be between 1 and min(n_samples {X[self.columns].shape[0]}, n_features {X[self.columns].shape[1]}) is {min(X[self.columns].shape)} with svd_solver '{self.svd_solver}'"""
                 )
 
         self.pca.fit(X[self.columns])
