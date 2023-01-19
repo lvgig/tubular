@@ -1,7 +1,8 @@
 Quick Start
 ====================
+|logo|
 
-Welcome to the quick start guide for |logo| !
+Welcome to the quick start guide for tubular!
 
 .. |logo| image:: ../../logo.png
    :height: 50px
@@ -15,7 +16,6 @@ The easiest way to get ``tubular`` is to install directly from ``pypi``;
 
      pip install tubular
 
-.. important::
 
     Thanks for installing tubular! We hope you find it useful!
 
@@ -56,7 +56,7 @@ Dates
 
 This module contains transformers to deal with datetime columns.
 
-Date differencing is available - accounting for leap years (`DateDiffLeapYearTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.dates.DateDiffLeapYearTransformer.html>`_) or not (`DateDifferenceTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.dates.DateDifferenceTransformer.html>`_).
+Date differencing is available - accounting for leap years `DateDiffLeapYearTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.dates.DateDiffLeapYearTransformer.html>`_ or not `DateDifferenceTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.dates.DateDifferenceTransformer.html>`_.
 
 The `BetweenDatesTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.dates.BetweenDatesTransformer.html>`_ calculates if one date falls between two others.
 
@@ -98,18 +98,18 @@ Nominal
 
 This module contains categorical encoding techniques. 
 
-There are respone encoding techniques such as `MeanResponseTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.MeanResponseTransformer.html>`_, one hot encoding (`OneHotEncodingTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.OneHotEncodingTransformer.html>`_) and grouping of infrequently occuring levels (`GroupRareLevelsTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.GroupRareLevelsTransformer.html>`_).
+There are respone encoding techniques such as `MeanResponseTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.MeanResponseTransformer.html>`_, one hot encoding `OneHotEncodingTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.OneHotEncodingTransformer.html>`_ and grouping of infrequently occuring levels `GroupRareLevelsTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.GroupRareLevelsTransformer.html>`_.
 
 `MeanResponseTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.MeanResponseTransformer.html>`_ also supports regularisation of encodings using a prior.
 
 Numeric
 ^^^^^^^
 
-This module contains numeric transformations - cut (`CutTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.CutTransformer.html>`_), log (`LogTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.LogTransformer.html>`_), and scaling (`ScalingTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.ScalingTransformer.html>`_).
+This module contains numeric transformations - cut `CutTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.CutTransformer.html>`_, log `LogTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.LogTransformer.html>`_, and scaling `ScalingTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.ScalingTransformer.html>`_.
 
-(`TwoColumnOperatorTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.TwoColumnOperatorTransformer.html>`_) allows a user to apply operations to two colmns using methods from `pandas.DataFrame method <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_ which require a multiple columns (e.g. add, subtract, multiply etc)
+`TwoColumnOperatorTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.TwoColumnOperatorTransformer.html>`_ allows a user to apply operations to two colmns using methods from `pandas.DataFrame method <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_ which require a multiple columns (e.g. add, subtract, multiply etc
 
-It also contains `InteractionTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.InteractionTransformer.html>`_) and `PCATransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.PCATransformer.html>`_) which create interaction terms and pca components.
+It also contains `InteractionTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.InteractionTransformer.html>`_ and `PCATransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.PCATransformer.html>`_ which create interaction terms and pca components.
 
 Strings
 ^^^^^^^
