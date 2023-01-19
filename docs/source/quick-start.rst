@@ -66,7 +66,7 @@ The `SeriesDtMethodTransformer <https://tubular.readthedocs.io/en/latest/api/tub
 
 The `DatetimeInfoExtractor <https://tubular.readthedocs.io/en/latest/api/tubular.dates.DatetimeInfoExtractor.html>`_ allows the user to extract datetime info such as the time of day or month from a datetime field.
 
-The `DatetimeSinusoidCalculator <https://tubular.readthedocs.io/en/latest/api/tubular.dates.DatetimeSinusoidCalculator.html>`_ derives a feature in a dataframe by calculating the sine or cosine of a datetime column in a given unit (e.g hour), with the option to scale period of the sine or cosine to match the natural period of the unit (e.g. 24).
+The `DatetimeSinusoidCalculator <https://tubular.readthedocs.io/en/latest/api/tubular.dates.DatetimeSinusoidCalculator.html>`_ derives a feature in a dataframe by calculating the sine or cosine of a datetime column.
 
 Imputers
 ^^^^^^^^
