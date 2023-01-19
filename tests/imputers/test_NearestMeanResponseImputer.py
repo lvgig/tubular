@@ -23,7 +23,7 @@ class TestInit(object):
     def test_class_methods(self):
         """Test that NearestMeanResponseImputer has fit and transform methods."""
 
-        x = NearestMeanResponseImputer(response_column="c", columns=None)
+        x = NearestMeanResponseImputer(columns=None)
 
         ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
 
@@ -94,7 +94,9 @@ class TestFit(object):
 
         x = NearestMeanResponseImputer(columns=["a", "b"])
 
-        with pytest.raises(ValueError, match="y has 1 null values"):
+        with pytest.raises(
+            ValueError, match="NearestMeanResponseImputer: y has 1 null values"
+        ):
 
             x.fit(df, df["c"])
 
@@ -109,7 +111,7 @@ class TestFit(object):
 
         with pytest.raises(
             ValueError,
-            match="Column a has no missing values, cannot use this transformer.",
+            match="NearestMeanResponseImputer: Column a has no missing values, cannot use this transformer.",
         ):
 
             x.fit(df, df["c"])

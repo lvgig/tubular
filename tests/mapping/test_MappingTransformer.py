@@ -7,6 +7,14 @@ import tubular
 from tubular.mapping import MappingTransformer
 from tubular.base import ReturnKeyDict
 
+from pandas.api.types import (
+    is_categorical_dtype,
+    is_integer_dtype,
+    is_bool_dtype,
+    is_float_dtype,
+    is_object_dtype,
+)
+
 
 class TestInit(object):
     """Tests for MappingTransformer.init()."""
@@ -98,7 +106,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=f"each item in mappings should be a dict but got type {type(1)} for key c",
+            match=f"MappingTransformer: each item in mappings should be a dict but got type {type(1)} for key c",
         ):
 
             MappingTransformer(mappings=mappings)
@@ -130,8 +138,8 @@ class TestTransform(object):
 
         ta.functions.test_function_arguments(
             func=MappingTransformer.transform,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
+            expected_arguments=["self", "X", "suppress_dtype_warning"],
+            expected_default_values=(False,),
         )
 
     def test_super_transform_call(self, mocker):
@@ -241,3 +249,123 @@ class TestTransform(object):
             expected=preserve_original_value_mapping,
             msg="MappingTransformer.transform has changed self.mappings unexpectedly",
         )
+
+    @pytest.mark.parametrize(
+        "mapping, input_col_name, output_col_type_check",
+        [
+            ({"a": {1: 1.1, 6: 6.6}}, "a", is_float_dtype),
+            ({"a": {1: "one", 6: "six"}}, "a", is_object_dtype),
+            (
+                {"a": {1: True, 2: True, 3: True, 4: False, 5: False, 6: False}},
+                "a",
+                is_bool_dtype,
+            ),
+            (
+                {"b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6}},
+                "b",
+                is_integer_dtype,
+            ),
+            (
+                {"b": {"a": 1.1, "b": 2.2, "c": 3.3, "d": 4.4, "e": 5.5, "f": 6.6}},
+                "b",
+                is_float_dtype,
+            ),
+        ],
+    )
+    def test_expected_dtype_conversions(
+        self, mapping, input_col_name, output_col_type_check
+    ):
+
+        df = d.create_df_1()
+        x = MappingTransformer(mappings=mapping)
+        df = x.transform(df)
+
+        assert output_col_type_check(df[input_col_name])
+
+    @pytest.mark.parametrize(
+        "mapping, input_col_name, input_col_type",
+        [
+            ({"a": {1: True, 6: False}}, "a", "int64"),
+        ],
+    )
+    def test_unexpected_dtype_change_warning_raised(
+        self, mapping, input_col_name, input_col_type
+    ):
+
+        df = d.create_df_1()
+        print(df["a"])
+
+        x = MappingTransformer(mappings=mapping)
+
+        with pytest.warns(
+            UserWarning,
+            match=f"MappingTransformer: This mapping changes {input_col_name} dtype from {input_col_type} to object. This is often caused by having multiple dtypes in one column, or by not mapping all values",
+        ):
+            x.transform(df)
+
+    @pytest.mark.parametrize(
+        "mapping, input_col_name, input_col_type",
+        [
+            ({"a": {1: True, 6: False}}, "a", "int64"),
+        ],
+    )
+    def test_unexpected_dtype_change_warning_suppressed(
+        self, mapping, input_col_name, input_col_type
+    ):
+
+        df = d.create_df_1()
+
+        x = MappingTransformer(mappings=mapping)
+
+        with pytest.warns(None) as warnings_record:
+            x.transform(df, suppress_dtype_warning=True)
+
+            assert len(warnings_record) == 0
+
+    def test_category_dtype_is_conserved(self):
+        """This is a separate test due to the behaviour of category dtypes
+
+        See documentation of transform method
+        """
+
+        df = d.create_df_1()
+        df["b"] = df["b"].astype("category")
+
+        mapping = mapping = {"b": {"a": "aaa", "b": "bbb"}}
+
+        x = MappingTransformer(mappings=mapping)
+        df = x.transform(df)
+
+        assert is_categorical_dtype(df["b"])
+
+    @pytest.mark.parametrize(
+        "mapping, mapped_col",
+        [({"a": {99: "99", 98: "98"}}, "a"), ({"b": {"z": 99, "y": 98}}, "b")],
+    )
+    def test_no_applicable_mapping(self, mapping, mapped_col):
+
+        df = d.create_df_1()
+
+        x = MappingTransformer(mappings=mapping)
+
+        with pytest.warns(
+            UserWarning,
+            match=f"MappingTransformer: No values from mapping for {mapped_col} exist in dataframe.",
+        ):
+            x.transform(df)
+
+    @pytest.mark.parametrize(
+        "mapping, mapped_col",
+        [({"a": {1: "1", 99: "99"}}, "a"), ({"b": {"a": 1, "z": 99}}, "b")],
+    )
+    def test_excess_mapping_values(self, mapping, mapped_col):
+
+        df = d.create_df_1()
+
+        x = MappingTransformer(mappings=mapping)
+
+        with pytest.warns(
+            UserWarning,
+            match=f"MappingTransformer: There are values in the mapping for {mapped_col} that are not present in the dataframe",
+        ):
+            x.transform(df)

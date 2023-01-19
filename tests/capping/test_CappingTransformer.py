@@ -56,7 +56,7 @@ class TestInit(object):
 
         with pytest.raises(
             ValueError,
-            match="both capping_values and quantiles are None, either supply capping values in the "
+            match="CappingTransformer: both capping_values and quantiles are None, either supply capping values in the "
             "capping_values argument or supply quantiles that can be learnt in the fit method",
         ):
 
@@ -67,7 +67,7 @@ class TestInit(object):
 
         with pytest.raises(
             ValueError,
-            match="both capping_values and quantiles are not None, supply one or the other",
+            match="CappingTransformer: both capping_values and quantiles are not None, supply one or the other",
         ):
 
             CappingTransformer(
@@ -80,7 +80,7 @@ class TestInit(object):
 
         with pytest.raises(
             ValueError,
-            match=rf"quantile values must be in the range \[0, 1\] but got {out_range_value} for key f",
+            match=rf"CappingTransformer: quantile values must be in the range \[0, 1\] but got {out_range_value} for key f",
         ):
 
             CappingTransformer(
@@ -217,7 +217,7 @@ class TestCheckCappingValuesDict(object):
 
         with pytest.raises(
             TypeError,
-            match="aaa should be dict of columns and capping values",
+            match="CappingTransformer: aaa should be dict of columns and capping values",
         ):
 
             x.check_capping_values_dict(
@@ -231,7 +231,7 @@ class TestCheckCappingValuesDict(object):
 
         with pytest.raises(
             TypeError,
-            match=r"all keys in bbb should be str, but got \<class 'int'\>",
+            match=r"CappingTransformer: all keys in bbb should be str, but got \<class 'int'\>",
         ):
 
             x.check_capping_values_dict(
@@ -245,7 +245,7 @@ class TestCheckCappingValuesDict(object):
 
         with pytest.raises(
             TypeError,
-            match=r"each item in ccc should be a list, but got \<class 'tuple'\> for key b",
+            match=r"CappingTransformer: each item in ccc should be a list, but got \<class 'tuple'\> for key b",
         ):
 
             x.check_capping_values_dict(
@@ -259,7 +259,7 @@ class TestCheckCappingValuesDict(object):
 
         with pytest.raises(
             ValueError,
-            match="each item in ddd should be length 2, but got 1 for key b",
+            match="CappingTransformer: each item in ddd should be length 2, but got 1 for key b",
         ):
 
             x.check_capping_values_dict(
@@ -273,7 +273,7 @@ class TestCheckCappingValuesDict(object):
 
         with pytest.raises(
             TypeError,
-            match=r"each item in eee lists must contain numeric values or None, got \<class 'str'\> for key a",
+            match=r"CappingTransformer: each item in eee lists must contain numeric values or None, got \<class 'str'\> for key a",
         ):
 
             x.check_capping_values_dict(
@@ -287,7 +287,7 @@ class TestCheckCappingValuesDict(object):
 
         with pytest.raises(
             ValueError,
-            match="lower value is greater than or equal to upper value for key a",
+            match="CappingTransformer: lower value is greater than or equal to upper value for key a",
         ):
 
             x.check_capping_values_dict(
@@ -302,7 +302,7 @@ class TestCheckCappingValuesDict(object):
 
         with pytest.raises(
             ValueError,
-            match="item in eee lists contains numpy NaN or Inf values",
+            match="CappingTransformer: item in eee lists contains numpy NaN or Inf values",
         ):
 
             x.check_capping_values_dict(
@@ -314,7 +314,9 @@ class TestCheckCappingValuesDict(object):
 
         x = CappingTransformer(capping_values={"a": [1, 3], "b": [None, -1]})
 
-        with pytest.raises(ValueError, match="both values are None for key a"):
+        with pytest.raises(
+            ValueError, match="CappingTransformer: both values are None for key a"
+        ):
 
             x.check_capping_values_dict(
                 capping_values_dict={"a": [None, None], "b": [None, 1]}, dict_name="eee"
@@ -338,7 +340,7 @@ class TestFit(object):
 
         with pytest.warns(
             UserWarning,
-            match="quantiles not set so no fitting done in CappingTransformer",
+            match="CappingTransformer: quantiles not set so no fitting done in CappingTransformer",
         ):
 
             df = d.create_df_3()
@@ -745,7 +747,8 @@ class TestTransform(object):
         x = CappingTransformer(capping_values={"a": [2, 5], "b": [-1, 8], "c": [-1, 8]})
 
         with pytest.raises(
-            TypeError, match=r"The following columns are not numeric in X; \['b', 'c'\]"
+            TypeError,
+            match=r"CappingTransformer: The following columns are not numeric in X; \['b', 'c'\]",
         ):
 
             x.transform(df)
@@ -759,7 +762,7 @@ class TestTransform(object):
 
         with pytest.raises(
             ValueError,
-            match="capping_values attribute is an empty dict - perhaps the fit method has not been run yet",
+            match="CappingTransformer: capping_values attribute is an empty dict - perhaps the fit method has not been run yet",
         ):
 
             x.transform(df)
@@ -776,7 +779,7 @@ class TestTransform(object):
 
         with pytest.raises(
             ValueError,
-            match="_replacement_values attribute is an empty dict - perhaps the fit method has not been run yet",
+            match="CappingTransformer: _replacement_values attribute is an empty dict - perhaps the fit method has not been run yet",
         ):
 
             x.transform(df)
@@ -874,7 +877,8 @@ class TestWeightedQuantile(object):
         x = CappingTransformer(capping_values={"a": [2, 10]})
 
         with pytest.raises(
-            ValueError, match="total sample weights are not greater than 0"
+            ValueError,
+            match="CappingTransformer: total sample weights are not greater than 0",
         ):
 
             x.weighted_quantile([2, 3, 4, 5], [0, 1], [0, 0])
@@ -884,7 +888,9 @@ class TestWeightedQuantile(object):
 
         x = CappingTransformer(capping_values={"a": [2, 10]})
 
-        with pytest.raises(ValueError, match="null values in sample weights"):
+        with pytest.raises(
+            ValueError, match="CappingTransformer: null values in sample weights"
+        ):
 
             x.weighted_quantile([2, 3, 4, 5], [0, 1], [3, np.NaN])
 
@@ -893,11 +899,15 @@ class TestWeightedQuantile(object):
 
         x = CappingTransformer(capping_values={"a": [2, 10]})
 
-        with pytest.raises(ValueError, match="infinite values in sample weights"):
+        with pytest.raises(
+            ValueError, match="CappingTransformer: infinite values in sample weights"
+        ):
 
             x.weighted_quantile([2, 3, 4, 5], [0, 1], [2, np.inf])
 
-        with pytest.raises(ValueError, match="infinite values in sample weights"):
+        with pytest.raises(
+            ValueError, match="CappingTransformer: infinite values in sample weights"
+        ):
 
             x.weighted_quantile([2, 3, 4, 5], [0, 1], [1, -np.inf])
 
@@ -906,6 +916,8 @@ class TestWeightedQuantile(object):
 
         x = CappingTransformer(capping_values={"a": [2, 10]})
 
-        with pytest.raises(ValueError, match="negative weights in sample weights"):
+        with pytest.raises(
+            ValueError, match="CappingTransformer: negative weights in sample weights"
+        ):
 
             x.weighted_quantile([2, 3, 4, 5], [0, 1], [2, -0.01])

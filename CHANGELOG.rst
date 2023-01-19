@@ -16,6 +16,40 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+0.3.3 (2023-01-19)
+------------------
+
+Added
+^^^^^
+- added support for prior mean encoding (regularised encodings) `#46 <https://github.com/lvgig/tubular/pull/46>`_
+
+- added support for weights to mean, median and mode imputers `#47 <https://github.com/lvgig/tubular/pull/47>`_
+
+- added classname() method to BaseTransformer and prefixed all errors with classname call for easier debugging `#48 <https://github.com/lvgig/tubular/pull/48>`_
+
+- added DatetimeInfoExtractor transformer in ``tubular/dates.py``associated tests with ``tests/dates/test_DatetimeInfoExtractor.py`` and examples with ``examples/dates/DatetimeInfoExtractor.ipynb`` `#49 <https://github.com/lvgig/tubular/pull/49>`_
+
+- added DatetimeSinusoidCalculator in ``tubular/dates.py``associated tests with ``tests/dates/test_DatetimeSinusoidCalculator.py`` and examples with ``examples/dates/DatetimeSinusoidCalculator.ipynb`` `#50 <https://github.com/lvgig/tubular/pull/50>`_
+
+- added TwoColumnOperatorTransformer in ``tubular/numeric.py``associated tests with ``tests/numeric/test_TwoColumnOperatorTransformer.py`` and examples with ``examples/dates/TwoColumnOperatorTransformer.ipynb`` `#51 <https://github.com/lvgig/tubular/pull/51>`_
+
+- added StringConcatenator in ``tubular/strings.py``associated tests with ``tests/strings/test_StringConcatenator.py`` and examples with ``examples/strings/StringConcatenator.ipynb`` `#52 <https://github.com/lvgig/tubular/pull/52>`_
+
+- added SetColumnDtype in ``tubular/misc.py``associated tests with ``tests/misc/test_StringConcatenator.py`` and examples with ``examples/strings/StringConcatenator.ipynb`` `#53 <https://github.com/lvgig/tubular/pull/53>`_
+
+- added waring to MappingTransformer in ``tubular/mapping.py`` for unexpected changes in dtype  `#54 <https://github.com/lvgig/tubular/pull/54>`_
+
+- added new module ``tubular/comparison.py`` containing EqualityChecker.  Also added associated tests with ``tests/comparison/test_EqualityChecker.py`` and examples with ``examples/comparison/EqualityChecker.ipynb`` `#55 <https://github.com/lvgig/tubular/pull/55>`_
+
+- added PCATransformer in ``tubular/numeric.py``associated tests with ``tests/misc/test_PCATransformer.py`` and examples with ``examples/numeric/PCATransformer.ipynb`` `#57 <https://github.com/lvgig/tubular/pull/57>`_
+
+Fixed
+^^^^^
+- updated black version to 22.3.0 and flake8 version to 5.0.4 to fix compatibility issues `#45 <https://github.com/lvgig/tubular/pull/45>`_
+
+- removed **kwargs argument from BaseTransfomer in ``tubular/base.py``to avoid silent erroring if incorrect arguments passed to transformers. Fixed a few tests which were revealed to have incorrect arguments passed by change `#56 <https://github.com/lvgig/tubular/pull/56>`_ 
+
+
 0.3.2 (2022-01-13)
 ------------------
 

@@ -71,7 +71,7 @@ class TestInit(object):
         with pytest.raises(
             TypeError,
             match=re.escape(
-                "columns must be a string or list with the columns to be pre-processed (if specified)"
+                "InteractionTransformer: columns must be a string or list with the columns to be pre-processed (if specified)"
             ),
         ):
 
@@ -84,7 +84,7 @@ class TestInit(object):
         with pytest.raises(
             TypeError,
             match=re.escape(
-                "each element of columns should be a single (string) column name"
+                "InteractionTransformer: each element of columns should be a single (string) column name"
             ),
         ):
 
@@ -96,7 +96,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"""unexpected type \(\<class 'str'\>\) for min_degree, must be int""",
+            match=r"""InteractionTransformer: unexpected type \(\<class 'str'\>\) for min_degree, must be int""",
         ):
 
             InteractionTransformer(
@@ -106,7 +106,7 @@ class TestInit(object):
             )
         with pytest.raises(
             TypeError,
-            match=r"""unexpected type \(\<class 'str'\>\) for max_degree, must be int""",
+            match=r"""InteractionTransformer: unexpected type \(\<class 'str'\>\) for max_degree, must be int""",
         ):
 
             InteractionTransformer(
@@ -119,7 +119,7 @@ class TestInit(object):
         """Test and exception is raised if degrees or columns provided are inconsistent."""
         with pytest.raises(
             ValueError,
-            match=r"""number of columns must be equal or greater than 2, got 1 column.""",
+            match=r"""InteractionTransformer: number of columns must be equal or greater than 2, got 1 column.""",
         ):
 
             InteractionTransformer(
@@ -128,7 +128,7 @@ class TestInit(object):
 
         with pytest.raises(
             ValueError,
-            match=r"""min_degree must be equal or greater than 2, got 0""",
+            match=r"""InteractionTransformer: min_degree must be equal or greater than 2, got 0""",
         ):
 
             InteractionTransformer(
@@ -139,7 +139,7 @@ class TestInit(object):
 
         with pytest.raises(
             ValueError,
-            match=r"""max_degree must be equal or greater than min_degree""",
+            match=r"""InteractionTransformer: max_degree must be equal or greater than min_degree""",
         ):
 
             InteractionTransformer(
@@ -150,7 +150,7 @@ class TestInit(object):
         # NEW
         with pytest.raises(
             ValueError,
-            match=r"""max_degree must be equal or lower than number of columns""",
+            match=r"""InteractionTransformer: max_degree must be equal or lower than number of columns""",
         ):
 
             InteractionTransformer(

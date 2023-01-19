@@ -43,7 +43,7 @@ General
 ^^^^^^^
 
 - Please try and keep each pull request to one change or feature only
-- Make sure to update the `changelog <https://github.com/lvgig/test-aide/blob/main/CHANGELOG.rst>`_ with details of your change
+- Make sure to update the `changelog <https://github.com/lvgig/tubular/blob/main/CHANGELOG.rst>`_ with details of your change
 
 Code formatting
 ^^^^^^^^^^^^^^^
