@@ -10,6 +10,7 @@ from sklearn.preprocessing import (
     StandardScaler,
     PolynomialFeatures,
 )
+from sklearn.decomposition import PCA
 
 from tubular.base import BaseTransformer, DataFrameMethodTransformer
 
@@ -567,6 +568,12 @@ class InteractionTransformer(BaseTransformer):
                 )
             else:
                 self.max_degree = max_degree
+            if max_degree > len(columns):
+                raise ValueError(
+                    "max_degree must be equal or lower than number of columns"
+                )
+            else:
+                self.max_degree = max_degree
         else:
             raise TypeError(
                 f"{self.classname()}: unexpected type ({type(max_degree)}) for max_degree, must be int"
@@ -633,5 +640,236 @@ class InteractionTransformer(BaseTransformer):
             X[self.interaction_colname[inter_idx]] = X[
                 interaction_combination_colname[inter_idx]
             ].product(axis=1, skipna=False)
+
+        return X
+
+
+class PCATransformer(BaseTransformer):
+    """Transformer that generates variables using Principal component analysis (PCA).
+    Linear dimensionality reduction using Singular Value Decomposition of the
+    data to project it to a lower dimensional space.
+
+    It is based on sklearn class sklearn.decomposition.PCA
+
+        Parameters
+        ----------
+        columns : None or list or str
+            Columns to apply the transformer to. If a str is passed this is put into a list. Value passed
+            in columns is saved in the columns attribute on the object. Note this has no default value so
+            the user has to specify the columns when initialising the transformer. When the user forget to set columns,
+            all columns would be picked up when super transform runs.
+        n_components : int, float or 'mle', default=None
+            Number of components to keep.
+            if n_components is not set all components are kept::
+                n_components == min(n_samples, n_features)
+            If ``n_components == 'mle'`` and ``svd_solver == 'full'``, Minka's
+            MLE is used to guess the dimension. Use of ``n_components == 'mle'``
+            will interpret ``svd_solver == 'auto'`` as ``svd_solver == 'full'``.
+            If ``0 < n_components < 1`` and ``svd_solver == 'full'``, select the
+            number of components such that the amount of variance that needs to be
+            explained is greater than the percentage specified by n_components.
+            If ``svd_solver == 'arpack'``, the number of components must be
+             strictly less than the minimum of n_features and n_samples.
+            Hence, the None case results in::
+                n_components == min(n_samples, n_features) - 1   svd_solver='auto', tol=0.0,  n_oversamples=10, random_state=None
+        svd_solver : {'auto', 'full', 'arpack', 'randomized'}, default='auto'
+            If auto :
+                The solver is selected by a default policy based on `X.shape` and
+                `n_components`: if the input data is larger than 500x500 and the
+                number of components to extract is lower than 80% of the smallest
+                dimension of the data, then the more efficient 'randomized'
+                method is enabled. Otherwise the exact full SVD is computed and
+                optionally truncated afterwards.
+            If full :
+                run exact full SVD calling the standard LAPACK solver via
+                `scipy.linalg.svd` and select the components by postprocessing
+            If arpack :
+                run SVD truncated to n_components calling ARPACK solver via
+                `scipy.sparse.linalg.svds`. It requires strictly
+                0 < n_components < min(X.shape)
+            If randomized :
+                run randomized SVD by the method of Halko et al.
+            .. sklearn versionadded:: 0.18.0
+
+        random_state : int, RandomState instance or None, default=None
+            Used when the 'arpack' or 'randomized' solvers are used. Pass an int
+            for reproducible results across multiple function calls.
+            .. sklearn versionadded:: 0.18.0
+        pca_column_prefix : str, prefix added to each the n components features generated. Default is "pca_"
+            example: if n_components = 3, new columns would be 'pca_0','pca_1','pca_2'.
+
+    Attributes
+    ----------
+
+    pca : PCA class from sklearn.decomposition
+    n_components_ : int
+        The estimated number of components. When n_components is set
+        to 'mle' or a number between 0 and 1 (with svd_solver == 'full') this
+        number is estimated from input data. Otherwise it equals the parameter
+        n_components, or the lesser value of n_features and n_samples
+        if n_components is None.
+    feature_names_out: list or None
+        list of feature name representing the new dimensions.
+
+
+    """
+
+    def __init__(
+        self,
+        columns,
+        n_components=2,
+        svd_solver="auto",
+        random_state=None,
+        pca_column_prefix="pca_",
+        **kwargs,
+    ):
+
+        super().__init__(columns=columns, **kwargs)
+
+        if type(n_components) is int:
+            if n_components < 1:
+                raise ValueError(
+                    f"{self.classname()}:n_components must be strictly positive got {str(n_components)}"
+                )
+            else:
+                self.n_components = n_components
+        elif type(n_components) is float:
+            if 0 < n_components < 1:
+                self.n_components = n_components
+            else:
+                raise ValueError(
+                    f"{self.classname()}:n_components must be strictly positive and must be of type int when greater than or equal to 1. Got {str(n_components)}"
+                )
+
+        else:
+            if n_components == "mle":
+                self.n_components = n_components
+            else:
+                raise TypeError(
+                    f"{self.classname()}:unexpected type {type(n_components)} for n_components, must be int, float (0-1) or equal to 'mle'."
+                )
+
+        if type(svd_solver) is str:
+            if svd_solver not in ["auto", "full", "arpack", "randomized"]:
+                raise ValueError(
+                    f"{self.classname()}:svd_solver {svd_solver} is unknown. Please select among 'auto', 'full', 'arpack', 'randomized'."
+                )
+            else:
+                self.svd_solver = svd_solver
+        else:
+            raise TypeError(
+                f"{self.classname()}:unexpected type {type(svd_solver)} for svd_solver, must be str"
+            )
+
+        if type(random_state) is int:
+            self.random_state = random_state
+        else:
+            if random_state is None:
+                self.random_state = random_state
+            else:
+                raise TypeError(
+                    f"{self.classname()}:unexpected type {type(random_state)} for random_state, must be int or None."
+                )
+
+        if (svd_solver == "arpack") and (n_components == "mle"):
+            raise ValueError(
+                f"{self.classname()}: n_components='mle' cannot be a string with svd_solver='arpack'"
+            )
+        if (svd_solver in ["randomized", "arpack"]) and (type(n_components) is float):
+            raise TypeError(
+                f"{self.classname()}: n_components {n_components} cannot be a float with svd_solver='{svd_solver}'"
+            )
+
+        if type(pca_column_prefix) is str:
+            self.pca_column_prefix = pca_column_prefix
+        else:
+            raise TypeError(
+                f"{self.classname()}:unexpected type {type(pca_column_prefix)} for pca_column_prefix, must be str"
+            )
+
+        self.pca = PCA(
+            n_components=self.n_components,
+            svd_solver=self.svd_solver,
+            random_state=self.random_state,
+        )
+
+        self.pca_column_prefix = pca_column_prefix
+        self.feature_names_out = None
+        self.n_components_ = None
+
+    def check_numeric_columns(self, X):
+        """Method to check all columns (specicifed in self.columns) in X are all numeric.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data containing columns to check.
+
+        """
+
+        numeric_column_types = X[self.columns].apply(
+            pd.api.types.is_numeric_dtype, axis=0
+        )
+
+        if not numeric_column_types.all():
+
+            non_numeric_columns = list(
+                numeric_column_types.loc[~numeric_column_types].index
+            )
+
+            raise TypeError(
+                f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
+            )
+
+        return X
+
+    def fit(self, X, y=None):
+        """Fit PCA to input data.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Dataframe with columns to learn scaling values from.
+
+        y : None
+            Required for pipeline.
+
+        """
+
+        super().fit(X, y)
+
+        X = self.check_numeric_columns(X)
+
+        if self.n_components != "mle":
+            if 0 < self.n_components <= min(X[self.columns].shape):
+                pass
+            else:
+                raise ValueError(
+                    f"""{self.classname()}: n_components {self.n_components} must be between 1 and min(n_samples {X[self.columns].shape[0]}, n_features {X[self.columns].shape[1]}) is {min(X[self.columns].shape)} with svd_solver '{self.svd_solver}'"""
+                )
+
+        self.pca.fit(X[self.columns])
+        self.n_components_ = self.pca.n_components_
+        self.feature_names_out = [
+            self.pca_column_prefix + str(i) for i in range(self.n_components_)
+        ]
+
+        return self
+
+    def transform(self, X):
+        """Generate from input pandas DataFrame (X) PCA features and add this column or columns in X.
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data to transform.
+        Returns
+        -------
+        X : pd.DataFrame
+            Input X with additional column or columns (self.interaction_colname) added. These contain the output of
+            running the  product pandas DataFrame method on identified combinations.
+        """
+        X = super().transform(X)
+        X = self.check_numeric_columns(X)
+        X[self.feature_names_out] = self.pca.transform(X[self.columns])
 
         return X
