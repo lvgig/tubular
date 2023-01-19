@@ -91,7 +91,7 @@ The misc module contains transformers which do not fit into other categories.
 
 `SetValueTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.misc.SetValueTransformer.html>`_ creates a constant column with arbitrary value.
 
-`SetDtype <https://tubular.readthedocs.io/en/latest/api/tubular.misc.SetDtype.html>`_ allows the user to set the dtype of a column as part of a pipeline
+`SetDtype <https://tubular.readthedocs.io/en/latest/api/tubular.misc.SetDtype.html>`_ allows the user to set the dtype of a column.
 
 Nominal
 ^^^^^^^
