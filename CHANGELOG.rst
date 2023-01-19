@@ -39,7 +39,7 @@ Added
 
 - added waring to MappingTransformer in ``tubular/mapping.py`` for unexpected changes in dtype  `#54 <https://github.com/lvgig/tubular/pull/54>`_
 
-- added new module ``tubular/comparison.py`` containing EqualityChecker.  Also added associated tests with ``tests/misc/test_StringConcatenator.py`` and examples with ``examples/strings/StringConcatenator.ipynb`` `#55 <https://github.com/lvgig/tubular/pull/55>`_
+- added new module ``tubular/comparison.py`` containing EqualityChecker.  Also added associated tests with ``tests/comparison/test_EqualityChecker.py`` and examples with ``examples/comparison/EqualityChecker.ipynb`` `#55 <https://github.com/lvgig/tubular/pull/55>`_
 
 - added PCATransformer in ``tubular/numeric.py``associated tests with ``tests/misc/test_PCATransformer.py`` and examples with ``examples/numeric/PCATransformer.ipynb`` `#57 <https://github.com/lvgig/tubular/pull/57>`_
 
