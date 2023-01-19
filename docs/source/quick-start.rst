@@ -1,12 +1,10 @@
 Quick Start
 ====================
-|logo|
+
+Welcome to the quick start guide for |logo| !
+
 .. |logo| image:: ../../logo.png
    :height: 50px
-
-Welcome to the quick start guide for tubular!
-
-
 
 Installation
 --------------------
@@ -17,7 +15,9 @@ The easiest way to get ``tubular`` is to install directly from ``pypi``;
 
      pip install tubular
 
-.. important:: Thanks for installing tubular! We hope you find it useful!
+.. important::
+
+    Thanks for installing tubular! We hope you find it useful!
 
 Examples
 ---------------------------------
@@ -90,12 +90,12 @@ Nominal
 
 This module contains categorical encoding techniques. 
 
-There are respone encoding techniques such as `MeanResponseTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.MeanResponseTransformer.html>`_, one hot encoding `OneHotEncodingTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.OneHotEncodingTransformer.html>`_ and grouping of infrequently occuring levels `GroupRareLevelsTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.GroupRareLevelsTransformer.html>`_.
+There are respone encoding techniques such as `MeanResponseTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.MeanResponseTransformer.html>`_, one hot encoding (`OneHotEncodingTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.OneHotEncodingTransformer.html>`_) and grouping of infrequently occuring levels (`GroupRareLevelsTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.GroupRareLevelsTransformer.html>`_).
 
 Numeric
 ^^^^^^^
 
-This module contains numeric transformations - cut `CutTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.CutTransformer.html>`_, log `LogTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.LogTransformer.html>`_ and scaling (`ScalingTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.ScalingTransformer.html>`_).
+This module contains numeric transformations - cut (`CutTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.CutTransformer.html>`_), log (`LogTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.LogTransformer.html>`_) and scaling (`ScalingTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.ScalingTransformer.html>`_).
 
 Strings
 ^^^^^^^
