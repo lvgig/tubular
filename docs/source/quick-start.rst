@@ -5,7 +5,7 @@ Quick Start
 Welcome to the quick start guide for tubular!
 
 .. |logo| image:: ../../logo.png
-   :height: 50px
+   :height: 200px
 
 Installation
 --------------------
