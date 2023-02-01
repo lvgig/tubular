@@ -947,7 +947,10 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         # Apply OHE transform
         X_transformed = OneHotEncoder.transform(self, X[self.columns])
 
-        input_columns = self.get_feature_names(input_features=self.columns)
+        if hasattr(self, "get_feature_names"):
+            input_columns = self.get_feature_names(input_features=self.columns)
+        else:
+            input_columns = self.get_feature_names_out(input_features=self.columns)
 
         X_transformed = pd.DataFrame(
             X_transformed, columns=input_columns, index=X.index
