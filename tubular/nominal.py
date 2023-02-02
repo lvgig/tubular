@@ -1040,7 +1040,7 @@ class MultiLevelMeanResponseTransformer(BaseNominalTransformer):
         if not isinstance(mre_kwargs, dict):
             raise TypeError(f"mre_kargs should be a dict but got type {type(mre_kwargs)}")
 
-        for column, kwargs_dict in mre_kwargs.values():
+        for column, kwargs_dict in mre_kwargs.items():
             if column not in self.columns:
                 raise ValueError('mre_kwargs provided for {column} which is not listed as a column to transform')
 
@@ -1079,11 +1079,12 @@ class MultiLevelMeanResponseTransformer(BaseNominalTransformer):
     def __init__(self, columns: Union[str, list[str]], response_column: str, ohe_kwargs: dict = {}, mre_kwargs: dict[dict] = {}):                
 
         super().__init__(columns = columns)
+
+        # dict checks
         
         ohe_kwargs = self._process_ohe_kwargs(ohe_kwargs)
-
-        self.mre_kwargs = self._process_mre_kwargs(mre_kwargs)
         
+        self.mre_kwargs = self._process_mre_kwargs(mre_kwargs)
         self.ohe_transformer = OneHotEncodingTransformer(
             columns=response_column, 
             drop_original=self.drop_original,
@@ -1096,6 +1097,7 @@ class MultiLevelMeanResponseTransformer(BaseNominalTransformer):
 
         
         self.response_column = response_column
+        self.mre_kwargs = mre_kwargs
         
     def _create_copy_columns_to_encode(self, data):
 
