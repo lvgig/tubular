@@ -916,15 +916,23 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         In scikit learn 1.0 "get_feature_names" was deprecated and then replaced with "get_feature_names_out" in version 1.2. The logic in this
         function will call the correct attribute, or raise an error if it can't be found.
+
+        Parameters
+        ----------
+        input_features : list(str)
+            Input columns being transformed by the OHE transformer.
+
+        kwargs : dict
+            Keyword arguments to be passed on to the scikit learn attriute.
         """
 
         if hasattr(self, "get_feature_names"):
 
-            input_columns = self.get_feature_names(input_features=input_features)
+            input_columns = self.get_feature_names(input_features=input_features, **kwargs)
 
         elif hasattr(self, "get_feature_names_out"):
 
-            input_columns = self.get_feature_names_out(input_features=input_features)
+            input_columns = self.get_feature_names_out(input_features=input_features, **kwargs)
 
         else:
 
