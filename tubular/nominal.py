@@ -928,17 +928,21 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         if hasattr(self, "get_feature_names"):
 
-            input_columns = self.get_feature_names(input_features=input_features, **kwargs)
+            input_columns = self.get_feature_names(
+                input_features=input_features, **kwargs
+            )
 
         elif hasattr(self, "get_feature_names_out"):
 
-            input_columns = self.get_feature_names_out(input_features=input_features, **kwargs)
+            input_columns = self.get_feature_names_out(
+                input_features=input_features, **kwargs
+            )
 
         else:
 
             raise AttributeError(
                 "Cannot access scikit learn OneHotEncoder get_feature_names method, may be a version issue"
-                )
+            )
 
         return input_columns
 
