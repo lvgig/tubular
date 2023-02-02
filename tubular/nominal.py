@@ -5,6 +5,7 @@ This module contains transformers that apply encodings to nominal columns.
 import pandas as pd
 import numpy as np
 import warnings
+from typing import Union
 from sklearn.preprocessing import OneHotEncoder
 
 from tubular.base import BaseTransformer
@@ -994,3 +995,32 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         X_transformed = pd.concat((X, X_transformed), axis=1)
 
         return X_transformed
+
+
+class MultiLevelMeanResponseTransformer(OneHotEncodingTransformer, MeanResponseTransformer):
+    """
+    Shoutout different fit format 
+    """
+
+    def __init__(self, columns: Union[str, list[str]], response_column: str, ohe_kwargs: dict = None, mre_kwargs: dict = None):                
+
+        super(OneHotEncodingTransformer, self).__init__
+
+        # dict checks
+
+        self.ohe_transformer = OneHotEncodingTransformer(self,
+                                                    columns=response_column,
+                                                    **ohe_kwargs)
+
+        self.response_column = response_column
+        self.mre_kwargs = mre_kwargs
+
+    def fit(X, y=None):
+        
+        X = slef.
+
+
+
+            
+
+
