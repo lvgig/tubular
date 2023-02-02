@@ -910,6 +910,30 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         return self
 
+    def _get_feature_names(self, input_features, **kwargs):
+        """
+        Function to access the get_feature_names attribute of the scikit learn attribute. Will return the output columns of the OHE transformer.
+
+        In scikit learn 1.0 "get_feature_names" was deprecated and then replaced with "get_feature_names_out" in version 1.2. The logic in this
+        function will call the correct attribute, or raise an error if it can't be found.
+        """
+
+        if hasattr(self, "get_feature_names"):
+
+            input_columns = self.get_feature_names(input_features=input_features)
+
+        elif hasattr(self, "get_feature_names_out"):
+
+            input_columns = self.get_feature_names_out(input_features=input_features)
+
+        else:
+
+            raise AttributeError(
+                "Cannot access scikit learn OneHotEncoder get_feature_names method, may be a version issue"
+                )
+
+        return input_columns
+
     def transform(self, X):
         """Create new dummy columns from categorical fields.
 
@@ -947,10 +971,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         # Apply OHE transform
         X_transformed = OneHotEncoder.transform(self, X[self.columns])
 
-        if hasattr(self, "get_feature_names"):
-            input_columns = self.get_feature_names(input_features=self.columns)
-        else:
-            input_columns = self.get_feature_names_out(input_features=self.columns)
+        input_columns = self._get_feature_names(self.columns)
 
         X_transformed = pd.DataFrame(
             X_transformed, columns=input_columns, index=X.index
