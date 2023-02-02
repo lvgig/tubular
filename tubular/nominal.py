@@ -911,6 +911,39 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         return self
 
+    def _get_feature_names(self, input_features, **kwargs):
+        """
+        Function to access the get_feature_names attribute of the scikit learn attribute. Will return the output columns of the OHE transformer.
+        In scikit learn 1.0 "get_feature_names" was deprecated and then replaced with "get_feature_names_out" in version 1.2. The logic in this
+        function will call the correct attribute, or raise an error if it can't be found.
+        Parameters
+        ----------
+        input_features : list(str)
+            Input columns being transformed by the OHE transformer.
+        kwargs : dict
+            Keyword arguments to be passed on to the scikit learn attriute.
+        """
+
+        if hasattr(self, "get_feature_names"):
+
+            input_columns = self.get_feature_names(
+                input_features=input_features, **kwargs
+            )
+
+        elif hasattr(self, "get_feature_names_out"):
+
+            input_columns = self.get_feature_names_out(
+                input_features=input_features, **kwargs
+            )
+
+        else:
+
+            raise AttributeError(
+                "Cannot access scikit learn OneHotEncoder get_feature_names method, may be a version issue"
+            )
+
+        return input_columns
+
     def transform(self, X):
         """Create new dummy columns from categorical fields.
 
@@ -948,7 +981,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         # Apply OHE transform
         X_transformed = OneHotEncoder.transform(self, X[self.columns])
 
-        input_columns = self.get_feature_names(input_features=self.columns)
+        input_columns = self._get_feature_names(input_features=self.columns)
 
         X_transformed = pd.DataFrame(
             X_transformed, columns=input_columns, index=X.index
@@ -997,27 +1030,120 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         return X_transformed
 
 
-class MultiLevelMeanResponseTransformer(OneHotEncodingTransformer, MeanResponseTransformer):
+class MultiLevelMeanResponseTransformer(BaseNominalTransformer):
     """
-    Shoutout different fit format 
+    Mention different fit format 
     """
 
-    def __init__(self, columns: Union[str, list[str]], response_column: str, ohe_kwargs: dict = None, mre_kwargs: dict = None):                
-
-        super(OneHotEncodingTransformer, self).__init__
-
-        # dict checks
-
-        self.ohe_transformer = OneHotEncodingTransformer(self,
-                                                    columns=response_column,
-                                                    **ohe_kwargs)
-
-        self.response_column = response_column
-        self.mre_kwargs = mre_kwargs
-
-    def fit(X, y=None):
+    def _process_mre_kwargs(self, mre_kwargs):
         
-        X = slef.
+        if not isinstance(mre_kwargs, dict):
+            raise TypeError(f"mre_kargs should be a dict but got type {type(mre_kwargs)}")
+
+        for column, kwargs_dict in mre_kwargs.values():
+            if column not in self.columns:
+                raise ValueError('mre_kwargs provided for {column} which is not listed as a column to transform')
+
+            if not isinstance(kwargs_dict, dict):
+                raise TypeError(f'mre_kwargs for each column should be a dict but got type {type(kwargs_dict)} for {column}')
+
+            mre_kwargs = self._separate_out_mre_kwargs(column, kwargs_dict, mre_kwargs)
+
+    
+    def _separate_out_mre_kwargs(self,column, column_kwarg_dict, mre_kwarg_dict):
+        mre_kwarg_dict[column] = {}
+        mre_kwarg_dict[column]['weights_column'] = column_kwarg_dict.pop('weights_column', None)
+        mre_kwarg_dict[column]['prior'] = column_kwarg_dict.pop('prior', 0)
+        mre_kwarg_dict[column]['kwargs'] = column_kwarg_dict
+
+        return mre_kwarg_dict
+        
+
+
+    def _process_ohe_kwargs(self, ohe_kwargs):
+
+        if not isinstance(ohe_kwargs, dict):
+            raise TypeError(f"ohe_kwargs should be a dict but got type {type(ohe_kwargs)}")    
+
+        if ohe_kwargs.get('drop_original'):
+            warnings.warn('WARNING: response column will be dropped if ohe_kwargs[drop_original] = False')
+
+        self.separator = ohe_kwargs.pop('separator', '_')
+        self.drop_original = ohe_kwargs.pop('drop_original', False)
+        self.ohe_copy = ohe_kwargs.pop('copy', True)
+        self.ohe_verbose = ohe_kwargs.pop('verbose', True)
+
+        return ohe_kwargs
+        
+
+    def __init__(self, columns: Union[str, list[str]], response_column: str, ohe_kwargs: dict = {}, mre_kwargs: dict[dict] = {}):                
+
+        super().__init__(columns = columns)
+        
+        ohe_kwargs = self._process_ohe_kwargs(ohe_kwargs)
+
+        self.mre_kwargs = self._process_mre_kwargs(mre_kwargs)
+        
+        self.ohe_transformer = OneHotEncodingTransformer(
+            columns=response_column, 
+            drop_original=self.drop_original,
+            separator=self.separator,
+            copy = self.ohe_copy,
+            verbose = self.ohe_verbose,
+            **ohe_kwargs
+            )
+
+
+        
+        self.response_column = response_column
+        
+    def _create_copy_columns_to_encode(self, data):
+
+        for encoded_response_column in self.encoded_response_cols:
+            response_value = encoded_response_column.split(self.ohe_transformer.separator)[-1]
+            for column in self.columns:
+                data[column + '_' + response_value] = data[column].copy()
+
+        return data
+
+    def fit(self, X : pd.DataFrame, y=None) -> None:
+        
+        self.ohe_transformer.fit(X)
+
+        temp = self.ohe_transformer.transform(X)
+        self.encoded_response_cols = self.ohe_transformer._get_feature_names([self.response_column])
+        print(temp.columns)
+
+        temp = self._create_copy_columns_to_encode(temp)
+        
+        self.MRE_transformers ={}
+        for column in self.columns:
+            self.MRE_transformers[column] = {}
+            kwargs = self.mre_kwargs.get(column, {})
+            for encoded_response_column in self.encoded_response_cols:
+                response_value = encoded_response_column.split(self.ohe_transformer.separator)[-1]
+                self.MRE_transformers[column][encoded_response_column] = MeanResponseTransformer(
+                    columns = column + '_' +  response_value,
+                    weights_column=kwargs.get('weights_column', None),
+                    prior = kwargs.get('prior', 0),
+                    **kwargs.get('kwargs', {})
+                )
+                self.MRE_transformers[column][encoded_response_column].fit(temp, temp[encoded_response_column])
+
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+
+        X = self._create_copy_columns_to_encode(X)
+
+        X.drop(columns=self.columns, inplace=True)
+            
+        for transformer_dict in self.MRE_transformers.values():
+            for transformer in transformer_dict.values():
+                X = transformer.transform(X)
+
+        return X
+
+        
+            
 
 
 
