@@ -501,7 +501,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
     """
 
-    def __init__(self, columns=None, weights_column=None, prior=0, level = None, drop_original = False, **kwargs):
+    def __init__(self, columns=None, weights_column=None, prior=0, level = None, **kwargs):
 
         if weights_column is not None:
 
@@ -518,7 +518,6 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         self.weights_column = weights_column
         self.prior = prior
-        self.drop_original = drop_original
         self.level = level
         # TODO: set default prior to None and refactor to only use prior regularisation when it is set?
 
@@ -550,70 +549,74 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         return regularised
 
-    def _fit_single_column(self, X, y):
+    def _fit_binary_response(self, X, y, columns, level = None):
 
-            self.mappings = {}
+        temp = X.copy()
 
-            if self.weights_column is not None:
+        if level:
 
-                if self.weights_column not in X.columns.values:
+            for response_level in self.response_levels:
+                for column in self.columns:
+                    temp[column + '_' + response_level] = X[column].copy()
 
-                    raise ValueError(
-                        f"{self.classname()}: weights column {self.weights_column} not in X"
-                    )
+        if self.weights_column is not None:
 
-            response_null_count = y.isnull().sum()
-
-            if response_null_count > 0:
+            if self.weights_column not in temp.columns.values:
 
                 raise ValueError(
-                    f"{self.classname()}: y has {response_null_count} null values"
+                    f"{self.classname()}: weights column {self.weights_column} not in X"
                 )
 
-            X_y = self._combine_X_y(X, y)
-            response_column = "_temporary_response"
+        response_null_count = y.isnull().sum()
+
+        if response_null_count > 0:
+
+            raise ValueError(
+                f"{self.classname()}: y has {response_null_count} null values"
+            )
+
+        X_y = self._combine_X_y(temp, y)
+        response_column = "_temporary_response"
+
+        if self.weights_column is None:
+
+            self.global_mean = X_y[response_column].mean()
+
+        else:
+
+            X_y["weighted_response"] = X_y[response_column].multiply(
+                X_y[self.weights_column]
+            )
+
+            self.global_mean = (
+                X_y["weighted_response"].sum() / X_y[self.weights_column].sum()
+            )
+
+        for c in columns:
 
             if self.weights_column is None:
 
-                self.global_mean = X_y[response_column].mean()
+                group_means = X_y.groupby(c)[response_column].mean()
+
+                group_counts = X_y.groupby(c)[response_column].size()
+
+                self.mappings[c] = self._prior_regularisation(
+                    group_means, group_counts
+                ).to_dict()
 
             else:
 
-                X_y["weighted_response"] = X_y[response_column].multiply(
-                    X_y[self.weights_column]
-                )
+                groupby_sum = X_y.groupby([c])[
+                    ["weighted_response", self.weights_column]
+                ].sum()
 
-                self.global_mean = (
-                    X_y["weighted_response"].sum() / X_y[self.weights_column].sum()
-                )
+                group_weight = groupby_sum[self.weights_column]
 
-            for c in self.columns:
+                group_means = groupby_sum["weighted_response"] / group_weight
 
-                if self.weights_column is None:
-
-                    group_means = X_y.groupby(c)[response_column].mean()
-
-                    group_counts = X_y.groupby(c)[response_column].size()
-
-                    self.mappings[c] = self._prior_regularisation(
-                        group_means, group_counts
-                    ).to_dict()
-
-                else:
-
-                    groupby_sum = X_y.groupby([c])[
-                        ["weighted_response", self.weights_column]
-                    ].sum()
-
-                    group_weight = groupby_sum[self.weights_column]
-
-                    group_means = groupby_sum["weighted_response"] / group_weight
-
-                    self.mappings[c] = self._prior_regularisation(
-                        group_means, group_weight
-                    ).to_dict()
-
-            return deepcopy(self)
+                self.mappings[c] = self._prior_regularisation(
+                    group_means, group_weight
+                ).to_dict()
 
 
     def fit(self, X, y):
@@ -635,11 +638,13 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         BaseNominalTransformer.fit(self, X, y)
 
+        self.mappings = {}
+
         if self.level:
 
             if self.level == 'all':
 
-                levels = y.unique()
+                self.response_levels = y.unique()
 
             else:
 
@@ -649,27 +654,27 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                 if any([level not in list(y.unique()) for level in self.level]):
                     raise ValueError("Levels contains a level to encode against that is not present in the response.")
 
-                levels = self.level
-
+                self.response_levels = self.level
+                
             self.transformer_dict = {}
+            mapped_columns = []
 
-            for level in levels:
-
+            for level in self.response_levels:
+                columns = [column + '_' + level for column in self.columns]
                 y_temp = y.apply(lambda x: x == level)
-                self.transformer_dict[level] = self._fit_single_column(X, y_temp)
+                self.transformer_dict[level] = self._fit_binary_response(X, y_temp, columns, level =  level)
 
+                mapped_columns += columns
+            
+            self.mapped_columns = list(set(mapped_columns) - set(self.columns))
                 
         else:
         
-           self = self._fit_single_column(X, y)
+           self._fit_binary_response(X, y, self.columns)
 
-    def _single_level_transform(self, X):
-    
-        self.check_mappable_rows(X)
-        X = BaseMappingTransformMixin.transform(self, X)
+        
 
-        return X
-
+        return self
 
     def transform(self, X):
         """Transform method to apply mean response encoding stored in the mappings attribute to
@@ -689,21 +694,20 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         X : pd.DataFrame
             Transformed input X with levels mapped accoriding to mappings dict.
 
-        """
+        """  
+        
         if self.level:
+            for response_level in self.response_levels:
+                for column in self.columns:
+                    X[column + '_' + response_level] = X[column]
+            drop_columns = self.columns
+            self.columns = self.mapped_columns
             
-            for level, transformer in self.transformer_dict.items():
-                
-                X[[column + '_' + level for column in self.columns]] = transformer._single_level_transform(X[self.columns])
+        self.check_mappable_rows(X)
+        X = BaseMappingTransformMixin.transform(self, X)
 
-
-        else:
-            
-            X = self._single_level_transform(X)
-
-        if self.drop_original:
-
-            X.drop(columns = self.columns, inplace = True)
+        if self.level:
+            X.drop(columns = drop_columns, inplace = True)
             
         return X
 
@@ -1078,177 +1082,3 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         X_transformed = pd.concat((X, X_transformed), axis=1)
 
         return X_transformed
-
-
-class MultiLevelMeanResponseTransformer(BaseNominalTransformer):
-    """
-    Create mean response encoded columns for a multi-level response. Consider using this transformer for non-ordinal multi-level responses. 
-    
-    An n-level response will be one hot encoded into a n binary responses. For each of the m features to be transformed, an encoded column will be 
-    generated for each level, adding n x m new columns to the dataframe.
-
-    It is possible to customise the kwargs passed to each intermediate transformer, for both the one hot encoding step and the n mean response encoders. 
-    In each case it is possible to provide arguments for the Tubular transformmer and the underlying SciKit Learn transformer. Kwargs for either should 
-    be passed in the same dictionary. Any kwargs not provided will be set to their default values.
-
-    Customisability by response level is available for MRE kwargs. To pass one kwargs dict for all n transformers, simply pass a single kwargs dict and leave 
-    process_all_levels_the_same as True. To specify response level kwargs, set process_all_levels_the_same to False and pass a nested dictionary of the form
-    mre_kwargs = {
-        response_level_1 : kwargs_dict_1,
-        response_level_2 : kwargs_dict_2,
-        default : kwargs_dict   
-        }
-    where the kwargs dict given as default will be broadcast to all other response levels. This last step is optional - any kwargs not provided explicitly at any
-    point will be set to their default values.
-    """
-
-    def _process_ohe_kwargs(self, ohe_kwargs):
-
-        if not isinstance(ohe_kwargs, dict):
-            raise TypeError(f"ohe_kwargs should be a dict but got type {type(ohe_kwargs)}")    
-
-        if ohe_kwargs.get('drop_original'):
-            warnings.warn('WARNING: response column will be dropped if ohe_kwargs[drop_original] = False')
-
-        self.separator = ohe_kwargs.pop('separator', '_')
-        self.drop_original = ohe_kwargs.pop('drop_original', False)
-        self.ohe_copy = ohe_kwargs.pop('copy', True)
-        self.ohe_verbose = ohe_kwargs.pop('verbose', True)
-
-        return ohe_kwargs
-        
-
-    def __init__(self, columns: Union[str, list[str]], response_column: str, ohe_kwargs: dict = {}, mre_kwargs: dict = {}, process_all_levels_the_same: bool = True):                
-
-        super().__init__(columns = columns)
-
-        # dict checks
-        
-        ohe_kwargs = self._process_ohe_kwargs(ohe_kwargs)
-
-        if not isinstance(mre_kwargs, dict):
-            raise TypeError(f"mre_kargs should be a dict but got type {type(mre_kwargs)}")
-
-        self.mre_kwargs = mre_kwargs
-
-        if not isinstance(process_all_levels_the_same, bool):
-            raise TypeError(f"process_all_levels_the_same should be a bool but got type {type(process_all_levels_the_same)}")
-
-        self.process_all_levels_the_same = process_all_levels_the_same
-
-        self.ohe_transformer = OneHotEncodingTransformer(
-            columns=response_column, 
-            drop_original=self.drop_original,
-            separator=self.separator,
-            copy = self.ohe_copy,
-            verbose = self.ohe_verbose,
-            **ohe_kwargs
-            )
-
-        self.response_column = response_column
-        
-    def _create_copy_columns_to_encode(self, data):
-
-        for response_value in data[self.response_column].unique():
-
-            for column in self.columns:
-                data[column + '_' + response_value] = data[column].copy()
-
-        return data
-
-    def _process_mre_kwargs(self, mre_kwargs, response_values):
-
-        if self.process_all_levels_the_same:
-
-            if any([list(mre_kwargs.keys()) in response_values]):
-                raise ValueError('mre_kwargs has a response value as a key. If providing response level kwargs then set process_all_levels_the_same to False')
-
-            mre_kwargs = self._separate_out_mre_kwargs(mre_kwargs)
-
-            processed_mre_kwargs = {response_val : mre_kwargs for response_val in response_values}
-
-        else:
-            
-            processed_mre_kwargs = {}
-
-            unspecified_levels = set(response_values) - set(mre_kwargs.keys())
-            
-            for response_val, kwargs_dict in mre_kwargs.items():
-
-                if not isinstance(kwargs_dict, dict):
-                    raise TypeError(f'mre_kwargs for each column should be a dict but got type {type(kwargs_dict)} for {response_val}')
-
-
-                processed_kwarg_dict = self._separate_out_mre_kwargs(kwargs_dict)
-                if response_val == 'default':
-
-                    
-                    
-                    for level in unspecified_levels:
-                        
-                        processed_mre_kwargs[level] = processed_kwarg_dict 
-
-                else:
-
-                    if response_val not in response_values:
-                        raise ValueError(f'mre_kwargs provided for {response_val} which is not found as a group in the response')
-
-                    processed_mre_kwargs[response_val] = processed_kwarg_dict
-
-        return processed_mre_kwargs
-
-    
-    def _separate_out_mre_kwargs(self, mre_kwarg_dict):
-        reformatted_kwarg_dict = {}
-        reformatted_kwarg_dict['weights_column'] = mre_kwarg_dict.pop('weights_column', None)
-        reformatted_kwarg_dict['prior'] = mre_kwarg_dict.pop('prior', 0)
-        reformatted_kwarg_dict['kwargs'] = mre_kwarg_dict
-
-        return reformatted_kwarg_dict
-        
-
-
-    def fit(self, X : pd.DataFrame, y=None) -> None:
-        
-        self.response_values = X[self.response_column].unique()
-
-        print(self.response_values)
-
-        self.mre_kwargs = self._process_mre_kwargs(self.mre_kwargs, self.response_values)
-
-        self.ohe_transformer.fit(X)
-        temp = self.ohe_transformer.transform(X)
-        self.encoded_response_cols = self.ohe_transformer._get_feature_names([self.response_column])
-        temp = self._create_copy_columns_to_encode(temp)
-        
-        self.MRE_transformers ={}
-            # make dict with response value and column
-        for (encoded_response_column, response_value) in zip(self.encoded_response_cols, self.response_values):
-            kwargs = self.mre_kwargs.get(response_value, {})
-            self.MRE_transformers[encoded_response_column] = MeanResponseTransformer(
-                columns = [column + '_' +  response_value for column in self.columns],
-                weights_column=kwargs.get('weights_column', None),
-                prior = kwargs.get('prior', 0),
-                **kwargs.get('kwargs', {})
-            )
-            self.MRE_transformers[encoded_response_column].fit(temp, temp[encoded_response_column])
-
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-
-        X = self._create_copy_columns_to_encode(X)
-
-        X.drop(columns=self.columns, inplace=True)
-            
-        for transformer in self.MRE_transformers.values():
-            X = transformer.transform(X)
-
-        return X
-
-        
-            
-
-
-
-            
-
-
