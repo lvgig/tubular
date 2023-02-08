@@ -501,7 +501,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
     """
 
-    def __init__(self, columns=None, weights_column=None, prior=0, **kwargs):
+    def __init__(self, columns=None, weights_column=None, prior=0, level = None, drop_original = False, **kwargs):
 
         if weights_column is not None:
 
@@ -518,6 +518,8 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         self.weights_column = weights_column
         self.prior = prior
+        self.drop_original = drop_original
+        self.level = level
         # TODO: set default prior to None and refactor to only use prior regularisation when it is set?
 
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
@@ -548,6 +550,72 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         return regularised
 
+    def _fit_single_column(self, X, y):
+
+            self.mappings = {}
+
+            if self.weights_column is not None:
+
+                if self.weights_column not in X.columns.values:
+
+                    raise ValueError(
+                        f"{self.classname()}: weights column {self.weights_column} not in X"
+                    )
+
+            response_null_count = y.isnull().sum()
+
+            if response_null_count > 0:
+
+                raise ValueError(
+                    f"{self.classname()}: y has {response_null_count} null values"
+                )
+
+            X_y = self._combine_X_y(X, y)
+            response_column = "_temporary_response"
+
+            if self.weights_column is None:
+
+                self.global_mean = X_y[response_column].mean()
+
+            else:
+
+                X_y["weighted_response"] = X_y[response_column].multiply(
+                    X_y[self.weights_column]
+                )
+
+                self.global_mean = (
+                    X_y["weighted_response"].sum() / X_y[self.weights_column].sum()
+                )
+
+            for c in self.columns:
+
+                if self.weights_column is None:
+
+                    group_means = X_y.groupby(c)[response_column].mean()
+
+                    group_counts = X_y.groupby(c)[response_column].size()
+
+                    self.mappings[c] = self._prior_regularisation(
+                        group_means, group_counts
+                    ).to_dict()
+
+                else:
+
+                    groupby_sum = X_y.groupby([c])[
+                        ["weighted_response", self.weights_column]
+                    ].sum()
+
+                    group_weight = groupby_sum[self.weights_column]
+
+                    group_means = groupby_sum["weighted_response"] / group_weight
+
+                    self.mappings[c] = self._prior_regularisation(
+                        group_means, group_weight
+                    ).to_dict()
+
+            return deepcopy(self)
+
+
     def fit(self, X, y):
         """Identify mapping of categorical levels to mean response values.
 
@@ -567,68 +635,41 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         BaseNominalTransformer.fit(self, X, y)
 
-        self.mappings = {}
+        if self.level:
 
-        if self.weights_column is not None:
+            if self.level == 'all':
 
-            if self.weights_column not in X.columns.values:
-
-                raise ValueError(
-                    f"{self.classname()}: weights column {self.weights_column} not in X"
-                )
-
-        response_null_count = y.isnull().sum()
-
-        if response_null_count > 0:
-
-            raise ValueError(
-                f"{self.classname()}: y has {response_null_count} null values"
-            )
-
-        X_y = self._combine_X_y(X, y)
-        response_column = "_temporary_response"
-
-        if self.weights_column is None:
-
-            self.global_mean = X_y[response_column].mean()
-
-        else:
-
-            X_y["weighted_response"] = X_y[response_column].multiply(
-                X_y[self.weights_column]
-            )
-
-            self.global_mean = (
-                X_y["weighted_response"].sum() / X_y[self.weights_column].sum()
-            )
-
-        for c in self.columns:
-
-            if self.weights_column is None:
-
-                group_means = X_y.groupby(c)[response_column].mean()
-
-                group_counts = X_y.groupby(c)[response_column].size()
-
-                self.mappings[c] = self._prior_regularisation(
-                    group_means, group_counts
-                ).to_dict()
+                levels = y.unique()
 
             else:
 
-                groupby_sum = X_y.groupby([c])[
-                    ["weighted_response", self.weights_column]
-                ].sum()
+                if isinstance(self.level, str):
+                    self.level = [self.level]
 
-                group_weight = groupby_sum[self.weights_column]
+                if any([level not in list(y.unique()) for level in self.level]):
+                    raise ValueError("Levels contains a level to encode against that is not present in the response.")
 
-                group_means = groupby_sum["weighted_response"] / group_weight
+                levels = self.level
 
-                self.mappings[c] = self._prior_regularisation(
-                    group_means, group_weight
-                ).to_dict()
+            self.transformer_dict = {}
 
-        return self
+            for level in levels:
+
+                y_temp = y.apply(lambda x: x == level)
+                self.transformer_dict[level] = self._fit_single_column(X, y_temp)
+
+                
+        else:
+        
+           self = self._fit_single_column(X, y)
+
+    def _single_level_transform(self, X):
+    
+        self.check_mappable_rows(X)
+        X = BaseMappingTransformMixin.transform(self, X)
+
+        return X
+
 
     def transform(self, X):
         """Transform method to apply mean response encoding stored in the mappings attribute to
@@ -649,13 +690,22 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             Transformed input X with levels mapped accoriding to mappings dict.
 
         """
+        if self.level:
+            
+            for level, transformer in self.transformer_dict.items():
+                
+                X[[column + '_' + level for column in self.columns]] = transformer._single_level_transform(X[self.columns])
 
-        self.check_mappable_rows(X)
 
-        X = BaseMappingTransformMixin.transform(self, X)
+        else:
+            
+            X = self._single_level_transform(X)
 
+        if self.drop_original:
+
+            X.drop(columns = self.columns, inplace = True)
+            
         return X
-
 
 class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixin):
     """Transformer to encode categorical variables into ascending rank-ordered integer values variables by mapping
