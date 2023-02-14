@@ -1027,8 +1027,8 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         self,
         columns: Union[str, List[str]],
         method: Union[str, List[str]],
-        units: str,
-        period: Union[int, float] = 2 * np.pi,
+        units: Union[str, dict[str, str]],
+        period: Union[int, float, dict[str, int], dict[str, float]] = 2 * np.pi,
     ):
 
         super().__init__(columns, copy=True)
@@ -1040,19 +1040,41 @@ class DatetimeSinusoidCalculator(BaseTransformer):
                 )
             )
 
-        if not isinstance(units, str):
+        if not isinstance(units, str) and not isinstance(units, dict):
             raise TypeError(
-                "{}: units must be a string but got {}".format(
+                "{}: units must be a string or dictionary but got {}".format(
                     self.classname(), type(units)
                 )
             )
 
-        if (not isinstance(period, int)) and (not isinstance(period, float)):
+        if (not isinstance(period, int)) and (not isinstance(period, float)) and (not isinstance(period, dict)):
             raise TypeError(
-                "{}: period must be a int or float but got {}".format(
+                "{}: period must be an int, float or dict but got {}".format(
                     self.classname(), type(period)
                 )
             )
+
+### type checks for dictionaries
+        if isinstance(units, dict):
+            if not all(isinstance(item, str) for item in list(units.keys())) or not all(isinstance(item, str) for item in list(units.values())):
+                raise TypeError(
+                    "{}: units dictionary key value pair must be strings but got {} {}".format(
+                        self.classname(), set(type(k) for k in units.keys()), set(type(v) for v in units.values())
+                    )
+                )
+
+        if isinstance(period, dict):
+            if not isinstance(period, dict[str, int]) and not isinstance(period, dict[str, float]):
+                raise TypeError(
+                    "{}: period dictionary key value pair must be string:int or string:float but got {}".format(
+                        self.classname(), type(period)
+                    )
+                )
+#TODO: pytest test for different types in dicts
+
+#TODO: check if dict that columns are present in columns arg
+
+###
 
         valid_method_list = ["sin", "cos"]
 
@@ -1078,6 +1100,16 @@ class DatetimeSinusoidCalculator(BaseTransformer):
             "second",
             "microsecond",
         ]
+
+### check units from valid units list
+        if isinstance(units, dict):
+            if not set(list(units.values())).issubset(valid_unit_list):
+                raise ValueError(
+                    "{}: units dictionary values must be one of 'year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond' but got {}".format(
+                        self.classname(), set(units.values())
+                    )
+                )
+#TODO: check all columns are in columns arg
 
         if units not in valid_unit_list:
             raise ValueError(

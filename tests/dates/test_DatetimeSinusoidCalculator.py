@@ -70,7 +70,7 @@ class TestDatetimeSinusoidCalculatorInit(object):
 
     @pytest.mark.parametrize("incorrect_type_method", [2, 2.0, True, {"a": 4}])
     def test_method_type_error(self, incorrect_type_method):
-        """Test that an exception is raised if method is not a str."""
+        """Test that an exception is raised if method is not a str or a list."""
 
         with pytest.raises(
             TypeError,
@@ -86,13 +86,13 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 24,
             )
 
-    @pytest.mark.parametrize("incorrect_type_units", [2, 2.0, True, {"a": 4}, ["help"]])
+    @pytest.mark.parametrize("incorrect_type_units", [2, 2.0, True, ["help"]])
     def test_units_type_error(self, incorrect_type_units):
-        """Test that an exception is raised if units is not a str."""
+        """Test that an exception is raised if units is not a str or a dict."""
 
         with pytest.raises(
             TypeError,
-            match="units must be a string but got {}".format(
+            match="units must be a string or dictionary but got {}".format(
                 type(incorrect_type_units)
             ),
         ):
@@ -104,13 +104,13 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 24,
             )
 
-    @pytest.mark.parametrize("incorrect_type_period", ["2", {"a": 4}, ["help"]])
+    @pytest.mark.parametrize("incorrect_type_period", ["2", True, ["help"]])
     def test_period_type_error(self, incorrect_type_period):
-        """Test that an error is raised if period is not an int or a float"""
+        """Test that an error is raised if period is not an int or a float or a dictionary"""
 
         with pytest.raises(
             TypeError,
-            match="period must be a int or float but got {}".format(
+            match="period must be an int, float or dict but got {}".format(
                 type(incorrect_type_period)
             ),
         ):
@@ -122,6 +122,45 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 incorrect_type_period,
             )
 
+    @pytest.mark.parametrize("incorrect_dict_types_units", [
+        {"str":True}, {2:"str"}, {"str":2}, {2:2}, {"str":["str"]}])
+    def test_units_dict_type_error(self, incorrect_dict_types_units):
+        """Test that an error is raised if units dict is not a str:str kv pair"""
+
+        with pytest.raises(
+            TypeError,
+            match="units dictionary key value pair must be strings but got {} {}".format(
+                set(type(k) for k in incorrect_dict_types_units.keys()), set(type(v) for v in incorrect_dict_types_units.values())
+            ),
+        ):
+
+            DatetimeSinusoidCalculator(
+                "a",
+                "cos",
+                incorrect_dict_types_units,
+                24,
+            )
+    @pytest.mark.parametrize("incorrect_dict_units", [
+        {"str":"tweet"}])
+    def test_units_dict_value_error(self, incorrect_dict_units):
+        """Test that an error is raised if units dict value is not from the valid units list."""
+
+        with pytest.raises(
+            ValueError,
+            match="units dictionary values must be one of 'year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond' but got {}".format(
+                set(incorrect_dict_units.values())
+            ),
+        ):
+
+            DatetimeSinusoidCalculator(
+                "a",
+                "cos",
+                incorrect_dict_units,
+                24,
+            )
+
+
+###
     def test_valid_method_value_error(self):
         """Test that a value error is raised if method is not sin, cos or a list containing both."""
         method = "tan"
