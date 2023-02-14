@@ -658,7 +658,8 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                 for column in self.columns:
                     X_temp[column + '_' + level] = X[column].copy()
 
-                y_temp = y.apply(lambda x: x == level)
+                # keep nans to preserve null check functionality of binary response MRE transformer
+                y_temp = y.apply(lambda x: x == level if not pd.isnull(x) else np.nan)
 
                 self.transformer_dict[level] = self._fit_binary_response(X_temp, y_temp, columns)
 
