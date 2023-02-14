@@ -472,7 +472,19 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
     """Transformer to apply mean response encoding. This converts categorical variables to
     numeric by mapping levels to the mean response for that level.
 
+    For a continuous or binary response there is an natural mean to calculate and the columns
+    specified will be encoded against that mean, in place of the original categorical columns
+    in the data. 
+
+    For an n > 1 level categorical response, up to n binary responses can be created, which in 
+    turn can then be used to encode each categorical column specified. This will generate up 
+    to n * len(columns) new columns, of with names of the form {column}_{response_level}. The 
+    original columns will be removed from the dataframe. This functionality is controlled using
+    the 'level' parameter.
+
     If a categorical variable contains null values these will not be transformed.
+
+    The same weights and prior are applied to each response level in the multi-level case.
 
     Parameters
     ----------
@@ -487,17 +499,46 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         Regularisation parameter, can be thought of roughly as the size a category should be in order for
         its statistics to be considered reliable (hence default value of 0 means no regularisation).
 
+    level : str, list or None, default = None
+        Parameter to control encoding against a multi-level categorical response. For a continuous or 
+        binary response, leave this as None. In the multi-level case, set to 'all' to encode against every
+        response level or provide a list of response levels to encode against.
+
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
 
     Attributes
     ----------
+    columns : str or list
+        Categorical columns to encode in the input data.
+
     weights_column : str or None
         Weights column to use when calculating the mean response.
+
+    prior : int, default = 0
+        Regularisation parameter, can be thought of roughly as the size a category should be in order for
+        its statistics to be considered reliable (hence default value of 0 means no regularisation).
+
+    level : str, list or None, default = None
+        Parameter to control encoding against a multi-level categorical response. If None the response will be
+        treated as binary or continous, if 'all' all response levels will be encoded against and if it is a list of
+        levels then only the levels specified will be encoded against.
+
+    response_levels : list
+        Only created in the mutli-level case. Generated from level, list of all the response levels to encode against.
 
     mappings : dict
         Created in fit. Dict of key (column names) value (mapping of categorical levels to numeric,
         mean response values) pairs.
+
+    mapped_columns : list
+        Only created in the multi-level case. A list of the new columns produced by encoded the columns in self.columns
+        against multiple response levels, of the form {column}_{level}.
+
+    transformer_dict : dict 
+        Only created in the mutli-level case. A dictionary of the form level : transformer containing the mean response 
+        transformers for each level to be encoded against.
+    
 
     """
 
@@ -670,8 +711,6 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         else:
         
            self._fit_binary_response(X, y, self.columns)
-
-        
 
         return self
 
