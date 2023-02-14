@@ -549,19 +549,11 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         return regularised
 
-    def _fit_binary_response(self, X, y, columns, level = None):
-
-        temp = X.copy()
-
-        if level:
-
-            for response_level in self.response_levels:
-                for column in self.columns:
-                    temp[column + '_' + response_level] = X[column].copy()
+    def _fit_binary_response(self, X, y, columns):
 
         if self.weights_column is not None:
 
-            if self.weights_column not in temp.columns.values:
+            if self.weights_column not in X.columns.values:
 
                 raise ValueError(
                     f"{self.classname()}: weights column {self.weights_column} not in X"
@@ -575,7 +567,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                 f"{self.classname()}: y has {response_null_count} null values"
             )
 
-        X_y = self._combine_X_y(temp, y)
+        X_y = self._combine_X_y(X, y)
         response_column = "_temporary_response"
 
         if self.weights_column is None:
@@ -661,8 +653,14 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
             for level in self.response_levels:
                 columns = [column + '_' + level for column in self.columns]
+                
+                X_temp = X.copy()
+                for column in self.columns:
+                    X_temp[column + '_' + level] = X[column].copy()
+
                 y_temp = y.apply(lambda x: x == level)
-                self.transformer_dict[level] = self._fit_binary_response(X, y_temp, columns, level =  level)
+
+                self.transformer_dict[level] = self._fit_binary_response(X_temp, y_temp, columns)
 
                 mapped_columns += columns
             
