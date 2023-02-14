@@ -682,6 +682,9 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         all rows can be mapped then transform from BaseMappingTransformMixin to apply the
         standard pd.Series.map method.
 
+        N.B. In the mutli-level case, this method briefly overwrites the self.columns attribute, but sets 
+        it back to the original value at the end.
+
         Parameters
         ----------
         X : pd.DataFrame
@@ -698,14 +701,17 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             for response_level in self.response_levels:
                 for column in self.columns:
                     X[column + '_' + response_level] = X[column]
-            drop_columns = self.columns
+            temp_columns = self.columns
+            # Temporarily overwriting self.columns to use BaseMappingTransformMixin
             self.columns = self.mapped_columns
             
         self.check_mappable_rows(X)
         X = BaseMappingTransformMixin.transform(self, X)
 
         if self.level:
-            X.drop(columns = drop_columns, inplace = True)
+            # Setting self.columns back so that the transformer object is unchanged after transform is called
+            self.columns = temp_columns
+            X.drop(columns = self.columns, inplace = True)
             
         return X
 
