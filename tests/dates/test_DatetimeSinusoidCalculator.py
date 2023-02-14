@@ -121,9 +121,27 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 "hour",
                 incorrect_type_period,
             )
+    @pytest.mark.parametrize("incorrect_dict_types_period", [
+        {"str":True}, {2:"str"}, {2:2}, {"str":["str"]}])
+    def test_period_dict_type_error(self, incorrect_dict_types_period):
+        """Test that an error is raised if period dict is not a str:int or str:float kv pair"""
+
+        with pytest.raises(
+            ValueError,
+            match="period dictionary key value pair must be str:int or str:float but got {} {}".format(
+                        set(type(k) for k in incorrect_dict_types_period.keys()), set(type(v) for v in incorrect_dict_types_period.values())
+                    ),
+        ):
+
+            DatetimeSinusoidCalculator(
+                "a",
+                "cos",
+                "hour",
+                incorrect_dict_types_period,
+            )
 
     @pytest.mark.parametrize("incorrect_dict_types_units", [
-        {"str":True}, {2:"str"}, {"str":2}, {2:2}, {"str":["str"]}])
+        {"str":True}, {2:"str"}, {"str":2}, {2:2}, {"str":True}, {"str":["str"]}])
     def test_units_dict_type_error(self, incorrect_dict_types_units):
         """Test that an error is raised if units dict is not a str:str kv pair"""
 

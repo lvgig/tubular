@@ -1047,34 +1047,53 @@ class DatetimeSinusoidCalculator(BaseTransformer):
                 )
             )
 
-        if (not isinstance(period, int)) and (not isinstance(period, float)) and (not isinstance(period, dict)):
+        if (
+            (not isinstance(period, int))
+            and (not isinstance(period, float))
+            and (not isinstance(period, dict))
+        ):
             raise TypeError(
                 "{}: period must be an int, float or dict but got {}".format(
                     self.classname(), type(period)
                 )
             )
 
-### type checks for dictionaries
+        ### type checks for dictionaries
         if isinstance(units, dict):
-            if not all(isinstance(item, str) for item in list(units.keys())) or not all(isinstance(item, str) for item in list(units.values())):
+            if not all(isinstance(item, str) for item in list(units.keys())) or not all(
+                isinstance(item, str) for item in list(units.values())
+            ):
                 raise TypeError(
                     "{}: units dictionary key value pair must be strings but got {} {}".format(
-                        self.classname(), set(type(k) for k in units.keys()), set(type(v) for v in units.values())
+                        self.classname(),
+                        set(type(k) for k in units.keys()),
+                        set(type(v) for v in units.values()),
                     )
                 )
 
         if isinstance(period, dict):
-            if not isinstance(period, dict[str, int]) and not isinstance(period, dict[str, float]):
-                raise TypeError(
-                    "{}: period dictionary key value pair must be string:int or string:float but got {}".format(
-                        self.classname(), type(period)
+            if (
+                not all(isinstance(item, str) for item in list(period.keys()))
+                or (
+                    not all(isinstance(item, int) for item in list(period.values()))
+                    and not all(
+                        isinstance(item, float) for item in list(period.values())
                     )
                 )
-#TODO: pytest test for different types in dicts
+                or all(isinstance(item, bool) for item in list(period.values()))
+            ):
+                raise ValueError(
+                    "{}: period dictionary key value pair must be str:int or str:float but got {} {}".format(
+                        self.classname(),
+                        set(type(k) for k in period.keys()),
+                        set(type(v) for v in period.values()),
+                    )
+                )
+        # TODO: pytest test for different types in dicts
 
-#TODO: check if dict that columns are present in columns arg
+        # TODO: check if dict that columns are present in columns arg
 
-###
+        ###
 
         valid_method_list = ["sin", "cos"]
 
@@ -1101,7 +1120,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
             "microsecond",
         ]
 
-### check units from valid units list
+        ### check units from valid units list
         if isinstance(units, dict):
             if not set(list(units.values())).issubset(valid_unit_list):
                 raise ValueError(
@@ -1109,14 +1128,13 @@ class DatetimeSinusoidCalculator(BaseTransformer):
                         self.classname(), set(units.values())
                     )
                 )
-#TODO: check all columns are in columns arg
-
-        if units not in valid_unit_list:
+        elif units not in valid_unit_list:
             raise ValueError(
                 "{}: Invalid units {} supplied, should be in {}".format(
                     self.classname(), units, valid_unit_list
                 )
             )
+        # TODO: check all columns are in columns arg
 
         self.method = method_list
         self.units = units
