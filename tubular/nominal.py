@@ -472,9 +472,8 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
     """Transformer to apply mean response encoding. This converts categorical variables to
     numeric by mapping levels to the mean response for that level.
 
-    For a continuous or binary response there is an natural mean to calculate and the columns
-    specified will be encoded against that mean, in place of the original categorical columns
-    in the data. 
+    For a continuous or binary response the categorical columns specified will have values
+    replaced with the mean response for each category.
 
     For an n > 1 level categorical response, up to n binary responses can be created, which in 
     turn can then be used to encode each categorical column specified. This will generate up 
@@ -597,7 +596,23 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         return regularised
 
     def _fit_binary_response(self, X, y, columns):
+        """
+        Function to learn the MRE mappings for a given binary or continuous response.
 
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data to with catgeorical variable columns to transform.
+
+        y : pd.Series
+            Binary or contionuous response variable to encode against.
+
+        columns : list(str)
+            Post transform names of columns to be encoded. In the binary or continous case
+            this is just self.columns. In the multi-level case this should be of the form
+            {column_in_original_data}_{response_level}, where response_level is the level 
+            being encoded against in this call of _fit_binary_response.
+        """
         if self.weights_column is not None:
 
             if self.weights_column not in X.columns.values:
@@ -663,6 +678,9 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         If the user specified the weights_column arg in when initialising the transformer
         the weighted mean response will be calculated using that column.
+
+        In the multi-level case this method learns which response levels are present and 
+        are to be encoded against.
 
         Parameters
         ----------
