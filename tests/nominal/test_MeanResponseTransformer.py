@@ -624,6 +624,29 @@ class TestTransform(object):
         df["c"] = df["c"].astype("category")
 
         return df
+    
+    def expected_df_3():
+        """Expected output for response with level = 'all'"""
+
+        df = pd.DataFrame(
+            {
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+                "c": ["a", "b", "c", "d", "e", "f"],
+                "d": [1, 2, 3, 4, 5, 6],
+                "e": [1, 2, 3, 4, 5, 6.0],
+                "multi_level_response" : ['blue', 'blue', 'yellow', 'yellow', 'green', 'green'],
+                "b_blue": [1, 1, 0,0, 0, 0],
+                "f_blue": [2/3, 2/3, 2/3, 0, 0, 0],
+                "b_green": [0, 0, 0,0, 1, 1],
+                "f_green": [0, 0, 0, 2/3, 2/3, 2/3],
+                "b_yellow": [0, 0, 1,1, 0, 0],
+                "f_yellow": [1/3, 1/3, 1/3, 1/3, 1/3, 1/3],
+            }
+        )
+
+        df["c"] = df["c"].astype("category")
+
+        return df
 
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""
@@ -693,7 +716,7 @@ class TestTransform(object):
         ),
     )
     def test_expected_output_binary_response(self, df, expected):
-        """Test that the output is expected from transform."""
+        """Test that the output is expected from transform with a binary response"""
 
         x = MeanResponseTransformer(columns=["b", "d", "f"])
 
@@ -719,7 +742,7 @@ class TestTransform(object):
         ),
     )
     def test_expected_output_one_multi_level(self, df, expected):
-        """Test that the output is expected from transform."""
+        """Test that the output is expected from transform with a multi-level response and one level selected."""
 
         x = MeanResponseTransformer(columns=["b", "f"], level = ['blue'])
 
@@ -729,6 +752,38 @@ class TestTransform(object):
             "f_blue": {False: 2/3, True: 0},
         }
         x.response_levels = ['blue']
+        x.mapped_columns = list(x.mappings.keys())
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_frame_equal_msg(
+            actual=df_transformed,
+            expected=expected,
+            msg_tag="Unexpected values in MeanResponseTransformer.transform",
+            check_like = False,
+        )
+
+    @pytest.mark.parametrize(
+        "df, expected",
+        ta.pandas.adjusted_dataframe_params(
+            d.create_MeanResponseTransformer_test_df(), expected_df_3()
+        ),
+    )
+    def test_expected_output_all_levels(self, df, expected):
+        """Test that the output is expected from transform for a multi-level response and all levels selected."""
+
+        x = MeanResponseTransformer(columns=["b", "f"], level = 'all')
+
+        # set the impute values dict directly rather than fitting x on df so test works with helpers
+        x.mappings = {
+            "b_blue": {"a": 1, "b": 1, "c": 0, "d": 0, "e": 0, "f": 0},
+            "b_yellow": {"a": 0, "b": 0, "c": 1, "d": 1, "e": 0, "f": 0},
+            "b_green": {"a": 0, "b": 0, "c": 0, "d": 0, "e": 1, "f": 1},
+            "f_blue": {False: 2/3, True: 0},
+            "f_yellow": {False: 1/3, True: 1/3},
+            "f_green": {False: 0, True: 2/3},
+        }
+
+        x.response_levels = ['blue', 'green', 'yellow']
         x.mapped_columns = list(x.mappings.keys())
         df_transformed = x.transform(df)
 
