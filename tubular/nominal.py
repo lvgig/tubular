@@ -556,9 +556,9 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         if not prior >= 0:
             raise ValueError(f"{self.classname()}: prior should be positive int")
         
-        if not level:
+        if level:
 
-            if not isinstance(level, Union(str, list)):
+            if not isinstance(level, str) and not isinstance(level, list):
 
                 raise TypeError(f"{self.classname()}: Level should be a NoneType, list or str but got {type(level)}")
 

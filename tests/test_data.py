@@ -301,6 +301,7 @@ def create_MeanResponseTransformer_test_df():
             "d": [1, 2, 3, 4, 5, 6],
             "e": [1, 2, 3, 4, 5, 6.0],
             "f": [False, False, False, True, True, True],
+            "multi_level_response" : ['blue', 'blue', 'yellow', 'yellow', 'green', 'green']
         }
     )
 
