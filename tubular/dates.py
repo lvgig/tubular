@@ -1042,7 +1042,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
 
         if not isinstance(units, str) and not isinstance(units, dict):
             raise TypeError(
-                "{}: units must be a string or dictionary but got {}".format(
+                "{}: units must be a string or dict but got {}".format(
                     self.classname(), type(units)
                 )
             )
@@ -1051,6 +1051,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
             (not isinstance(period, int))
             and (not isinstance(period, float))
             and (not isinstance(period, dict))
+            or (isinstance(period, bool))
         ):
             raise TypeError(
                 "{}: period must be an int, float or dict but got {}".format(
@@ -1058,7 +1059,6 @@ class DatetimeSinusoidCalculator(BaseTransformer):
                 )
             )
 
-        ### type checks for dictionaries
         if isinstance(units, dict):
             if not all(isinstance(item, str) for item in list(units.keys())) or not all(
                 isinstance(item, str) for item in list(units.values())
@@ -1080,20 +1080,15 @@ class DatetimeSinusoidCalculator(BaseTransformer):
                         isinstance(item, float) for item in list(period.values())
                     )
                 )
-                or all(isinstance(item, bool) for item in list(period.values()))
+                or any(isinstance(item, bool) for item in list(period.values()))
             ):
-                raise ValueError(
+                raise TypeError(
                     "{}: period dictionary key value pair must be str:int or str:float but got {} {}".format(
                         self.classname(),
                         set(type(k) for k in period.keys()),
                         set(type(v) for v in period.values()),
                     )
                 )
-        # TODO: pytest test for different types in dicts
-
-        # TODO: check if dict that columns are present in columns arg
-
-        ###
 
         valid_method_list = ["sin", "cos"]
 
@@ -1120,7 +1115,6 @@ class DatetimeSinusoidCalculator(BaseTransformer):
             "microsecond",
         ]
 
-        ### check units from valid units list
         if isinstance(units, dict):
             if not set(list(units.values())).issubset(valid_unit_list):
                 raise ValueError(
@@ -1134,11 +1128,26 @@ class DatetimeSinusoidCalculator(BaseTransformer):
                     self.classname(), units, valid_unit_list
                 )
             )
-        # TODO: check all columns are in columns arg
 
         self.method = method_list
         self.units = units
         self.period = period
+
+        if isinstance(units, dict):
+            if not set(list(units.keys())).issubset(list(self.columns)):
+                raise ValueError(
+                    "{}: unit dictionary keys must be a subset of columns but got {}".format(
+                        self.classname(), set(units.keys())
+                    )
+                )
+
+        if isinstance(period, dict):
+            if not set(list(period.keys())).issubset(list(self.columns)):
+                raise ValueError(
+                    "{}: period dictionary keys must be a subset of columns but got {}".format(
+                        self.classname(), set(period.keys())
+                    )
+                )
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform - creates column containing sine or cosine of another datetime column.
