@@ -552,10 +552,16 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         if type(prior) is not int:
 
-            raise TypeError("prior should be a int")
+            raise TypeError(f"{self.classname()}: prior should be a int")
 
         if not prior >= 0:
-            raise ValueError("prior should be positive int")
+            raise ValueError(f"{self.classname()}: prior should be positive int")
+        
+        if not level:
+
+            if not isinstance(level, Union(str, list)):
+
+                raise TypeError(f"{self.classname()}: Level should be a NoneType, list or str but got {type(level)}")
 
         self.weights_column = weights_column
         self.prior = prior
