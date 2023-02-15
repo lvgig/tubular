@@ -104,3 +104,4 @@ venv.bak/
 # mypy
 .mypy_cache/
 test_nominal.ipynb
+.vscode/settings.json
