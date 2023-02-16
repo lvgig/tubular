@@ -86,7 +86,7 @@ class TestInit(object):
             match=f"Level should be a NoneType, list or str but got {type(level)}",
         ):
 
-            x = MeanResponseTransformer(level=level)
+            MeanResponseTransformer(level=level)
 
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that the values passed in init are saved in an attribute of the same name."""
