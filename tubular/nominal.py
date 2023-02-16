@@ -721,7 +721,9 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             mapped_columns = []
 
             for level in self.response_levels:
-                mapping_columns_for_this_level = [column + "_" + level for column in self.columns]
+                mapping_columns_for_this_level = [
+                    column + "_" + level for column in self.columns
+                ]
 
                 X_temp = X.copy()
                 for column in self.columns:
