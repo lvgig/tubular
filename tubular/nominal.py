@@ -471,7 +471,18 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
     """Transformer to apply mean response encoding. This converts categorical variables to
     numeric by mapping levels to the mean response for that level.
 
+    For a continuous or binary response the categorical columns specified will have values
+    replaced with the mean response for each category.
+
+    For an n > 1 level categorical response, up to n binary responses can be created, which in
+    turn can then be used to encode each categorical column specified. This will generate up
+    to n * len(columns) new columns, of with names of the form {column}_{response_level}. The
+    original columns will be removed from the dataframe. This functionality is controlled using
+    the 'level' parameter.
+
     If a categorical variable contains null values these will not be transformed.
+
+    The same weights and prior are applied to each response level in the multi-level case.
 
     Parameters
     ----------
@@ -486,21 +497,52 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         Regularisation parameter, can be thought of roughly as the size a category should be in order for
         its statistics to be considered reliable (hence default value of 0 means no regularisation).
 
+    level : str, list or None, default = None
+        Parameter to control encoding against a multi-level categorical response. For a continuous or
+        binary response, leave this as None. In the multi-level case, set to 'all' to encode against every
+        response level or provide a list of response levels to encode against.
+
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
 
     Attributes
     ----------
+    columns : str or list
+        Categorical columns to encode in the input data.
+
     weights_column : str or None
         Weights column to use when calculating the mean response.
+
+    prior : int, default = 0
+        Regularisation parameter, can be thought of roughly as the size a category should be in order for
+        its statistics to be considered reliable (hence default value of 0 means no regularisation).
+
+    level : str, list or None, default = None
+        Parameter to control encoding against a multi-level categorical response. If None the response will be
+        treated as binary or continous, if 'all' all response levels will be encoded against and if it is a list of
+        levels then only the levels specified will be encoded against.
+
+    response_levels : list
+        Only created in the mutli-level case. Generated from level, list of all the response levels to encode against.
 
     mappings : dict
         Created in fit. Dict of key (column names) value (mapping of categorical levels to numeric,
         mean response values) pairs.
 
+    mapped_columns : list
+        Only created in the multi-level case. A list of the new columns produced by encoded the columns in self.columns
+        against multiple response levels, of the form {column}_{level}.
+
+    transformer_dict : dict
+        Only created in the mutli-level case. A dictionary of the form level : transformer containing the mean response
+        transformers for each level to be encoded against.
+
+
     """
 
-    def __init__(self, columns=None, weights_column=None, prior=0, **kwargs):
+    def __init__(
+        self, columns=None, weights_column=None, prior=0, level=None, **kwargs
+    ):
 
         if weights_column is not None:
 
@@ -510,13 +552,22 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         if type(prior) is not int:
 
-            raise TypeError("prior should be a int")
+            raise TypeError(f"{self.classname()}: prior should be a int")
 
         if not prior >= 0:
-            raise ValueError("prior should be positive int")
+            raise ValueError(f"{self.classname()}: prior should be positive int")
+
+        if level:
+
+            if not isinstance(level, str) and not isinstance(level, list):
+
+                raise TypeError(
+                    f"{self.classname()}: Level should be a NoneType, list or str but got {type(level)}"
+                )
 
         self.weights_column = weights_column
         self.prior = prior
+        self.level = level
         # TODO: set default prior to None and refactor to only use prior regularisation when it is set?
 
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
@@ -547,27 +598,24 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         return regularised
 
-    def fit(self, X, y):
-        """Identify mapping of categorical levels to mean response values.
-
-        If the user specified the weights_column arg in when initialising the transformer
-        the weighted mean response will be calculated using that column.
+    def _fit_binary_response(self, X, y, columns):
+        """
+        Function to learn the MRE mappings for a given binary or continuous response.
 
         Parameters
         ----------
         X : pd.DataFrame
-            Data to with catgeorical variable columns to transform and also containing response_column
-            column.
+            Data to with catgeorical variable columns to transform.
 
         y : pd.Series
-            Response variable or target.
+            Binary or contionuous response variable to encode against.
 
+        columns : list(str)
+            Post transform names of columns to be encoded. In the binary or continous case
+            this is just self.columns. In the multi-level case this should be of the form
+            {column_in_original_data}_{response_level}, where response_level is the level
+            being encoded against in this call of _fit_binary_response.
         """
-
-        BaseNominalTransformer.fit(self, X, y)
-
-        self.mappings = {}
-
         if self.weights_column is not None:
 
             if self.weights_column not in X.columns.values:
@@ -601,7 +649,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                 X_y["weighted_response"].sum() / X_y[self.weights_column].sum()
             )
 
-        for c in self.columns:
+        for c in columns:
 
             if self.weights_column is None:
 
@@ -627,6 +675,75 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                     group_means, group_weight
                 ).to_dict()
 
+    def fit(self, X, y):
+        """Identify mapping of categorical levels to mean response values.
+
+        If the user specified the weights_column arg in when initialising the transformer
+        the weighted mean response will be calculated using that column.
+
+        In the multi-level case this method learns which response levels are present and
+        are to be encoded against.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data to with catgeorical variable columns to transform and also containing response_column
+            column.
+
+        y : pd.Series
+            Response variable or target.
+
+        """
+
+        BaseNominalTransformer.fit(self, X, y)
+
+        self.mappings = {}
+
+        if self.level:
+
+            if self.level == "all":
+
+                self.response_levels = y.unique()
+
+            else:
+
+                if isinstance(self.level, str):
+                    self.level = [self.level]
+
+                if any([level not in list(y.unique()) for level in self.level]):
+                    raise ValueError(
+                        "Levels contains a level to encode against that is not present in the response."
+                    )
+
+                self.response_levels = self.level
+
+            self.transformer_dict = {}
+            mapped_columns = []
+
+            for level in self.response_levels:
+                mapping_columns_for_this_level = [
+                    column + "_" + level for column in self.columns
+                ]
+
+                X_temp = X.copy()
+                for column in self.columns:
+                    X_temp[column + "_" + level] = X[column].copy()
+
+                # keep nans to preserve null check functionality of binary response MRE transformer
+                y_temp = y.apply(lambda x: x == level if not pd.isnull(x) else np.nan)
+
+                self.transformer_dict[level] = self._fit_binary_response(
+                    X_temp, y_temp, mapping_columns_for_this_level
+                )
+
+                mapped_columns += mapping_columns_for_this_level
+
+            self.mapped_columns = list(set(mapped_columns) - set(self.columns))
+
+        else:
+
+            self._fit_binary_response(X, y, self.columns)
+
         return self
 
     def transform(self, X):
@@ -636,6 +753,9 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         This method calls the check_mappable_rows method from BaseNominalTransformer to check that
         all rows can be mapped then transform from BaseMappingTransformMixin to apply the
         standard pd.Series.map method.
+
+        N.B. In the mutli-level case, this method briefly overwrites the self.columns attribute, but sets
+        it back to the original value at the end.
 
         Parameters
         ----------
@@ -649,9 +769,21 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         """
 
-        self.check_mappable_rows(X)
+        if self.level:
+            for response_level in self.response_levels:
+                for column in self.columns:
+                    X[column + "_" + response_level] = X[column]
+            temp_columns = self.columns
+            # Temporarily overwriting self.columns to use BaseMappingTransformMixin
+            self.columns = self.mapped_columns
 
+        self.check_mappable_rows(X)
         X = BaseMappingTransformMixin.transform(self, X)
+
+        if self.level:
+            # Setting self.columns back so that the transformer object is unchanged after transform is called
+            self.columns = temp_columns
+            X.drop(columns=self.columns, inplace=True)
 
         return X
 
@@ -983,7 +1115,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         # Apply OHE transform
         X_transformed = OneHotEncoder.transform(self, X[self.columns])
 
-        input_columns = self._get_feature_names(self.columns)
+        input_columns = self._get_feature_names(input_features=self.columns)
 
         X_transformed = pd.DataFrame(
             X_transformed, columns=input_columns, index=X.index
