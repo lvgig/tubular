@@ -16,6 +16,14 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+unreleased
+------------------
+
+Fixed
+^^^^^
+
+- fixed issue with OneHotencodingTransformer use of deprecated sklearn.OneHotEencoder.get_feature_names method `#66 <https://github.com/lvgig/tubular/pull/66>`_
+
 0.3.3 (2023-01-19)
 ------------------
 
