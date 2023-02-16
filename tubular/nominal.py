@@ -721,7 +721,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             mapped_columns = []
 
             for level in self.response_levels:
-                columns = [column + "_" + level for column in self.columns]
+                mapping_columns_for_this_level = [column + "_" + level for column in self.columns]
 
                 X_temp = X.copy()
                 for column in self.columns:
@@ -731,10 +731,10 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                 y_temp = y.apply(lambda x: x == level if not pd.isnull(x) else np.nan)
 
                 self.transformer_dict[level] = self._fit_binary_response(
-                    X_temp, y_temp, columns
+                    X_temp, y_temp, mapping_columns_for_this_level
                 )
 
-                mapped_columns += columns
+                mapped_columns += mapping_columns_for_this_level
 
             self.mapped_columns = list(set(mapped_columns) - set(self.columns))
 
