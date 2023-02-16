@@ -13,42 +13,14 @@ from tubular.nominal import MeanResponseTransformer
 def learnt_mapping_dict():
 
     learnt_mapping_dict = {
-        'b' : {
-            'a' :1.0,
-            'b' :2.0,
-            'c' :3.0,
-            'd' :4.0,
-            'e' :5.0,
-            'f' :6.0
-         },
-         'b_blue' : {
-            'a' :1.0,
-            'b' :1.0,
-            'c' :0.0,
-            'd' :0.0,
-            'e' :0.0,
-            'f' :0.0
-         },
-         'b_yellow' : {
-            'a' :0.0,
-            'b' :0.0,
-            'c' :1.0,
-            'd' :1.0,
-            'e' :0.0,
-            'f' :0.0
-         },
-         'b_green' : {
-            'a' :0.0,
-            'b' :0.0,
-            'c' :0.0,
-            'd' :0.0,
-            'e' :1.0,
-            'f' :1.0
-         },
+        "b": {"a": 1.0, "b": 2.0, "c": 3.0, "d": 4.0, "e": 5.0, "f": 6.0},
+        "b_blue": {"a": 1.0, "b": 1.0, "c": 0.0, "d": 0.0, "e": 0.0, "f": 0.0},
+        "b_yellow": {"a": 0.0, "b": 0.0, "c": 1.0, "d": 1.0, "e": 0.0, "f": 0.0},
+        "b_green": {"a": 0.0, "b": 0.0, "c": 0.0, "d": 0.0, "e": 1.0, "f": 1.0},
     }
     return learnt_mapping_dict
 
-    
+
 class TestInit(object):
     """Tests for MeanResponseTransformer.init()."""
 
@@ -106,23 +78,24 @@ class TestInit(object):
 
             MeanResponseTransformer(prior=-1)
 
-    @pytest.mark.parametrize(
-            "level", [{'dict' : 1}, 2, 2.5]
-    )
+    @pytest.mark.parametrize("level", [{"dict": 1}, 2, 2.5])
     def test_level_wrong_type_error(self, level):
-        
-        with pytest.raises(TypeError, match=f"Level should be a NoneType, list or str but got {type(level)}"):
 
-            x = MeanResponseTransformer(level =level)
+        with pytest.raises(
+            TypeError,
+            match=f"Level should be a NoneType, list or str but got {type(level)}",
+        ):
+
+            x = MeanResponseTransformer(level=level)
 
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that the values passed in init are saved in an attribute of the same name."""
 
-        x = MeanResponseTransformer(weights_column="aaa", prior=1, level = 'any')
+        x = MeanResponseTransformer(weights_column="aaa", prior=1, level="any")
 
         ta.classes.test_object_attributes(
             obj=x,
-            expected_attributes={"weights_column": "aaa", "prior": 1, 'level' : 'any'},
+            expected_attributes={"weights_column": "aaa", "prior": 1, "level": "any"},
             msg="Attributes for MeanResponseTransformer set in init",
         )
 
@@ -194,8 +167,8 @@ class Test_prior_regularisation(object):
 
         assert_series_equal(expected, output)
 
-class TestFit():
 
+class TestFit:
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseTransformer.fit."""
 
@@ -234,20 +207,21 @@ class TestFit():
             call_pos_args,
             "unexpected arguments in BaseTransformer.fit call",
         )
+
     @pytest.mark.parametrize(
-            "level, target_column",
-            [
-                (None, "a"),
-                ('all', "multi_level_response"),
-                (['yellow','blue'], "multi_level_response")
-            ]
+        "level, target_column",
+        [
+            (None, "a"),
+            ("all", "multi_level_response"),
+            (["yellow", "blue"], "multi_level_response"),
+        ],
     )
     def test_fit_returns_self(self, level, target_column):
         """Test fit returns self?"""
 
         df = d.create_MeanResponseTransformer_test_df()
 
-        x = MeanResponseTransformer(columns="b", level =level)
+        x = MeanResponseTransformer(columns="b", level=level)
 
         x_fitted = x.fit(df, df[target_column])
 
@@ -256,19 +230,19 @@ class TestFit():
         ), "Returned value from create_MeanResponseTransformer_test_df.fit not as expected."
 
     @pytest.mark.parametrize(
-            "level, target_column",
-            [
-                (None, "a"),
-                ('all', "multi_level_response"),
-                (['yellow','blue'], "multi_level_response")
-            ]
+        "level, target_column",
+        [
+            (None, "a"),
+            ("all", "multi_level_response"),
+            (["yellow", "blue"], "multi_level_response"),
+        ],
     )
     def test_fit_not_changing_data(self, level, target_column):
         """Test fit does not change X."""
 
         df = d.create_MeanResponseTransformer_test_df()
 
-        x = MeanResponseTransformer(columns="b", level = level)
+        x = MeanResponseTransformer(columns="b", level=level)
 
         x.fit(df, df[target_column])
 
@@ -277,65 +251,68 @@ class TestFit():
             actual=df,
             msg="Check X not changing during fit",
         )
-    
+
     @pytest.mark.parametrize(
-            "level, target_column",
-            [
-                (None, "a"),
-                ('all', "multi_level_response"),
-                (['yellow','blue'], "multi_level_response")
-            ]
+        "level, target_column",
+        [
+            (None, "a"),
+            ("all", "multi_level_response"),
+            (["yellow", "blue"], "multi_level_response"),
+        ],
     )
     def test_response_column_nulls_error(self, level, target_column):
         """Test that an exception is raised if nulls are present in response_column."""
 
         df = d.create_MeanResponseTransformer_test_df()
-        df.loc[1,target_column] = np.nan
+        df.loc[1, target_column] = np.nan
 
-        x = MeanResponseTransformer(columns=["b"], level = level)
+        x = MeanResponseTransformer(columns=["b"], level=level)
 
         with pytest.raises(
             ValueError, match="MeanResponseTransformer: y has 1 null values"
         ):
 
             x.fit(df, df[target_column])
-    
+
     @pytest.mark.parametrize(
-            "level, target_column",
-            [
-                (None, "a"),
-                ('all', "multi_level_response"),
-                (['yellow','blue'], "multi_level_response")
-            ]
+        "level, target_column",
+        [
+            (None, "a"),
+            ("all", "multi_level_response"),
+            (["yellow", "blue"], "multi_level_response"),
+        ],
     )
     def test_correct_mappings_stored(self, learnt_mapping_dict, level, target_column):
         "Test that the mapping dictionary created in fit has the correct keys and values"
 
         df = d.create_MeanResponseTransformer_test_df()
-        x = MeanResponseTransformer(columns=["b"], level = level)
+        x = MeanResponseTransformer(columns=["b"], level=level)
         x.fit(df, df[target_column])
-        
+
         if level:
-            if level == 'all':
-                assert set(x.mapped_columns) == set(['b_blue', 'b_yellow', 'b_green']), "Stored mapped columns are not as expected"
+            if level == "all":
+                assert set(x.mapped_columns) == set(
+                    ["b_blue", "b_yellow", "b_green"]
+                ), "Stored mapped columns are not as expected"
 
             else:
-                assert set(x.mapped_columns) == set(['b_blue', 'b_yellow']), "Stored mapped columns are not as expected"
-            
+                assert set(x.mapped_columns) == set(
+                    ["b_blue", "b_yellow"]
+                ), "Stored mapped columns are not as expected"
+
             for column in x.mapped_columns:
                 actual = x.mappings[column]
                 expected = learnt_mapping_dict[column]
                 assert actual == expected
 
         else:
-            assert x.columns == ['b'], "Columns attribute changed in fit"
+            assert x.columns == ["b"], "Columns attribute changed in fit"
 
             for column in x.columns:
                 actual = x.mappings[column]
                 expected = learnt_mapping_dict[column]
                 assert actual == expected
-            
-        
+
 
 class TestFitBinaryResponse(object):
     """Tests for MeanResponseTransformer.fit()"""
@@ -470,7 +447,6 @@ class TestFitBinaryResponse(object):
             columns=["d", "f"], prior=0, weights_column="weight"
         )
 
-
         x_prior.mappings = {}
         x_no_prior.mappings = {}
 
@@ -524,14 +500,14 @@ class TestFitBinaryResponse(object):
             prior=5,
             weights_column="weight",
         )
-        
+
         x_no_prior = MeanResponseTransformer(
             columns=["f"], prior=0, weights_column="weight"
         )
 
         x_prior.mappings = {}
         x_no_prior.mappings = {}
-        
+
         x_prior._fit_binary_response(df, df["a"], x_prior.columns)
 
         x_no_prior._fit_binary_response(df, df["a"], x_no_prior.columns)
@@ -576,7 +552,7 @@ class TestFitBinaryResponse(object):
         df = d.create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(weights_column="z", columns=["b", "d", "f"])
-        
+
         with pytest.raises(
             ValueError, match="MeanResponseTransformer: weights column z not in X"
         ):
@@ -598,7 +574,14 @@ class TestTransform(object):
                 "d": [1, 2, 3, 4, 5, 6],
                 "e": [1, 2, 3, 4, 5, 6.0],
                 "f": [2, 2, 2, 5, 5, 5],
-                "multi_level_response" : ['blue', 'blue', 'yellow', 'yellow', 'green', 'green']
+                "multi_level_response": [
+                    "blue",
+                    "blue",
+                    "yellow",
+                    "yellow",
+                    "green",
+                    "green",
+                ],
             }
         )
 
@@ -615,16 +598,23 @@ class TestTransform(object):
                 "c": ["a", "b", "c", "d", "e", "f"],
                 "d": [1, 2, 3, 4, 5, 6],
                 "e": [1, 2, 3, 4, 5, 6.0],
-                "multi_level_response" : ['blue', 'blue', 'yellow', 'yellow', 'green', 'green'],
-                "b_blue": [1, 1, 0,0, 0, 0],
-                "f_blue": [2/3, 2/3, 2/3,0, 0, 0],
+                "multi_level_response": [
+                    "blue",
+                    "blue",
+                    "yellow",
+                    "yellow",
+                    "green",
+                    "green",
+                ],
+                "b_blue": [1, 1, 0, 0, 0, 0],
+                "f_blue": [2 / 3, 2 / 3, 2 / 3, 0, 0, 0],
             }
         )
 
         df["c"] = df["c"].astype("category")
 
         return df
-    
+
     def expected_df_3():
         """Expected output for response with level = 'all'"""
 
@@ -634,13 +624,20 @@ class TestTransform(object):
                 "c": ["a", "b", "c", "d", "e", "f"],
                 "d": [1, 2, 3, 4, 5, 6],
                 "e": [1, 2, 3, 4, 5, 6.0],
-                "multi_level_response" : ['blue', 'blue', 'yellow', 'yellow', 'green', 'green'],
-                "b_blue": [1, 1, 0,0, 0, 0],
-                "f_blue": [2/3, 2/3, 2/3, 0, 0, 0],
-                "b_green": [0, 0, 0,0, 1, 1],
-                "f_green": [0, 0, 0, 2/3, 2/3, 2/3],
-                "b_yellow": [0, 0, 1,1, 0, 0],
-                "f_yellow": [1/3, 1/3, 1/3, 1/3, 1/3, 1/3],
+                "multi_level_response": [
+                    "blue",
+                    "blue",
+                    "yellow",
+                    "yellow",
+                    "green",
+                    "green",
+                ],
+                "b_blue": [1, 1, 0, 0, 0, 0],
+                "f_blue": [2 / 3, 2 / 3, 2 / 3, 0, 0, 0],
+                "b_green": [0, 0, 0, 0, 1, 1],
+                "f_green": [0, 0, 0, 2 / 3, 2 / 3, 2 / 3],
+                "b_yellow": [0, 0, 1, 1, 0, 0],
+                "f_yellow": [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3],
             }
         )
 
@@ -744,14 +741,14 @@ class TestTransform(object):
     def test_expected_output_one_multi_level(self, df, expected):
         """Test that the output is expected from transform with a multi-level response and one level selected."""
 
-        x = MeanResponseTransformer(columns=["b", "f"], level = ['blue'])
+        x = MeanResponseTransformer(columns=["b", "f"], level=["blue"])
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
         x.mappings = {
             "b_blue": {"a": 1, "b": 1, "c": 0, "d": 0, "e": 0, "f": 0},
-            "f_blue": {False: 2/3, True: 0},
+            "f_blue": {False: 2 / 3, True: 0},
         }
-        x.response_levels = ['blue']
+        x.response_levels = ["blue"]
         x.mapped_columns = list(x.mappings.keys())
         df_transformed = x.transform(df)
 
@@ -759,7 +756,7 @@ class TestTransform(object):
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in MeanResponseTransformer.transform",
-            check_like = False,
+            check_like=False,
         )
 
     @pytest.mark.parametrize(
@@ -771,19 +768,19 @@ class TestTransform(object):
     def test_expected_output_all_levels(self, df, expected):
         """Test that the output is expected from transform for a multi-level response and all levels selected."""
 
-        x = MeanResponseTransformer(columns=["b", "f"], level = 'all')
+        x = MeanResponseTransformer(columns=["b", "f"], level="all")
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
         x.mappings = {
             "b_blue": {"a": 1, "b": 1, "c": 0, "d": 0, "e": 0, "f": 0},
             "b_yellow": {"a": 0, "b": 0, "c": 1, "d": 1, "e": 0, "f": 0},
             "b_green": {"a": 0, "b": 0, "c": 0, "d": 0, "e": 1, "f": 1},
-            "f_blue": {False: 2/3, True: 0},
-            "f_yellow": {False: 1/3, True: 1/3},
-            "f_green": {False: 0, True: 2/3},
+            "f_blue": {False: 2 / 3, True: 0},
+            "f_yellow": {False: 1 / 3, True: 1 / 3},
+            "f_green": {False: 0, True: 2 / 3},
         }
 
-        x.response_levels = ['blue', 'green', 'yellow']
+        x.response_levels = ["blue", "green", "yellow"]
         x.mapped_columns = list(x.mappings.keys())
         df_transformed = x.transform(df)
 
@@ -794,7 +791,7 @@ class TestTransform(object):
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in MeanResponseTransformer.transform",
-            check_like = False,
+            check_like=False,
         )
 
     def test_nulls_introduced_in_transform_error(self):
