@@ -1176,7 +1176,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
             if not isinstance(self.units, dict):
                 column_in_desired_unit = getattr(X[column].dt, self.units)
                 desired_units = self.units
-            elif isinstance(self.unit, dict):
+            elif isinstance(self.units, dict):
                 column_in_desired_unit = getattr(X[column].dt, self.units[column])
                 desired_units = self.units[column]
             if not isinstance(self.period, dict):
@@ -1184,13 +1184,13 @@ class DatetimeSinusoidCalculator(BaseTransformer):
             elif isinstance(self.period, dict):
                 desired_period = self.period[column]
 
-                for method in self.method:
+            for method in self.method:
 
-                    new_column_name = method + "_" + desired_period + "_" + desired_units + "_" + column
+                new_column_name = f"{method}_{desired_period}_{desired_units}_{column}"
 
-                    X[new_column_name] = getattr(np, method)(
-                        column_in_desired_unit * (2.0 * np.pi / desired_period)
-                    )
+                X[new_column_name] = getattr(np, method)(
+                    column_in_desired_unit * (2.0 * np.pi / desired_period)
+                )
 
 
         return X
