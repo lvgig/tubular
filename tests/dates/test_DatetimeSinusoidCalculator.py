@@ -17,6 +17,28 @@ def example_transformer():
 
 class TestDatetimeSinusoidCalculatorInit(object):
     """Tests for DateDifferenceTransformer.init()."""
+    def test_super_init_called(self, mocker):
+        """Test that init calls BaseTransformer.init."""
+
+        expected_call_args = {
+            0: {
+                "args": ("a",),
+                "kwargs": {
+                    "copy": True,
+                },
+            }
+        }
+
+        with ta.functions.assert_function_call(
+            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+        ):
+
+            DatetimeSinusoidCalculator(
+                "a",
+                "cos",
+                "hour",
+                24,
+            )
 
     @pytest.mark.parametrize("incorrect_type_method", [2, 2.0, True, {"a": 4}])
     def test_method_type_error(self, incorrect_type_method):
@@ -81,7 +103,7 @@ class TestDatetimeSinusoidCalculatorInit(object):
 
         with pytest.raises(
             TypeError,
-            match="period dictionary key value pair must be str:int or str:float but got {} {}".format(
+            match="period dictionary key value pair must be str:int or str:float but got keys: {} and values: {}".format(
                 set(type(k) for k in incorrect_dict_types_period.keys()),
                 set(type(v) for v in incorrect_dict_types_period.values()),
             ),
@@ -110,7 +132,7 @@ class TestDatetimeSinusoidCalculatorInit(object):
 
         with pytest.raises(
             TypeError,
-            match="units dictionary key value pair must be strings but got {} {}".format(
+            match="units dictionary key value pair must be strings but got keys: {} and values: {}".format(
                 set(type(k) for k in incorrect_dict_types_units.keys()),
                 set(type(v) for v in incorrect_dict_types_units.values()),
             ),
@@ -146,11 +168,11 @@ class TestDatetimeSinusoidCalculatorInit(object):
         [{"ham": 24}, {"str": 34.0}],
     )
     def test_period_dict_col_error(self, incorrect_dict_columns_period):
-        """Test that an error is raised if period dict keys are not a subset of columns"""
+        """Test that an error is raised if period dict keys are not equal to columns"""
 
         with pytest.raises(
             ValueError,
-            match="period dictionary keys must be a subset of columns but got {}".format(
+            match="period dictionary keys must be the same as columns but got {}".format(
                 set(incorrect_dict_columns_period.keys()),
             ),
         ):
@@ -167,11 +189,11 @@ class TestDatetimeSinusoidCalculatorInit(object):
         [{"sausage_roll": "hour"}],
     )
     def test_unit_dict_col_error(self, incorrect_dict_columns_unit):
-        """Test that an error is raised if unit dict keys is not a subset of columns"""
+        """Test that an error is raised if unit dict keys is not equal to columns"""
 
         with pytest.raises(
             ValueError,
-            match="unit dictionary keys must be a subset of columns but got {}".format(
+            match="unit dictionary keys must be the same as columns but got {}".format(
                 set(incorrect_dict_columns_unit.keys()),
             ),
         ):

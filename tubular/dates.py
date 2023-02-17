@@ -1064,7 +1064,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
                 isinstance(item, str) for item in list(units.values())
             ):
                 raise TypeError(
-                    "{}: units dictionary key value pair must be strings but got {} {}".format(
+                    "{}: units dictionary key value pair must be strings but got keys: {} and values: {}".format(
                         self.classname(),
                         set(type(k) for k in units.keys()),
                         set(type(v) for v in units.values()),
@@ -1083,7 +1083,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
                 or any(isinstance(item, bool) for item in list(period.values()))
             ):
                 raise TypeError(
-                    "{}: period dictionary key value pair must be str:int or str:float but got {} {}".format(
+                    "{}: period dictionary key value pair must be str:int or str:float but got keys: {} and values: {}".format(
                         self.classname(),
                         set(type(k) for k in period.keys()),
                         set(type(v) for v in period.values()),
@@ -1134,17 +1134,17 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         self.period = period
 
         if isinstance(units, dict):
-            if not set(list(units.keys())).issubset(list(self.columns)):
+            if not sorted(list(units.keys())) == sorted(list(self.columns)):
                 raise ValueError(
-                    "{}: unit dictionary keys must be a subset of columns but got {}".format(
+                    "{}: unit dictionary keys must be the same as columns but got {}".format(
                         self.classname(), set(units.keys())
                     )
                 )
 
         if isinstance(period, dict):
-            if not set(list(period.keys())).issubset(list(self.columns)):
+            if not sorted(list(period.keys()))==sorted(list(self.columns)):
                 raise ValueError(
-                    "{}: period dictionary keys must be a subset of columns but got {}".format(
+                    "{}: period dictionary keys must be the same as columns but got {}".format(
                         self.classname(), set(period.keys())
                     )
                 )
@@ -1166,22 +1166,31 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         """
 
         X = super().transform(X)
-
+        
         for column in self.columns:
             if not pd.api.types.is_datetime64_dtype(X[column]):
 
                 raise TypeError(
                     f"{self.classname()} : {column} should be datetime64[ns] type but got {X[column].dtype}"
                 )
+            if not isinstance(self.units, dict):
+                column_in_desired_unit = getattr(X[column].dt, self.units)
+                desired_units = self.units
+            elif isinstance(self.unit, dict):
+                column_in_desired_unit = getattr(X[column].dt, self.units[column])
+                desired_units = self.units[column]
+            if not isinstance(self.period, dict):
+                desired_period = self.period
+            elif isinstance(self.period, dict):
+                desired_period = self.period[column]
 
-            column_in_desired_unit = getattr(X[column].dt, self.units)
+                for method in self.method:
 
-            for method in self.method:
+                    new_column_name = method + "_" + desired_period + "_" + desired_units + "_" + column
 
-                new_column_name = method + "_" + column
+                    X[new_column_name] = getattr(np, method)(
+                        column_in_desired_unit * (2.0 * np.pi / desired_period)
+                    )
 
-                X[new_column_name] = getattr(np, method)(
-                    column_in_desired_unit * (2.0 * np.pi / self.period)
-                )
 
         return X
