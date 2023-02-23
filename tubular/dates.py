@@ -1142,7 +1142,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
                 )
 
         if isinstance(period, dict):
-            if not sorted(list(period.keys()))==sorted(list(self.columns)):
+            if not sorted(list(period.keys())) == sorted(list(self.columns)):
                 raise ValueError(
                     "{}: period dictionary keys must be the same as columns but got {}".format(
                         self.classname(), set(period.keys())
@@ -1166,7 +1166,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         """
 
         X = super().transform(X)
-        
+
         for column in self.columns:
             if not pd.api.types.is_datetime64_dtype(X[column]):
 
@@ -1191,6 +1191,5 @@ class DatetimeSinusoidCalculator(BaseTransformer):
                 X[new_column_name] = getattr(np, method)(
                     column_in_desired_unit * (2.0 * np.pi / desired_period)
                 )
-
 
         return X
