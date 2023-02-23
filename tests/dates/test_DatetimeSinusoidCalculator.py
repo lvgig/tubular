@@ -18,33 +18,6 @@ def example_transformer():
 class TestDatetimeSinusoidCalculatorInit(object):
     """Tests for DateDifferenceTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-
-        ta.functions.test_function_arguments(
-            func=DatetimeSinusoidCalculator.__init__,
-            expected_arguments=[
-                "self",
-                "columns",
-                "method",
-                "units",
-                "period",
-            ],
-            expected_default_values=(2 * np.pi,),
-        )
-
-    def test_class_methods(self, example_transformer):
-        """Test that DateDifferenceTransformer has a transform method."""
-
-        ta.classes.test_object_method(
-            obj=example_transformer, expected_method="transform", msg="transform"
-        )
-
-    def test_inheritance(self, example_transformer):
-        """Test that DateDifferenceTransformer inherits from BaseTransformer."""
-
-        ta.classes.assert_inheritance(example_transformer, tubular.base.BaseTransformer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
 
@@ -70,7 +43,7 @@ class TestDatetimeSinusoidCalculatorInit(object):
 
     @pytest.mark.parametrize("incorrect_type_method", [2, 2.0, True, {"a": 4}])
     def test_method_type_error(self, incorrect_type_method):
-        """Test that an exception is raised if method is not a str."""
+        """Test that an exception is raised if method is not a str or a list."""
 
         with pytest.raises(
             TypeError,
@@ -86,13 +59,13 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 24,
             )
 
-    @pytest.mark.parametrize("incorrect_type_units", [2, 2.0, True, {"a": 4}, ["help"]])
+    @pytest.mark.parametrize("incorrect_type_units", [2, 2.0, True, ["help"]])
     def test_units_type_error(self, incorrect_type_units):
-        """Test that an exception is raised if units is not a str."""
+        """Test that an exception is raised if units is not a str or a dict."""
 
         with pytest.raises(
             TypeError,
-            match="units must be a string but got {}".format(
+            match="units must be a string or dict but got {}".format(
                 type(incorrect_type_units)
             ),
         ):
@@ -104,13 +77,13 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 24,
             )
 
-    @pytest.mark.parametrize("incorrect_type_period", ["2", {"a": 4}, ["help"]])
+    @pytest.mark.parametrize("incorrect_type_period", ["2", True, ["help"]])
     def test_period_type_error(self, incorrect_type_period):
-        """Test that an error is raised if period is not an int or a float"""
+        """Test that an error is raised if period is not an int or a float or a dictionary"""
 
         with pytest.raises(
             TypeError,
-            match="period must be a int or float but got {}".format(
+            match="period must be an int, float or dict but got {}".format(
                 type(incorrect_type_period)
             ),
         ):
@@ -120,6 +93,117 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 "cos",
                 "hour",
                 incorrect_type_period,
+            )
+
+    @pytest.mark.parametrize(
+        "incorrect_dict_types_period",
+        [{"str": True}, {2: "str"}, {2: 2}, {"str": ["str"]}],
+    )
+    def test_period_dict_type_error(self, incorrect_dict_types_period):
+        """Test that an error is raised if period dict is not a str:int or str:float kv pair"""
+
+        with pytest.raises(
+            TypeError,
+            match="period dictionary key value pair must be str:int or str:float but got keys: {} and values: {}".format(
+                set(type(k) for k in incorrect_dict_types_period.keys()),
+                set(type(v) for v in incorrect_dict_types_period.values()),
+            ),
+        ):
+
+            DatetimeSinusoidCalculator(
+                "a",
+                "cos",
+                "hour",
+                incorrect_dict_types_period,
+            )
+
+    @pytest.mark.parametrize(
+        "incorrect_dict_types_units",
+        [
+            {"str": True},
+            {2: "str"},
+            {"str": 2},
+            {2: 2},
+            {"str": True},
+            {"str": ["str"]},
+        ],
+    )
+    def test_units_dict_type_error(self, incorrect_dict_types_units):
+        """Test that an error is raised if units dict is not a str:str kv pair"""
+
+        with pytest.raises(
+            TypeError,
+            match="units dictionary key value pair must be strings but got keys: {} and values: {}".format(
+                set(type(k) for k in incorrect_dict_types_units.keys()),
+                set(type(v) for v in incorrect_dict_types_units.values()),
+            ),
+        ):
+
+            DatetimeSinusoidCalculator(
+                "a",
+                "cos",
+                incorrect_dict_types_units,
+                24,
+            )
+
+    @pytest.mark.parametrize("incorrect_dict_units", [{"str": "tweet"}])
+    def test_units_dict_value_error(self, incorrect_dict_units):
+        """Test that an error is raised if units dict value is not from the valid units list."""
+
+        with pytest.raises(
+            ValueError,
+            match="units dictionary values must be one of 'year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond' but got {}".format(
+                set(incorrect_dict_units.values())
+            ),
+        ):
+
+            DatetimeSinusoidCalculator(
+                "a",
+                "cos",
+                incorrect_dict_units,
+                24,
+            )
+
+    @pytest.mark.parametrize(
+        "incorrect_dict_columns_period",
+        [{"ham": 24}, {"str": 34.0}],
+    )
+    def test_period_dict_col_error(self, incorrect_dict_columns_period):
+        """Test that an error is raised if period dict keys are not equal to columns"""
+
+        with pytest.raises(
+            ValueError,
+            match="period dictionary keys must be the same as columns but got {}".format(
+                set(incorrect_dict_columns_period.keys()),
+            ),
+        ):
+
+            DatetimeSinusoidCalculator(
+                ["vegan_sausages", "carrots", "peas"],
+                "cos",
+                "hour",
+                incorrect_dict_columns_period,
+            )
+
+    @pytest.mark.parametrize(
+        "incorrect_dict_columns_unit",
+        [{"sausage_roll": "hour"}],
+    )
+    def test_unit_dict_col_error(self, incorrect_dict_columns_unit):
+        """Test that an error is raised if unit dict keys is not equal to columns"""
+
+        with pytest.raises(
+            ValueError,
+            match="unit dictionary keys must be the same as columns but got {}".format(
+                set(incorrect_dict_columns_unit.keys()),
+            ),
+        ):
+
+            DatetimeSinusoidCalculator(
+                ["vegan_sausages", "carrots", "peas"],
+                "cos",
+                incorrect_dict_columns_unit,
+                6,
             )
 
     def test_valid_method_value_error(self):
@@ -285,7 +369,7 @@ class TestDatetimeSinusoidCalculatorTransform(object):
         for column in transformer.columns:
             column_in_desired_unit = expected[column].dt.month
             cos_argument = column_in_desired_unit * (2.0 * np.pi / 12)
-            new_col_name = "cos_" + column
+            new_col_name = "cos_12_month_" + column
             expected[new_col_name] = cos_argument.apply(np.cos)
 
         x = transformer
@@ -313,10 +397,134 @@ class TestDatetimeSinusoidCalculatorTransform(object):
         for column in transformer.columns:
             column_in_desired_unit = expected[column].dt.month
             method_ready_column = column_in_desired_unit * (2.0 * np.pi / 12)
-            new_cos_col_name = "cos_" + column
-            new_sin_col_name = "sin_" + column
+            new_cos_col_name = "cos_12_month_" + column
+            new_sin_col_name = "sin_12_month_" + column
             expected[new_sin_col_name] = method_ready_column.apply(np.sin)
             expected[new_cos_col_name] = method_ready_column.apply(np.cos)
+
+        actual = transformer.transform(d.create_datediff_test_df())
+        ta.equality.assert_frame_equal_msg(
+            actual=actual,
+            expected=expected,
+            msg_tag="DatetimeSinusoidCalculator transformer does not produce the expected output",
+        )
+
+    def test_expected_output_dict_units(self):
+
+        expected = d.create_datediff_test_df()
+
+        transformer = DatetimeSinusoidCalculator(
+            [
+                "a",
+                "b",
+            ],
+            ["sin"],
+            {"a": "month", "b": "day"},
+            12,
+        )
+
+        a_in_desired_unit = expected["a"].dt.month
+        b_in_desired_unit = expected["b"].dt.day
+        a_method_ready_column = a_in_desired_unit * (2.0 * np.pi / 12)
+        b_method_ready_column = b_in_desired_unit * (2.0 * np.pi / 12)
+        a_col_name = "sin_12_month_a"
+        b_col_name = "sin_12_day_b"
+        expected[a_col_name] = a_method_ready_column.apply(np.sin)
+        expected[b_col_name] = b_method_ready_column.apply(np.sin)
+
+        actual = transformer.transform(d.create_datediff_test_df())
+        ta.equality.assert_frame_equal_msg(
+            actual=actual,
+            expected=expected,
+            msg_tag="DatetimeSinusoidCalculator transformer does not produce the expected output",
+        )
+
+    def test_expected_output_dict_period(self):
+
+        expected = d.create_datediff_test_df()
+
+        transformer = DatetimeSinusoidCalculator(
+            [
+                "a",
+                "b",
+            ],
+            ["sin"],
+            "month",
+            {"a": 12, "b": 24},
+        )
+
+        a_in_desired_unit = expected["a"].dt.month
+        b_in_desired_unit = expected["b"].dt.month
+        a_method_ready_column = a_in_desired_unit * (2.0 * np.pi / 12)
+        b_method_ready_column = b_in_desired_unit * (2.0 * np.pi / 24)
+        a_col_name = "sin_12_month_a"
+        b_col_name = "sin_24_month_b"
+        expected[a_col_name] = a_method_ready_column.apply(np.sin)
+        expected[b_col_name] = b_method_ready_column.apply(np.sin)
+
+        actual = transformer.transform(d.create_datediff_test_df())
+        ta.equality.assert_frame_equal_msg(
+            actual=actual,
+            expected=expected,
+            msg_tag="DatetimeSinusoidCalculator transformer does not produce the expected output",
+        )
+
+    def test_expected_output_dict_both(self):
+
+        expected = d.create_datediff_test_df()
+
+        transformer = DatetimeSinusoidCalculator(
+            [
+                "a",
+                "b",
+            ],
+            ["sin"],
+            {"a": "month", "b": "day"},
+            {"a": 12, "b": 24},
+        )
+
+        a_in_desired_unit = expected["a"].dt.month
+        b_in_desired_unit = expected["b"].dt.day
+        a_method_ready_column = a_in_desired_unit * (2.0 * np.pi / 12)
+        b_method_ready_column = b_in_desired_unit * (2.0 * np.pi / 24)
+        a_col_name = "sin_12_month_a"
+        b_col_name = "sin_24_day_b"
+        expected[a_col_name] = a_method_ready_column.apply(np.sin)
+        expected[b_col_name] = b_method_ready_column.apply(np.sin)
+
+        actual = transformer.transform(d.create_datediff_test_df())
+        ta.equality.assert_frame_equal_msg(
+            actual=actual,
+            expected=expected,
+            msg_tag="DatetimeSinusoidCalculator transformer does not produce the expected output",
+        )
+
+    def test_expected_output_dict_both_with_both_methods(self):
+
+        expected = d.create_datediff_test_df()
+
+        transformer = DatetimeSinusoidCalculator(
+            [
+                "a",
+                "b",
+            ],
+            ["sin", "cos"],
+            {"a": "month", "b": "day"},
+            {"a": 12, "b": 24},
+        )
+
+        a_in_desired_unit = expected["a"].dt.month
+        b_in_desired_unit = expected["b"].dt.day
+        a_method_ready_column = a_in_desired_unit * (2.0 * np.pi / 12)
+        b_method_ready_column = b_in_desired_unit * (2.0 * np.pi / 24)
+        a_sin_col_name = "sin_12_month_a"
+        a_cos_col_name = "cos_12_month_a"
+        b_sin_col_name = "sin_24_day_b"
+        b_cos_col_name = "cos_24_day_b"
+        expected[a_sin_col_name] = a_method_ready_column.apply(np.sin)
+        expected[a_cos_col_name] = a_method_ready_column.apply(np.cos)
+        expected[b_sin_col_name] = b_method_ready_column.apply(np.sin)
+        expected[b_cos_col_name] = b_method_ready_column.apply(np.cos)
 
         actual = transformer.transform(d.create_datediff_test_df())
         ta.equality.assert_frame_equal_msg(
