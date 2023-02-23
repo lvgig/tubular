@@ -1027,8 +1027,8 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         self,
         columns: Union[str, List[str]],
         method: Union[str, List[str]],
-        units: Union[str, dict[str, str]],
-        period: Union[int, float, dict[str, int], dict[str, float]] = 2 * np.pi,
+        units: Union[str, dict],
+        period: Union[int, float, dict, dict] = 2 * np.pi,
     ):
 
         super().__init__(columns, copy=True)
