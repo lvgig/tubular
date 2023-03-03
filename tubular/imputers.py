@@ -45,24 +45,19 @@ class BaseImputer(BaseTransformer):
 
 class ArbitraryImputer(BaseImputer):
     """Transformer to impute null values with an arbitrary pre-defined value.
-
     Parameters
     ----------
     impute_value : int or float or str
         Value to impute nulls with.
-
     columns : None or str or list, default = None
         Columns to impute, if the default of None is supplied all columns in X are used
         when the transform method is called.
-
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
-
     Attributes
     ----------
     impute_value : int or float or str
         Value to impute nulls with.
-
     """
 
     def __init__(self, impute_value, columns, **kwargs):
@@ -90,39 +85,40 @@ class ArbitraryImputer(BaseImputer):
 
     def transform(self, X):
         """Impute missing values with the supplied impute_value.
-
         If columns is None all columns in X will be imputed.
-
         Parameters
         ----------
         X : pd.DataFrame
             Data containing columns to impute.
-
         Returns
         -------
         X : pd.DataFrame
             Transformed input X with nulls imputed with the specified impute_value, for the specified columns.
 
+        Additions
+        ---------
+        * Preserving the datatypes of columns
+        * Finding the target column dtype and cast imputer values as same dtype
         """
 
-        self.check_is_fitted(["impute_value"])
+        self.check_is_fitted(["impute_values_"])
         self.columns_check(X)
 
         for c in self.columns:
+                
+                if "category" in X[c].dtype.name:
 
-            # for categorical dtypes have to set new category for the impute values first
-            if "category" in X[c].dtype.name:
+                    if self.impute_value not in X[c].cat.categories:
 
-                if self.impute_value not in X[c].cat.categories:
+                        X[c] = X[c].cat.add_categories(self.impute_value) # add new category
 
-                    X[c] = X[c].cat.add_categories(self.impute_value)
+                dtypes = X[c].dtype # preserve dtype
 
-            self.impute_values_[c] = self.impute_value
+                X[c] = X[c].fillna(self.impute_value).astype(dtypes) # cast imputer value as same dtype
 
-        X = super().transform(X)
-
+        X = super().transform(X) # impute
+ 
         return X
-
 
 class MedianImputer(BaseImputer):
     """Transformer to impute missing values with the median of the supplied columns.
