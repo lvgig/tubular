@@ -5,6 +5,9 @@ import tests.test_data as d
 import tubular
 from tubular.imputers import ArbitraryImputer
 
+# Downcasting function
+from data_type_casting import downcast_dtypes
+
 
 class TestInit(object):
     """Tests for ArbitraryImputer.init()."""
@@ -172,3 +175,20 @@ class TestTransform(object):
         ):
 
             x.transform(df)
+
+    # Testing if the datatypes are preserved after imputation
+    def test_data_types_preserved(self):
+        """Test that data types are preserved after imputation."""
+
+        df = d.create_df_2()
+
+        x = ArbitraryImputer(impute_value=-1, columns="a") # imputing with -1
+
+        # downcasting the dataframe
+        df_downcast = downcast_dtypes(df)
+
+        # imputing the downcasted dataframe
+        df_imputed = x.transform(df_downcast)
+
+        # Checking the data types of the downcasted data frame and the imputed data frame are the same
+        assert df_downcast.dtypes.equals(df_imputed.dtypes), "Data types are preserved after imputation"

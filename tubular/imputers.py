@@ -101,7 +101,7 @@ class ArbitraryImputer(BaseImputer):
         * Finding the target column dtype and cast imputer values as same dtype
         """
 
-        self.check_is_fitted(["impute_values_"])
+        self.check_is_fitted(["impute_value"])
         self.columns_check(X)
 
         for c in self.columns:
@@ -112,11 +112,13 @@ class ArbitraryImputer(BaseImputer):
 
                         X[c] = X[c].cat.add_categories(self.impute_value) # add new category
 
-                dtypes = X[c].dtype # preserve dtype
+                dtype = X[c].dtype # get the dtype of column
 
-                X[c] = X[c].fillna(self.impute_value).astype(dtypes) # cast imputer value as same dtype
+                X[c] = X[c].fillna(self.impute_values_).astype(dtype) # casting imputer value as same dtype
 
-        X = super().transform(X) # impute
+                self.impute_values_[c] = self.impute_value # updating impute_values_ attribute
+
+        X = super().transform(X) # impute the values
  
         return X
 
