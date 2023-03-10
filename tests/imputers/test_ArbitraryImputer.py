@@ -5,9 +5,6 @@ import tests.test_data as d
 import tubular
 from tubular.imputers import ArbitraryImputer
 
-# Downcasting function
-from data_type_casting import downcast_dtypes
-
 
 class TestInit(object):
     """Tests for ArbitraryImputer.init()."""
@@ -176,19 +173,29 @@ class TestTransform(object):
 
             x.transform(df)
 
-    # Testing if the datatypes are preserved after imputation
-    def test_data_types_preserved(self):
-        """Test that data types are preserved after imputation."""
+    # Unit testing to check if downcast datatypes of columns is preserved after imputation is done
+    def test_impute_value_preserve_dtype(self):
+        """Testing downcast dtypes of columns are preserved after imputation using the create_downcast_df dataframe.
 
-        df = d.create_df_2()
+        Explicitly setting the dtype of "a" to int8 and "b" to float16 and check if the dtype of the columns are preserved after imputation."""
 
-        x = ArbitraryImputer(impute_value=-1, columns="a") # imputing with -1
+        df = d.create_downcast_df() # By default the dtype of "a" and "b" are int64 and float64 respectively
 
-        # downcasting the dataframe
-        df_downcast = downcast_dtypes(df)
+        x = ArbitraryImputer(impute_value=1, columns=["a", "b"]) 
 
-        # imputing the downcasted dataframe
-        df_imputed = x.transform(df_downcast)
+        # Setting the dtype of "a" to int8 and "b" to float16
+        df["a"] = df["a"].astype("int8")
+        df["b"] = df["b"].astype("float16")
 
-        # Checking the data types of the downcasted data frame and the imputed data frame are the same
-        assert df_downcast.dtypes.equals(df_imputed.dtypes), "Data types are preserved after imputation"
+        # Checking if the dtype of "a" and "b" are int8 and float16 respectively
+        assert df["a"].dtype == "int8"
+        assert df["b"].dtype == "float16"
+
+        # Impute the dataframe
+        df = x.transform(df)
+
+        # Checking if the dtype of "a" and "b" are int8 and float16 respectively after imputation
+        assert df["a"].dtype == "int8"
+        assert df["b"].dtype == "float16"        
+    
+        
