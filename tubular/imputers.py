@@ -105,22 +105,29 @@ class ArbitraryImputer(BaseImputer):
         self.columns_check(X)
 
         for c in self.columns:
-                
-                if "category" in X[c].dtype.name:
 
-                    if self.impute_value not in X[c].cat.categories:
+            if "category" in X[c].dtype.name:
 
-                        X[c] = X[c].cat.add_categories(self.impute_value) # add new category
+                if self.impute_value not in X[c].cat.categories:
 
-                dtype = X[c].dtype # get the dtype of column
+                    X[c] = X[c].cat.add_categories(
+                        self.impute_value
+                    )  # add new category
 
-                X[c] = X[c].fillna(self.impute_values_).astype(dtype) # casting imputer value as same dtype
+            dtype = X[c].dtype  # get the dtype of column
 
-                self.impute_values_[c] = self.impute_value # updating impute_values_ attribute
+            X[c] = (
+                X[c].fillna(self.impute_values_).astype(dtype)
+            )  # casting imputer value as same dtype
 
-        X = super().transform(X) # impute the values
- 
+            self.impute_values_[
+                c
+            ] = self.impute_value  # updating impute_values_ attribute
+
+        X = super().transform(X)  # impute the values
+
         return X
+
 
 class MedianImputer(BaseImputer):
     """Transformer to impute missing values with the median of the supplied columns.

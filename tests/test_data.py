@@ -532,6 +532,7 @@ def create_is_between_dates_df_2():
 
     return df
 
+
 # Example DataFrame for downcasting dtypes tests
 def create_downcast_df():
     """Create a dataframe with mixed dtypes to use in downcasting tests."""
