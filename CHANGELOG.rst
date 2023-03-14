@@ -28,7 +28,6 @@ Changed
 ^^^^^^^
 - changed ArbitraryImputer to preserve the dtype of columns (previously would upcast dtypes like int8 or float32) `#76 <https://github.com/lvgig/tubular/pull/76>`_
 
-
 Fixed
 ^^^^^
 
