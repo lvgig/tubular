@@ -178,10 +178,12 @@ class TestTransform(object):
         """Testing downcast dtypes of columns are preserved after imputation using the create_downcast_df dataframe.
 
         Explicitly setting the dtype of "a" to int8 and "b" to float16 and check if the dtype of the columns are preserved after imputation."""
+        df = (
+            d.create_downcast_df()
+        )  # By default the dtype of "a" and "b" are int64 and float64 respectively
 
-        df = d.create_downcast_df() # By default the dtype of "a" and "b" are int64 and float64 respectively
-
-        x = ArbitraryImputer(impute_value=1, columns=["a", "b"]) 
+        # Imputing the dataframe
+        x = ArbitraryImputer(impute_value=1, columns=["a", "b"])
 
         # Setting the dtype of "a" to int8 and "b" to float16
         df["a"] = df["a"].astype("int8")
@@ -196,6 +198,4 @@ class TestTransform(object):
 
         # Checking if the dtype of "a" and "b" are int8 and float16 respectively after imputation
         assert df["a"].dtype == "int8"
-        assert df["b"].dtype == "float16"        
-    
-        
+        assert df["b"].dtype == "float16"
