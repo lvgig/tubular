@@ -105,3 +105,4 @@ venv.bak/
 .mypy_cache/
 test_nominal.ipynb
 .vscode/settings.json
+.DS_Store
