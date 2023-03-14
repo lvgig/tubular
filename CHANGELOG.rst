@@ -16,8 +16,17 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
-unreleased
+0.3.4 (2023-03-14)
 ------------------
+
+Added
+^^^^^
+- added support for passing multiple columns and periods/units parameters to DatetimeSinusoidCalculator `#74 <https://github.com/lvgig/tubular/pull/74>`_
+- added support for handling a multi level response to MeanResponseTransformer `#67 <https://github.com/lvgig/tubular/pull/67>`_
+
+Changed
+^^^^^^^
+- changed ArbitraryImputer to preserve the dtype of columns (previously would upcast dtypes like int8 or float32) `#76 <https://github.com/lvgig/tubular/pull/76>`_
 
 Fixed
 ^^^^^
