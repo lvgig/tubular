@@ -59,7 +59,7 @@ class TestInit(object):
         with pytest.raises(
             TypeError,
             match=re.escape(
-                "CutTransformer: column arg (name of column) should be a single str giving the column to discretise"
+                "column arg (name of column) should be a single str giving the column to discretise"
             ),
         ):
 
@@ -71,9 +71,7 @@ class TestInit(object):
     def test_new_column_name_type_error(self):
         """Test that an exception is raised if new_column_name is not a str."""
 
-        with pytest.raises(
-            TypeError, match="CutTransformer: new_column_name must be a str"
-        ):
+        with pytest.raises(TypeError, match="new_column_name must be a str"):
 
             CutTransformer(column="b", new_column_name=1)
 
@@ -92,7 +90,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"""CutTransformer: unexpected type \(\<class 'int'\>\) for cut_kwargs key in position 1, must be str""",
+            match=r"""unexpected type \(\<class 'int'\>\) for cut_kwargs key in position 1, must be str""",
         ):
 
             CutTransformer(
@@ -237,8 +235,7 @@ class TestTransform(object):
         x = CutTransformer(column="b", new_column_name="d")
 
         with pytest.raises(
-            TypeError,
-            match="CutTransformer: b should be a numeric dtype but got object",
+            TypeError, match="b should be a numeric dtype but got object"
         ):
 
             x.transform(df)

@@ -51,8 +51,7 @@ class TestInit(object):
         """Test that an exception is raised if columns is passed as None."""
 
         with pytest.raises(
-            ValueError,
-            match="ArbitraryImputer: columns must be specified in init for ArbitraryImputer",
+            ValueError, match="columns must be specified in init for ArbitraryImputer"
         ):
 
             ArbitraryImputer(impute_value=1, columns=None)
@@ -61,8 +60,7 @@ class TestInit(object):
         """Test that an exception is raised if impute_value is not an int, float or str."""
 
         with pytest.raises(
-            ValueError,
-            match="ArbitraryImputer: impute_value should be a single value .*",
+            ValueError, match="impute_value should be a single value .*"
         ):
 
             ArbitraryImputer(impute_value={}, columns="a")

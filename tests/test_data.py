@@ -29,20 +29,6 @@ def create_zeros_array(shape=(10, 3)):
     return arr
 
 
-def create_numeric_df_1():
-    """Example with numeric dataframe"""
-    df = pd.DataFrame(
-        {
-            "a": [34.48, 21.71, 32.83, 1.08, 32.93, 4.74, 2.76, 75.7, 14.08, 61.31],
-            "b": [12.03, 20.32, 24.12, 24.18, 68.99, 0.0, 0.0, 59.46, 11.02, 60.68],
-            "c": [17.06, 12.25, 19.15, 29.73, 1.98, 8.23, 15.22, 20.59, 3.82, 39.73],
-            "d": [25.94, 70.22, 72.94, 64.55, 0.41, 13.62, 30.22, 4.6, 67.13, 10.38],
-            "e": [94.3, 4.18, 51.7, 16.63, 2.6, 16.57, 3.51, 30.79, 66.19, 25.44],
-        }
-    )
-    return df
-
-
 def create_df_1():
     """Create simple DataFrame with the following...
 
@@ -197,19 +183,6 @@ def create_df_10():
     return df
 
 
-def create_df_11():
-    """Create simple DataFrame to use in other tests"""
-
-    df = pd.DataFrame(
-        {
-            "a": [1, 2, 3],
-            "b": [4, 5, 6],
-        }
-    )
-
-    return df
-
-
 def create_large_null_df(n_col=1000):
     """Create large single row df with all null values.
 
@@ -263,26 +236,6 @@ def create_large_half_null_df(n_col=1000):
     data_df = pd.DataFrame(data_dict, index=[0, 1])
 
     return data_df
-
-
-def create_weighted_imputers_test_df():
-    """Create DataFrame to use imputer tests that correct values are imputed for weighted dataframes
-
-    weight column contains the weights between 0 and 1
-    """
-
-    df = pd.DataFrame(
-        {
-            "a": [1.0, 1.0, 1.0, 3.0, 5.0, 5.0],
-            "b": ["a", "a", "a", "d", "e", "e"],
-            "c": ["a", "a", np.nan, np.nan, np.nan, "f"],
-            "d": [1.0, 5.0, 3.0, np.nan, np.nan, 1.0],
-            "response": [0, 1, 0, 1, 1, 1],
-            "weight": [0.1, 0.1, 0.8, 0.5, 0.9, 0.8],
-        }
-    )
-
-    return df
 
 
 def create_MeanResponseTransformer_test_df():

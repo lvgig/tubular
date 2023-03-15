@@ -50,9 +50,7 @@ class TestInit(object):
     def test_no_keys_dict_error(self):
         """Test that an exception is raised if mappings is a dict but with no keys."""
 
-        with pytest.raises(
-            ValueError, match="BaseMappingTransformer: mappings has no values"
-        ):
+        with pytest.raises(ValueError, match="mappings has no values"):
 
             BaseMappingTransformer(mappings={})
 
@@ -60,8 +58,7 @@ class TestInit(object):
         """Test that an exception is raised if mappings contains non-dict items."""
 
         with pytest.raises(
-            ValueError,
-            match="BaseMappingTransformer: values in mappings dictionary should be dictionaries",
+            ValueError, match="values in mappings dictionary should be dictionaries"
         ):
 
             BaseMappingTransformer(mappings={"a": {"a": 1}, "b": 1})
@@ -69,9 +66,7 @@ class TestInit(object):
     def test_mappings_not_dict_error(self):
         """Test that an exception is raised if mappings is not a dict."""
 
-        with pytest.raises(
-            ValueError, match="BaseMappingTransformer: mappings must be a dictionary"
-        ):
+        with pytest.raises(ValueError, match="mappings must be a dictionary"):
 
             BaseMappingTransformer(mappings=())
 

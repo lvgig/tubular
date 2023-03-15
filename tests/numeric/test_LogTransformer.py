@@ -26,12 +26,13 @@ class TestInit(object):
 
         with pytest.raises(
             ValueError,
-            match=re.escape("LogTransformer: base should be numeric or None"),
+            match=re.escape("base should be numeric or None"),
         ):
 
             LogTransformer(
                 columns=["a"],
                 base="a",
+                new_column_name="b",
             )
 
     def test_base_not_strictly_positive_error(self):
@@ -39,12 +40,13 @@ class TestInit(object):
 
         with pytest.raises(
             ValueError,
-            match=re.escape("LogTransformer: base should be strictly positive"),
+            match=re.escape("base should be strictly positive"),
         ):
 
             LogTransformer(
                 columns=["a"],
                 base=0,
+                new_column_name="b",
             )
 
     def test_class_methods(self):
@@ -209,8 +211,7 @@ class TestTransform(object):
         x = LogTransformer(columns=["a", "b", "c"])
 
         with pytest.raises(
-            TypeError,
-            match=r"LogTransformer: The following columns are not numeric in X; \['b', 'c'\]",
+            TypeError, match=r"The following columns are not numeric in X; \['b', 'c'\]"
         ):
 
             x.transform(df)
@@ -366,7 +367,7 @@ class TestTransform(object):
 
         with pytest.raises(
             ValueError,
-            match=f"LogTransformer: values less than or equal to 0 in columns{extra_exception_text}, make greater than 0 before using transform",
+            match=f"values less than or equal to 0 in columns{extra_exception_text}, make greater than 0 before using transform",
         ):
 
             x.transform(df)

@@ -1,11 +1,10 @@
 Quick Start
 ====================
-|logo|
 
-Welcome to the quick start guide for tubular!
+Welcome to the quick start guide for |logo| !
 
 .. |logo| image:: ../../logo.png
-   :height: 200px
+   :height: 50px
 
 Installation
 --------------------
@@ -16,6 +15,7 @@ The easiest way to get ``tubular`` is to install directly from ``pypi``;
 
      pip install tubular
 
+.. important::
 
     Thanks for installing tubular! We hope you find it useful!
 
@@ -54,24 +54,20 @@ The standard `OutOfRangeNullTransformer <https://tubular.readthedocs.io/en/lates
 Dates
 ^^^^^
 
-This module contains transformers to deal with datetime columns.
+This module contains transformers to deal with date columns.
 
-Date differencing is available - accounting for leap years `DateDiffLeapYearTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.dates.DateDiffLeapYearTransformer.html>`_ or not `DateDifferenceTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.dates.DateDifferenceTransformer.html>`_.
+Date differencing is available - accounting for leap years (`DateDiffLeapYearTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.dates.DateDiffLeapYearTransformer.html>`_) or not (`DateDifferenceTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.dates.DateDifferenceTransformer.html>`_).
 
 The `BetweenDatesTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.dates.BetweenDatesTransformer.html>`_ calculates if one date falls between two others.
 
 The `ToDatetimeTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.dates.ToDatetimeTransformer.html>`_ converts columns to datetime type.
 
-The `SeriesDtMethodTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.dates.SeriesDtMethodTransformer.html>`_ allows the user to use `pandas.Series.dt <https://pandas.pydata.org/docs/reference/api/pandas.Series.dt.html>`_ methods in a similar way to `base.DataFrameMethodTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.base.DataFrameMethodTransformer.html>`_.
-
-The `DatetimeInfoExtractor <https://tubular.readthedocs.io/en/latest/api/tubular.dates.DatetimeInfoExtractor.html>`_ allows the user to extract datetime info such as the time of day or month from a datetime field.
-
-The `DatetimeSinusoidCalculator <https://tubular.readthedocs.io/en/latest/api/tubular.dates.DatetimeSinusoidCalculator.html>`_ derives a feature in a dataframe by calculating the sine or cosine of a datetime column.
+Finally the `SeriesDtMethodTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.dates.SeriesDtMethodTransformer.html>`_ allows the user to use `pandas.Series.dt <https://pandas.pydata.org/docs/reference/api/pandas.Series.dt.html>`_ methods in a similar way to `base.DataFrameMethodTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.base.DataFrameMethodTransformer.html>`_.
 
 Imputers
 ^^^^^^^^
 
-This module contains standard imputation techniques - mean, median mode as well as `NearestMeanResponseImputer <https://tubular.readthedocs.io/en/feature-version_0_3_0/api/tubular.imputers.NearestMeanResponseImputer.html>`_ which imputes with the value which is closest to the ``null`` values in terms of average response.  All of these support weights.
+This module contains standard imputation techniques - mean, median mode as well as `NearestMeanResponseImputer <https://tubular.readthedocs.io/en/feature-version_0_3_0/api/tubular.imputers.NearestMeanResponseImputer.html>`_ which imputes with the value which is closest to the ``null`` values in terms of average response.
 
 The `NullIndicator <https://tubular.readthedocs.io/en/feature-version_0_3_0/api/tubular.imputers.NullIndicator.html>`_ is used to create binary indicators of where ``null`` values are present in a column.
 
@@ -87,36 +83,24 @@ The `CrossColumnMappingTransformer <https://tubular.readthedocs.io/en/latest/api
 Misc
 ^^^^
 
-The misc module contains transformers which do not fit into other categories.
-
-`SetValueTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.misc.SetValueTransformer.html>`_ creates a constant column with arbitrary value.
-
-`SetDtype <https://tubular.readthedocs.io/en/latest/api/tubular.misc.SetDtype.html>`_ allows the user to set the dtype of a column.
+The misc module currently contains only one transformer, `SetValueTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.misc.SetValueTransformer.html>`_, which creates a constant column with arbitrary value.
 
 Nominal
 ^^^^^^^
 
 This module contains categorical encoding techniques. 
 
-There are respone encoding techniques such as `MeanResponseTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.MeanResponseTransformer.html>`_, one hot encoding `OneHotEncodingTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.OneHotEncodingTransformer.html>`_ and grouping of infrequently occuring levels `GroupRareLevelsTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.GroupRareLevelsTransformer.html>`_.
-
-`MeanResponseTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.MeanResponseTransformer.html>`_ also supports regularisation of encodings using a prior.
+There are respone encoding techniques such as `MeanResponseTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.MeanResponseTransformer.html>`_, one hot encoding (`OneHotEncodingTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.OneHotEncodingTransformer.html>`_) and grouping of infrequently occuring levels (`GroupRareLevelsTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.nominal.GroupRareLevelsTransformer.html>`_).
 
 Numeric
 ^^^^^^^
 
-This module contains numeric transformations - cut `CutTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.CutTransformer.html>`_, log `LogTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.LogTransformer.html>`_, and scaling `ScalingTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.ScalingTransformer.html>`_.
-
-`TwoColumnOperatorTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.TwoColumnOperatorTransformer.html>`_ allows a user to apply operations to two colmns using methods from `pandas.DataFrame method <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_ which require a multiple columns (e.g. add, subtract, multiply etc
-
-It also contains `InteractionTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.InteractionTransformer.html>`_ and `PCATransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.PCATransformer.html>`_ which create interaction terms and pca components.
+This module contains numeric transformations - cut (`CutTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.CutTransformer.html>`_), log (`LogTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.LogTransformer.html>`_) and scaling (`ScalingTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.numeric.ScalingTransformer.html>`_).
 
 Strings
 ^^^^^^^
 
-The strings module contains useful transformers for working with strings.  `SeriesStrMethodTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.strings.SeriesStrMethodTransformer.html>`_, allows the user to access `pandas.Series.str <https://pandas.pydata.org/docs/reference/api/pandas.Series.str.html>`_ methods within ``tubular``.  `StringConcatenator <https://tubular.readthedocs.io/en/latest/api/tubular.strings.StringConcatenator.html>`_ allows a user to concatenate multiple columns together of varied dtype into a string output.
-
-
+The strings module contains a single transformer, `SeriesStrMethodTransformer <https://tubular.readthedocs.io/en/latest/api/tubular.strings.SeriesStrMethodTransformer.html>`_, that allows the user to access `pandas.Series.str <https://pandas.pydata.org/docs/reference/api/pandas.Series.str.html>`_ methods within ``tubular``.
 
 Reporting an issue
 ---------------------------------

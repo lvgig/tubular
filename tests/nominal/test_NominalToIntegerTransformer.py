@@ -286,7 +286,7 @@ class TestTransform(object):
 
         with pytest.raises(
             ValueError,
-            match="NominalToIntegerTransformer: nulls would be introduced into column a from levels not present in mapping",
+            match="nulls would be introduced into column a from levels not present in mapping",
         ):
 
             x.transform(df)
@@ -385,7 +385,7 @@ class TestInverseTransform(object):
 
         with pytest.raises(
             ValueError,
-            match="NominalToIntegerTransformer: nulls introduced from levels not present in mapping for column: b",
+            match="nulls introduced from levels not present in mapping for column: b",
         ):
 
             x.inverse_transform(df_transformed)
