@@ -20,14 +20,6 @@ capping module
 
     capping.CappingTransformer
     capping.OutOfRangeNullTransformer
-    
-comparison module
-------------------
-
-.. autosummary::
-    :toctree: api/
-
-    comparison.EqualityChecker
 
 dates module
 ------------------
@@ -40,8 +32,6 @@ dates module
     dates.DateDiffLeapYearTransformer
     dates.SeriesDtMethodTransformer    
     dates.ToDatetimeTransformer
-    dates.DatetimeInfoExtractor
-    dates.DatetimeSinusoidCalculator
 
 imputers module
 ------------------
@@ -77,7 +67,6 @@ misc module
     :toctree: api/
 
     misc.SetValueTransformer
-    misc.SetColumnDtype
 
 nominal module
 ------------------
@@ -99,11 +88,9 @@ numeric module
     :toctree: api/
 
     numeric.LogTransformer
-    numeric.CutTransformer  
-    numeric.TwoColumnOperatorTransformer
+    numeric.CutTransformer   
     numeric.ScalingTransformer
     numeric.InteractionTransformer
-    numeric.PCATransformer
  
 strings module
 ------------------
@@ -112,4 +99,3 @@ strings module
     :toctree: api/
 
     strings.SeriesStrMethodTransformer
-    strings.StringConcatenator

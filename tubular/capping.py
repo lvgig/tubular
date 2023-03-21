@@ -67,14 +67,14 @@ class CappingTransformer(BaseTransformer):
         if capping_values is None and quantiles is None:
 
             raise ValueError(
-                f"{self.classname()}: both capping_values and quantiles are None, either supply capping values in the "
+                "both capping_values and quantiles are None, either supply capping values in the "
                 "capping_values argument or supply quantiles that can be learnt in the fit method"
             )
 
         if capping_values is not None and quantiles is not None:
 
             raise ValueError(
-                f"{self.classname()}: both capping_values and quantiles are not None, supply one or the other"
+                "both capping_values and quantiles are not None, supply one or the other"
             )
 
         if capping_values is not None:
@@ -98,7 +98,7 @@ class CappingTransformer(BaseTransformer):
                         if quantile_value < 0 or quantile_value > 1:
 
                             raise ValueError(
-                                f"{self.classname()}: quantile values must be in the range [0, 1] but got {quantile_value} for key {k}"
+                                f"quantile values must be in the range [0, 1] but got {quantile_value} for key {k}"
                             )
 
             self.capping_values = {}
@@ -114,28 +114,26 @@ class CappingTransformer(BaseTransformer):
 
         if type(capping_values_dict) is not dict:
 
-            raise TypeError(
-                f"{self.classname()}: {dict_name} should be dict of columns and capping values"
-            )
+            raise TypeError(f"{dict_name} should be dict of columns and capping values")
 
         for k, cap_values in capping_values_dict.items():
 
             if type(k) is not str:
 
                 raise TypeError(
-                    f"{self.classname()}: all keys in {dict_name} should be str, but got {type(k)}"
+                    f"all keys in {dict_name} should be str, but got {type(k)}"
                 )
 
             if type(cap_values) is not list:
 
                 raise TypeError(
-                    f"{self.classname()}: each item in {dict_name} should be a list, but got {type(cap_values)} for key {k}"
+                    f"each item in {dict_name} should be a list, but got {type(cap_values)} for key {k}"
                 )
 
             if len(cap_values) != 2:
 
                 raise ValueError(
-                    f"{self.classname()}: each item in {dict_name} should be length 2, but got {len(cap_values)} for key {k}"
+                    f"each item in {dict_name} should be length 2, but got {len(cap_values)} for key {k}"
                 )
 
             for cap_value in cap_values:
@@ -145,13 +143,13 @@ class CappingTransformer(BaseTransformer):
                     if type(cap_value) not in [int, float]:
 
                         raise TypeError(
-                            f"{self.classname()}: each item in {dict_name} lists must contain numeric values or None, got {type(cap_value)} for key {k}"
+                            f"each item in {dict_name} lists must contain numeric values or None, got {type(cap_value)} for key {k}"
                         )
 
                     if np.isnan(cap_value) or np.isinf(cap_value):
 
                         raise ValueError(
-                            f"{self.classname()}: item in {dict_name} lists contains numpy NaN or Inf values"
+                            f"item in {dict_name} lists contains numpy NaN or Inf values"
                         )
 
             if all([cap_value is not None for cap_value in cap_values]):
@@ -159,14 +157,12 @@ class CappingTransformer(BaseTransformer):
                 if cap_values[0] >= cap_values[1]:
 
                     raise ValueError(
-                        f"{self.classname()}: lower value is greater than or equal to upper value for key {k}"
+                        f"lower value is greater than or equal to upper value for key {k}"
                     )
 
             if all([cap_value is None for cap_value in cap_values]):
 
-                raise ValueError(
-                    f"{self.classname()}: both values are None for key {k}"
-                )
+                raise ValueError(f"both values are None for key {k}")
 
     def fit(self, X, y=None):
         """Learn capping values from input data X.
@@ -207,9 +203,7 @@ class CappingTransformer(BaseTransformer):
 
         else:
 
-            warnings.warn(
-                f"{self.classname()}: quantiles not set so no fitting done in CappingTransformer"
-            )
+            warnings.warn("quantiles not set so no fitting done in CappingTransformer")
 
         self._replacement_values = copy.deepcopy(self.capping_values)
 
@@ -328,18 +322,16 @@ class CappingTransformer(BaseTransformer):
             sample_weight = np.array(sample_weight)
 
         if np.isnan(sample_weight).sum() > 0:
-            raise ValueError(f"{self.classname()}: null values in sample weights")
+            raise ValueError("null values in sample weights")
 
         if np.isinf(sample_weight).sum() > 0:
-            raise ValueError(f"{self.classname()}: infinite values in sample weights")
+            raise ValueError("infinite values in sample weights")
 
         if (sample_weight < 0).sum() > 0:
-            raise ValueError(f"{self.classname()}: negative weights in sample weights")
+            raise ValueError("negative weights in sample weights")
 
         if sample_weight.sum() <= 0:
-            raise ValueError(
-                f"{self.classname()}: total sample weights are not greater than 0"
-            )
+            raise ValueError("total sample weights are not greater than 0")
 
         values = np.array(values)
         quantiles = np.array(quantiles)
@@ -387,13 +379,13 @@ class CappingTransformer(BaseTransformer):
         if self.capping_values == {}:
 
             raise ValueError(
-                f"{self.classname()}: capping_values attribute is an empty dict - perhaps the fit method has not been run yet"
+                "capping_values attribute is an empty dict - perhaps the fit method has not been run yet"
             )
 
         if self._replacement_values == {}:
 
             raise ValueError(
-                f"{self.classname()}: _replacement_values attribute is an empty dict - perhaps the fit method has not been run yet"
+                "_replacement_values attribute is an empty dict - perhaps the fit method has not been run yet"
             )
 
         X = super().transform(X)
@@ -409,7 +401,7 @@ class CappingTransformer(BaseTransformer):
             )
 
             raise TypeError(
-                f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
+                f"The following columns are not numeric in X; {non_numeric_columns}"
             )
 
         for col in self.columns:

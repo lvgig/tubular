@@ -10,9 +10,8 @@ from sklearn.preprocessing import (
     StandardScaler,
     PolynomialFeatures,
 )
-from sklearn.decomposition import PCA
 
-from tubular.base import BaseTransformer, DataFrameMethodTransformer
+from tubular.base import BaseTransformer
 
 
 class LogTransformer(BaseTransformer):
@@ -65,11 +64,9 @@ class LogTransformer(BaseTransformer):
 
         if base is not None:
             if not isinstance(base, (int, float)):
-                raise ValueError(f"{self.classname()}: base should be numeric or None")
+                raise ValueError("base should be numeric or None")
             if not base > 0:
-                raise ValueError(
-                    f"{self.classname()}: base should be strictly positive"
-                )
+                raise ValueError("base should be strictly positive")
 
         self.base = base
         self.add_1 = add_1
@@ -108,7 +105,7 @@ class LogTransformer(BaseTransformer):
             )
 
             raise TypeError(
-                f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
+                f"The following columns are not numeric in X; {non_numeric_columns}"
             )
 
         new_column_names = [f"{column}_{self.suffix}" for column in self.columns]
@@ -118,7 +115,7 @@ class LogTransformer(BaseTransformer):
             if (X[self.columns] <= -1).sum().sum() > 0:
 
                 raise ValueError(
-                    f"{self.classname()}: values less than or equal to 0 in columns (after adding 1), make greater than 0 before using transform"
+                    "values less than or equal to 0 in columns (after adding 1), make greater than 0 before using transform"
                 )
 
             if self.base is None:
@@ -134,7 +131,7 @@ class LogTransformer(BaseTransformer):
             if (X[self.columns] <= 0).sum().sum() > 0:
 
                 raise ValueError(
-                    f"{self.classname()}: values less than or equal to 0 in columns, make greater than 0 before using transform"
+                    "values less than or equal to 0 in columns, make greater than 0 before using transform"
                 )
 
             if self.base is None:
@@ -179,17 +176,17 @@ class CutTransformer(BaseTransformer):
         if not type(column) is str:
 
             raise TypeError(
-                f"{self.classname()}: column arg (name of column) should be a single str giving the column to discretise"
+                "column arg (name of column) should be a single str giving the column to discretise"
             )
 
         if not type(new_column_name) is str:
 
-            raise TypeError(f"{self.classname()}: new_column_name must be a str")
+            raise TypeError("new_column_name must be a str")
 
         if not type(cut_kwargs) is dict:
 
             raise TypeError(
-                f"{self.classname()}: cut_kwargs should be a dict but got type {type(cut_kwargs)}"
+                f"cut_kwargs should be a dict but got type {type(cut_kwargs)}"
             )
 
         else:
@@ -199,7 +196,7 @@ class CutTransformer(BaseTransformer):
                 if not type(k) is str:
 
                     raise TypeError(
-                        f"{self.classname()}: unexpected type ({type(k)}) for cut_kwargs key in position {i}, must be str"
+                        f"unexpected type ({type(k)}) for cut_kwargs key in position {i}, must be str"
                     )
 
         self.cut_kwargs = cut_kwargs
@@ -226,127 +223,10 @@ class CutTransformer(BaseTransformer):
         if not pd.api.types.is_numeric_dtype(X[self.columns[0]]):
 
             raise TypeError(
-                f"{self.classname()}: {self.columns[0]} should be a numeric dtype but got {X[self.columns[0]].dtype}"
+                f"{self.columns[0]} should be a numeric dtype but got {X[self.columns[0]].dtype}"
             )
 
         X[self.new_column_name] = pd.cut(X[self.columns[0]], **self.cut_kwargs)
-
-        return X
-
-
-class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
-
-    """
-    This transformer applies a pandas.DataFrame method to two columns (add, sub, mul, div, mod, pow).
-
-    Transformer assigns the output of the method to a new column. The method will be applied
-    in the form (column 1)operator(column 2), so order matters (if the method does not commute). It is possible to
-    supply other key word arguments to the transform method, which will be passed to the pandas.DataFrame method being called.
-
-    Parameters
-    ----------
-    pd_method_name : str
-        The name of the pandas.DataFrame method to be called.
-
-    column1_name : str
-        The name of the 1st column in the operation.
-
-    column2_name : str
-        The name of the 2nd column in the operation.
-
-    new_column_name : str
-        The name of the new column that the output is assigned to.
-
-    pd_method_kwargs : dict, default =  {'axis':0}
-        Dictionary of method kwargs to be passed to pandas.DataFrame method. Must contain an entry for axis, set to either 1 or 0.
-
-    **kwargs :
-        Arbitrary keyword arguments passed onto BaseTransformer.__init__().
-
-    Attributes
-    ----------
-    pd_method_name : str
-        The name of the pandas.DataFrame method to be called.
-
-    columns : list
-        list containing two string items: [column1_name, column2_name] The first will be operated upon by the
-        chosen pandas method using the second.
-
-    column2_name : str
-        The name of the 2nd column in the operation.
-
-    new_column_name : str
-        The name of the new column that the output is assigned to.
-
-    pd_method_kwargs : dict
-        Dictionary of method kwargs to be passed to pandas.DataFrame method.
-
-    """
-
-    def __init__(
-        self,
-        pd_method_name,
-        columns,
-        new_column_name,
-        pd_method_kwargs={"axis": 0},
-        **kwargs,
-    ):
-        """
-        Performs input checks not done in either DataFrameMethodTransformer.__init__ or BaseTransformer.__init__
-        """
-
-        if "axis" not in pd_method_kwargs.keys():
-            raise ValueError(
-                f'{self.classname()}: pd_method_kwargs must contain an entry "axis" set to 0 or 1'
-            )
-
-        if pd_method_kwargs["axis"] not in [0, 1]:
-            raise ValueError(
-                f"{self.classname()}: pd_method_kwargs 'axis' must be 0 or 1"
-            )
-
-        if not type(columns) is list:
-            if len(columns) != 2:
-                raise ValueError(
-                    f"{self.classname()}: columns must be a list containing two column names but got {columns}"
-                )
-
-        self.column1_name = columns[0]
-        self.column2_name = columns[1]
-
-        # call DataFrameMethodTransformer.__init__
-        # This class will inherit all the below attributes from DataFrameMethodTransformer
-        super().__init__(
-            new_column_name=new_column_name,
-            pd_method_name=pd_method_name,
-            columns=columns,
-            pd_method_kwargs=pd_method_kwargs,
-            **kwargs,
-        )
-
-    def transform(self, X):
-        """
-        Transform input data by applying the chosen method to the two specified columns
-
-        Args:
-            X (pd.DataFrame): Data to transform.
-
-        Returns:
-            pd.DataFrame: Input X with an additional column.
-        """
-        # call BaseTransformer.transform
-        X = super(DataFrameMethodTransformer, self).transform(X)
-
-        is_numeric = X[self.columns].apply(pd.api.types.is_numeric_dtype, axis=0)
-
-        if not is_numeric.all():
-            raise TypeError(
-                f"{self.classname()}: input columns in X must contain only numeric values"
-            )
-
-        X[self.new_column_name] = getattr(X[[self.column1_name]], self.pd_method_name)(
-            X[self.column2_name], **self.pd_method_kwargs
-        )
 
         return X
 
@@ -379,7 +259,7 @@ class ScalingTransformer(BaseTransformer):
         if not type(scaler_kwargs) is dict:
 
             raise TypeError(
-                f"{self.classname()}: scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
+                f"scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
             )
 
         else:
@@ -389,16 +269,14 @@ class ScalingTransformer(BaseTransformer):
                 if not type(k) is str:
 
                     raise TypeError(
-                        f"{self.classname()}: unexpected type ({type(k)}) for scaler_kwargs key in position {i}, must be str"
+                        f"unexpected type ({type(k)}) for scaler_kwargs key in position {i}, must be str"
                     )
 
         allowed_scaler_values = ["min_max", "max_abs", "standard"]
 
         if scaler_type not in allowed_scaler_values:
 
-            raise ValueError(
-                f"{self.classname()}: scaler_type should be one of; {allowed_scaler_values}"
-            )
+            raise ValueError(f"scaler_type should be one of; {allowed_scaler_values}")
 
         if scaler_type == "min_max":
 
@@ -440,7 +318,7 @@ class ScalingTransformer(BaseTransformer):
             )
 
             raise TypeError(
-                f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
+                f"The following columns are not numeric in X; {non_numeric_columns}"
             )
 
         return X
@@ -541,31 +419,23 @@ class InteractionTransformer(BaseTransformer):
 
         if len(columns) < 2:
             raise ValueError(
-                f"{self.classname()}: number of columns must be equal or greater than 2, got {str(len(columns))} column."
+                f"number of columns must be equal or greater than 2, got {str(len(columns))} column."
             )
 
         if type(min_degree) is int:
             if min_degree < 2:
                 raise ValueError(
-                    f"{self.classname()}: min_degree must be equal or greater than 2, got {str(min_degree)}"
+                    f"min_degree must be equal or greater than 2, got {str(min_degree)}"
                 )
             else:
                 self.min_degree = min_degree
         else:
             raise TypeError(
-                f"{self.classname()}: unexpected type ({type(min_degree)}) for min_degree, must be int"
+                f"unexpected type ({type(min_degree)}) for min_degree, must be int"
             )
         if type(max_degree) is int:
             if min_degree > max_degree:
-                raise ValueError(
-                    f"{self.classname()}: max_degree must be equal or greater than min_degree"
-                )
-            else:
-                self.max_degree = max_degree
-            if max_degree > len(columns):
-                raise ValueError(
-                    f"{self.classname()}: max_degree must be equal or lower than number of columns"
-                )
+                raise ValueError("max_degree must be equal or greater than min_degree")
             else:
                 self.max_degree = max_degree
             if max_degree > len(columns):
@@ -576,7 +446,7 @@ class InteractionTransformer(BaseTransformer):
                 self.max_degree = max_degree
         else:
             raise TypeError(
-                f"{self.classname()}: unexpected type ({type(max_degree)}) for max_degree, must be int"
+                f"unexpected type ({type(max_degree)}) for max_degree, must be int"
             )
 
         self.nb_features_to_interact = len(self.columns)
@@ -640,236 +510,5 @@ class InteractionTransformer(BaseTransformer):
             X[self.interaction_colname[inter_idx]] = X[
                 interaction_combination_colname[inter_idx]
             ].product(axis=1, skipna=False)
-
-        return X
-
-
-class PCATransformer(BaseTransformer):
-    """Transformer that generates variables using Principal component analysis (PCA).
-    Linear dimensionality reduction using Singular Value Decomposition of the
-    data to project it to a lower dimensional space.
-
-    It is based on sklearn class sklearn.decomposition.PCA
-
-        Parameters
-        ----------
-        columns : None or list or str
-            Columns to apply the transformer to. If a str is passed this is put into a list. Value passed
-            in columns is saved in the columns attribute on the object. Note this has no default value so
-            the user has to specify the columns when initialising the transformer. When the user forget to set columns,
-            all columns would be picked up when super transform runs.
-        n_components : int, float or 'mle', default=None
-            Number of components to keep.
-            if n_components is not set all components are kept::
-                n_components == min(n_samples, n_features)
-            If ``n_components == 'mle'`` and ``svd_solver == 'full'``, Minka's
-            MLE is used to guess the dimension. Use of ``n_components == 'mle'``
-            will interpret ``svd_solver == 'auto'`` as ``svd_solver == 'full'``.
-            If ``0 < n_components < 1`` and ``svd_solver == 'full'``, select the
-            number of components such that the amount of variance that needs to be
-            explained is greater than the percentage specified by n_components.
-            If ``svd_solver == 'arpack'``, the number of components must be
-             strictly less than the minimum of n_features and n_samples.
-            Hence, the None case results in::
-                n_components == min(n_samples, n_features) - 1   svd_solver='auto', tol=0.0,  n_oversamples=10, random_state=None
-        svd_solver : {'auto', 'full', 'arpack', 'randomized'}, default='auto'
-            If auto :
-                The solver is selected by a default policy based on `X.shape` and
-                `n_components`: if the input data is larger than 500x500 and the
-                number of components to extract is lower than 80% of the smallest
-                dimension of the data, then the more efficient 'randomized'
-                method is enabled. Otherwise the exact full SVD is computed and
-                optionally truncated afterwards.
-            If full :
-                run exact full SVD calling the standard LAPACK solver via
-                `scipy.linalg.svd` and select the components by postprocessing
-            If arpack :
-                run SVD truncated to n_components calling ARPACK solver via
-                `scipy.sparse.linalg.svds`. It requires strictly
-                0 < n_components < min(X.shape)
-            If randomized :
-                run randomized SVD by the method of Halko et al.
-            .. sklearn versionadded:: 0.18.0
-
-        random_state : int, RandomState instance or None, default=None
-            Used when the 'arpack' or 'randomized' solvers are used. Pass an int
-            for reproducible results across multiple function calls.
-            .. sklearn versionadded:: 0.18.0
-        pca_column_prefix : str, prefix added to each the n components features generated. Default is "pca_"
-            example: if n_components = 3, new columns would be 'pca_0','pca_1','pca_2'.
-
-    Attributes
-    ----------
-
-    pca : PCA class from sklearn.decomposition
-    n_components_ : int
-        The estimated number of components. When n_components is set
-        to 'mle' or a number between 0 and 1 (with svd_solver == 'full') this
-        number is estimated from input data. Otherwise it equals the parameter
-        n_components, or the lesser value of n_features and n_samples
-        if n_components is None.
-    feature_names_out: list or None
-        list of feature name representing the new dimensions.
-
-
-    """
-
-    def __init__(
-        self,
-        columns,
-        n_components=2,
-        svd_solver="auto",
-        random_state=None,
-        pca_column_prefix="pca_",
-        **kwargs,
-    ):
-
-        super().__init__(columns=columns, **kwargs)
-
-        if type(n_components) is int:
-            if n_components < 1:
-                raise ValueError(
-                    f"{self.classname()}:n_components must be strictly positive got {str(n_components)}"
-                )
-            else:
-                self.n_components = n_components
-        elif type(n_components) is float:
-            if 0 < n_components < 1:
-                self.n_components = n_components
-            else:
-                raise ValueError(
-                    f"{self.classname()}:n_components must be strictly positive and must be of type int when greater than or equal to 1. Got {str(n_components)}"
-                )
-
-        else:
-            if n_components == "mle":
-                self.n_components = n_components
-            else:
-                raise TypeError(
-                    f"{self.classname()}:unexpected type {type(n_components)} for n_components, must be int, float (0-1) or equal to 'mle'."
-                )
-
-        if type(svd_solver) is str:
-            if svd_solver not in ["auto", "full", "arpack", "randomized"]:
-                raise ValueError(
-                    f"{self.classname()}:svd_solver {svd_solver} is unknown. Please select among 'auto', 'full', 'arpack', 'randomized'."
-                )
-            else:
-                self.svd_solver = svd_solver
-        else:
-            raise TypeError(
-                f"{self.classname()}:unexpected type {type(svd_solver)} for svd_solver, must be str"
-            )
-
-        if type(random_state) is int:
-            self.random_state = random_state
-        else:
-            if random_state is None:
-                self.random_state = random_state
-            else:
-                raise TypeError(
-                    f"{self.classname()}:unexpected type {type(random_state)} for random_state, must be int or None."
-                )
-
-        if (svd_solver == "arpack") and (n_components == "mle"):
-            raise ValueError(
-                f"{self.classname()}: n_components='mle' cannot be a string with svd_solver='arpack'"
-            )
-        if (svd_solver in ["randomized", "arpack"]) and (type(n_components) is float):
-            raise TypeError(
-                f"{self.classname()}: n_components {n_components} cannot be a float with svd_solver='{svd_solver}'"
-            )
-
-        if type(pca_column_prefix) is str:
-            self.pca_column_prefix = pca_column_prefix
-        else:
-            raise TypeError(
-                f"{self.classname()}:unexpected type {type(pca_column_prefix)} for pca_column_prefix, must be str"
-            )
-
-        self.pca = PCA(
-            n_components=self.n_components,
-            svd_solver=self.svd_solver,
-            random_state=self.random_state,
-        )
-
-        self.pca_column_prefix = pca_column_prefix
-        self.feature_names_out = None
-        self.n_components_ = None
-
-    def check_numeric_columns(self, X):
-        """Method to check all columns (specicifed in self.columns) in X are all numeric.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            Data containing columns to check.
-
-        """
-
-        numeric_column_types = X[self.columns].apply(
-            pd.api.types.is_numeric_dtype, axis=0
-        )
-
-        if not numeric_column_types.all():
-
-            non_numeric_columns = list(
-                numeric_column_types.loc[~numeric_column_types].index
-            )
-
-            raise TypeError(
-                f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
-            )
-
-        return X
-
-    def fit(self, X, y=None):
-        """Fit PCA to input data.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            Dataframe with columns to learn scaling values from.
-
-        y : None
-            Required for pipeline.
-
-        """
-
-        super().fit(X, y)
-
-        X = self.check_numeric_columns(X)
-
-        if self.n_components != "mle":
-            if 0 < self.n_components <= min(X[self.columns].shape):
-                pass
-            else:
-                raise ValueError(
-                    f"""{self.classname()}: n_components {self.n_components} must be between 1 and min(n_samples {X[self.columns].shape[0]}, n_features {X[self.columns].shape[1]}) is {min(X[self.columns].shape)} with svd_solver '{self.svd_solver}'"""
-                )
-
-        self.pca.fit(X[self.columns])
-        self.n_components_ = self.pca.n_components_
-        self.feature_names_out = [
-            self.pca_column_prefix + str(i) for i in range(self.n_components_)
-        ]
-
-        return self
-
-    def transform(self, X):
-        """Generate from input pandas DataFrame (X) PCA features and add this column or columns in X.
-        Parameters
-        ----------
-        X : pd.DataFrame
-            Data to transform.
-        Returns
-        -------
-        X : pd.DataFrame
-            Input X with additional column or columns (self.interaction_colname) added. These contain the output of
-            running the  product pandas DataFrame method on identified combinations.
-        """
-        X = super().transform(X)
-        X = self.check_numeric_columns(X)
-        X[self.feature_names_out] = self.pca.transform(X[self.columns])
 
         return X

@@ -237,8 +237,7 @@ class TestFit(object):
         x = OneHotEncodingTransformer(columns=["b", "c"])
 
         with pytest.raises(
-            ValueError,
-            match="OneHotEncodingTransformer: column b has nulls - replace before proceeding",
+            ValueError, match="column b has nulls - replace before proceeding"
         ):
 
             x.fit(df)
@@ -253,7 +252,7 @@ class TestFit(object):
 
         with pytest.raises(
             ValueError,
-            match="OneHotEncodingTransformer: column b has over 100 unique values - consider another type of encoding",
+            match="column b has over 100 unique values - consider another type of encoding",
         ):
 
             x.fit(df)
@@ -391,8 +390,7 @@ class TestTransform(object):
         x.fit(df_train)
 
         with pytest.raises(
-            ValueError,
-            match="OneHotEncodingTransformer: column b has nulls - replace before proceeding",
+            ValueError, match="column b has nulls - replace before proceeding"
         ):
 
             x.transform(df_test)

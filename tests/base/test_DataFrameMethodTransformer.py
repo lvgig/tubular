@@ -3,7 +3,6 @@ import test_aide as ta
 import tests.test_data as d
 import pandas as pd
 import numpy as np
-import re
 
 import tubular
 from tubular.base import DataFrameMethodTransformer
@@ -75,7 +74,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"DataFrameMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_name, expecting str",
+            match=r"unexpected type \(\<class 'int'\>\) for pd_method_name, expecting str",
         ):
 
             DataFrameMethodTransformer(
@@ -84,7 +83,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"DataFrameMethodTransformer: unexpected type \(\<class 'float'\>\) for new_column_name, must be str or list of strings",
+            match=r"unexpected type \(\<class 'float'\>\) for new_column_name, must be str or list of strings",
         ):
 
             DataFrameMethodTransformer(
@@ -93,7 +92,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"DataFrameMethodTransformer: if new_column_name is a list, all elements must be strings but got \<class 'float'\> in position 1",
+            match=r"if new_column_name is a list, all elements must be strings but got \<class 'float'\> in position 1",
         ):
 
             DataFrameMethodTransformer(
@@ -102,7 +101,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"""DataFrameMethodTransformer: pd_method_kwargs should be a dict but got type \<class 'int'\>""",
+            match=r"""pd_method_kwargs should be a dict but got type \<class 'int'\>""",
         ):
 
             DataFrameMethodTransformer(
@@ -114,7 +113,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"""DataFrameMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_kwargs key in position 1, must be str""",
+            match=r"""unexpected type \(\<class 'int'\>\) for pd_method_kwargs key in position 1, must be str""",
         ):
 
             DataFrameMethodTransformer(
@@ -126,7 +125,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"DataFrameMethodTransformer: unexpected type \(\<class 'int'\>\) for drop_original, expecting bool",
+            match=r"unexpected type \(\<class 'int'\>\) for drop_original, expecting bool",
         ):
 
             DataFrameMethodTransformer(
@@ -141,7 +140,7 @@ class TestInit(object):
 
         with pytest.raises(
             AttributeError,
-            match="""DataFrameMethodTransformer: error accessing "b" method on pd.DataFrame object - pd_method_name should be a pd.DataFrame method""",
+            match="""error accessing "b" method on pd.DataFrame object - pd_method_name should be a pd.DataFrame method""",
         ):
 
             DataFrameMethodTransformer(
@@ -167,23 +166,6 @@ class TestInit(object):
             },
             msg="Attributes for DataFrameMethodTransformer set in init",
         )
-
-    def test_unexpected_kwarg_error(self):
-
-        with pytest.raises(
-            TypeError,
-            match=re.escape(
-                "__init__() got an unexpected keyword argument 'unexpected_kwarg'"
-            ),
-        ):
-
-            DataFrameMethodTransformer(
-                new_column_name="a",
-                pd_method_name="sum",
-                columns=["b", "c"],
-                drop_original=True,
-                unexpected_kwarg="spanish inquisition",
-            )
 
 
 class TestTransform(object):

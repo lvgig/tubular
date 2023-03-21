@@ -61,50 +61,35 @@ class TestInit(object):
     def test_cut_off_percent_not_float_error(self):
         """Test that an exception is raised if cut_off_percent is not an float."""
 
-        with pytest.raises(
-            ValueError,
-            match="GroupRareLevelsTransformer: cut_off_percent must be a float",
-        ):
+        with pytest.raises(ValueError, match="cut_off_percent must be a float"):
 
             GroupRareLevelsTransformer(cut_off_percent="a")
 
     def test_cut_off_percent_negative_error(self):
         """Test that an exception is raised if cut_off_percent is negative."""
 
-        with pytest.raises(
-            ValueError,
-            match="GroupRareLevelsTransformer: cut_off_percent must be > 0 and < 1",
-        ):
+        with pytest.raises(ValueError, match="cut_off_percent must be > 0 and < 1"):
 
             GroupRareLevelsTransformer(cut_off_percent=-1.0)
 
     def test_cut_off_percent_gt_one_error(self):
         """Test that an exception is raised if cut_off_percent is greater than 1."""
 
-        with pytest.raises(
-            ValueError,
-            match="GroupRareLevelsTransformer: cut_off_percent must be > 0 and < 1",
-        ):
+        with pytest.raises(ValueError, match="cut_off_percent must be > 0 and < 1"):
 
             GroupRareLevelsTransformer(cut_off_percent=2.0)
 
     def test_weight_not_str_error(self):
         """Test that an exception is raised if weight is not a str, if supplied."""
 
-        with pytest.raises(
-            ValueError,
-            match="GroupRareLevelsTransformer: weight should be a single column",
-        ):
+        with pytest.raises(ValueError, match="weight should be a single column"):
 
             GroupRareLevelsTransformer(weight=2)
 
     def test_record_rare_levels_not_str_error(self):
         """Test that an exception is raised if record_rare_levels is not a bool."""
 
-        with pytest.raises(
-            ValueError,
-            match="GroupRareLevelsTransformer: record_rare_levels must be a bool",
-        ):
+        with pytest.raises(ValueError, match="record_rare_levels must be a bool"):
 
             GroupRareLevelsTransformer(record_rare_levels=2)
 
@@ -164,9 +149,7 @@ class TestFit(object):
 
         x = GroupRareLevelsTransformer(columns=["b", "c"], weight="aaaa")
 
-        with pytest.raises(
-            ValueError, match="GroupRareLevelsTransformer: weight aaaa not in X"
-        ):
+        with pytest.raises(ValueError, match="weight aaaa not in X"):
 
             x.fit(df)
 
@@ -220,7 +203,7 @@ class TestFit(object):
 
         df = d.create_df_6()
 
-        x = GroupRareLevelsTransformer(columns=["b"], cut_off_percent=0.3, weight="a")
+        x = GroupRareLevelsTransformer(columns=["b"], cut_off_percent=0.3, weights="a")
 
         x.fit(df)
 
@@ -235,7 +218,7 @@ class TestFit(object):
 
         df = d.create_df_6()
 
-        x = GroupRareLevelsTransformer(columns=["c"], cut_off_percent=0.2, weight="a")
+        x = GroupRareLevelsTransformer(columns=["c"], cut_off_percent=0.2, weights="a")
 
         x.fit(df)
 
@@ -251,8 +234,7 @@ class TestFit(object):
         df = d.create_df_10()
 
         with pytest.raises(
-            ValueError,
-            match="GroupRareLevelsTransformer: rare_level_name must be of the same type of the columns",
+            ValueError, match="rare_level_name must be of the same type of the columns"
         ):
 
             x = GroupRareLevelsTransformer(columns=["a", "b"], rare_level_name=2)
@@ -260,8 +242,7 @@ class TestFit(object):
             x.fit(df)
 
         with pytest.raises(
-            ValueError,
-            match="GroupRareLevelsTransformer: rare_level_name must be of the same type of the columns",
+            ValueError, match="rare_level_name must be of the same type of the columns"
         ):
 
             x = GroupRareLevelsTransformer(columns=["c"])

@@ -3,11 +3,8 @@ This module contains transformers that apply different types of mappings to colu
 """
 
 import pandas as pd
-from pandas.api.types import is_categorical_dtype
 import numpy as np
 from collections import OrderedDict
-import warnings
-
 
 from tubular.base import BaseTransformer, ReturnKeyDict
 
@@ -40,21 +37,21 @@ class BaseMappingTransformer(BaseTransformer):
 
             if not len(mappings) > 0:
 
-                raise ValueError(f"{self.classname()}: mappings has no values")
+                raise ValueError("mappings has no values")
 
             for j in mappings.values():
 
                 if not isinstance(j, dict):
 
                     raise ValueError(
-                        f"{self.classname()}: values in mappings dictionary should be dictionaries"
+                        "values in mappings dictionary should be dictionaries"
                     )
 
             self.mappings = mappings
 
         else:
 
-            raise ValueError(f"{self.classname()}: mappings must be a dictionary")
+            raise ValueError("mappings must be a dictionary")
 
         columns = list(mappings.keys())
 
@@ -128,7 +125,7 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
     is not available in the mapping dict.
 
     This transformer inherits from BaseMappingTransformMixin as well as the BaseMappingTransformer
-    in order to access the standard pd.Series.map transform function.
+    in order to access the startard pd.Series.map transform function.
 
     Parameters
     ----------
@@ -160,34 +157,23 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
             else:
 
                 raise TypeError(
-                    f"{self.classname()}: each item in mappings should be a dict but got type {type(v)} for key {k}"
+                    f"each item in mappings should be a dict but got type {type(v)} for key {k}"
                 )
 
         BaseMappingTransformer.__init__(self, mappings=mappings, **kwargs)
 
-    def transform(self, X, suppress_dtype_warning=False):
-        """Transform the input data X according to the mappings in the mappings attribute dict.
+    def transform(self, X):
+        """Transfrom the input data X according to the mappings in the mappings attribute dict.
 
         This method calls the BaseMappingTransformMixin.transform. Note, this transform method is
         different to some of the transform methods in the nominal module, even though they also
         use the BaseMappingTransformMixin.transform method. Here, if a value does not exist in
         the mapping it is unchanged.
 
-        Due to the way pd.Series.map works, mappings can result in column dtypes changing,
-        sometimes unexpectedly. If the result of the mappings is a dtype that doesn't match
-        the original dtype, or the dtype of the values provided in the mapping a warning
-        will be raised. This normally results from an incomplete mapping being provided,
-        or a mix of dtypes causing pandas to default to the object dtype.
-
-        For columns with a 'category' dtype the warning will not be raised.
-
         Parameters
         ----------
         X : pd.DataFrame
             Data with nominal columns to transform.
-
-        suppress_dtype_warning: Bool, default = False
-            Whether to suppress warnings about dtype changes
 
         Returns
         -------
@@ -195,50 +181,8 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
             Transformed input X with levels mapped accoriding to mappings dict.
 
         """
-        mapped_columns = self.mappings.keys()
-        original_dtypes = X[mapped_columns].dtypes
-
-        for col in mapped_columns:
-
-            values_to_be_mapped = set(self.mappings[col].keys())
-            values_in_df = set(X[col].unique())
-
-            if len(values_to_be_mapped.intersection(values_in_df)) == 0:
-
-                warnings.warn(
-                    f"{self.classname()}: No values from mapping for {col} exist in dataframe."
-                )
-
-            if len(values_to_be_mapped.difference(values_in_df)) > 0:
-
-                warnings.warn(
-                    f"{self.classname()}: There are values in the mapping for {col} that are not present in the dataframe"
-                )
 
         X = BaseMappingTransformMixin.transform(self, X)
-
-        mapped_dtypes = X[mapped_columns].dtypes
-
-        if not suppress_dtype_warning:
-
-            for col in mapped_columns:
-
-                col_mappings = pd.Series(self.mappings[col])
-                mapping_dtype = col_mappings.dtype
-
-                if (mapped_dtypes[col] != mapping_dtype) and (
-                    mapped_dtypes[col] != original_dtypes[col]
-                ):
-
-                    # Confirm the initial and end dtypes are not categories
-                    if not (
-                        is_categorical_dtype(original_dtypes[col])
-                        and is_categorical_dtype(mapped_dtypes[col])
-                    ):
-
-                        warnings.warn(
-                            f"{self.classname()}: This mapping changes {col} dtype from {original_dtypes[col]} to {mapped_dtypes[col]}. This is often caused by having multiple dtypes in one column, or by not mapping all values."
-                        )
 
         return X
 
@@ -258,7 +202,7 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
         would replace the values in the adjustment column based off the values in column a using the mapping
         1->'a', 3->'b' and also replace based off the values in column b using a mapping 'a'->1, 'b'->2.
         If more than one column is defined for this mapping, then this object must be an OrderedDict
-        to ensure reproducibility.
+        to ensure reproducability.
 
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
@@ -282,14 +226,14 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
 
         if not isinstance(adjust_column, str):
 
-            raise TypeError(f"{self.classname()}: adjust_column should be a string")
+            raise TypeError("adjust_column should be a string")
 
         if len(mappings) > 1:
 
             if not isinstance(mappings, OrderedDict):
 
                 raise TypeError(
-                    f"{self.classname()}: mappings should be an ordered dict for 'replace' mappings using multiple columns"
+                    "mappings should be an ordered dict for 'replace' mappings using multiple columns"
                 )
 
         self.adjust_column = adjust_column
@@ -315,9 +259,7 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
 
         if self.adjust_column not in X.columns.values:
 
-            raise ValueError(
-                f"{self.classname()}: variable {self.adjust_column} is not in X"
-            )
+            raise ValueError("variable " + self.adjust_column + " is not in X")
 
         for i in self.columns:
 
@@ -369,7 +311,7 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
 
         if not isinstance(adjust_column, str):
 
-            raise TypeError(f"{self.classname()}: adjust_column should be a string")
+            raise TypeError("adjust_column should be a string")
 
         for j in mappings.values():
 
@@ -377,9 +319,7 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
 
                 if type(k) not in [int, float]:
 
-                    raise TypeError(
-                        f"{self.classname()}: mapping values must be numeric"
-                    )
+                    raise TypeError("mapping values must be numeric")
 
         self.adjust_column = adjust_column
 
@@ -404,14 +344,12 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
 
         if self.adjust_column not in X.columns.values:
 
-            raise ValueError(
-                f"{self.classname()}: variable {self.adjust_column} is not in X"
-            )
+            raise ValueError("variable " + self.adjust_column + " is not in X")
 
         if not pd.api.types.is_numeric_dtype(X[self.adjust_column]):
 
             raise TypeError(
-                f"{self.classname()}: variable {self.adjust_column} must have numeric dtype."
+                "variable " + self.adjust_column + " must have numeric dtype."
             )
 
         for i in self.columns:
@@ -466,7 +404,7 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
 
         if not isinstance(adjust_column, str):
 
-            raise TypeError(f"{self.classname()}: adjust_column should be a string")
+            raise TypeError("adjust_column should be a string")
 
         for j in mappings.values():
 
@@ -474,9 +412,7 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
 
                 if type(k) not in [int, float]:
 
-                    raise TypeError(
-                        f"{self.classname()}: mapping values must be numeric"
-                    )
+                    raise TypeError("mapping values must be numeric")
 
         self.adjust_column = adjust_column
 
@@ -501,16 +437,12 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
 
         if self.adjust_column not in X.columns.values:
 
-            raise ValueError(
-                f"{self.classname()}: variable " + self.adjust_column + " is not in X"
-            )
+            raise ValueError("variable " + self.adjust_column + " is not in X")
 
         if not pd.api.types.is_numeric_dtype(X[self.adjust_column]):
 
             raise TypeError(
-                f"{self.classname()}: variable "
-                + self.adjust_column
-                + " must have numeric dtype."
+                "variable " + self.adjust_column + " must have numeric dtype."
             )
 
         for i in self.columns:
