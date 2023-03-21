@@ -40,7 +40,9 @@ class BaseNominalTransformer(BaseTransformer):
 
             if not len(columns) > 0:
 
-                raise ValueError("no object or category columns in X")
+                raise ValueError(
+                    f"{self.classname()}: no object or category columns in X"
+                )
 
             self.columns = columns
 
@@ -69,7 +71,7 @@ class BaseNominalTransformer(BaseTransformer):
             if mappable_rows < X.shape[0]:
 
                 raise ValueError(
-                    f"nulls would be introduced into column {c} from levels not present in mapping"
+                    f"{self.classname()}: nulls would be introduced into column {c} from levels not present in mapping"
                 )
 
 
@@ -113,7 +115,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
 
         if not isinstance(start_encoding, int):
 
-            raise ValueError("start_encoding should be an integer")
+            raise ValueError(f"{self.classname()}: start_encoding should be an integer")
 
         self.start_encoding = start_encoding
 
@@ -205,7 +207,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
             if (X.shape[0] - mappable_rows) > 0:
 
                 raise ValueError(
-                    "nulls introduced from levels not present in mapping for column: "
+                    f"{self.classname()}: nulls introduced from levels not present in mapping for column: "
                     + c
                 )
 
@@ -290,11 +292,11 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
         if not isinstance(cut_off_percent, float):
 
-            raise ValueError("cut_off_percent must be a float")
+            raise ValueError(f"{self.classname()}: cut_off_percent must be a float")
 
         if not ((cut_off_percent > 0) & (cut_off_percent < 1)):
 
-            raise ValueError("cut_off_percent must be > 0 and < 1")
+            raise ValueError(f"{self.classname()}: cut_off_percent must be > 0 and < 1")
 
         self.cut_off_percent = cut_off_percent
 
@@ -302,7 +304,9 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
             if not isinstance(weight, str):
 
-                raise ValueError("weight should be a single column (str)")
+                raise ValueError(
+                    f"{self.classname()}: weight should be a single column (str)"
+                )
 
         self.weight = weight
 
@@ -310,7 +314,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
         if not isinstance(record_rare_levels, bool):
 
-            raise ValueError("record_rare_levels must be a bool")
+            raise ValueError(f"{self.classname()}: record_rare_levels must be a bool")
 
         self.record_rare_levels = record_rare_levels
 
@@ -342,14 +346,14 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                 if pd.Series(self.rare_level_name).dtype != X[c].dtypes:
 
                     raise ValueError(
-                        "rare_level_name must be of the same type of the columns"
+                        f"{self.classname()}: rare_level_name must be of the same type of the columns"
                     )
 
         if self.weight is not None:
 
             if self.weight not in X.columns.values:
 
-                raise ValueError("weight " + self.weight + " not in X")
+                raise ValueError(f"{self.classname()}: weight {self.weight} not in X")
 
         self.mapping_ = {}
 
@@ -467,7 +471,18 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
     """Transformer to apply mean response encoding. This converts categorical variables to
     numeric by mapping levels to the mean response for that level.
 
+    For a continuous or binary response the categorical columns specified will have values
+    replaced with the mean response for each category.
+
+    For an n > 1 level categorical response, up to n binary responses can be created, which in
+    turn can then be used to encode each categorical column specified. This will generate up
+    to n * len(columns) new columns, of with names of the form {column}_{response_level}. The
+    original columns will be removed from the dataframe. This functionality is controlled using
+    the 'level' parameter.
+
     If a categorical variable contains null values these will not be transformed.
+
+    The same weights and prior are applied to each response level in the multi-level case.
 
     Parameters
     ----------
@@ -478,37 +493,196 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
     weights_column : str or None
         Weights column to use when calculating the mean response.
 
+    prior : int, default = 0
+        Regularisation parameter, can be thought of roughly as the size a category should be in order for
+        its statistics to be considered reliable (hence default value of 0 means no regularisation).
+
+    level : str, list or None, default = None
+        Parameter to control encoding against a multi-level categorical response. For a continuous or
+        binary response, leave this as None. In the multi-level case, set to 'all' to encode against every
+        response level or provide a list of response levels to encode against.
+
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
 
     Attributes
     ----------
+    columns : str or list
+        Categorical columns to encode in the input data.
+
     weights_column : str or None
         Weights column to use when calculating the mean response.
+
+    prior : int, default = 0
+        Regularisation parameter, can be thought of roughly as the size a category should be in order for
+        its statistics to be considered reliable (hence default value of 0 means no regularisation).
+
+    level : str, list or None, default = None
+        Parameter to control encoding against a multi-level categorical response. If None the response will be
+        treated as binary or continous, if 'all' all response levels will be encoded against and if it is a list of
+        levels then only the levels specified will be encoded against.
+
+    response_levels : list
+        Only created in the mutli-level case. Generated from level, list of all the response levels to encode against.
 
     mappings : dict
         Created in fit. Dict of key (column names) value (mapping of categorical levels to numeric,
         mean response values) pairs.
 
+    mapped_columns : list
+        Only created in the multi-level case. A list of the new columns produced by encoded the columns in self.columns
+        against multiple response levels, of the form {column}_{level}.
+
+    transformer_dict : dict
+        Only created in the mutli-level case. A dictionary of the form level : transformer containing the mean response
+        transformers for each level to be encoded against.
+
+
     """
 
-    def __init__(self, columns=None, weights_column=None, **kwargs):
+    def __init__(
+        self, columns=None, weights_column=None, prior=0, level=None, **kwargs
+    ):
 
         if weights_column is not None:
 
             if type(weights_column) is not str:
 
-                raise TypeError("weights_column should be a str")
+                raise TypeError(f"{self.classname()}: weights_column should be a str")
+
+        if type(prior) is not int:
+
+            raise TypeError(f"{self.classname()}: prior should be a int")
+
+        if not prior >= 0:
+            raise ValueError(f"{self.classname()}: prior should be positive int")
+
+        if level:
+
+            if not isinstance(level, str) and not isinstance(level, list):
+
+                raise TypeError(
+                    f"{self.classname()}: Level should be a NoneType, list or str but got {type(level)}"
+                )
 
         self.weights_column = weights_column
+        self.prior = prior
+        self.level = level
+        # TODO: set default prior to None and refactor to only use prior regularisation when it is set?
 
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
+
+    def _prior_regularisation(self, target_means, cat_freq):
+        """Regularise encoding values by pushing encodings of infrequent categories towards the global mean.  If prior is zero this will return target_means unaltered.
+
+        Parameters
+        ----------
+        target_means : pd.Series
+            Series containing group means for levels of column in data
+
+        cat_freq : str
+            Series containing group sizes for levels of column in data
+
+        Returns
+        -------
+        regularised : pd.Series
+            Series of regularised encoding values
+        """
+
+        self.check_is_fitted(["global_mean"])
+
+        regularised = (
+            target_means.multiply(cat_freq, axis="index")
+            + self.global_mean * self.prior
+        ).divide(cat_freq + self.prior, axis="index")
+
+        return regularised
+
+    def _fit_binary_response(self, X, y, columns):
+        """
+        Function to learn the MRE mappings for a given binary or continuous response.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data to with catgeorical variable columns to transform.
+
+        y : pd.Series
+            Binary or contionuous response variable to encode against.
+
+        columns : list(str)
+            Post transform names of columns to be encoded. In the binary or continous case
+            this is just self.columns. In the multi-level case this should be of the form
+            {column_in_original_data}_{response_level}, where response_level is the level
+            being encoded against in this call of _fit_binary_response.
+        """
+        if self.weights_column is not None:
+
+            if self.weights_column not in X.columns.values:
+
+                raise ValueError(
+                    f"{self.classname()}: weights column {self.weights_column} not in X"
+                )
+
+        response_null_count = y.isnull().sum()
+
+        if response_null_count > 0:
+
+            raise ValueError(
+                f"{self.classname()}: y has {response_null_count} null values"
+            )
+
+        X_y = self._combine_X_y(X, y)
+        response_column = "_temporary_response"
+
+        if self.weights_column is None:
+
+            self.global_mean = X_y[response_column].mean()
+
+        else:
+
+            X_y["weighted_response"] = X_y[response_column].multiply(
+                X_y[self.weights_column]
+            )
+
+            self.global_mean = (
+                X_y["weighted_response"].sum() / X_y[self.weights_column].sum()
+            )
+
+        for c in columns:
+
+            if self.weights_column is None:
+
+                group_means = X_y.groupby(c)[response_column].mean()
+
+                group_counts = X_y.groupby(c)[response_column].size()
+
+                self.mappings[c] = self._prior_regularisation(
+                    group_means, group_counts
+                ).to_dict()
+
+            else:
+
+                groupby_sum = X_y.groupby([c])[
+                    ["weighted_response", self.weights_column]
+                ].sum()
+
+                group_weight = groupby_sum[self.weights_column]
+
+                group_means = groupby_sum["weighted_response"] / group_weight
+
+                self.mappings[c] = self._prior_regularisation(
+                    group_means, group_weight
+                ).to_dict()
 
     def fit(self, X, y):
         """Identify mapping of categorical levels to mean response values.
 
         If the user specified the weights_column arg in when initialising the transformer
         the weighted mean response will be calculated using that column.
+
+        In the multi-level case this method learns which response levels are present and
+        are to be encoded against.
 
         Parameters
         ----------
@@ -525,36 +699,50 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         self.mappings = {}
 
-        if self.weights_column is not None:
+        if self.level:
 
-            if self.weights_column not in X.columns.values:
+            if self.level == "all":
 
-                raise ValueError(f"weights column {self.weights_column} not in X")
-
-        response_null_count = y.isnull().sum()
-
-        if response_null_count > 0:
-
-            raise ValueError(f"y has {response_null_count} null values")
-
-        X_y = self._combine_X_y(X, y)
-        response_column = "_temporary_response"
-
-        for c in self.columns:
-
-            if self.weights_column is None:
-
-                self.mappings[c] = X_y.groupby([c])[response_column].mean().to_dict()
+                self.response_levels = y.unique()
 
             else:
 
-                groupby_sum = X_y.groupby([c])[
-                    [response_column, self.weights_column]
-                ].sum()
+                if isinstance(self.level, str):
+                    self.level = [self.level]
 
-                self.mappings[c] = (
-                    groupby_sum[response_column] / groupby_sum[self.weights_column]
-                ).to_dict()
+                if any([level not in list(y.unique()) for level in self.level]):
+                    raise ValueError(
+                        "Levels contains a level to encode against that is not present in the response."
+                    )
+
+                self.response_levels = self.level
+
+            self.transformer_dict = {}
+            mapped_columns = []
+
+            for level in self.response_levels:
+                mapping_columns_for_this_level = [
+                    column + "_" + level for column in self.columns
+                ]
+
+                X_temp = X.copy()
+                for column in self.columns:
+                    X_temp[column + "_" + level] = X[column].copy()
+
+                # keep nans to preserve null check functionality of binary response MRE transformer
+                y_temp = y.apply(lambda x: x == level if not pd.isnull(x) else np.nan)
+
+                self.transformer_dict[level] = self._fit_binary_response(
+                    X_temp, y_temp, mapping_columns_for_this_level
+                )
+
+                mapped_columns += mapping_columns_for_this_level
+
+            self.mapped_columns = list(set(mapped_columns) - set(self.columns))
+
+        else:
+
+            self._fit_binary_response(X, y, self.columns)
 
         return self
 
@@ -565,6 +753,9 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         This method calls the check_mappable_rows method from BaseNominalTransformer to check that
         all rows can be mapped then transform from BaseMappingTransformMixin to apply the
         standard pd.Series.map method.
+
+        N.B. In the mutli-level case, this method briefly overwrites the self.columns attribute, but sets
+        it back to the original value at the end.
 
         Parameters
         ----------
@@ -578,9 +769,21 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         """
 
-        self.check_mappable_rows(X)
+        if self.level:
+            for response_level in self.response_levels:
+                for column in self.columns:
+                    X[column + "_" + response_level] = X[column]
+            temp_columns = self.columns
+            # Temporarily overwriting self.columns to use BaseMappingTransformMixin
+            self.columns = self.mapped_columns
 
+        self.check_mappable_rows(X)
         X = BaseMappingTransformMixin.transform(self, X)
+
+        if self.level:
+            # Setting self.columns back so that the transformer object is unchanged after transform is called
+            self.columns = temp_columns
+            X.drop(columns=self.columns, inplace=True)
 
         return X
 
@@ -622,7 +825,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
 
             if type(weights_column) is not str:
 
-                raise TypeError("weights_column should be a str")
+                raise TypeError(f"{self.classname()}: weights_column should be a str")
 
         self.weights_column = weights_column
 
@@ -653,13 +856,17 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
 
             if self.weights_column not in X.columns.values:
 
-                raise ValueError(f"weights column {self.weights_column} not in X")
+                raise ValueError(
+                    f"{self.classname()}: weights column {self.weights_column} not in X"
+                )
 
         response_null_count = y.isnull().sum()
 
         if response_null_count > 0:
 
-            raise ValueError(f"y has {response_null_count} null values")
+            raise ValueError(
+                f"{self.classname()}: y has {response_null_count} null values"
+            )
 
         X_y = self._combine_X_y(X, y)
         response_column = "_temporary_response"
@@ -814,7 +1021,10 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
             if X[c].isnull().sum() > 0:
 
-                raise ValueError("column %s has nulls - replace before proceeding" % c)
+                raise ValueError(
+                    f"{self.classname()}: column %s has nulls - replace before proceeding"
+                    % c
+                )
 
         # Check each field has less than 100 categories/levels
         for c in self.columns:
@@ -824,13 +1034,49 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
             if len(levels) > 100:
 
                 raise ValueError(
-                    "column %s has over 100 unique values - consider another type of encoding"
+                    f"{self.classname()}: column %s has over 100 unique values - consider another type of encoding"
                     % c
                 )
 
         OneHotEncoder.fit(self, X=X[self.columns], y=y)
 
         return self
+
+    def _get_feature_names(self, input_features, **kwargs):
+        """
+        Function to access the get_feature_names attribute of the scikit learn attribute. Will return the output columns of the OHE transformer.
+
+        In scikit learn 1.0 "get_feature_names" was deprecated and then replaced with "get_feature_names_out" in version 1.2. The logic in this
+        function will call the correct attribute, or raise an error if it can't be found.
+
+        Parameters
+        ----------
+        input_features : list(str)
+            Input columns being transformed by the OHE transformer.
+
+        kwargs : dict
+            Keyword arguments to be passed on to the scikit learn attriute.
+        """
+
+        if hasattr(self, "get_feature_names"):
+
+            input_columns = self.get_feature_names(
+                input_features=input_features, **kwargs
+            )
+
+        elif hasattr(self, "get_feature_names_out"):
+
+            input_columns = self.get_feature_names_out(
+                input_features=input_features, **kwargs
+            )
+
+        else:
+
+            raise AttributeError(
+                "Cannot access scikit learn OneHotEncoder get_feature_names method, may be a version issue"
+            )
+
+        return input_columns
 
     def transform(self, X):
         """Create new dummy columns from categorical fields.
@@ -859,14 +1105,17 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
             if X[c].isnull().sum() > 0:
 
-                raise ValueError("column %s has nulls - replace before proceeding" % c)
+                raise ValueError(
+                    f"{self.classname()}: column %s has nulls - replace before proceeding"
+                    % c
+                )
 
         X = BaseNominalTransformer.transform(self, X)
 
         # Apply OHE transform
         X_transformed = OneHotEncoder.transform(self, X[self.columns])
 
-        input_columns = self.get_feature_names(input_features=self.columns)
+        input_columns = self._get_feature_names(input_features=self.columns)
 
         X_transformed = pd.DataFrame(
             X_transformed, columns=input_columns, index=X.index
@@ -900,7 +1149,8 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
                 if len(unseen_levels) > 0:
 
                     warnings.warn(
-                        "column %s has unseen categories: %s" % (c, unseen_levels)
+                        f"{self.classname()}: column %s has unseen categories: %s"
+                        % (c, unseen_levels)
                     )
 
         # Drop original columns

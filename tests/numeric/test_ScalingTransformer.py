@@ -32,7 +32,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"""scaler_kwargs should be a dict but got type \<class 'int'\>""",
+            match=r"""ScalingTransformer: scaler_kwargs should be a dict but got type \<class 'int'\>""",
         ):
 
             ScalingTransformer(columns="b", scaler_type="standard", scaler_kwargs=1)
@@ -42,7 +42,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"""unexpected type \(\<class 'int'\>\) for scaler_kwargs key in position 1, must be str""",
+            match=r"""ScalingTransformer: unexpected type \(\<class 'int'\>\) for scaler_kwargs key in position 1, must be str""",
         ):
 
             ScalingTransformer(
@@ -56,7 +56,7 @@ class TestInit(object):
 
         with pytest.raises(
             ValueError,
-            match=r"""scaler_type should be one of; \['min_max', 'max_abs', 'standard'\]""",
+            match=r"""ScalingTransformer: scaler_type should be one of; \['min_max', 'max_abs', 'standard'\]""",
         ):
 
             ScalingTransformer(columns="b", scaler_type="zzz", scaler_kwargs={"a": 1})
@@ -157,7 +157,7 @@ class TestCheckNumericColumns(object):
 
         with pytest.raises(
             TypeError,
-            match=r"""The following columns are not numeric in X; \['b', 'c'\]""",
+            match=r"""ScalingTransformer: The following columns are not numeric in X; \['b', 'c'\]""",
         ):
 
             x.check_numeric_columns(df)

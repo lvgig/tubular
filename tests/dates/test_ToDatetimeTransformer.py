@@ -70,7 +70,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match="column should be a single str giving the column to transform to datetime",
+            match="ToDatetimeTransformer: column should be a single str giving the column to transform to datetime",
         ):
 
             ToDatetimeTransformer(
@@ -81,7 +81,9 @@ class TestInit(object):
     def test_new_column_name_type_error(self):
         """Test that an exception is raised if new_column_name is not a str."""
 
-        with pytest.raises(TypeError, match="new_column_name must be a str"):
+        with pytest.raises(
+            TypeError, match="ToDatetimeTransformer: new_column_name must be a str"
+        ):
 
             ToDatetimeTransformer(column="b", new_column_name=1)
 
@@ -90,7 +92,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"""to_datetime_kwargs should be a dict but got type \<class 'int'\>""",
+            match=r"""ToDatetimeTransformer: to_datetime_kwargs should be a dict but got type \<class 'int'\>""",
         ):
 
             ToDatetimeTransformer(column="b", new_column_name="a", to_datetime_kwargs=1)
@@ -100,7 +102,7 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=r"""unexpected type \(\<class 'int'\>\) for to_datetime_kwargs key in position 1, must be str""",
+            match=r"""ToDatetimeTransformer: unexpected type \(\<class 'int'\>\) for to_datetime_kwargs key in position 1, must be str""",
         ):
 
             ToDatetimeTransformer(

@@ -22,7 +22,7 @@ class TestInit(object):
     def test_class_methods(self):
         """Test that OrdinalEncoderTransformer has fit and transform methods."""
 
-        x = OrdinalEncoderTransformer(response_column="a")
+        x = OrdinalEncoderTransformer()
 
         ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
 
@@ -33,7 +33,7 @@ class TestInit(object):
     def test_inheritance(self):
         """Test that NominalToIntegerTransformer inherits from BaseNominalTransformer."""
 
-        x = OrdinalEncoderTransformer(response_column="a")
+        x = OrdinalEncoderTransformer()
 
         ta.classes.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
         ta.classes.assert_inheritance(x, tubular.mapping.BaseMappingTransformMixin)
@@ -72,7 +72,9 @@ class TestInit(object):
     def test_weights_column_not_str_error(self):
         """Test that an exception is raised if weights_column is not a str."""
 
-        with pytest.raises(TypeError, match="weights_column should be a str"):
+        with pytest.raises(
+            TypeError, match="OrdinalEncoderTransformer: weights_column should be a str"
+        ):
 
             OrdinalEncoderTransformer(weights_column=1)
 
@@ -216,7 +218,9 @@ class TestFit(object):
 
         x = OrdinalEncoderTransformer(weights_column="z", columns=["b", "d", "f"])
 
-        with pytest.raises(ValueError, match="weights column z not in X"):
+        with pytest.raises(
+            ValueError, match="OrdinalEncoderTransformer: weights column z not in X"
+        ):
 
             x.fit(df, df["a"])
 
@@ -227,7 +231,9 @@ class TestFit(object):
 
         x = OrdinalEncoderTransformer(columns=["b"])
 
-        with pytest.raises(ValueError, match="y has 1 null values"):
+        with pytest.raises(
+            ValueError, match="OrdinalEncoderTransformer: y has 1 null values"
+        ):
 
             x.fit(df, df["a"])
 
@@ -363,7 +369,7 @@ class TestTransform(object):
 
         with pytest.raises(
             ValueError,
-            match="nulls would be introduced into column b from levels not present in mapping",
+            match="OrdinalEncoderTransformer: nulls would be introduced into column b from levels not present in mapping",
         ):
 
             x.transform(df)
