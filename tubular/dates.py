@@ -1000,27 +1000,31 @@ class DatetimeSinusoidCalculator(BaseTransformer):
     method : str or list
         Argument to specify which function is to be calculated. Accepted values are 'sin', 'cos' or a list containing both.
 
-    units : str
+    units : str or dict
         Which time unit the calculation is to be carried out on. Accepted values are 'year', 'month',
-        'day', 'hour', 'minute', 'second', 'microsecond'.
+        'day', 'hour', 'minute', 'second', 'microsecond'.  Can be a string or a dict containing key-value pairs of column
+        name and units to be used for that column.
 
-    period : int or float, default = 2*np.pi
-        The period of the output in the units specified above. To leave the period of the sinusoid output as 2 pi, specify 2*np.pi (or leave as default)
+    period : int, float or dict, default = 2*np.pi
+        The period of the output in the units specified above. To leave the period of the sinusoid output as 2 pi, specify 2*np.pi (or leave as default).
+        Can be a string or a dict containing key-value pairs of column name and period to be used for that column.
 
     Attributes
     -----------
     columns : str or list
         Columns to take the sine or cosine of.
 
-    method : str
+    method : str or list
         The function to be calculated; either sin, cos or a list containing both.
 
-    units : str
+    units : str or dict
         Which time unit the calculation is to be carried out on. Will take any of 'year', 'month',
-        'day', 'hour', 'minute', 'second', 'microsecond'.
+        'day', 'hour', 'minute', 'second', 'microsecond'. Can be a string or a dict containing key-value pairs of column
+        name and units to be used for that column.
 
-    period : str or float, default = 2*np.pi
-        The period of the output in the units specified above.
+    period : str, float or dict, default = 2*np.pi
+        The period of the output in the units specified above. Can be a string or a dict containing key-value pairs of column
+        name and units to be used for that column.
     """
 
     def __init__(
