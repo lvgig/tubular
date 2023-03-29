@@ -504,12 +504,12 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         binary response, leave this as None. In the multi-level case, set to 'all' to encode against every
         response level or provide a list of response levels to encode against.
 
-    unseen_levels : str("Mean", "Median", "Lowest" or "Highest) or int/float, default = None
+    unseen_level_handling : str("Mean", "Median", "Lowest" or "Highest) or int/float, default = None
         Parameter to control the logic for handling unseen levels of the categorical features to encode in
         data when using transform method. Default value of None will output error when attempting to use transform
         on data with unseen levels in categorical columns to encode. Set this parameter to one of the options above
-        in order to impute the unseen levels in each categorical column to encode, according to mean, median etc. of
-        each encoded column. One can also pass an arbitrary int/float value to use for imputing all unseen levels.
+        in order to encode unseen levels in each categorical column with the mean, median etc. of
+        each column. One can also pass an arbitrary int/float value to use for encoding unseen levels.
 
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
@@ -546,8 +546,8 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         Only created in the mutli-level case. A dictionary of the form level : transformer containing the mean response
         transformers for each level to be encoded against.
 
-    impute_dict: dict
-        Dict containing the values (based on chosen unseen_levels) derived from the encoded columns to use when handling unseen levels in data passed to transform method.
+    unseen_levels_encoding_dict: dict
+        Dict containing the values (based on chosen unseen_level_handling) derived from the encoded columns to use when handling unseen levels in data passed to transform method.
 
 
     """
@@ -558,7 +558,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         weights_column=None,
         prior=0,
         level=None,
-        unseen_levels=None,
+        unseen_level_handling=None,
         **kwargs,
     ):
 
@@ -582,17 +582,17 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                 raise TypeError(
                     f"{self.classname()}: Level should be a NoneType, list or str but got {type(level)}"
                 )
-        if unseen_levels:
-            if unseen_levels not in ["Mean", "Median", "Lowest", "Highest"]:
-                if not isinstance(unseen_levels, (int, float)):
+        if unseen_level_handling:
+            if unseen_level_handling not in ["Mean", "Median", "Lowest", "Highest"]:
+                if not isinstance(unseen_level_handling, (int, float)):
                     raise ValueError(
-                        f"{self.classname()}: unseen_levels should be the option: Mean, Median, Lowest, Highest or an arbitrary int/float value"
+                        f"{self.classname()}: unseen_level_handling should be the option: Mean, Median, Lowest, Highest or an arbitrary int/float value"
                     )
 
         self.weights_column = weights_column
         self.prior = prior
         self.level = level
-        self.unseen_levels = unseen_levels
+        self.unseen_level_handling = unseen_level_handling
         # TODO: set default prior to None and refactor to only use prior regularisation when it is set?
 
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
@@ -723,7 +723,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         BaseNominalTransformer.fit(self, X, y)
 
         self.mappings = {}
-        self.impute_dict = {}
+        self.unseen_levels_encoding_dict = {}
         X_temp = X.copy()
 
         if self.level:
@@ -772,25 +772,33 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             self._fit_binary_response(X, y, self.columns)
             self.encoded_feature_columns = self.columns
 
-        if self.unseen_levels == "Mean":
+        if self.unseen_level_handling == "Mean":
             for c in self.encoded_feature_columns:
-                self.impute_dict[c] = X_temp[c].map(self.mappings[c]).mean()
+                self.unseen_levels_encoding_dict[c] = (
+                    X_temp[c].map(self.mappings[c]).mean()
+                )
 
-        if self.unseen_levels == "Median":
+        elif self.unseen_level_handling == "Median":
             for c in self.encoded_feature_columns:
-                self.impute_dict[c] = X_temp[c].map(self.mappings[c]).median()
+                self.unseen_levels_encoding_dict[c] = (
+                    X_temp[c].map(self.mappings[c]).median()
+                )
 
-        elif self.unseen_levels == "Lowest":
+        elif self.unseen_level_handling == "Lowest":
             for c in self.encoded_feature_columns:
-                self.impute_dict[c] = X_temp[c].map(self.mappings[c]).min()
+                self.unseen_levels_encoding_dict[c] = (
+                    X_temp[c].map(self.mappings[c]).min()
+                )
 
-        elif self.unseen_levels == "Highest":
+        elif self.unseen_level_handling == "Highest":
             for c in self.encoded_feature_columns:
-                self.impute_dict[c] = X_temp[c].map(self.mappings[c]).max()
+                self.unseen_levels_encoding_dict[c] = (
+                    X_temp[c].map(self.mappings[c]).max()
+                )
 
-        elif isinstance(self.unseen_levels, (int, float)):
+        elif isinstance(self.unseen_level_handling, (int, float)):
             for c in self.encoded_feature_columns:
-                self.impute_dict[c] = float(self.unseen_levels)
+                self.unseen_levels_encoding_dict[c] = float(self.unseen_level_handling)
 
         return self
 
@@ -824,9 +832,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             # Temporarily overwriting self.columns to use BaseMappingTransformMixin
             self.columns = self.mapped_columns
 
-        if self.unseen_levels in ["Mean", "Median", "Lowest", "Highest"] or isinstance(
-            self.unseen_levels, (int, float)
-        ):
+        if self.unseen_level_handling:
             self.check_is_fitted(["mappings"])
             unseen_indices = {}
             for c in self.columns:
@@ -834,7 +840,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                 unseen_indices[c] = X[~X[c].isin(self.mappings[c].keys())].index
             X = BaseMappingTransformMixin.transform(self, X)
             for c in self.columns:
-                X.loc[unseen_indices[c], c] = self.impute_dict[c]
+                X.loc[unseen_indices[c], c] = self.unseen_levels_encoding_dict[c]
         else:
             self.check_mappable_rows(X)
             X = BaseMappingTransformMixin.transform(self, X)
