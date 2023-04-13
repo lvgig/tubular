@@ -60,8 +60,8 @@ class BaseMappingTransformer(BaseTransformer):
 
         super().__init__(columns=columns, **kwargs)
 
-    def check_dtypes_and_warn(self, X, original_dtypes, suppress_dtype_warning=False):
-        mapped_columns = self.mappings.keys()
+    def check_dtypes_and_warn(self, X, original_dtypes, mapped_columns, suppress_dtype_warning=False):
+        
         mapped_dtypes = X[mapped_columns].dtypes
 
         if not suppress_dtype_warning:
@@ -99,6 +99,7 @@ class BaseMappingTransformer(BaseTransformer):
 
         self.check_is_fitted(["mappings"])
 
+        mapped_columns = self.mappings.keys()
         original_dtypes = X[mapped_columns].dtypes
 
         X = super().transform(X)
