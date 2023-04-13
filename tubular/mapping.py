@@ -60,7 +60,28 @@ class BaseMappingTransformer(BaseTransformer):
 
         super().__init__(columns=columns, **kwargs)
 
-    def transform(self, X):
+    def check_dtypes_and_warn(self, X, original_dtypes, suppress_dtype_warning=False):
+        mapped_columns = self.mappings.keys()
+        mapped_dtypes = X[mapped_columns].dtypes
+
+        if not suppress_dtype_warning:
+            for col in mapped_columns:
+                col_mappings = pd.Series(self.mappings[col])
+                mapping_dtype = col_mappings.dtype
+
+                if (mapped_dtypes[col] != mapping_dtype) and (
+                    mapped_dtypes[col] != original_dtypes[col]
+                ):
+                    # Confirm the initial and end dtypes are not categories
+                    if not (
+                        is_categorical_dtype(original_dtypes[col])
+                        and is_categorical_dtype(mapped_dtypes[col])
+                    ):
+                        warnings.warn(
+                            f"{self.classname()}: This mapping changes {col} dtype from {original_dtypes[col]} to {mapped_dtypes[col]}. This is often caused by having multiple dtypes in one column, or by not mapping all values."
+                        )
+
+    def transform(self, X, suppress_dtype_warning=False):
         """Base mapping transformer transform method.  Checks that the mappings
         dict has been fitted and calls the BaseTransformer transform method.
 
@@ -78,7 +99,11 @@ class BaseMappingTransformer(BaseTransformer):
 
         self.check_is_fitted(["mappings"])
 
+        original_dtypes = X[mapped_columns].dtypes
+
         X = super().transform(X)
+
+        self.check_dtypes_and_warn(X, original_dtypes, suppress_dtype_warning)
 
         return X
 
@@ -91,7 +116,7 @@ class BaseMappingTransformMixin(BaseTransformer):
 
     """
 
-    def transform(self, X):
+    def transform(self, X, suppress_dtype_warning=False):
         """Applies the mapping defined in the mappings dict to each column in the columns
         attribute.
 
@@ -196,8 +221,7 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
 
         """
         mapped_columns = self.mappings.keys()
-        original_dtypes = X[mapped_columns].dtypes
-
+        
         for col in mapped_columns:
 
             values_to_be_mapped = set(self.mappings[col].keys())
@@ -216,29 +240,6 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
                 )
 
         X = BaseMappingTransformMixin.transform(self, X)
-
-        mapped_dtypes = X[mapped_columns].dtypes
-
-        if not suppress_dtype_warning:
-
-            for col in mapped_columns:
-
-                col_mappings = pd.Series(self.mappings[col])
-                mapping_dtype = col_mappings.dtype
-
-                if (mapped_dtypes[col] != mapping_dtype) and (
-                    mapped_dtypes[col] != original_dtypes[col]
-                ):
-
-                    # Confirm the initial and end dtypes are not categories
-                    if not (
-                        is_categorical_dtype(original_dtypes[col])
-                        and is_categorical_dtype(mapped_dtypes[col])
-                    ):
-
-                        warnings.warn(
-                            f"{self.classname()}: This mapping changes {col} dtype from {original_dtypes[col]} to {mapped_dtypes[col]}. This is often caused by having multiple dtypes in one column, or by not mapping all values."
-                        )
 
         return X
 
