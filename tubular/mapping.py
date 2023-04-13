@@ -49,7 +49,7 @@ class BaseMappingTransformer(BaseTransformer):
             if not isinstance(col_mappings, dict):
 
                 raise ValueError(
-                    f"{self.classname()}: mappings for column {col} should be a dictionary"
+                    f"{self.classname()}: values in mappings dictionary should be dictionaries"
                 )
 
         self.mappings = mappings
@@ -114,7 +114,7 @@ class BaseMappingTransformMixin(BaseTransformer):
 
     """
 
-    def transform(self, X, suppress_dtype_warning=False):
+    def transform(self, X):
         """Applies the mapping defined in the mappings dict to each column in the columns
         attribute.
 
@@ -188,7 +188,7 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
 
         BaseMappingTransformer.__init__(self, mappings=mappings, **kwargs)
 
-    def transform(self, X, suppress_dtype_warning=False):
+    def transform(self, X):
         """Transform the input data X according to the mappings in the mappings attribute dict.
 
         This method calls the BaseMappingTransformMixin.transform. Note, this transform method is
