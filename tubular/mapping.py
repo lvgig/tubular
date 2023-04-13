@@ -36,50 +36,46 @@ class BaseMappingTransformer(BaseTransformer):
 
     def __init__(self, mappings, **kwargs):
 
-        if isinstance(mappings, dict):
-
-            if not len(mappings) > 0:
-
-                raise ValueError(f"{self.classname()}: mappings has no values")
-
-            for j in mappings.values():
-
-                if not isinstance(j, dict):
-
-                    raise ValueError(
-                        f"{self.classname()}: values in mappings dictionary should be dictionaries"
-                    )
-
-            self.mappings = mappings
-
-        else:
+        if not isinstance(mappings, dict):
 
             raise ValueError(f"{self.classname()}: mappings must be a dictionary")
 
-        columns = list(mappings.keys())
+        if not mappings:
 
-        super().__init__(columns=columns, **kwargs)
+            raise ValueError(f"{self.classname()}: mappings has no values")
 
-    def check_dtypes_and_warn(self, X, original_dtypes, mapped_columns, suppress_dtype_warning=False):
-        
+        for col, col_mappings in mappings.items():
+
+            if not isinstance(col_mappings, dict):
+
+                raise ValueError(
+                    f"{self.classname()}: mappings for column {col} should be a dictionary"
+                )
+
+        self.mappings = mappings
+
+        super().__init__(columns=list(mappings.keys()), **kwargs)
+
+    def check_dtypes_and_warn(self, X, original_dtypes):
+        mapped_columns = self.mappings.keys()
         mapped_dtypes = X[mapped_columns].dtypes
 
-        if not suppress_dtype_warning:
-            for col in mapped_columns:
-                col_mappings = pd.Series(self.mappings[col])
-                mapping_dtype = col_mappings.dtype
+        for col in mapped_columns:
+            col_mappings = pd.Series(self.mappings[col])
+            mapping_dtype = col_mappings.dtype
 
-                if (mapped_dtypes[col] != mapping_dtype) and (
-                    mapped_dtypes[col] != original_dtypes[col]
+            if (mapped_dtypes[col] != mapping_dtype) and (
+                mapped_dtypes[col] != original_dtypes[col]
+            ):
+                # Confirm the initial and end dtypes are not categories
+                if not (
+                    is_categorical_dtype(original_dtypes[col])
+                    and is_categorical_dtype(mapped_dtypes[col])
                 ):
-                    # Confirm the initial and end dtypes are not categories
-                    if not (
-                        is_categorical_dtype(original_dtypes[col])
-                        and is_categorical_dtype(mapped_dtypes[col])
-                    ):
-                        warnings.warn(
-                            f"{self.classname()}: This mapping changes {col} dtype from {original_dtypes[col]} to {mapped_dtypes[col]}. This is often caused by having multiple dtypes in one column, or by not mapping all values."
-                        )
+                    warnings.warn(
+                        f"{self.classname()}: This mapping changes {col} dtype from {original_dtypes[col]} to {mapped_dtypes[col]}. This is often caused by having multiple dtypes in one column, or by not mapping all values.",
+                        category=UserWarning,
+                    )
 
     def transform(self, X, suppress_dtype_warning=False):
         """Base mapping transformer transform method.  Checks that the mappings
@@ -104,7 +100,8 @@ class BaseMappingTransformer(BaseTransformer):
 
         X = super().transform(X)
 
-        self.check_dtypes_and_warn(X, original_dtypes, suppress_dtype_warning)
+        if suppress_dtype_warning == False:
+            self.check_dtypes_and_warn(X, original_dtypes)
 
         return X
 
