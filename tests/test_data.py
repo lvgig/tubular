@@ -317,6 +317,39 @@ def create_MeanResponseTransformer_test_df():
     return df
 
 
+def create_MeanResponseTransformer_test_df_unseen_levels():
+    """Create DataFrame to use in MeanResponseTransformer tests that check correct values are
+    generated when using transform method on data with unseen levels.
+    DataFrame column a is the response, the other columns are categorical columns
+    of types; object, category, int, float, bool.
+
+    """
+    df = pd.DataFrame(
+        {
+            "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 3.0],
+            "b": ["a", "b", "c", "d", "e", "f", "g", "h"],
+            "c": ["a", "b", "c", "d", "e", "f", "g", "h"],
+            "d": [1, 2, 3, 4, 5, 6, 7, 8],
+            "e": [1, 2, 3, 4, 5, 6.0, 7, 8],
+            "f": [False, False, False, True, True, True, True, False],
+            "multi_level_response": [
+                "blue",
+                "blue",
+                "yellow",
+                "yellow",
+                "green",
+                "green",
+                "yellow",
+                "blue",
+            ],
+        }
+    )
+
+    df["c"] = df["c"].astype("category")
+
+    return df
+
+
 def create_OrdinalEncoderTransformer_test_df():
     """Create DataFrame to use OrdinalEncoderTransformer tests that correct values are
 

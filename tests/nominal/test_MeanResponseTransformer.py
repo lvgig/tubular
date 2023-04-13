@@ -88,46 +88,37 @@ class TestInit(object):
 
             MeanResponseTransformer(level=level)
 
+    def test_unseen_level_handling_incorrect_value_error(self):
+        """Test that an exception is raised if unseen_level_handling is an incorrect value"""
+
+        with pytest.raises(
+            ValueError,
+            match="unseen_level_handling should be the option: Mean, Median, Lowest, Highest or an arbitrary int/float value",
+        ):
+
+            MeanResponseTransformer(unseen_level_handling="AAA")
+
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that the values passed in init are saved in an attribute of the same name."""
 
-        x = MeanResponseTransformer(weights_column="aaa", prior=1, level="any")
+        x = MeanResponseTransformer(
+            weights_column="aaa", prior=1, level="any", unseen_level_handling="Mean"
+        )
 
         ta.classes.test_object_attributes(
             obj=x,
-            expected_attributes={"weights_column": "aaa", "prior": 1, "level": "any"},
+            expected_attributes={
+                "weights_column": "aaa",
+                "prior": 1,
+                "level": "any",
+                "unseen_level_handling": "Mean",
+            },
             msg="Attributes for MeanResponseTransformer set in init",
         )
 
 
 class Test_prior_regularisation(object):
     "tests for _prior_regularisation method"
-
-    def test_arguments(self):
-        """Test that MeanResponseTransformer._prior_regularisation has expected arguments."""
-
-        ta.functions.test_function_arguments(
-            func=MeanResponseTransformer._prior_regularisation,
-            expected_arguments=["self", "target_means", "cat_freq"],
-            expected_default_values=None,
-        )
-
-    def test_check_is_fitted_called(self, mocker):
-        """Test that _prior_regularisation calls BaseTransformer.check_is_fitted."""
-
-        expected_call_args = {0: {"args": (["global_mean"],), "kwargs": {}}}
-
-        x = MeanResponseTransformer()
-
-        x.fit(pd.DataFrame({"a": ["1", "2"]}), pd.Series([2, 3]))
-
-        with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
-        ):
-
-            x._prior_regularisation(
-                cat_freq=pd.Series([1, 2]), target_means=pd.Series([1, 2])
-            )
 
     def test_output1(self):
         "Test output of method"
@@ -169,59 +160,22 @@ class Test_prior_regularisation(object):
 
 
 class TestFit:
-    def test_super_fit_called(self, mocker):
-        """Test that fit calls BaseTransformer.fit."""
-
-        df = d.create_MeanResponseTransformer_test_df()
-
-        x = MeanResponseTransformer(columns="b")
-
-        spy = mocker.spy(tubular.base.BaseTransformer, "fit")
-
-        x.fit(df, df["a"])
-
-        assert spy.call_count == 1, "unexpected number of calls to BaseTransformer.fit"
-
-        call_args = spy.call_args_list[0]
-        call_pos_args = call_args[0]
-        call_kwargs = call_args[1]
-
-        expected_kwargs = {}
-
-        assert (
-            call_kwargs == expected_kwargs
-        ), "unexpected kwargs in BaseTransformer.fit call"
-
-        expected_pos_args = (
-            x,
-            d.create_MeanResponseTransformer_test_df(),
-            d.create_MeanResponseTransformer_test_df()["a"],
-        )
-
-        assert len(expected_pos_args) == len(
-            call_pos_args
-        ), "unexpected # positional args in BaseTransformer.fit call"
-
-        ta.equality.assert_equal_dispatch(
-            expected_pos_args,
-            call_pos_args,
-            "unexpected arguments in BaseTransformer.fit call",
-        )
-
     @pytest.mark.parametrize(
-        "level, target_column",
+        "level, target_column, unseen_level_handling",
         [
-            (None, "a"),
-            ("all", "multi_level_response"),
-            (["yellow", "blue"], "multi_level_response"),
+            (None, "a", "Mean"),
+            ("all", "multi_level_response", 32),
+            (["yellow", "blue"], "multi_level_response", "Highest"),
         ],
     )
-    def test_fit_returns_self(self, level, target_column):
+    def test_fit_returns_self(self, level, target_column, unseen_level_handling):
         """Test fit returns self?"""
 
         df = d.create_MeanResponseTransformer_test_df()
 
-        x = MeanResponseTransformer(columns="b", level=level)
+        x = MeanResponseTransformer(
+            columns="b", level=level, unseen_level_handling=unseen_level_handling
+        )
 
         x_fitted = x.fit(df, df[target_column])
 
@@ -230,19 +184,21 @@ class TestFit:
         ), "Returned value from create_MeanResponseTransformer_test_df.fit not as expected."
 
     @pytest.mark.parametrize(
-        "level, target_column",
+        "level, target_column, unseen_level_handling",
         [
-            (None, "a"),
-            ("all", "multi_level_response"),
-            (["yellow", "blue"], "multi_level_response"),
+            (None, "a", "Mean"),
+            ("all", "multi_level_response", 32),
+            (["yellow", "blue"], "multi_level_response", "Highest"),
         ],
     )
-    def test_fit_not_changing_data(self, level, target_column):
+    def test_fit_not_changing_data(self, level, target_column, unseen_level_handling):
         """Test fit does not change X."""
 
         df = d.create_MeanResponseTransformer_test_df()
 
-        x = MeanResponseTransformer(columns="b", level=level)
+        x = MeanResponseTransformer(
+            columns="b", level=level, unseen_level_handling=unseen_level_handling
+        )
 
         x.fit(df, df[target_column])
 
@@ -253,20 +209,24 @@ class TestFit:
         )
 
     @pytest.mark.parametrize(
-        "level, target_column",
+        "level, target_column, unseen_level_handling",
         [
-            (None, "a"),
-            ("all", "multi_level_response"),
-            (["yellow", "blue"], "multi_level_response"),
+            (None, "a", "Mean"),
+            ("all", "multi_level_response", 32),
+            (["yellow", "blue"], "multi_level_response", "Highest"),
         ],
     )
-    def test_response_column_nulls_error(self, level, target_column):
+    def test_response_column_nulls_error(
+        self, level, target_column, unseen_level_handling
+    ):
         """Test that an exception is raised if nulls are present in response_column."""
 
         df = d.create_MeanResponseTransformer_test_df()
         df.loc[1, target_column] = np.nan
 
-        x = MeanResponseTransformer(columns=["b"], level=level)
+        x = MeanResponseTransformer(
+            columns=["b"], level=level, unseen_level_handling=unseen_level_handling
+        )
 
         with pytest.raises(
             ValueError, match="MeanResponseTransformer: y has 1 null values"
@@ -275,18 +235,22 @@ class TestFit:
             x.fit(df, df[target_column])
 
     @pytest.mark.parametrize(
-        "level, target_column",
+        "level, target_column, unseen_level_handling",
         [
-            (None, "a"),
-            ("all", "multi_level_response"),
-            (["yellow", "blue"], "multi_level_response"),
+            (None, "a", "Mean"),
+            ("all", "multi_level_response", 32),
+            (["yellow", "blue"], "multi_level_response", "Highest"),
         ],
     )
-    def test_correct_mappings_stored(self, learnt_mapping_dict, level, target_column):
+    def test_correct_mappings_stored(
+        self, learnt_mapping_dict, level, target_column, unseen_level_handling
+    ):
         "Test that the mapping dictionary created in fit has the correct keys and values"
 
         df = d.create_MeanResponseTransformer_test_df()
-        x = MeanResponseTransformer(columns=["b"], level=level)
+        x = MeanResponseTransformer(
+            columns=["b"], level=level, unseen_level_handling=unseen_level_handling
+        )
         x.fit(df, df[target_column])
 
         if level:
@@ -645,45 +609,210 @@ class TestTransform(object):
 
         return df
 
-    def test_check_is_fitted_called(self, mocker):
-        """Test that BaseTransformer check_is_fitted called."""
+    def expected_df_4():
+        """Expected output for transform on dataframe with single level response and unseen levels,
+        where unseen_level_handling = 'Mean'"""
 
-        df = d.create_MeanResponseTransformer_test_df()
+        df = pd.DataFrame(
+            {
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 3.0],
+                "b": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 3.5, 3.5],
+                "c": ["a", "b", "c", "d", "e", "f", "g", "h"],
+                "d": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 3.5, 3.5],
+                "e": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0],
+                "f": [2.0, 2.0, 2.0, 5.0, 5.0, 5.0, 5.0, 2.0],
+                "multi_level_response": [
+                    "blue",
+                    "blue",
+                    "yellow",
+                    "yellow",
+                    "green",
+                    "green",
+                    "yellow",
+                    "blue",
+                ],
+            }
+        )
 
-        x = MeanResponseTransformer(columns="b")
+        df["c"] = df["c"].astype("category")
 
-        x.fit(df, df["a"])
+        return df
 
-        expected_call_args = {0: {"args": (["mappings"],), "kwargs": {}}}
+    def expected_df_5():
+        """Expected output for transform on dataframe with single level response and unseen levels,
+        where unseen_level_handling = 'Median'"""
 
-        with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
-        ):
+        df = pd.DataFrame(
+            {
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 3.0],
+                "b": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 3.5, 3.5],
+                "c": ["a", "b", "c", "d", "e", "f", "g", "h"],
+                "d": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 3.5, 3.5],
+                "e": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0],
+                "f": [2.0, 2.0, 2.0, 5.0, 5.0, 5.0, 5.0, 2.0],
+                "multi_level_response": [
+                    "blue",
+                    "blue",
+                    "yellow",
+                    "yellow",
+                    "green",
+                    "green",
+                    "yellow",
+                    "blue",
+                ],
+            }
+        )
 
-            x.transform(df)
+        df["c"] = df["c"].astype("category")
 
-    def test_super_transform_called(self, mocker):
-        """Test that BaseTransformer.transform called."""
+        return df
 
-        df = d.create_MeanResponseTransformer_test_df()
+    def expected_df_6():
+        """Expected output for transform on dataframe with single level response and unseen levels,
+        where unseen_level_handling = 'Lowest'"""
 
-        x = MeanResponseTransformer(columns="b")
+        df = pd.DataFrame(
+            {
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 3.0],
+                "b": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 1.0, 1.0],
+                "c": ["a", "b", "c", "d", "e", "f", "g", "h"],
+                "d": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 1.0, 1.0],
+                "e": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0],
+                "f": [2.0, 2.0, 2.0, 5.0, 5.0, 5.0, 5.0, 2.0],
+                "multi_level_response": [
+                    "blue",
+                    "blue",
+                    "yellow",
+                    "yellow",
+                    "green",
+                    "green",
+                    "yellow",
+                    "blue",
+                ],
+            }
+        )
 
-        x.fit(df, df["a"])
+        df["c"] = df["c"].astype("category")
 
-        expected_call_args = {
-            0: {"args": (d.create_MeanResponseTransformer_test_df(),), "kwargs": {}}
-        }
+        return df
 
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-            return_value=d.create_MeanResponseTransformer_test_df(),
-        ):
+    def expected_df_7():
+        """Expected output for transform on dataframe with single level response and unseen levels,
+        where unseen_level_handling = 'Highest'"""
 
-            x.transform(df)
+        df = pd.DataFrame(
+            {
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 3.0],
+                "b": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 6.0, 6.0],
+                "c": ["a", "b", "c", "d", "e", "f", "g", "h"],
+                "d": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 6.0, 6.0],
+                "e": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0],
+                "f": [2.0, 2.0, 2.0, 5.0, 5.0, 5.0, 5.0, 2.0],
+                "multi_level_response": [
+                    "blue",
+                    "blue",
+                    "yellow",
+                    "yellow",
+                    "green",
+                    "green",
+                    "yellow",
+                    "blue",
+                ],
+            }
+        )
+
+        df["c"] = df["c"].astype("category")
+
+        return df
+
+    def expected_df_8():
+        """Expected output for transform on dataframe with single level response and unseen levels,
+        where unseen_level_handling set to arbitrary int/float value"""
+
+        df = pd.DataFrame(
+            {
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 3.0],
+                "b": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 21.6, 21.6],
+                "c": ["a", "b", "c", "d", "e", "f", "g", "h"],
+                "d": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 21.6, 21.6],
+                "e": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0],
+                "f": [2.0, 2.0, 2.0, 5.0, 5.0, 5.0, 5.0, 2.0],
+                "multi_level_response": [
+                    "blue",
+                    "blue",
+                    "yellow",
+                    "yellow",
+                    "green",
+                    "green",
+                    "yellow",
+                    "blue",
+                ],
+            }
+        )
+
+        df["c"] = df["c"].astype("category")
+
+        return df
+
+    def expected_df_9():
+        """Expected output for transform on dataframe with multi-level response with level = blue and unseen levels in data"""
+
+        df = pd.DataFrame(
+            {
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 3.0],
+                "c": ["a", "b", "c", "d", "e", "f", "g", "h"],
+                "d": [1, 2, 3, 4, 5, 6, 7, 8],
+                "e": [1, 2, 3, 4, 5, 6.0, 7, 8],
+                "multi_level_response": [
+                    "blue",
+                    "blue",
+                    "yellow",
+                    "yellow",
+                    "green",
+                    "green",
+                    "yellow",
+                    "blue",
+                ],
+                "b_blue": [1, 1, 0, 0, 0, 0, 2 / 6, 2 / 6],
+                "f_blue": [2 / 3, 2 / 3, 2 / 3, 0, 0, 0, 0, 2 / 3],
+            }
+        )
+
+        df["c"] = df["c"].astype("category")
+
+        return df
+
+    def expected_df_10():
+        """Expected output for transform on dataframe with multi-level response with level = "all" and unseen levels in data"""
+
+        df = pd.DataFrame(
+            {
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 3.0],
+                "c": ["a", "b", "c", "d", "e", "f", "g", "h"],
+                "d": [1, 2, 3, 4, 5, 6, 7, 8],
+                "e": [1, 2, 3, 4, 5, 6.0, 7, 8],
+                "multi_level_response": [
+                    "blue",
+                    "blue",
+                    "yellow",
+                    "yellow",
+                    "green",
+                    "green",
+                    "yellow",
+                    "blue",
+                ],
+                "b_blue": [1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0],
+                "f_blue": [2 / 3, 2 / 3, 2 / 3, 0, 0, 0, 0, 2 / 3],
+                "b_yellow": [0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0],
+                "f_yellow": [1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3, 1 / 3],
+                "b_green": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0],
+                "f_green": [0.0, 0.0, 0.0, 2 / 3, 2 / 3, 2 / 3, 2 / 3, 0],
+            }
+        )
+
+        df["c"] = df["c"].astype("category")
+
+        return df
 
     def test_learnt_values_not_modified(self):
         """Test that the mappings from fit are not changed in transform."""
@@ -792,6 +921,194 @@ class TestTransform(object):
             expected=expected,
             msg_tag="Unexpected values in MeanResponseTransformer.transform",
             check_like=False,
+        )
+
+    def test_expected_output_sigle_level_response_unseen_levels_default(self):
+        """Test that the output is expected from transform with a single level response with unseen levels in data with
+        unseen_level_handling set to 'None', i.e., default value"""
+
+        initial_df = d.create_MeanResponseTransformer_test_df()
+        x = MeanResponseTransformer(columns=["b", "d", "f"])
+        x.fit(initial_df, initial_df["a"])
+        df = d.create_MeanResponseTransformer_test_df_unseen_levels()
+        with pytest.raises(
+            ValueError,
+            match="MeanResponseTransformer: nulls would be introduced into column b from levels not present in mapping",
+        ):
+            x.transform(df)
+
+    @pytest.mark.parametrize(
+        "df, expected",
+        ta.pandas.adjusted_dataframe_params(
+            d.create_MeanResponseTransformer_test_df_unseen_levels(), expected_df_4()
+        ),
+    )
+    def test_expected_output_sigle_level_response_unseen_levels_mean(
+        self, df, expected
+    ):
+        """Test that the output is expected from transform with a single level response with unseen levels in data with
+        unseen_level_handling set to 'Mean'"""
+
+        x = MeanResponseTransformer(
+            columns=["b", "d", "f"], unseen_level_handling="Mean"
+        )
+
+        initial_df = d.create_MeanResponseTransformer_test_df()
+        x.fit(initial_df, initial_df["a"])
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_frame_equal_msg(
+            actual=df_transformed,
+            expected=expected,
+            msg_tag="Unexpected values in MeanResponseTransformer.transform",
+        )
+
+    @pytest.mark.parametrize(
+        "df, expected",
+        ta.pandas.adjusted_dataframe_params(
+            d.create_MeanResponseTransformer_test_df_unseen_levels(), expected_df_5()
+        ),
+    )
+    def test_expected_output_sigle_level_response_unseen_levels_median(
+        self, df, expected
+    ):
+        """Test that the output is expected from transform with a single level response with unseen levels in data
+        with unseen_level_handling set to 'Median'"""
+
+        x = MeanResponseTransformer(
+            columns=["b", "d", "f"], unseen_level_handling="Median"
+        )
+
+        initial_df = d.create_MeanResponseTransformer_test_df()
+        x.fit(initial_df, initial_df["a"])
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_frame_equal_msg(
+            actual=df_transformed,
+            expected=expected,
+            msg_tag="Unexpected values in MeanResponseTransformer.transform",
+        )
+
+    @pytest.mark.parametrize(
+        "df, expected",
+        ta.pandas.adjusted_dataframe_params(
+            d.create_MeanResponseTransformer_test_df_unseen_levels(), expected_df_6()
+        ),
+    )
+    def test_expected_output_sigle_level_response_unseen_levels_lowest(
+        self, df, expected
+    ):
+        """Test that the output is expected from transform with a single level response with unseen levels in data
+        with unseen_level_handling set to 'Lowest'"""
+
+        x = MeanResponseTransformer(
+            columns=["b", "d", "f"], unseen_level_handling="Lowest"
+        )
+
+        initial_df = d.create_MeanResponseTransformer_test_df()
+        x.fit(initial_df, initial_df["a"])
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_frame_equal_msg(
+            actual=df_transformed,
+            expected=expected,
+            msg_tag="Unexpected values in MeanResponseTransformer.transform",
+        )
+
+    @pytest.mark.parametrize(
+        "df, expected",
+        ta.pandas.adjusted_dataframe_params(
+            d.create_MeanResponseTransformer_test_df_unseen_levels(), expected_df_7()
+        ),
+    )
+    def test_expected_output_sigle_level_response_unseen_levels_highest(
+        self, df, expected
+    ):
+        """Test that the output is expected from transform with a single level response with unseen levels in data
+        with unseen_level_handling set to 'Highest'"""
+
+        x = MeanResponseTransformer(
+            columns=["b", "d", "f"], unseen_level_handling="Highest"
+        )
+
+        initial_df = d.create_MeanResponseTransformer_test_df()
+        x.fit(initial_df, initial_df["a"])
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_frame_equal_msg(
+            actual=df_transformed,
+            expected=expected,
+            msg_tag="Unexpected values in MeanResponseTransformer.transform",
+        )
+
+    @pytest.mark.parametrize(
+        "df, expected",
+        ta.pandas.adjusted_dataframe_params(
+            d.create_MeanResponseTransformer_test_df_unseen_levels(), expected_df_8()
+        ),
+    )
+    def test_expected_output_sigle_level_response_unseen_levels_arbitrary(
+        self, df, expected
+    ):
+        """Test that the output is expected from transform with a single level response with unseen levels in data
+        with unseen_level_handling set to an arbitrary int/float value'"""
+
+        x = MeanResponseTransformer(columns=["b", "d", "f"], unseen_level_handling=21.6)
+
+        initial_df = d.create_MeanResponseTransformer_test_df()
+        x.fit(initial_df, initial_df["a"])
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_frame_equal_msg(
+            actual=df_transformed,
+            expected=expected,
+            msg_tag="Unexpected values in MeanResponseTransformer.transform",
+        )
+
+    @pytest.mark.parametrize(
+        "df, expected",
+        ta.pandas.adjusted_dataframe_params(
+            d.create_MeanResponseTransformer_test_df_unseen_levels(), expected_df_9()
+        ),
+    )
+    def test_expected_output_one_multi_level_unseen_levels(self, df, expected):
+        """Test that the output is expected from transform with a multi-level response and unseen levels and one level selected."""
+
+        x = MeanResponseTransformer(
+            columns=["b", "f"], level=["blue"], unseen_level_handling="Mean"
+        )
+
+        initial_df = d.create_MeanResponseTransformer_test_df()
+        x.fit(initial_df, initial_df["multi_level_response"])
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_frame_equal_msg(
+            actual=df_transformed,
+            expected=expected,
+            msg_tag="Unexpected values in MeanResponseTransformer.transform",
+        )
+
+    @pytest.mark.parametrize(
+        "df, expected",
+        ta.pandas.adjusted_dataframe_params(
+            d.create_MeanResponseTransformer_test_df_unseen_levels(), expected_df_10()
+        ),
+    )
+    def test_expected_output_all_multi_level_unseen_levels(self, df, expected):
+        """Test that the output is expected from transform with a multi-level response and unseen levels and all level selected."""
+
+        x = MeanResponseTransformer(
+            columns=["b", "f"], level="all", unseen_level_handling="Highest"
+        )
+
+        initial_df = d.create_MeanResponseTransformer_test_df()
+        x.fit(initial_df, initial_df["multi_level_response"])
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_frame_equal_msg(
+            actual=df_transformed,
+            expected=expected,
+            msg_tag="Unexpected values in MeanResponseTransformer.transform",
         )
 
     def test_nulls_introduced_in_transform_error(self):
