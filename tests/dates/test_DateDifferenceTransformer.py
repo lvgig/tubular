@@ -464,7 +464,7 @@ class TestTransform(object):
         return df
 
     def expected_df_7():
-        """Expected output for test_expected_output_nulls."""
+        """Expected output for test_expected_output_nulls_Y."""
 
         df = pd.DataFrame(
             {
@@ -483,6 +483,30 @@ class TestTransform(object):
             },
             index=[0, 1],
         )
+
+        return df
+    
+    def expected_df_8():
+        """Expected output for test_expected_output_nulls_D."""
+
+        df = pd.DataFrame(
+            {
+                "a": [
+                    datetime.datetime(1993, 9, 27, 11, 58, 58),
+                    np.NaN,
+                ],
+                "b": [
+                    np.NaN,
+                    datetime.datetime(2019, 12, 25, 11, 58, 58),
+                ],
+                "D": [
+                    np.NaN,
+                    np.NaN,
+                ],
+            },
+            index=[0, 1],
+        )
+
         return df
 
     def test_arguments(self):
@@ -704,7 +728,7 @@ class TestTransform(object):
             d.create_datediff_test_nulls_df(), expected_df_7()
         ),
     )
-    def test_expected_output_nulls(self, df, expected):
+    def test_expected_output_nulls_Y(self, df, expected):
         """Test that the output is expected from transform, when columns are nulls."""
 
         x = DateDifferenceTransformer(
@@ -712,6 +736,32 @@ class TestTransform(object):
             column_upper="b",
             new_column_name="Y",
             units="Y",
+            copy=True,
+            verbose=False,
+        )
+
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_frame_equal_msg(
+            actual=df_transformed,
+            expected=expected,
+            msg_tag="Unexpected values in DateDifferenceTransformer.transform (nulls)",
+        )
+
+    @pytest.mark.parametrize(
+        "df, expected",
+        ta.pandas.adjusted_dataframe_params(
+            d.create_datediff_test_nulls_df(), expected_df_8()
+        ),
+    )
+    def test_expected_output_nulls_D(self, df, expected):
+        """Test that the output is expected from transform, when columns are nulls."""
+
+        x = DateDifferenceTransformer(
+            column_lower="a",
+            column_upper="b",
+            new_column_name="D",
+            units="D",
             copy=True,
             verbose=False,
         )
