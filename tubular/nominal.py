@@ -478,7 +478,9 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
     turn can then be used to encode each categorical column specified. This will generate up
     to n * len(columns) new columns, of with names of the form {column}_{response_level}. The
     original columns will be removed from the dataframe. This functionality is controlled using
-    the 'level' parameter.
+    the 'level' parameter. Note that the above only works for a n > 1 level categorical response.
+    Do not use 'level' parameter for a n > 1 level numerical response. In this case, use the standard
+    mean response transformer without the 'level' parameter.
 
     If a categorical variable contains null values these will not be transformed.
 
@@ -501,6 +503,13 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         Parameter to control encoding against a multi-level categorical response. For a continuous or
         binary response, leave this as None. In the multi-level case, set to 'all' to encode against every
         response level or provide a list of response levels to encode against.
+
+    unseen_level_handling : str("Mean", "Median", "Lowest" or "Highest) or int/float, default = None
+        Parameter to control the logic for handling unseen levels of the categorical features to encode in
+        data when using transform method. Default value of None will output error when attempting to use transform
+        on data with unseen levels in categorical columns to encode. Set this parameter to one of the options above
+        in order to encode unseen levels in each categorical column with the mean, median etc. of
+        each column. One can also pass an arbitrary int/float value to use for encoding unseen levels.
 
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
@@ -537,11 +546,20 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         Only created in the mutli-level case. A dictionary of the form level : transformer containing the mean response
         transformers for each level to be encoded against.
 
+    unseen_levels_encoding_dict: dict
+        Dict containing the values (based on chosen unseen_level_handling) derived from the encoded columns to use when handling unseen levels in data passed to transform method.
+
 
     """
 
     def __init__(
-        self, columns=None, weights_column=None, prior=0, level=None, **kwargs
+        self,
+        columns=None,
+        weights_column=None,
+        prior=0,
+        level=None,
+        unseen_level_handling=None,
+        **kwargs,
     ):
 
         if weights_column is not None:
@@ -564,10 +582,17 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                 raise TypeError(
                     f"{self.classname()}: Level should be a NoneType, list or str but got {type(level)}"
                 )
+        if unseen_level_handling:
+            if unseen_level_handling not in ["Mean", "Median", "Lowest", "Highest"]:
+                if not isinstance(unseen_level_handling, (int, float)):
+                    raise ValueError(
+                        f"{self.classname()}: unseen_level_handling should be the option: Mean, Median, Lowest, Highest or an arbitrary int/float value"
+                    )
 
         self.weights_column = weights_column
         self.prior = prior
         self.level = level
+        self.unseen_level_handling = unseen_level_handling
         # TODO: set default prior to None and refactor to only use prior regularisation when it is set?
 
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
@@ -698,6 +723,8 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         BaseNominalTransformer.fit(self, X, y)
 
         self.mappings = {}
+        self.unseen_levels_encoding_dict = {}
+        X_temp = X.copy()
 
         if self.level:
 
@@ -725,7 +752,6 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                     column + "_" + level for column in self.columns
                 ]
 
-                X_temp = X.copy()
                 for column in self.columns:
                     X_temp[column + "_" + level] = X[column].copy()
 
@@ -739,10 +765,40 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                 mapped_columns += mapping_columns_for_this_level
 
             self.mapped_columns = list(set(mapped_columns) - set(self.columns))
+            self.encoded_feature_columns = self.mapped_columns
 
         else:
 
             self._fit_binary_response(X, y, self.columns)
+            self.encoded_feature_columns = self.columns
+
+        if self.unseen_level_handling == "Mean":
+            for c in self.encoded_feature_columns:
+                self.unseen_levels_encoding_dict[c] = (
+                    X_temp[c].map(self.mappings[c]).mean()
+                )
+
+        elif self.unseen_level_handling == "Median":
+            for c in self.encoded_feature_columns:
+                self.unseen_levels_encoding_dict[c] = (
+                    X_temp[c].map(self.mappings[c]).median()
+                )
+
+        elif self.unseen_level_handling == "Lowest":
+            for c in self.encoded_feature_columns:
+                self.unseen_levels_encoding_dict[c] = (
+                    X_temp[c].map(self.mappings[c]).min()
+                )
+
+        elif self.unseen_level_handling == "Highest":
+            for c in self.encoded_feature_columns:
+                self.unseen_levels_encoding_dict[c] = (
+                    X_temp[c].map(self.mappings[c]).max()
+                )
+
+        elif isinstance(self.unseen_level_handling, (int, float)):
+            for c in self.encoded_feature_columns:
+                self.unseen_levels_encoding_dict[c] = float(self.unseen_level_handling)
 
         return self
 
@@ -768,7 +824,6 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             Transformed input X with levels mapped accoriding to mappings dict.
 
         """
-
         if self.level:
             for response_level in self.response_levels:
                 for column in self.columns:
@@ -777,8 +832,18 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             # Temporarily overwriting self.columns to use BaseMappingTransformMixin
             self.columns = self.mapped_columns
 
-        self.check_mappable_rows(X)
-        X = BaseMappingTransformMixin.transform(self, X)
+        if self.unseen_level_handling:
+            self.check_is_fitted(["mappings"])
+            unseen_indices = {}
+            for c in self.columns:
+                # finding rows with values not in the keys of mappings dictionary
+                unseen_indices[c] = X[~X[c].isin(self.mappings[c].keys())].index
+            X = BaseMappingTransformMixin.transform(self, X)
+            for c in self.columns:
+                X.loc[unseen_indices[c], c] = self.unseen_levels_encoding_dict[c]
+        else:
+            self.check_mappable_rows(X)
+            X = BaseMappingTransformMixin.transform(self, X)
 
         if self.level:
             # Setting self.columns back so that the transformer object is unchanged after transform is called
