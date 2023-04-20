@@ -668,7 +668,7 @@ class TestTransform(object):
             d.create_datediff_test_df(), expected_df_5()
         ),
     )
-    def test_expected_output_units_xminutes(self, df, expected):
+    def test_expected_output_units_m(self, df, expected):
         """Test that the output is expected from transform, when units is m.
 
         This tests positive month gaps, negative month gaps, and missing values.
