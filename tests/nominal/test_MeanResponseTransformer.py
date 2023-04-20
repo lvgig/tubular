@@ -21,6 +21,66 @@ def learnt_mapping_dict():
     return learnt_mapping_dict
 
 
+@pytest.fixture()
+def learnt_unseen_levels_encoding_dict_mean():
+
+    learnt_unseen_levels_encoding_dict_mean = {
+        "b": (1.0 + 2.0 + 3.0 + 4.0 + 5.0 + 6.0) / 6,
+        "b_blue": (1.0 + 1.0 + 0.0 + 0.0 + 0.0 + 0.0) / 6,
+        "b_yellow": (0.0 + 0.0 + 1.0 + 1.0 + 0.0 + 0.0) / 6,
+        "b_green": (0.0 + 0.0 + 0.0 + 0.0 + 1.0 + 1.0) / 6,
+    }
+    return learnt_unseen_levels_encoding_dict_mean
+
+
+@pytest.fixture()
+def learnt_unseen_levels_encoding_dict_median():
+
+    learnt_unseen_levels_encoding_dict_median = {
+        "b": (3.0 + 4.0) / 2,
+        "b_blue": (0.0 + 0.0) / 2,
+        "b_yellow": (0.0 + 0.0) / 2,
+        "b_green": (0.0 + 0.0) / 2,
+    }
+    return learnt_unseen_levels_encoding_dict_median
+
+
+@pytest.fixture()
+def learnt_unseen_levels_encoding_dict_highest():
+
+    learnt_unseen_levels_encoding_dict_highest = {
+        "b": 6.0,
+        "b_blue": 1.0,
+        "b_yellow": 1.0,
+        "b_green": 1.0,
+    }
+    return learnt_unseen_levels_encoding_dict_highest
+
+
+@pytest.fixture()
+def learnt_unseen_levels_encoding_dict_lowest():
+
+    learnt_unseen_levels_encoding_dict_lowest = {
+        "b": 1.0,
+        "b_blue": 0.0,
+        "b_yellow": 0.0,
+        "b_green": 0.0,
+    }
+    return learnt_unseen_levels_encoding_dict_lowest
+
+
+@pytest.fixture()
+def learnt_unseen_levels_encoding_dict_arbitrary():
+
+    learnt_unseen_levels_encoding_dict_arbitrary = {
+        "b": 22.0,
+        "b_blue": 22.0,
+        "b_yellow": 22.0,
+        "b_green": 22.0,
+    }
+    return learnt_unseen_levels_encoding_dict_arbitrary
+
+
 class TestInit(object):
     """Tests for MeanResponseTransformer.init()."""
 
@@ -120,6 +180,23 @@ class TestInit(object):
 class Test_prior_regularisation(object):
     "tests for _prior_regularisation method"
 
+    def test_check_is_fitted_called(self, mocker):
+        """Test that _prior_regularisation calls BaseTransformer.check_is_fitted."""
+
+        expected_call_args = {0: {"args": (["global_mean"],), "kwargs": {}}}
+
+        x = MeanResponseTransformer()
+
+        x.fit(pd.DataFrame({"a": ["1", "2"]}), pd.Series([2, 3]))
+
+        with ta.functions.assert_function_call(
+            mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
+        ):
+
+            x._prior_regularisation(
+                cat_freq=pd.Series([1, 2]), target_means=pd.Series([1, 2])
+            )
+
     def test_output1(self):
         "Test output of method"
 
@@ -160,6 +237,45 @@ class Test_prior_regularisation(object):
 
 
 class TestFit:
+    def test_super_fit_called(self, mocker):
+        """Test that fit calls BaseTransformer.fit."""
+
+        df = d.create_MeanResponseTransformer_test_df()
+
+        x = MeanResponseTransformer(columns="b")
+
+        spy = mocker.spy(tubular.base.BaseTransformer, "fit")
+
+        x.fit(df, df["a"])
+
+        assert spy.call_count == 1, "unexpected number of calls to BaseTransformer.fit"
+
+        call_args = spy.call_args_list[0]
+        call_pos_args = call_args[0]
+        call_kwargs = call_args[1]
+
+        expected_kwargs = {}
+
+        assert (
+            call_kwargs == expected_kwargs
+        ), "unexpected kwargs in BaseTransformer.fit call"
+
+        expected_pos_args = (
+            x,
+            d.create_MeanResponseTransformer_test_df(),
+            d.create_MeanResponseTransformer_test_df()["a"],
+        )
+
+        assert len(expected_pos_args) == len(
+            call_pos_args
+        ), "unexpected # positional args in BaseTransformer.fit call"
+
+        ta.equality.assert_equal_dispatch(
+            expected_pos_args,
+            call_pos_args,
+            "unexpected arguments in BaseTransformer.fit call",
+        )
+
     @pytest.mark.parametrize(
         "level, target_column, unseen_level_handling",
         [
@@ -276,6 +392,88 @@ class TestFit:
                 actual = x.mappings[column]
                 expected = learnt_mapping_dict[column]
                 assert actual == expected
+
+    @pytest.mark.parametrize(
+        "level, target_column, unseen_level_handling",
+        [
+            (None, "a", "Mean"),
+            (None, "a", "Median"),
+            (None, "a", "Lowest"),
+            (None, "a", "Highest"),
+            (None, "a", 22.0),
+            ("all", "multi_level_response", "Mean"),
+            (["yellow", "blue"], "multi_level_response", "Mean"),
+        ],
+    )
+    def test_correct_unseen_levels_encoding_dict_stored(
+        self,
+        learnt_unseen_levels_encoding_dict_mean,
+        learnt_unseen_levels_encoding_dict_median,
+        learnt_unseen_levels_encoding_dict_lowest,
+        learnt_unseen_levels_encoding_dict_highest,
+        learnt_unseen_levels_encoding_dict_arbitrary,
+        level,
+        target_column,
+        unseen_level_handling,
+    ):
+        "Test that the unseen_levels_encoding_dict dictionary created in fit has the correct keys and values"
+
+        df = d.create_MeanResponseTransformer_test_df()
+        x = MeanResponseTransformer(
+            columns=["b"], level=level, unseen_level_handling=unseen_level_handling
+        )
+        x.fit(df, df[target_column])
+
+        if level:
+            if level == "all":
+                assert set(x.unseen_levels_encoding_dict.keys()) == set(
+                    ["b_blue", "b_yellow", "b_green"]
+                ), "Stored unseen_levels_encoding_dict keys are not as expected"
+
+            else:
+                assert set(x.unseen_levels_encoding_dict.keys()) == set(
+                    ["b_blue", "b_yellow"]
+                ), "Stored unseen_levels_encoding_dict keys are not as expected"
+
+            for column in x.unseen_levels_encoding_dict.keys():
+                actual = x.unseen_levels_encoding_dict[column]
+                expected = learnt_unseen_levels_encoding_dict_mean[column]
+                assert actual == expected
+
+        else:
+            assert x.unseen_levels_encoding_dict.keys() == set(
+                ["b"]
+            ), "Stored unseen_levels_encoding_dict key is not as expected"
+
+            if unseen_level_handling == "Mean":
+                for column in x.unseen_levels_encoding_dict.keys():
+                    actual = x.unseen_levels_encoding_dict[column]
+                    expected = learnt_unseen_levels_encoding_dict_mean[column]
+                    assert actual == expected
+
+            if unseen_level_handling == "Median":
+                for column in x.unseen_levels_encoding_dict.keys():
+                    actual = x.unseen_levels_encoding_dict[column]
+                    expected = learnt_unseen_levels_encoding_dict_median[column]
+                    assert actual == expected
+
+            if unseen_level_handling == "Lowest":
+                for column in x.unseen_levels_encoding_dict.keys():
+                    actual = x.unseen_levels_encoding_dict[column]
+                    expected = learnt_unseen_levels_encoding_dict_lowest[column]
+                    assert actual == expected
+
+            if unseen_level_handling == "Highest":
+                for column in x.unseen_levels_encoding_dict.keys():
+                    actual = x.unseen_levels_encoding_dict[column]
+                    expected = learnt_unseen_levels_encoding_dict_highest[column]
+                    assert actual == expected
+
+            if unseen_level_handling == "Abitrary":
+                for column in x.unseen_levels_encoding_dict.keys():
+                    actual = x.unseen_levels_encoding_dict[column]
+                    expected = learnt_unseen_levels_encoding_dict_arbitrary[column]
+                    assert actual == expected
 
 
 class TestFitBinaryResponse(object):
@@ -813,6 +1011,46 @@ class TestTransform(object):
         df["c"] = df["c"].astype("category")
 
         return df
+
+    def test_check_is_fitted_called(self, mocker):
+        """Test that BaseTransformer check_is_fitted called."""
+
+        df = d.create_MeanResponseTransformer_test_df()
+
+        x = MeanResponseTransformer(columns="b")
+
+        x.fit(df, df["a"])
+
+        expected_call_args = {0: {"args": (["mappings"],), "kwargs": {}}}
+
+        with ta.functions.assert_function_call(
+            mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
+        ):
+
+            x.transform(df)
+
+    def test_super_transform_called(self, mocker):
+        """Test that BaseTransformer.transform called."""
+
+        df = d.create_MeanResponseTransformer_test_df()
+
+        x = MeanResponseTransformer(columns="b")
+
+        x.fit(df, df["a"])
+
+        expected_call_args = {
+            0: {"args": (d.create_MeanResponseTransformer_test_df(),), "kwargs": {}}
+        }
+
+        with ta.functions.assert_function_call(
+            mocker,
+            tubular.base.BaseTransformer,
+            "transform",
+            expected_call_args,
+            return_value=d.create_MeanResponseTransformer_test_df(),
+        ):
+
+            x.transform(df)
 
     def test_learnt_values_not_modified(self):
         """Test that the mappings from fit are not changed in transform."""
