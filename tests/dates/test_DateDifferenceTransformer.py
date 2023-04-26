@@ -231,27 +231,17 @@ class TestTransform(object):
                     datetime.datetime(2015, 11, 10, 11, 59, 59),
                     datetime.datetime(2015, 11, 10, 12, 59, 59),
                     datetime.datetime(2015, 7, 23, 11, 59, 59),
-                ], 
-                "Y": [
-                    27,
-                    19,
-                    0,
-                    0,
-                    0,
-                    -3,
-                    -3,
-                    30,
                 ],
-                # "Y": [
-                #     26.59340677135105,
-                #     19.76757257798535,
-                #     0.0,
-                #     0.08487511721664373,
-                #     -0.08236536912690427,
-                #     -2.915756882984136,
-                #     -3.082769210410435,
-                #     29.999247075573077,
-                # ],
+                "Y": [
+                    26.59340677135105,
+                    19.76757257798535,
+                    0.0,
+                    0.08487511721664373,
+                    -0.08236536912690427,
+                    -2.915756882984136,
+                    -3.082769210410435,
+                    29.999247075573077,
+                ],
             }
         )
         return df
@@ -282,29 +272,17 @@ class TestTransform(object):
                     datetime.datetime(2015, 7, 23, 11, 59, 59),
                 ],
                 "M": [
-                    320,
-                    237,
-                    0,
-                    1,
-                    -1,
-                    -35,
-                    -37,
-                    360,
+                    319.12088125621256,
+                    237.21087093582423,
+                    0.0,
+                    1.0185014065997249,
+                    -0.9883844295228512,
+                    -34.989082595809634,
+                    -36.993230524925224,
+                    359.9909649068769,
                 ],
-                # "M": [
-                #     319.12088125621256,
-                #     237.21087093582423,
-                #     0.0,
-                #     1.0185014065997249,
-                #     -0.9883844295228512,
-                #     -34.989082595809634,
-                #     -36.993230524925224,
-                #     359.9909649068769,
-                # ],
             }
         )
-
-        df['M'] = df['M'].astype(int)
         return df
 
     def expected_df_3():
@@ -483,6 +461,7 @@ class TestTransform(object):
             },
             index=[0, 1],
         )
+
         return df
 
     def test_arguments(self):
@@ -644,7 +623,7 @@ class TestTransform(object):
             d.create_datediff_test_df(), expected_df_5()
         ),
     )
-    def test_expected_output_units_xminutes(self, df, expected):
+    def test_expected_output_units_m(self, df, expected):
         """Test that the output is expected from transform, when units is m.
 
         This tests positive month gaps, negative month gaps, and missing values.

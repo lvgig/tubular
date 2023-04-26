@@ -268,13 +268,9 @@ class DateDifferenceTransformer(BaseTransformer):
 
         X = super().transform(X)
 
-        if self.units in ['Y','M']:
-            #pandas does not support timedelata operations with M/Y units
-            X[self.new_column_name] = X[self.columns[1]].dt.to_period(self.units).astype(int) - X[self.columns[0]].dt.to_period(self.units).astype(int)
-
-        else:
-            X[self.new_column_name] = (X[self.columns[1]] - X[self.columns[0]]
-            ) / np.timedelta64(1, self.units)
+        X[self.new_column_name] = (
+            X[self.columns[1]] - X[self.columns[0]]
+        ) / np.timedelta64(1, self.units)
 
         return X
 
