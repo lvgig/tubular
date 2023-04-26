@@ -147,10 +147,8 @@ class TestInit(object):
                 copy=True,
                 verbose=False,
             )
-    @pytest.mark.parametrize(
-        'unit',
-        ['M','Y']
-        )
+
+    @pytest.mark.parametrize("unit", ["M", "Y"])
     def test_units_warning(self, unit):
         """Test that a warning is raised if M units passed to init."""
 
