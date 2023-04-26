@@ -66,7 +66,6 @@ class DateDiffLeapYearTransformer(BaseTransformer):
         missing_replacement=None,
         **kwargs,
     ):
-
         if not isinstance(column_lower, str):
             raise TypeError(f"{self.classname()}: column_lower should be a str")
 
@@ -121,7 +120,6 @@ class DateDiffLeapYearTransformer(BaseTransformer):
             return self.missing_replacement
 
         else:
-
             if not type(row[self.columns[1]]) in [datetime.date, datetime.datetime]:
                 raise TypeError(
                     f"{self.classname()}: upper column values should be datetime.datetime or datetime.date objects"
@@ -205,13 +203,10 @@ class DateDifferenceTransformer(BaseTransformer):
         copy=True,
         verbose=False,
     ):
-
         if not type(column_lower) is str:
-
             raise TypeError(f"{self.classname()}: column_lower must be a str")
 
         if not type(column_upper) is str:
-
             raise TypeError(f"{self.classname()}: column_upper must be a str")
 
         columns = [column_lower, column_upper]
@@ -226,27 +221,26 @@ class DateDifferenceTransformer(BaseTransformer):
         ]
 
         if not type(units) is str:
-
             raise TypeError(f"{self.classname()}: units must be a str")
 
         if units not in accepted_values_units:
-
             raise ValueError(
                 f"{self.classname()}: units must be one of {accepted_values_units}, got {units}"
+            )
+        if units in ["Y", "M"]:
+            warnings.warn(
+                f"{self.classname()}: Y/M units will be changed or deprecated in a future version, consider using DateDiffLeapYearTransformer or D units instead"
             )
 
         self.units = units
 
         if new_column_name is not None:
-
             if not type(new_column_name) is str:
-
                 raise TypeError(f"{self.classname()}: new_column_name must be a str")
 
             self.new_column_name = new_column_name
 
         else:
-
             self.new_column_name = f"{column_upper}_{column_lower}_datediff_{units}"
 
         super().__init__(columns=columns, copy=copy, verbose=verbose)
@@ -297,29 +291,22 @@ class ToDatetimeTransformer(BaseTransformer):
     """
 
     def __init__(self, column, new_column_name, to_datetime_kwargs={}, **kwargs):
-
         if not type(column) is str:
-
             raise TypeError(
                 f"{self.classname()}: column should be a single str giving the column to transform to datetime"
             )
 
         if not type(new_column_name) is str:
-
             raise TypeError(f"{self.classname()}: new_column_name must be a str")
 
         if not type(to_datetime_kwargs) is dict:
-
             raise TypeError(
                 f"{self.classname()}: to_datetime_kwargs should be a dict but got type {type(to_datetime_kwargs)}"
             )
 
         else:
-
             for i, k in enumerate(to_datetime_kwargs.keys()):
-
                 if not type(k) is str:
-
                     raise TypeError(
                         f"{self.classname()}: unexpected type ({type(k)}) for to_datetime_kwargs key in position {i}, must be str"
                     )
@@ -409,9 +396,7 @@ class SeriesDtMethodTransformer(BaseTransformer):
     def __init__(
         self, new_column_name, pd_method_name, column, pd_method_kwargs={}, **kwargs
     ):
-
         if type(column) is not str:
-
             raise TypeError(
                 f"{self.classname()}: column should be a str but got {type(column)}"
             )
@@ -419,29 +404,23 @@ class SeriesDtMethodTransformer(BaseTransformer):
         super().__init__(columns=column, **kwargs)
 
         if type(new_column_name) is not str:
-
             raise TypeError(
                 f"{self.classname()}: unexpected type ({type(new_column_name)}) for new_column_name, must be str"
             )
 
         if type(pd_method_name) is not str:
-
             raise TypeError(
                 f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
             )
 
         if type(pd_method_kwargs) is not dict:
-
             raise TypeError(
                 f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
             )
 
         else:
-
             for i, k in enumerate(pd_method_kwargs.keys()):
-
                 if not type(k) is str:
-
                     raise TypeError(
                         f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
                     )
@@ -451,22 +430,18 @@ class SeriesDtMethodTransformer(BaseTransformer):
         self.pd_method_kwargs = pd_method_kwargs
 
         try:
-
             ser = pd.Series([datetime.datetime(2020, 12, 21)])
             getattr(ser.dt, pd_method_name)
 
         except Exception as err:
-
             raise AttributeError(
                 f"""{self.classname()}: error accessing "dt.{pd_method_name}" method on pd.Series object - pd_method_name should be a pd.Series.dt method"""
             ) from err
 
         if callable(getattr(ser.dt, pd_method_name)):
-
             self._callable = True
 
         else:
-
             self._callable = False
 
         # This attribute is not for use in any method, use 'columns' instead.
@@ -496,13 +471,11 @@ class SeriesDtMethodTransformer(BaseTransformer):
         X = super().transform(X)
 
         if self._callable:
-
             X[self.new_column_name] = getattr(
                 X[self.columns[0]].dt, self.pd_method_name
             )(**self.pd_method_kwargs)
 
         else:
-
             X[self.new_column_name] = getattr(
                 X[self.columns[0]].dt, self.pd_method_name
             )
@@ -580,7 +553,6 @@ class BetweenDatesTransformer(BaseTransformer):
         upper_inclusive=True,
         **kwargs,
     ):
-
         if type(column_lower) is not str:
             raise TypeError(f"{self.classname()}: column_lower should be str")
 
@@ -633,33 +605,26 @@ class BetweenDatesTransformer(BaseTransformer):
         X = super().transform(X)
 
         for col in self.columns:
-
             if not pd.api.types.is_datetime64_dtype(X[col]):
-
                 raise TypeError(
                     f"{self.classname()}: {col} should be datetime64[ns] type but got {X[col].dtype}"
                 )
 
         if not (X[self.columns[0]] <= X[self.columns[2]]).all():
-
             warnings.warn(
                 f"{self.classname()}: not all {self.columns[2]} are greater than or equal to {self.columns[0]}"
             )
 
         if self.lower_inclusive:
-
             lower_comparison = X[self.columns[0]] <= X[self.columns[1]]
 
         else:
-
             lower_comparison = X[self.columns[0]] < X[self.columns[1]]
 
         if self.upper_inclusive:
-
             upper_comparison = X[self.columns[1]] <= X[self.columns[2]]
 
         else:
-
             upper_comparison = X[self.columns[1]] < X[self.columns[2]]
 
         X[self.new_column_name] = lower_comparison & upper_comparison
@@ -743,7 +708,6 @@ class DatetimeInfoExtractor(BaseTransformer):
         datetime_mappings={},
         **kwargs,
     ):
-
         if not type(include) is list:
             raise TypeError(f"{self.classname()}: include should be List")
 
@@ -882,7 +846,6 @@ class DatetimeInfoExtractor(BaseTransformer):
             self.dayofweek_mapping = {}
 
     def _map_values(self, value, interval: str):
-
         """
         Method to apply mappings for a specified interval ("timeofday", "timeofmonth", "timeofyear" or "dayofweek")
         from corresponding mapping attribute to a single value.
@@ -1034,7 +997,6 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         units: Union[str, dict],
         period: Union[int, float, dict, dict] = 2 * np.pi,
     ):
-
         super().__init__(columns, copy=True)
 
         if not isinstance(method, str) and not isinstance(method, list):
@@ -1173,7 +1135,6 @@ class DatetimeSinusoidCalculator(BaseTransformer):
 
         for column in self.columns:
             if not pd.api.types.is_datetime64_dtype(X[column]):
-
                 raise TypeError(
                     f"{self.classname()} : {column} should be datetime64[ns] type but got {X[column].dtype}"
                 )
@@ -1189,7 +1150,6 @@ class DatetimeSinusoidCalculator(BaseTransformer):
                 desired_period = self.period[column]
 
             for method in self.method:
-
                 new_column_name = f"{method}_{desired_period}_{desired_units}_{column}"
 
                 X[new_column_name] = getattr(np, method)(
