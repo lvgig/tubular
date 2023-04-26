@@ -147,8 +147,11 @@ class TestInit(object):
                 copy=True,
                 verbose=False,
             )
-
-    def test_M_units_warning(self):
+    @pytest.mark.parametrize(
+        'unit',
+        ['M','Y']
+        )
+    def test_units_warning(self, unit):
         """Test that a warning is raised if M units passed to init."""
 
         with pytest.warns(
@@ -159,23 +162,7 @@ class TestInit(object):
                 column_lower="dummy_1",
                 column_upper="dummy_2",
                 new_column_name="dummy_3",
-                units="M",
-                copy=True,
-                verbose=False,
-            )
-
-    def test_Y_units_warning(self):
-        """Test that a warning is raised if Y units passed to init."""
-
-        with pytest.warns(
-            Warning,
-            match="DateDifferenceTransformer: Y/M units will be changed or deprecated in a future version, consider using DateDiffLeapYearTransformer or D units instead",
-        ):
-            DateDifferenceTransformer(
-                column_lower="dummy_1",
-                column_upper="dummy_2",
-                new_column_name="dummy_3",
-                units="Y",
+                units=unit,
                 copy=True,
                 verbose=False,
             )
