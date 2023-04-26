@@ -178,8 +178,6 @@ class TestTransform(object):
 
         df["a_year"] = [1993, 2000, 2018, 2018, 2018, 2018, 2018, 1985]
 
-        df["a_year"] = df["a_year"].astype('int32')
-
         return df
 
     def expected_df_2():
@@ -188,8 +186,6 @@ class TestTransform(object):
         df = d.create_datediff_test_df()
 
         df["a"] = [1993, 2000, 2018, 2018, 2018, 2018, 2018, 1985]
-
-        df["a"] = df["a"].astype('int32')
 
         return df
 
