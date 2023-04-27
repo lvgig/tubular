@@ -16,6 +16,21 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+0.3.5 (2023-04-26)
+------------------
+
+Added
+^^^^^
+- added support for handling unseen levels in MeanResponseTransformer `#80 <https://github.com/lvgig/tubular/pull/80>`_
+
+Changed
+^^^^^^^
+- added pandas < 2.0.0 dependency `#81 <https://github.com/lvgig/tubular/pull/81>`_
+
+Deprecated
+^^^^^^^^^^
+- DateDifferenceTransformer M and Y units are incpompatible with pandas 2.0.0 and will be removed or changed in a future version `#81 <https://github.com/lvgig/tubular/pull/81>`_
+
 0.3.4 (2023-03-14)
 ------------------
 

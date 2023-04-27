@@ -1,5 +1,5 @@
 test-aide>=0.1.0
-pandas>=1.0.0
+pandas>=1.0.0, <2.0.0
 scikit-learn>=0.22
 pytest>=5.4.1
 pytest-mock>=3.5.1

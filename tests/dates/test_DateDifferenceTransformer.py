@@ -65,7 +65,6 @@ class TestInit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             DateDifferenceTransformer(
                 column_lower="dummy_1",
                 column_upper="dummy_2",
@@ -79,7 +78,6 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="DateDifferenceTransformer: column_lower must be a str"
         ):
-
             DateDifferenceTransformer(
                 column_lower=123,
                 column_upper="dummy_2",
@@ -95,7 +93,6 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="DateDifferenceTransformer: column_upper must be a str"
         ):
-
             DateDifferenceTransformer(
                 column_lower="dummy_1",
                 column_upper=123,
@@ -111,7 +108,6 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="DateDifferenceTransformer: new_column_name must be a str"
         ):
-
             DateDifferenceTransformer(
                 column_lower="dummy_1",
                 column_upper="dummy_2",
@@ -127,7 +123,6 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="DateDifferenceTransformer: units must be a str"
         ):
-
             DateDifferenceTransformer(
                 column_lower="dummy_1",
                 column_upper="dummy_2",
@@ -144,12 +139,28 @@ class TestInit(object):
             ValueError,
             match=r"DateDifferenceTransformer: units must be one of \['Y', 'M', 'D', 'h', 'm', 's'\], got y",
         ):
-
             DateDifferenceTransformer(
                 column_lower="dummy_1",
                 column_upper="dummy_2",
                 new_column_name="dummy_3",
                 units="y",
+                copy=True,
+                verbose=False,
+            )
+
+    @pytest.mark.parametrize("unit", ["M", "Y"])
+    def test_units_warning(self, unit):
+        """Test that a warning is raised if M units passed to init."""
+
+        with pytest.warns(
+            Warning,
+            match="DateDifferenceTransformer: Y/M units will be changed or deprecated in a future version, consider using DateDiffLeapYearTransformer or D units instead",
+        ):
+            DateDifferenceTransformer(
+                column_lower="dummy_1",
+                column_upper="dummy_2",
+                new_column_name="dummy_3",
+                units=unit,
                 copy=True,
                 verbose=False,
             )
@@ -494,7 +505,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_datediff_test_df(),
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(
