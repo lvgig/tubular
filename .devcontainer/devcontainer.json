@@ -15,7 +15,11 @@
 	"postCreateCommand": "pip3 install --user -r requirements-dev.txt",
 
 	// Configure tool-specific properties.
-	// "customizations": {},
+	"customizations": {
+		// Configure properties specific to VS Code.
+		"vscode": {
+		  // Add the IDs of extensions you want installed when the container is created.
+		  "extensions": ["ms-python.vscode-pylance", "eamodio.gitlens"]
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
