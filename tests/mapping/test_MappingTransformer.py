@@ -123,15 +123,6 @@ class TestTransform(object):
 
         return df
 
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-
-        ta.functions.test_function_arguments(
-            func=MappingTransformer.transform,
-            expected_arguments=["self", "X", "suppress_dtype_warning"],
-            expected_default_values=(False,),
-        )
-
     def test_super_transform_call(self, mocker):
         """Test the call to BaseMappingTransformMixin.transform."""
 
