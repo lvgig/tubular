@@ -8,9 +8,7 @@ import numpy as np
 from collections import OrderedDict
 import warnings
 
-
-from tubular.base import BaseTransformer, ReturnKeyDict 
-
+from tubular.base import BaseTransformer, ReturnKeyDict
 
 class BaseMappingTransformer(BaseTransformer):
     """Base Transformer Extension for mapping transformers.
@@ -36,25 +34,29 @@ class BaseMappingTransformer(BaseTransformer):
 
     def __init__(self, mappings, **kwargs):
 
-        if not isinstance(mappings, dict):
+        if isinstance(mappings, dict):
+
+            if not len(mappings) > 0:
+
+                raise ValueError(f"{self.classname()}: mappings has no values")
+
+            for j in mappings.values():
+
+                if not isinstance(j, dict):
+
+                    raise ValueError(
+                        f"{self.classname()}: values in mappings dictionary should be dictionaries"
+                    )
+
+            self.mappings = mappings
+
+        else:
 
             raise ValueError(f"{self.classname()}: mappings must be a dictionary")
 
-        if not mappings:
+        columns = list(mappings.keys())
 
-            raise ValueError(f"{self.classname()}: mappings has no values")
-
-        for col, col_mappings in mappings.items():
-
-            if not isinstance(col_mappings, dict):
-
-                raise ValueError(
-                    f"{self.classname()}: values in mappings dictionary should be dictionaries"
-                )
-
-        self.mappings = mappings
-
-        super().__init__(columns=list(mappings.keys()), **kwargs)
+        super().__init__(columns=columns, **kwargs)
 
     def check_dtype_changes(self, X, original_dtypes, suppress_dtype_warning=False):
         mapped_columns = self.mappings.keys()
