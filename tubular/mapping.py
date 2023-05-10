@@ -9,7 +9,7 @@ from collections import OrderedDict
 import warnings
 
 
-from tubular.base import BaseTransformer, ReturnKeyDict
+from tubular.base import BaseTransformer, ReturnKeyDict 
 
 
 class BaseMappingTransformer(BaseTransformer):
@@ -56,35 +56,41 @@ class BaseMappingTransformer(BaseTransformer):
 
         super().__init__(columns=list(mappings.keys()), **kwargs)
 
-    def check_dtypes_and_warn(self, X, original_dtypes):
+    def check_dtype_changes(self, X, original_dtypes, suppress_dtype_warning=False):
         mapped_columns = self.mappings.keys()
         mapped_dtypes = X[mapped_columns].dtypes
 
-        for col in mapped_columns:
-            col_mappings = pd.Series(self.mappings[col])
-            mapping_dtype = col_mappings.dtype
+        if not suppress_dtype_warning:
+            for col in mapped_columns:
+                col_mappings = pd.Series(self.mappings[col])
+                mapping_dtype = col_mappings.dtype
 
-            if (mapped_dtypes[col] != mapping_dtype) and (
-                mapped_dtypes[col] != original_dtypes[col]
-            ):
-                # Confirm the initial and end dtypes are not categories
-                if not (
-                    is_categorical_dtype(original_dtypes[col])
-                    and is_categorical_dtype(mapped_dtypes[col])
+                if (mapped_dtypes[col] != mapping_dtype) and (
+                    mapped_dtypes[col] != original_dtypes[col]
                 ):
-                    warnings.warn(
-                        f"{self.classname()}: This mapping changes {col} dtype from {original_dtypes[col]} to {mapped_dtypes[col]}. This is often caused by having multiple dtypes in one column, or by not mapping all values.",
-                        category=UserWarning,
-                    )
+
+                    # Confirm the initial and end dtypes are not categories
+                    if not (
+                        is_categorical_dtype(original_dtypes[col])
+                        and is_categorical_dtype(mapped_dtypes[col])
+                    ):
+
+                        warnings.warn(
+                            f"{self.classname()}: This mapping changes {col} dtype from {original_dtypes[col]} to {mapped_dtypes[col]}. This is often caused by having multiple dtypes in one column, or by not mapping all values."
+                        )
+
 
     def transform(self, X, suppress_dtype_warning=False):
-        """Base mapping transformer transform method.  Checks that the mappings
+        """Base mapping transformer transform method. Checks that the mappings
         dict has been fitted and calls the BaseTransformer transform method.
 
         Parameters
         ----------
         X : pd.DataFrame
             Data to apply mappings to.
+
+        suppress_dtype_warning: bool, default = False
+            Whether to suppress warnings about dtype changes
 
         Returns
         -------
@@ -95,13 +101,14 @@ class BaseMappingTransformer(BaseTransformer):
 
         self.check_is_fitted(["mappings"])
 
+        # Store the original dtypes of the columns
         mapped_columns = self.mappings.keys()
         original_dtypes = X[mapped_columns].dtypes
 
         X = super().transform(X)
 
-        if suppress_dtype_warning == False:
-            self.check_dtypes_and_warn(X, original_dtypes)
+        # Call the check_dtype_changes method
+        self.check_dtype_changes(X, original_dtypes, suppress_dtype_warning)
 
         return X
 
@@ -126,7 +133,7 @@ class BaseMappingTransformMixin(BaseTransformer):
         Returns
         -------
         X : pd.DataFrame
-            Transformed input X with levels mapped accoriding to mappings dict.
+            Transformed input X with levels mapped according to mappings dict.
 
         """
 
@@ -188,21 +195,17 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
 
         BaseMappingTransformer.__init__(self, mappings=mappings, **kwargs)
 
-    def transform(self, X):
-        """Transform the input data X according to the mappings in the mappings attribute dict.
+def transform(self, X, suppress_dtype_warning=False):
+        """Transformer to map values in columns to other values e.g. to merge two levels into one.
 
-        This method calls the BaseMappingTransformMixin.transform. Note, this transform method is
-        different to some of the transform methods in the nominal module, even though they also
-        use the BaseMappingTransformMixin.transform method. Here, if a value does not exist in
-        the mapping it is unchanged.
+        Note, the MappingTransformer does not require 'self-mappings' to be defined i.e. if you want
+        to map a value to itself, you can omit this value from the mappings rather than having to
+        map it to itself. This is because it uses the ReturnKeyDict  type to store the mappings
+        for each columns, this dict will return the key i.e. the original value in that row if it
+        is not available in the mapping dict.
 
-        Due to the way pd.Series.map works, mappings can result in column dtypes changing,
-        sometimes unexpectedly. If the result of the mappings is a dtype that doesn't match
-        the original dtype, or the dtype of the values provided in the mapping a warning
-        will be raised. This normally results from an incomplete mapping being provided,
-        or a mix of dtypes causing pandas to default to the object dtype.
-
-        For columns with a 'category' dtype the warning will not be raised.
+        This transformer inherits from BaseMappingTransformMixin as well as the BaseMappingTransformer
+        in order to access the standard pd.Series.map transform function.
 
         Parameters
         ----------
@@ -219,6 +222,9 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
 
         """
         mapped_columns = self.mappings.keys()
+        
+        # Store the original dtypes of the columns
+        original_dtypes = X[mapped_columns].dtypes
         
         for col in mapped_columns:
 
@@ -238,6 +244,9 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
                 )
 
         X = BaseMappingTransformMixin.transform(self, X)
+
+        # Call the check_dtype_changes method
+        self.check_dtype_changes(X, original_dtypes, suppress_dtype_warning)
 
         return X
 
@@ -293,13 +302,16 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
 
         self.adjust_column = adjust_column
 
-    def transform(self, X):
+    def transform(self, X, suppress_dtype_warning=False):
         """Transforms values in given column using the values provided in the adjustments dictionary.
 
         Parameters
         ----------
         X : pd.DataFrame
             Data to apply adjustments to.
+
+        suppress_dtype_warning: Bool, default = False
+            Whether to suppress warnings about dtype changes
 
         Returns
         -------
@@ -309,6 +321,9 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
         """
 
         self.check_is_fitted(["adjust_column"])
+
+        # Store the original dtype of all the columns that will be mapped
+        original_dtypes = X[mapped_columns].dtypes
 
         X = super().transform(X)
 
@@ -326,7 +341,12 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
                     (X[i] == j), self.mappings[i][j], X[self.adjust_column]
                 )
 
+        # Call the check_dtype_changes method for the mapped columns
+        self.check_dtype_changes(X, original_dtypes, suppress_dtype_warning)
+
         return X
+
+
 
 
 class CrossColumnMultiplyTransformer(BaseMappingTransformer):
@@ -382,13 +402,16 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
 
         self.adjust_column = adjust_column
 
-    def transform(self, X):
+    def transform(self, X, suppress_dtype_warning=False):
         """Transforms values in given column using the values provided in the adjustments dictionary.
 
         Parameters
         ----------
         X : pd.DataFrame
             Data to apply adjustments to.
+
+        suppress_dtype_warning: Bool, default = False
+        Whether to suppress warnings about dtype changes
 
         Returns
         -------
@@ -398,6 +421,9 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
         """
 
         self.check_is_fitted(["adjust_column"])
+
+        # Store the original dtype of all the columns that will be mapped
+        original_dtypes = X[self.columns].dtypes
 
         X = super().transform(X)
 
@@ -422,6 +448,9 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
                     X[self.adjust_column] * self.mappings[i][j],
                     X[self.adjust_column],
                 )
+
+        # Call the check_dtype_changes method for the mapped columns
+        self.check_dtype_changes(X, original_dtypes, suppress_dtype_warning)
 
         return X
 
@@ -479,13 +508,16 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
 
         self.adjust_column = adjust_column
 
-    def transform(self, X):
+    def transform(self, X, suppress_dtype_warning=False):
         """Transforms values in given column using the values provided in the adjustments dictionary.
 
         Parameters
         ----------
         X : pd.DataFrame
             Data to apply adjustments to.
+
+        suppress_dtype_warning: Bool, default = False
+        Whether to suppress warnings about dtype changes
 
         Returns
         -------
@@ -495,6 +527,9 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
         """
 
         self.check_is_fitted(["adjust_column"])
+
+        # Store the original dtype of all the columns that will be mapped
+        original_dtypes = X[self.columns].dtypes
 
         X = super().transform(X)
 
@@ -521,5 +556,8 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
                     X[self.adjust_column] + self.mappings[i][j],
                     X[self.adjust_column],
                 )
+
+        # Call the check_dtype_changes method for the mapped columns
+        self.check_dtype_changes(X, original_dtypes, suppress_dtype_warning)
 
         return X
