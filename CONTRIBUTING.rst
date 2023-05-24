@@ -37,6 +37,8 @@ To configure ``pre-commit`` for your local repository run the following;
 
      pre-commit install
 
+If working in a codespace the dev requirements and precommit will be installed automatically in the dev container.
+
 If you are building the documentation locally you will need the `docs/requirements.txt <https://github.com/lvgig/tubular/blob/main/docs/requirements.txt>`_.
 
 General

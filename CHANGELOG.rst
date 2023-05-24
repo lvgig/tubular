@@ -19,6 +19,10 @@ Each individual change should have a link to the pull request after the descript
 0.3.6 (unreleased)
 ------------------
 
+Added
+^^^^^
+- added support for vscode dev container with python 3.8, requirments-dev.txt, pylance/gitlens extensions and precommit all preinstalled `#83 <https://github.com/lvgig/tubular/pull/83>`_
+
 Changed
 ^^^^^^^
 - added sklearn < 1.2 dependency `#86 <https://github.com/lvgig/tubular/pull/86>`_
