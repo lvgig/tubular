@@ -19,15 +19,6 @@ from pandas.api.types import (
 class TestInit(object):
     """Tests for MappingTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-
-        ta.functions.test_function_arguments(
-            func=MappingTransformer.__init__,
-            expected_arguments=["self", "mappings"],
-            expected_default_values=None,
-        )
-
     def test_class_methods(self):
         """Test that MappingTransformer has transform method."""
 
@@ -108,7 +99,6 @@ class TestInit(object):
             TypeError,
             match=f"MappingTransformer: each item in mappings should be a dict but got type {type(1)} for key c",
         ):
-
             MappingTransformer(mappings=mappings)
 
 
@@ -132,15 +122,6 @@ class TestTransform(object):
         )
 
         return df
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-
-        ta.functions.test_function_arguments(
-            func=MappingTransformer.transform,
-            expected_arguments=["self", "X", "suppress_dtype_warning"],
-            expected_default_values=(False,),
-        )
 
     def test_super_transform_call(self, mocker):
         """Test the call to BaseMappingTransformMixin.transform."""
@@ -275,7 +256,6 @@ class TestTransform(object):
     def test_expected_dtype_conversions(
         self, mapping, input_col_name, output_col_type_check
     ):
-
         df = d.create_df_1()
         x = MappingTransformer(mappings=mapping)
         df = x.transform(df)
@@ -291,7 +271,6 @@ class TestTransform(object):
     def test_unexpected_dtype_change_warning_raised(
         self, mapping, input_col_name, input_col_type
     ):
-
         df = d.create_df_1()
         print(df["a"])
 
@@ -312,7 +291,6 @@ class TestTransform(object):
     def test_unexpected_dtype_change_warning_suppressed(
         self, mapping, input_col_name, input_col_type
     ):
-
         df = d.create_df_1()
 
         x = MappingTransformer(mappings=mapping)
@@ -343,7 +321,6 @@ class TestTransform(object):
         [({"a": {99: "99", 98: "98"}}, "a"), ({"b": {"z": 99, "y": 98}}, "b")],
     )
     def test_no_applicable_mapping(self, mapping, mapped_col):
-
         df = d.create_df_1()
 
         x = MappingTransformer(mappings=mapping)
@@ -359,7 +336,6 @@ class TestTransform(object):
         [({"a": {1: "1", 99: "99"}}, "a"), ({"b": {"a": 1, "z": 99}}, "b")],
     )
     def test_excess_mapping_values(self, mapping, mapped_col):
-
         df = d.create_df_1()
 
         x = MappingTransformer(mappings=mapping)

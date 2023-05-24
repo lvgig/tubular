@@ -16,6 +16,17 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+0.3.6 (2023-05-24)
+------------------
+
+Added
+^^^^^
+- added support for vscode dev container with python 3.8, requirments-dev.txt, pylance/gitlens extensions and precommit all preinstalled `#83 <https://github.com/lvgig/tubular/pull/83>`_
+
+Changed
+^^^^^^^
+- added sklearn < 1.2 dependency `#86 <https://github.com/lvgig/tubular/pull/86>`_
+
 0.3.5 (2023-04-26)
 ------------------
 
