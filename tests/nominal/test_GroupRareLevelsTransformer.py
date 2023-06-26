@@ -342,11 +342,19 @@ class TestTransform(object):
 
         x.fit(df)
 
-        expected_call_args = {0: {"args": (d.create_df_5(),), "kwargs": {}}}
+        expected_call_args = {
+            0: {
+                "args": (
+                    x,
+                    d.create_df_5(),
+                ),
+                "kwargs": {},
+            }
+        }
 
         with ta.functions.assert_function_call(
             mocker,
-            tubular.base.BaseTransformer,
+            tubular.nominal.BaseNominalTransformer,
             "transform",
             expected_call_args,
             return_value=d.create_df_5(),

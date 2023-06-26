@@ -16,6 +16,15 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+0.3.7 (2023-06-23)
+------------------
+
+Changed
+^^^^^^^
+- minor change to `GroupRareLevelsTransformer` `test_super_transform_called` test to align with other cases
+- removed pin of scikit-learn version to <1.20
+- update `black` version in pre-commit-config
+
 0.3.6 (2023-05-24)
 ------------------
 
