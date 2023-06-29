@@ -16,7 +16,7 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
-0.3.7 (2023-06-23)
+0.3.7 (2023-06-29)
 ------------------
 
 Changed
