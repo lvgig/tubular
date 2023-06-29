@@ -56,33 +56,28 @@ class SeriesStrMethodTransformer(BaseTransformer):
     ):
         if type(columns) is list:
             if len(columns) > 1:
-                raise ValueError(
-                    f"{self.classname()}: columns arg should contain only 1 column name but got {len(columns)}"
-                )
+                msg = f"{self.classname()}: columns arg should contain only 1 column name but got {len(columns)}"
+                raise ValueError(msg)
 
         super().__init__(columns=columns, **kwargs)
 
         if type(new_column_name) is not str:
-            raise TypeError(
-                f"{self.classname()}: unexpected type ({type(new_column_name)}) for new_column_name, must be str"
-            )
+            msg = f"{self.classname()}: unexpected type ({type(new_column_name)}) for new_column_name, must be str"
+            raise TypeError(msg)
 
         if type(pd_method_name) is not str:
-            raise TypeError(
-                f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
-            )
+            msg = f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
+            raise TypeError(msg)
 
         if type(pd_method_kwargs) is not dict:
-            raise TypeError(
-                f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
-            )
+            msg = f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
+            raise TypeError(msg)
 
         else:
             for i, k in enumerate(pd_method_kwargs.keys()):
                 if not type(k) is str:
-                    raise TypeError(
-                        f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
-                    )
+                    msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
+                    raise TypeError(msg)
 
         self.new_column_name = new_column_name
         self.pd_method_name = pd_method_name
@@ -93,9 +88,8 @@ class SeriesStrMethodTransformer(BaseTransformer):
             getattr(ser.str, pd_method_name)
 
         except Exception as err:
-            raise AttributeError(
-                f"""{self.classname()}: error accessing "str.{pd_method_name}" method on pd.Series object - pd_method_name should be a pd.Series.str method"""
-            ) from err
+            msg = f'{self.classname()}: error accessing "str.{pd_method_name}" method on pd.Series object - pd_method_name should be a pd.Series.str method'
+            raise AttributeError(msg) from err
 
     def transform(self, X):
         """Transform specific column on input pandas.DataFrame (X) using the given pandas.Series.str method and
@@ -144,12 +138,14 @@ class StringConcatenator(BaseTransformer):
         super().__init__(columns=columns, copy=True)
 
         if not isinstance(new_column, str):
-            raise TypeError(f"{self.classname()}: new_column should be a str")
+            msg = f"{self.classname()}: new_column should be a str"
+            raise TypeError(msg)
 
         self.new_column = new_column
 
         if not isinstance(separator, str):
-            raise TypeError(f"{self.classname()}: The separator should be a str")
+            msg = f"{self.classname()}: The separator should be a str"
+            raise TypeError(msg)
 
         self.separator = separator
 

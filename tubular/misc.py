@@ -81,6 +81,5 @@ class SetColumnDtype(BaseTransformer):
         try:
             pd.api.types.pandas_dtype(dtype)
         except TypeError:
-            raise TypeError(
-                f"{self.classname()}: data type '{dtype}' not understood as a valid dtype"
-            )
+            msg = f"{self.classname()}: data type '{dtype}' not understood as a valid dtype"
+            raise TypeError(msg)

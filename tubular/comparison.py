@@ -28,18 +28,20 @@ class EqualityChecker(BaseTransformer):
         super().__init__(columns=columns, **kwargs)
 
         if not (isinstance(columns, list)):
-            raise TypeError(f"{self.classname()}: columns should be list")
+            msg = f"{self.classname()}: columns should be list"
+            raise TypeError(msg)
 
         if len(columns) != 2:
-            raise ValueError(
-                f"{self.classname()}: This transformer works with two columns only"
-            )
+            msg = f"{self.classname()}: This transformer works with two columns only"
+            raise ValueError(msg)
 
         if not (isinstance(new_col_name, str)):
-            raise TypeError(f"{self.classname()}: new_col_name should be str")
+            msg = f"{self.classname()}: new_col_name should be str"
+            raise TypeError(msg)
 
         if not (isinstance(drop_original, bool)):
-            raise TypeError(f"{self.classname()}: drop_original should be bool")
+            msg = f"{self.classname()}: drop_original should be bool"
+            raise TypeError(msg)
 
         self.new_col_name = new_col_name
         self.drop_original = drop_original

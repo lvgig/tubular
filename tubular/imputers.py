@@ -61,9 +61,8 @@ class ArbitraryImputer(BaseImputer):
 
     def __init__(self, impute_value, columns, **kwargs):
         if columns is None:
-            raise ValueError(
-                f"{self.classname()}: columns must be specified in init for ArbitraryImputer"
-            )
+            msg = f"{self.classname()}: columns must be specified in init for ArbitraryImputer"
+            raise ValueError(msg)
 
         super().__init__(columns=columns, **kwargs)
 
@@ -72,9 +71,8 @@ class ArbitraryImputer(BaseImputer):
             and not isinstance(impute_value, float)
             and not isinstance(impute_value, str)
         ):
-            raise ValueError(
-                f"{self.classname()}: impute_value should be a single value (int, float or str)"
-            )
+            msg = f"{self.classname()}: impute_value should be a single value (int, float or str)"
+            raise ValueError(msg)
 
         self.impute_values_ = {}
         self.impute_value = impute_value
@@ -381,7 +379,8 @@ class NearestMeanResponseImputer(BaseImputer):
         n_nulls = y.isnull().sum()
 
         if n_nulls > 0:
-            raise ValueError(f"{self.classname()}: y has {n_nulls} null values")
+            msg = f"{self.classname()}: y has {n_nulls} null values"
+            raise ValueError(msg)
 
         self.impute_values_ = {}
 
@@ -392,9 +391,8 @@ class NearestMeanResponseImputer(BaseImputer):
             c_nulls = X[c].isnull()
 
             if c_nulls.sum() == 0:
-                raise ValueError(
-                    f"{self.classname()}: Column {c} has no missing values, cannot use this transformer."
-                )
+                msg = f"{self.classname()}: Column {c} has no missing values, cannot use this transformer."
+                raise ValueError(msg)
 
             else:
                 mean_response_by_levels = pd.DataFrame(

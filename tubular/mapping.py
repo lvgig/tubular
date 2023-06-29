@@ -37,18 +37,19 @@ class BaseMappingTransformer(BaseTransformer):
     def __init__(self, mappings, **kwargs):
         if isinstance(mappings, dict):
             if not len(mappings) > 0:
-                raise ValueError(f"{self.classname()}: mappings has no values")
+                msg = f"{self.classname()}: mappings has no values"
+                raise ValueError(msg)
 
             for j in mappings.values():
                 if not isinstance(j, dict):
-                    raise ValueError(
-                        f"{self.classname()}: values in mappings dictionary should be dictionaries"
-                    )
+                    msg = f"{self.classname()}: values in mappings dictionary should be dictionaries"
+                    raise ValueError(msg)
 
             self.mappings = mappings
 
         else:
-            raise ValueError(f"{self.classname()}: mappings must be a dictionary")
+            msg = f"{self.classname()}: mappings must be a dictionary"
+            raise ValueError(msg)
 
         columns = list(mappings.keys())
 
@@ -148,9 +149,8 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
                 mappings[k] = ReturnKeyDict(v)
 
             else:
-                raise TypeError(
-                    f"{self.classname()}: each item in mappings should be a dict but got type {type(v)} for key {k}"
-                )
+                msg = f"{self.classname()}: each item in mappings should be a dict but got type {type(v)} for key {k}"
+                raise TypeError(msg)
 
         BaseMappingTransformer.__init__(self, mappings=mappings, **kwargs)
 
@@ -262,13 +262,13 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
         super().__init__(mappings=mappings, **kwargs)
 
         if not isinstance(adjust_column, str):
-            raise TypeError(f"{self.classname()}: adjust_column should be a string")
+            msg = f"{self.classname()}: adjust_column should be a string"
+            raise TypeError(msg)
 
         if len(mappings) > 1:
             if not isinstance(mappings, OrderedDict):
-                raise TypeError(
-                    f"{self.classname()}: mappings should be an ordered dict for 'replace' mappings using multiple columns"
-                )
+                msg = f"{self.classname()}: mappings should be an ordered dict for 'replace' mappings using multiple columns"
+                raise TypeError(msg)
 
         self.adjust_column = adjust_column
 
@@ -292,9 +292,8 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
         X = super().transform(X)
 
         if self.adjust_column not in X.columns.values:
-            raise ValueError(
-                f"{self.classname()}: variable {self.adjust_column} is not in X"
-            )
+            msg = f"{self.classname()}: variable {self.adjust_column} is not in X"
+            raise ValueError(msg)
 
         for i in self.columns:
             for j in self.mappings[i].keys():
@@ -342,14 +341,14 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
         super().__init__(mappings=mappings, **kwargs)
 
         if not isinstance(adjust_column, str):
-            raise TypeError(f"{self.classname()}: adjust_column should be a string")
+            msg = f"{self.classname()}: adjust_column should be a string"
+            raise TypeError(msg)
 
         for j in mappings.values():
             for k in j.values():
                 if type(k) not in [int, float]:
-                    raise TypeError(
-                        f"{self.classname()}: mapping values must be numeric"
-                    )
+                    msg = f"{self.classname()}: mapping values must be numeric"
+                    raise TypeError(msg)
 
         self.adjust_column = adjust_column
 
@@ -373,14 +372,12 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
         X = super().transform(X)
 
         if self.adjust_column not in X.columns.values:
-            raise ValueError(
-                f"{self.classname()}: variable {self.adjust_column} is not in X"
-            )
+            msg = f"{self.classname()}: variable {self.adjust_column} is not in X"
+            raise ValueError(msg)
 
         if not pd.api.types.is_numeric_dtype(X[self.adjust_column]):
-            raise TypeError(
-                f"{self.classname()}: variable {self.adjust_column} must have numeric dtype."
-            )
+            msg = f"{self.classname()}: variable {self.adjust_column} must have numeric dtype."
+            raise TypeError(msg)
 
         for i in self.columns:
             for j in self.mappings[i].keys():
@@ -430,14 +427,14 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
         super().__init__(mappings=mappings, **kwargs)
 
         if not isinstance(adjust_column, str):
-            raise TypeError(f"{self.classname()}: adjust_column should be a string")
+            msg = f"{self.classname()}: adjust_column should be a string"
+            raise TypeError(msg)
 
         for j in mappings.values():
             for k in j.values():
                 if type(k) not in [int, float]:
-                    raise TypeError(
-                        f"{self.classname()}: mapping values must be numeric"
-                    )
+                    msg = f"{self.classname()}: mapping values must be numeric"
+                    raise TypeError(msg)
 
         self.adjust_column = adjust_column
 
