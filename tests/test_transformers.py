@@ -1,5 +1,7 @@
 # tests to apply to all transformers
 import pytest
+import sklearn.base as b
+
 import tubular.base as base
 import tubular.capping as capping
 import tubular.comparison as comparison
@@ -10,7 +12,6 @@ import tubular.misc as misc
 import tubular.nominal as nominal
 import tubular.numeric as numeric
 import tubular.strings as strings
-import sklearn.base as b
 
 
 class TestInit(object):

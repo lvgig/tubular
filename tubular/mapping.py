@@ -2,12 +2,12 @@
 This module contains transformers that apply different types of mappings to columns.
 """
 
+import warnings
+from collections import OrderedDict
+
+import numpy as np
 import pandas as pd
 from pandas.api.types import is_categorical_dtype
-import numpy as np
-from collections import OrderedDict
-import warnings
-
 
 from tubular.base import BaseTransformer, ReturnKeyDict
 

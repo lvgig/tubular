@@ -4,13 +4,13 @@ This module contains transformers that apply numeric functions.
 
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import (
-    MinMaxScaler,
-    MaxAbsScaler,
-    StandardScaler,
-    PolynomialFeatures,
-)
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import (
+    MaxAbsScaler,
+    MinMaxScaler,
+    PolynomialFeatures,
+    StandardScaler,
+)
 
 from tubular.base import BaseTransformer, DataFrameMethodTransformer
 

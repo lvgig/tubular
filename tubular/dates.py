@@ -4,10 +4,10 @@ This module contains a transformer that applies capping to numeric columns.
 
 import datetime
 import warnings
+from typing import List, Union
+
 import numpy as np
 import pandas as pd
-
-from typing import Union, List
 
 from tubular.base import BaseTransformer
 

@@ -1,7 +1,7 @@
 import pytest
-import tests.test_data as d
 import test_aide as ta
 
+import tests.test_data as d
 import tubular
 from tubular.comparison import EqualityChecker
 

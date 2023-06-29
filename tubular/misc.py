@@ -1,5 +1,6 @@
-from tubular.base import BaseTransformer
 import pandas as pd
+
+from tubular.base import BaseTransformer
 
 
 class SetValueTransformer(BaseTransformer):

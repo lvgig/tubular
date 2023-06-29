@@ -1,7 +1,7 @@
 import pytest
 import test_aide as ta
-import tests.test_data as d
 
+import tests.test_data as d
 import tubular
 from tubular.misc import SetValueTransformer
 

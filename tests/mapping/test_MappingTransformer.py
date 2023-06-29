@@ -1,19 +1,18 @@
+import pandas as pd
 import pytest
 import test_aide as ta
-import tests.test_data as d
-import pandas as pd
-
-import tubular
-from tubular.mapping import MappingTransformer
-from tubular.base import ReturnKeyDict
-
 from pandas.api.types import (
-    is_categorical_dtype,
-    is_integer_dtype,
     is_bool_dtype,
+    is_categorical_dtype,
     is_float_dtype,
+    is_integer_dtype,
     is_object_dtype,
 )
+
+import tests.test_data as d
+import tubular
+from tubular.base import ReturnKeyDict
+from tubular.mapping import MappingTransformer
 
 
 class TestInit(object):

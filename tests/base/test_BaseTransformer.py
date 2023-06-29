@@ -1,11 +1,12 @@
+import re
+from unittest import mock
+
+import numpy as np
+import pandas as pd
 import pytest
 import test_aide as ta
-import tests.test_data as d
-from unittest import mock
-import pandas as pd
-import numpy as np
-import re
 
+import tests.test_data as d
 import tubular
 from tubular.base import BaseTransformer
 

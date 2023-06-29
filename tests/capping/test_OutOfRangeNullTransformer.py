@@ -1,8 +1,8 @@
+import numpy as np
 import pytest
 import test_aide as ta
-import tests.test_data as d
-import numpy as np
 
+import tests.test_data as d
 import tubular
 from tubular.capping import OutOfRangeNullTransformer
 

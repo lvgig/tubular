@@ -1,12 +1,13 @@
-import pytest
-import tests.test_data as d
-import test_aide as ta
 import re
 
+import numpy as np
+import pandas as pd
+import pytest
+import test_aide as ta
+
+import tests.test_data as d
 import tubular
 from tubular.dates import DatetimeSinusoidCalculator
-import pandas as pd
-import numpy as np
 
 
 @pytest.fixture(scope="module", autouse=True)

@@ -1,9 +1,10 @@
-import pytest
 import pandas as pd
+import pytest
 import test_aide as ta
+
+import tests.test_data as d
 import tubular
 from tubular.numeric import TwoColumnOperatorTransformer
-import tests.test_data as d
 
 
 @pytest.fixture(scope="module", autouse=True)

@@ -1,8 +1,9 @@
 """This module contains functions that create simple datasets that are used in the tests."""
 
 import datetime
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 
 
 def create_series_1(n=6):

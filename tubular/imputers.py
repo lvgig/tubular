@@ -2,10 +2,10 @@
 This module contains transformers that deal with imputation of missing values.
 """
 
-import pandas as pd
-import numpy as np
 import warnings
 
+import numpy as np
+import pandas as pd
 
 from tubular.base import BaseTransformer
 
