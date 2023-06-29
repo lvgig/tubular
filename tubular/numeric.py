@@ -60,7 +60,6 @@ class LogTransformer(BaseTransformer):
     def __init__(
         self, columns, base=None, add_1=False, drop=True, suffix="log", **kwargs
     ):
-
         super().__init__(columns=columns, **kwargs)
 
         if base is not None:
@@ -102,7 +101,6 @@ class LogTransformer(BaseTransformer):
         )
 
         if not numeric_column_types.all():
-
             non_numeric_columns = list(
                 numeric_column_types.loc[~numeric_column_types].index
             )
@@ -114,39 +112,30 @@ class LogTransformer(BaseTransformer):
         new_column_names = [f"{column}_{self.suffix}" for column in self.columns]
 
         if self.add_1:
-
             if (X[self.columns] <= -1).sum().sum() > 0:
-
                 raise ValueError(
                     f"{self.classname()}: values less than or equal to 0 in columns (after adding 1), make greater than 0 before using transform"
                 )
 
             if self.base is None:
-
                 X[new_column_names] = np.log(X[self.columns] + 1)
 
             else:
-
                 X[new_column_names] = np.log(X[self.columns] + 1) / np.log(self.base)
 
         else:
-
             if (X[self.columns] <= 0).sum().sum() > 0:
-
                 raise ValueError(
                     f"{self.classname()}: values less than or equal to 0 in columns, make greater than 0 before using transform"
                 )
 
             if self.base is None:
-
                 X[new_column_names] = np.log(X[self.columns])
 
             else:
-
                 X[new_column_names] = np.log(X[self.columns]) / np.log(self.base)
 
         if self.drop:
-
             X.drop(self.columns, axis=1, inplace=True)
 
         return X
@@ -175,29 +164,22 @@ class CutTransformer(BaseTransformer):
     """
 
     def __init__(self, column, new_column_name, cut_kwargs={}, **kwargs):
-
         if not type(column) is str:
-
             raise TypeError(
                 f"{self.classname()}: column arg (name of column) should be a single str giving the column to discretise"
             )
 
         if not type(new_column_name) is str:
-
             raise TypeError(f"{self.classname()}: new_column_name must be a str")
 
         if not type(cut_kwargs) is dict:
-
             raise TypeError(
                 f"{self.classname()}: cut_kwargs should be a dict but got type {type(cut_kwargs)}"
             )
 
         else:
-
             for i, k in enumerate(cut_kwargs.keys()):
-
                 if not type(k) is str:
-
                     raise TypeError(
                         f"{self.classname()}: unexpected type ({type(k)}) for cut_kwargs key in position {i}, must be str"
                     )
@@ -224,7 +206,6 @@ class CutTransformer(BaseTransformer):
         X = super().transform(X)
 
         if not pd.api.types.is_numeric_dtype(X[self.columns[0]]):
-
             raise TypeError(
                 f"{self.classname()}: {self.columns[0]} should be a numeric dtype but got {X[self.columns[0]].dtype}"
             )
@@ -375,19 +356,14 @@ class ScalingTransformer(BaseTransformer):
     """
 
     def __init__(self, columns, scaler_type, scaler_kwargs={}, **kwargs):
-
         if not type(scaler_kwargs) is dict:
-
             raise TypeError(
                 f"{self.classname()}: scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
             )
 
         else:
-
             for i, k in enumerate(scaler_kwargs.keys()):
-
                 if not type(k) is str:
-
                     raise TypeError(
                         f"{self.classname()}: unexpected type ({type(k)}) for scaler_kwargs key in position {i}, must be str"
                     )
@@ -395,21 +371,17 @@ class ScalingTransformer(BaseTransformer):
         allowed_scaler_values = ["min_max", "max_abs", "standard"]
 
         if scaler_type not in allowed_scaler_values:
-
             raise ValueError(
                 f"{self.classname()}: scaler_type should be one of; {allowed_scaler_values}"
             )
 
         if scaler_type == "min_max":
-
             self.scaler = MinMaxScaler(**scaler_kwargs)
 
         elif scaler_type == "max_abs":
-
             self.scaler = MaxAbsScaler(**scaler_kwargs)
 
         elif scaler_type == "standard":
-
             self.scaler = StandardScaler(**scaler_kwargs)
 
         # This attribute is not for use in any method
@@ -434,7 +406,6 @@ class ScalingTransformer(BaseTransformer):
         )
 
         if not numeric_column_types.all():
-
             non_numeric_columns = list(
                 numeric_column_types.loc[~numeric_column_types].index
             )
@@ -536,7 +507,6 @@ class InteractionTransformer(BaseTransformer):
     """
 
     def __init__(self, columns, min_degree=2, max_degree=2, **kwargs):
-
         super().__init__(columns=columns, **kwargs)
 
         if len(columns) < 2:
@@ -723,7 +693,6 @@ class PCATransformer(BaseTransformer):
         pca_column_prefix="pca_",
         **kwargs,
     ):
-
         super().__init__(columns=columns, **kwargs)
 
         if type(n_components) is int:
@@ -812,7 +781,6 @@ class PCATransformer(BaseTransformer):
         )
 
         if not numeric_column_types.all():
-
             non_numeric_columns = list(
                 numeric_column_types.loc[~numeric_column_types].index
             )

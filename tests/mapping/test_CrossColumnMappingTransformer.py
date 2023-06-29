@@ -52,7 +52,6 @@ class TestInit(object):
             "__init__",
             expected_call_args,
         ):
-
             CrossColumnMappingTransformer(
                 mappings={"a": {"a": 1}}, adjust_column="b", verbose=True, copy=True
             )
@@ -64,7 +63,6 @@ class TestInit(object):
             TypeError,
             match="CrossColumnMappingTransformer: adjust_column should be a string",
         ):
-
             CrossColumnMappingTransformer(mappings={"a": {"a": 1}}, adjust_column=1)
 
     def test_mappings_not_ordered_dict_error(self):
@@ -74,7 +72,6 @@ class TestInit(object):
             TypeError,
             match="CrossColumnMappingTransformer: mappings should be an ordered dict for 'replace' mappings using multiple columns",
         ):
-
             CrossColumnMappingTransformer(
                 mappings={"a": {"a": 1}, "b": {"b": 2}}, adjust_column="c"
             )
@@ -150,7 +147,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
-
             x.transform(df)
 
     def test_super_transform_call(self, mocker):
@@ -171,7 +167,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_df_1(),
         ):
-
             x.transform(df)
 
     def test_adjust_col_not_in_x_error(self):
@@ -186,7 +181,6 @@ class TestTransform(object):
         with pytest.raises(
             ValueError, match="CrossColumnMappingTransformer: variable c is not in X"
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(

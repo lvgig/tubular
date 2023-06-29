@@ -21,7 +21,6 @@ class SetValueTransformer(BaseTransformer):
     """
 
     def __init__(self, columns, value, **kwargs):
-
         self.value = value
 
         super().__init__(columns=columns, **kwargs)
@@ -63,7 +62,6 @@ class SetColumnDtype(BaseTransformer):
     """
 
     def __init__(self, columns, dtype):
-
         super().__init__(columns, copy=True)
 
         self.__validate_dtype(dtype)
@@ -71,7 +69,6 @@ class SetColumnDtype(BaseTransformer):
         self.dtype = dtype
 
     def transform(self, X):
-
         X = super().transform(X)
 
         X[self.columns] = X[self.columns].astype(self.dtype)

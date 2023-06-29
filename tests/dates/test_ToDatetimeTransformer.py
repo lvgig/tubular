@@ -60,7 +60,6 @@ class TestInit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             ToDatetimeTransformer(
                 column="a", new_column_name="b", verbose=False, copy=True
             )
@@ -72,7 +71,6 @@ class TestInit(object):
             TypeError,
             match="ToDatetimeTransformer: column should be a single str giving the column to transform to datetime",
         ):
-
             ToDatetimeTransformer(
                 column=["a"],
                 new_column_name="a",
@@ -84,7 +82,6 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="ToDatetimeTransformer: new_column_name must be a str"
         ):
-
             ToDatetimeTransformer(column="b", new_column_name=1)
 
     def test_to_datetime_kwargs_type_error(self):
@@ -94,7 +91,6 @@ class TestInit(object):
             TypeError,
             match=r"""ToDatetimeTransformer: to_datetime_kwargs should be a dict but got type \<class 'int'\>""",
         ):
-
             ToDatetimeTransformer(column="b", new_column_name="a", to_datetime_kwargs=1)
 
     def test_to_datetime_kwargs_key_type_error(self):
@@ -104,7 +100,6 @@ class TestInit(object):
             TypeError,
             match=r"""ToDatetimeTransformer: unexpected type \(\<class 'int'\>\) for to_datetime_kwargs key in position 1, must be str""",
         ):
-
             ToDatetimeTransformer(
                 new_column_name="a",
                 column="b",
@@ -186,7 +181,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_datediff_test_df(),
         ):
-
             to_dt.transform(df)
 
     def test_to_datetime_call(self, mocker):
@@ -212,7 +206,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=pd.to_datetime(d.create_to_datetime_test_df()["a"]),
         ):
-
             to_dt.transform(df)
 
     def test_output_from_to_datetime_assigned_to_column(self, mocker):

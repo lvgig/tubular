@@ -44,7 +44,6 @@ class TestInit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             BaseMappingTransformer(mappings={"a": {"a": 1}}, verbose=True, copy=True)
 
     def test_no_keys_dict_error(self):
@@ -53,7 +52,6 @@ class TestInit(object):
         with pytest.raises(
             ValueError, match="BaseMappingTransformer: mappings has no values"
         ):
-
             BaseMappingTransformer(mappings={})
 
     def test_mappings_contains_non_dict_items_error(self):
@@ -63,7 +61,6 @@ class TestInit(object):
             ValueError,
             match="BaseMappingTransformer: values in mappings dictionary should be dictionaries",
         ):
-
             BaseMappingTransformer(mappings={"a": {"a": 1}, "b": 1})
 
     def test_mappings_not_dict_error(self):
@@ -72,7 +69,6 @@ class TestInit(object):
         with pytest.raises(
             ValueError, match="BaseMappingTransformer: mappings must be a dictionary"
         ):
-
             BaseMappingTransformer(mappings=())
 
     def test_mappings_set_to_attribute(self):
@@ -118,7 +114,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
-
             x.transform(df)
 
     def test_super_transform_call(self, mocker):
@@ -138,7 +133,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(

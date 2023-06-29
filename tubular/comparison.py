@@ -25,7 +25,6 @@ class EqualityChecker(BaseTransformer):
     def __init__(
         self, columns: list, new_col_name: str, drop_original: bool = False, **kwargs
     ) -> None:
-
         super().__init__(columns=columns, **kwargs)
 
         if not (isinstance(columns, list)):
@@ -46,7 +45,6 @@ class EqualityChecker(BaseTransformer):
         self.drop_original = drop_original
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-
         """Create a column which is populated by the boolean
         matching between two columns iterated over rows.
 
@@ -66,7 +64,6 @@ class EqualityChecker(BaseTransformer):
         X[self.new_col_name] = X[self.columns[0]] == X[self.columns[1]]
 
         if self.drop_original:
-
             X.drop(self.columns, axis=1, inplace=True)
 
         return X

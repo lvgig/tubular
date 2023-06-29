@@ -8,7 +8,6 @@ from tubular.comparison import EqualityChecker
 
 @pytest.fixture(scope="module", autouse=True)
 def example_transformer():
-
     example_transformer = EqualityChecker(columns=["a", "b"], new_col_name="d")
 
     return example_transformer
@@ -19,7 +18,6 @@ class TestInit:
     """Tests for the EqualityChecker.__init__ method."""
 
     def test_arguments(self):
-
         """Test that init has expected arguments."""
 
         ta.functions.test_function_arguments(
@@ -48,7 +46,6 @@ class TestInit:
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             EqualityChecker(
                 columns=["a", "b"], new_col_name="d", verbose=False, copy=False
             )
@@ -140,7 +137,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
-
             example_transformer.transform(df)
 
     @pytest.mark.parametrize(

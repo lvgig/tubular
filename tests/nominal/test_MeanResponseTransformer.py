@@ -11,7 +11,6 @@ from tubular.nominal import MeanResponseTransformer
 
 @pytest.fixture()
 def learnt_mapping_dict():
-
     learnt_mapping_dict = {
         "b": {"a": 1.0, "b": 2.0, "c": 3.0, "d": 4.0, "e": 5.0, "f": 6.0},
         "b_blue": {"a": 1.0, "b": 1.0, "c": 0.0, "d": 0.0, "e": 0.0, "f": 0.0},
@@ -23,7 +22,6 @@ def learnt_mapping_dict():
 
 @pytest.fixture()
 def learnt_unseen_levels_encoding_dict_mean():
-
     learnt_unseen_levels_encoding_dict_mean = {
         "b": (1.0 + 2.0 + 3.0 + 4.0 + 5.0 + 6.0) / 6,
         "b_blue": (1.0 + 1.0 + 0.0 + 0.0 + 0.0 + 0.0) / 6,
@@ -35,7 +33,6 @@ def learnt_unseen_levels_encoding_dict_mean():
 
 @pytest.fixture()
 def learnt_unseen_levels_encoding_dict_median():
-
     learnt_unseen_levels_encoding_dict_median = {
         "b": (3.0 + 4.0) / 2,
         "b_blue": (0.0 + 0.0) / 2,
@@ -47,7 +44,6 @@ def learnt_unseen_levels_encoding_dict_median():
 
 @pytest.fixture()
 def learnt_unseen_levels_encoding_dict_highest():
-
     learnt_unseen_levels_encoding_dict_highest = {
         "b": 6.0,
         "b_blue": 1.0,
@@ -59,7 +55,6 @@ def learnt_unseen_levels_encoding_dict_highest():
 
 @pytest.fixture()
 def learnt_unseen_levels_encoding_dict_lowest():
-
     learnt_unseen_levels_encoding_dict_lowest = {
         "b": 1.0,
         "b_blue": 0.0,
@@ -71,7 +66,6 @@ def learnt_unseen_levels_encoding_dict_lowest():
 
 @pytest.fixture()
 def learnt_unseen_levels_encoding_dict_arbitrary():
-
     learnt_unseen_levels_encoding_dict_arbitrary = {
         "b": 22.0,
         "b_blue": 22.0,
@@ -121,31 +115,26 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="MeanResponseTransformer: weights_column should be a str"
         ):
-
             MeanResponseTransformer(weights_column=1)
 
     def test_prior_not_int_error(self):
         """Test that an exception is raised if prior is not an int."""
 
         with pytest.raises(TypeError, match="prior should be a int"):
-
             MeanResponseTransformer(prior="1")
 
     def test_prior_not_positive_int_error(self):
         """Test that an exception is raised if prior is not a positive int."""
 
         with pytest.raises(ValueError, match="prior should be positive int"):
-
             MeanResponseTransformer(prior=-1)
 
     @pytest.mark.parametrize("level", [{"dict": 1}, 2, 2.5])
     def test_level_wrong_type_error(self, level):
-
         with pytest.raises(
             TypeError,
             match=f"Level should be a NoneType, list or str but got {type(level)}",
         ):
-
             MeanResponseTransformer(level=level)
 
     def test_unseen_level_handling_incorrect_value_error(self):
@@ -155,7 +144,6 @@ class TestInit(object):
             ValueError,
             match="unseen_level_handling should be the option: Mean, Median, Lowest, Highest or an arbitrary int/float value",
         ):
-
             MeanResponseTransformer(unseen_level_handling="AAA")
 
     def test_values_passed_in_init_set_to_attribute(self):
@@ -192,7 +180,6 @@ class Test_prior_regularisation(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
-
             x._prior_regularisation(
                 cat_freq=pd.Series([1, 2]), target_means=pd.Series([1, 2])
             )
@@ -347,7 +334,6 @@ class TestFit:
         with pytest.raises(
             ValueError, match="MeanResponseTransformer: y has 1 null values"
         ):
-
             x.fit(df, df[target_column])
 
     @pytest.mark.parametrize(
@@ -628,7 +614,6 @@ class TestFitBinaryResponse(object):
 
         for col in prior_mappings:
             for value in prior_mappings[col]:
-
                 prior_encoding = prior_mappings[col][value]
                 no_prior_encoding = no_prior_mappings[col][value]
 
@@ -718,7 +703,6 @@ class TestFitBinaryResponse(object):
         with pytest.raises(
             ValueError, match="MeanResponseTransformer: weights column z not in X"
         ):
-
             x._fit_binary_response(df, df["a"], x.columns)
 
 
@@ -1026,7 +1010,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
-
             x.transform(df)
 
     def test_super_transform_called(self, mocker):
@@ -1049,7 +1032,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_MeanResponseTransformer_test_df(),
         ):
-
             x.transform(df)
 
     def test_learnt_values_not_modified(self):
@@ -1364,5 +1346,4 @@ class TestTransform(object):
             ValueError,
             match="MeanResponseTransformer: nulls would be introduced into column b from levels not present in mapping",
         ):
-
             x.transform(df)

@@ -23,7 +23,6 @@ class TestCalculateAge(object):
         with pytest.raises(
             TypeError, match="DateDiffLeapYearTransformer: row should be a pd.Series"
         ):
-
             date_transformer.calculate_age(row=row)
 
     def test_null_replacement(self):
@@ -54,7 +53,6 @@ class TestCalculateAge(object):
             TypeError,
             match="DateDiffLeapYearTransformer: upper column values should be datetime.datetime or datetime.date objects",
         ):
-
             date_transformer.calculate_age(row=row)
 
     def test_lower_column_type_error(self):
@@ -69,7 +67,6 @@ class TestCalculateAge(object):
             TypeError,
             match="DateDiffLeapYearTransformer: lower column values should be datetime.datetime or datetime.date objects",
         ):
-
             date_transformer.calculate_age(row=row)
 
 
@@ -138,7 +135,6 @@ class TestInit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             DateDiffLeapYearTransformer(
                 column_lower="dummy_1",
                 column_upper="dummy_2",
@@ -154,7 +150,6 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="DateDiffLeapYearTransformer: column_lower should be a str"
         ):
-
             DateDiffLeapYearTransformer(
                 column_lower=123,
                 column_upper="dummy_2",
@@ -168,7 +163,6 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="DateDiffLeapYearTransformer: column_upper should be a str"
         ):
-
             DateDiffLeapYearTransformer(
                 column_lower="dummy_1",
                 column_upper=123,
@@ -183,7 +177,6 @@ class TestInit(object):
             TypeError,
             match="DateDiffLeapYearTransformer: new_column_name should be a str",
         ):
-
             DateDiffLeapYearTransformer(
                 column_lower="dummy_1",
                 column_upper="dummy_2",
@@ -197,7 +190,6 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="DateDiffLeapYearTransformer: drop_cols should be a bool"
         ):
-
             DateDiffLeapYearTransformer(
                 column_lower="dummy_1",
                 column_upper="dummy_2",
@@ -212,7 +204,6 @@ class TestInit(object):
             TypeError,
             match="DateDiffLeapYearTransformer: if not None, missing_replacement should be an int, float or string",
         ):
-
             DateDiffLeapYearTransformer(
                 column_lower="dummy_1",
                 column_upper="dummy_2",
@@ -355,7 +346,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_date_test_df(),
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(

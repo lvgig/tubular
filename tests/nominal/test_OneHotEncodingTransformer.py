@@ -156,7 +156,6 @@ class TestFit(object):
             "columns_set_or_check",
             expected_call_args,
         ):
-
             x.fit(df)
 
     def test_base_nominal_transformer_fit_called(self, mocker):
@@ -240,7 +239,6 @@ class TestFit(object):
             ValueError,
             match="OneHotEncodingTransformer: column b has nulls - replace before proceeding",
         ):
-
             x.fit(df)
 
     def test_fields_with_over_100_levels_error(self):
@@ -255,7 +253,6 @@ class TestFit(object):
             ValueError,
             match="OneHotEncodingTransformer: column b has over 100 unique values - consider another type of encoding",
         ):
-
             x.fit(df)
 
     def test_fit_returns_self(self):
@@ -357,7 +354,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "columns_check", expected_call_args
         ):
-
             x.transform(df)
 
     def test_check_is_fitted_first_call(self, mocker):
@@ -377,7 +373,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
-
             x.transform(df)
 
     def test_non_numeric_column_error_1(self):
@@ -394,7 +389,6 @@ class TestTransform(object):
             ValueError,
             match="OneHotEncodingTransformer: column b has nulls - replace before proceeding",
         ):
-
             x.transform(df_test)
 
     def test_base_nominal_transformer_transform_called(self, mocker):
@@ -564,7 +558,6 @@ class TestTransform(object):
         x.fit(df_train)
 
         with pytest.warns(Warning):
-
             x.transform(df_test)
 
     @pytest.mark.parametrize(

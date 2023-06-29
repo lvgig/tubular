@@ -44,7 +44,6 @@ class TestInit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             ArbitraryImputer(impute_value=1, columns="a", verbose=True, copy=True)
 
     def test_columns_none_error(self):
@@ -54,7 +53,6 @@ class TestInit(object):
             ValueError,
             match="ArbitraryImputer: columns must be specified in init for ArbitraryImputer",
         ):
-
             ArbitraryImputer(impute_value=1, columns=None)
 
     def test_impute_value_type_error(self):
@@ -64,7 +62,6 @@ class TestInit(object):
             ValueError,
             match="ArbitraryImputer: impute_value should be a single value .*",
         ):
-
             ArbitraryImputer(impute_value={}, columns="a")
 
     def test_impute_values_set_to_attribute(self):
@@ -103,7 +100,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
-
             x.transform(df)
 
     def test_super_transform_called(self, mocker):
@@ -118,7 +114,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.imputers.BaseImputer, "transform", expected_call_args
         ):
-
             x.transform(df)
 
     def test_impute_values_set(self, mocker):
@@ -170,14 +165,14 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "columns_check", expected_call_args
         ):
-
             x.transform(df)
 
     # Unit testing to check if downcast datatypes of columns is preserved after imputation is done
     def test_impute_value_preserve_dtype(self):
         """Testing downcast dtypes of columns are preserved after imputation using the create_downcast_df dataframe.
 
-        Explicitly setting the dtype of "a" to int8 and "b" to float16 and check if the dtype of the columns are preserved after imputation."""
+        Explicitly setting the dtype of "a" to int8 and "b" to float16 and check if the dtype of the columns are preserved after imputation.
+        """
         df = (
             d.create_downcast_df()
         )  # By default the dtype of "a" and "b" are int64 and float64 respectively

@@ -45,7 +45,6 @@ class TestStringConcatenator:
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             StringConcatenator(columns=["a", "b"], new_column="merged_column")
 
     def test_merged_values_attribute_set(self, concatenate_str):
@@ -65,7 +64,6 @@ class TestStringConcatenator:
             TypeError,
             match="StringConcatenator: new_column should be a str",
         ):
-
             x = StringConcatenator(columns=["a", "b"], new_column=new_column)
             x.transform(df)
 
@@ -106,7 +104,6 @@ class TestTransform:
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
-
             concatenate_str.transform(df)
 
     def test_correct_df_returned_1(self, concatenate_str):

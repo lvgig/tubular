@@ -52,42 +52,31 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         return type(self).__name__
 
     def __init__(self, columns=None, copy=True, verbose=False):
-
         self.version_ = __version__
 
         if not isinstance(verbose, bool):
-
             raise TypeError(f"{self.classname()}: verbose must be a bool")
 
         else:
-
             self.verbose = verbose
 
         if self.verbose:
-
             print("BaseTransformer.__init__() called")
 
         if columns is None:
-
             self.columns = None
 
         else:
-
             # make sure columns is a single str or list of strs
             if isinstance(columns, str):
-
                 self.columns = [columns]
 
             elif isinstance(columns, list):
-
                 if not len(columns) > 0:
-
                     raise ValueError(f"{self.classname()}: columns has no values")
 
                 for c in columns:
-
                     if not isinstance(c, str):
-
                         raise TypeError(
                             f"{self.classname()}: each element of columns should be a single (string) column name"
                         )
@@ -95,17 +84,14 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
                 self.columns = columns
 
             else:
-
                 raise TypeError(
                     f"{self.classname()}: columns must be a string or list with the columns to be pre-processed (if specified)"
                 )
 
         if not isinstance(copy, bool):
-
             raise TypeError(f"{self.classname()}: copy must be a bool")
 
         else:
-
             self.copy = copy
 
     def fit(self, X, y=None):
@@ -126,25 +112,20 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         """
 
         if self.verbose:
-
             print("BaseTransformer.fit() called")
 
         self.columns_set_or_check(X)
 
         if not X.shape[0] > 0:
-
             raise ValueError(f"{self.classname()}: X has no rows; {X.shape}")
 
         if y is not None:
-
             if not isinstance(y, pd.Series):
-
                 raise TypeError(
                     f"{self.classname()}: unexpected type for y, should be a pd.Series"
                 )
 
             if not y.shape[0] > 0:
-
                 raise ValueError(f"{self.classname()}: y is empty; {y.shape}")
 
         return self
@@ -168,21 +149,17 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         """
 
         if not isinstance(X, pd.DataFrame):
-
             raise TypeError(f"{self.classname()}: X should be a pd.DataFrame")
 
         if not isinstance(y, pd.Series):
-
             raise TypeError(f"{self.classname()}: y should be a pd.Series")
 
         if X.shape[0] != y.shape[0]:
-
             raise ValueError(
                 f"{self.classname()}: X and y have different numbers of rows ({X.shape[0]} vs {y.shape[0]})"
             )
 
         if not (X.index == y.index).all():
-
             warnings.warn(f"{self.classname()}: X and y do not have equal indexes")
 
         X_y = X.copy()
@@ -211,15 +188,12 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         self.columns_check(X)
 
         if self.verbose:
-
             print("BaseTransformer.transform() called")
 
         if self.copy:
-
             X = X.copy()
 
         if not X.shape[0] > 0:
-
             raise ValueError(f"{self.classname()}: X has no rows; {X.shape}")
 
         return X
@@ -250,21 +224,16 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         """
 
         if not isinstance(X, pd.DataFrame):
-
             raise TypeError(f"{self.classname()}: X should be a pd.DataFrame")
 
         if self.columns is None:
-
             raise ValueError(f"{self.classname()}: columns not set")
 
         if not isinstance(self.columns, list):
-
             raise TypeError(f"{self.classname()}: self.columns should be a list")
 
         for c in self.columns:
-
             if c not in X.columns.values:
-
                 raise ValueError(f"{self.classname()}: variable " + c + " is not in X")
 
     def columns_set_or_check(self, X):
@@ -280,15 +249,12 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         """
 
         if not isinstance(X, pd.DataFrame):
-
             raise TypeError(f"{self.classname()}: X should be a pd.DataFrame")
 
         if self.columns is None:
-
             self.columns = list(X.columns.values)
 
         else:
-
             self.columns_check(X)
 
     @staticmethod
@@ -302,27 +268,22 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         """
 
         if weights_column is not None:
-
             # check if given weight is in columns
             if weights_column not in X.columns:
-
                 raise ValueError(
                     f"weight col ({weights_column}) is not present in columns of data"
                 )
 
             # check weight is numeric
             elif not pd.api.types.is_numeric_dtype(X[weights_column]):
-
                 raise ValueError("weight column must be numeric.")
 
             # check weight is positive
             elif not (X[weights_column] < 0).sum() == 0:
-
                 raise ValueError("weight column must be positive")
 
             # check weight non-null
             elif not (X[weights_column].isnull()).sum() == 0:
-
                 raise ValueError("weight column must be non-null")
 
 
@@ -408,49 +369,38 @@ class DataFrameMethodTransformer(BaseTransformer):
         drop_original=False,
         **kwargs,
     ):
-
         super().__init__(columns=columns, **kwargs)
 
         if type(new_column_name) is list:
-
             for i, item in enumerate(new_column_name):
-
                 if not type(item) is str:
-
                     raise TypeError(
                         f"{self.classname()}: if new_column_name is a list, all elements must be strings but got {type(item)} in position {i}"
                     )
 
         elif not type(new_column_name) is str:
-
             raise TypeError(
                 f"{self.classname()}: unexpected type ({type(new_column_name)}) for new_column_name, must be str or list of strings"
             )
 
         if not type(pd_method_name) is str:
-
             raise TypeError(
                 f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
             )
 
         if not type(pd_method_kwargs) is dict:
-
             raise TypeError(
                 f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
             )
 
         else:
-
             for i, k in enumerate(pd_method_kwargs.keys()):
-
                 if not type(k) is str:
-
                     raise TypeError(
                         f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
                     )
 
         if not type(drop_original) is bool:
-
             raise TypeError(
                 f"{self.classname()}: unexpected type ({type(drop_original)}) for drop_original, expecting bool"
             )
@@ -461,12 +411,10 @@ class DataFrameMethodTransformer(BaseTransformer):
         self.drop_original = drop_original
 
         try:
-
             df = pd.DataFrame()
             getattr(df, pd_method_name)
 
         except Exception as err:
-
             raise AttributeError(
                 f"""{self.classname()}: error accessing "{pd_method_name}" method on pd.DataFrame object - pd_method_name should be a pd.DataFrame method"""
             ) from err
@@ -497,7 +445,6 @@ class DataFrameMethodTransformer(BaseTransformer):
         )
 
         if self.drop_original:
-
             X.drop(self.columns, axis=1, inplace=True)
 
         return X

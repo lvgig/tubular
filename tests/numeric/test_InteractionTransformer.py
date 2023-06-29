@@ -74,7 +74,6 @@ class TestInit(object):
                 "InteractionTransformer: columns must be a string or list with the columns to be pre-processed (if specified)"
             ),
         ):
-
             InteractionTransformer(
                 columns=3.2,
                 min_degree=2,
@@ -87,7 +86,6 @@ class TestInit(object):
                 "InteractionTransformer: each element of columns should be a single (string) column name"
             ),
         ):
-
             InteractionTransformer(
                 columns=["A", "B", 4],
                 min_degree=2,
@@ -98,7 +96,6 @@ class TestInit(object):
             TypeError,
             match=r"""InteractionTransformer: unexpected type \(\<class 'str'\>\) for min_degree, must be int""",
         ):
-
             InteractionTransformer(
                 columns=["A", "B", "C"],
                 min_degree="2",
@@ -108,7 +105,6 @@ class TestInit(object):
             TypeError,
             match=r"""InteractionTransformer: unexpected type \(\<class 'str'\>\) for max_degree, must be int""",
         ):
-
             InteractionTransformer(
                 columns=["A", "B", "C"],
                 min_degree=2,
@@ -121,7 +117,6 @@ class TestInit(object):
             ValueError,
             match=r"""InteractionTransformer: number of columns must be equal or greater than 2, got 1 column.""",
         ):
-
             InteractionTransformer(
                 columns=["A"],
             )
@@ -130,7 +125,6 @@ class TestInit(object):
             ValueError,
             match=r"""InteractionTransformer: min_degree must be equal or greater than 2, got 0""",
         ):
-
             InteractionTransformer(
                 columns=["A", "B", "C"],
                 min_degree=0,
@@ -141,7 +135,6 @@ class TestInit(object):
             ValueError,
             match=r"""InteractionTransformer: max_degree must be equal or greater than min_degree""",
         ):
-
             InteractionTransformer(
                 columns=["A", "B", "C"],
                 min_degree=3,
@@ -152,7 +145,6 @@ class TestInit(object):
             ValueError,
             match=r"""InteractionTransformer: max_degree must be equal or lower than number of columns""",
         ):
-
             InteractionTransformer(
                 columns=["A", "B", "C"],
                 min_degree=3,
@@ -247,7 +239,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(

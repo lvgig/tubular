@@ -76,7 +76,6 @@ class TestInit(object):
         """Test that an exception is raised if start_encoding is not an int."""
 
         with pytest.raises(ValueError):
-
             NominalToIntegerTransformer(start_encoding="a")
 
     def test_start_encoding_set_to_attribute(self):
@@ -230,7 +229,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
-
             x.transform(df)
 
     def test_super_transform_called(self, mocker):
@@ -251,7 +249,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_df_1(),
         ):
-
             x.transform(df)
 
     def test_learnt_values_not_modified(self):
@@ -288,7 +285,6 @@ class TestTransform(object):
             ValueError,
             match="NominalToIntegerTransformer: nulls would be introduced into column a from levels not present in mapping",
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(
@@ -342,7 +338,6 @@ class TestInverseTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
-
             x.inverse_transform(df_transformed)
 
     @pytest.mark.parametrize(
@@ -387,7 +382,6 @@ class TestInverseTransform(object):
             ValueError,
             match="NominalToIntegerTransformer: nulls introduced from levels not present in mapping for column: b",
         ):
-
             x.inverse_transform(df_transformed)
 
     def test_learnt_values_not_modified(self):

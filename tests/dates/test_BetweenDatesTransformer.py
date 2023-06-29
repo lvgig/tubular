@@ -51,7 +51,6 @@ class TestInit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             BetweenDatesTransformer(
                 column_lower="a",
                 column_between="b",
@@ -67,7 +66,6 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="BetweenDatesTransformer: column_lower should be str"
         ):
-
             BetweenDatesTransformer(
                 column_lower=False,
                 column_between="b",
@@ -81,7 +79,6 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="BetweenDatesTransformer: column_between should be str"
         ):
-
             BetweenDatesTransformer(
                 column_lower="a",
                 column_between=1,
@@ -95,7 +92,6 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="BetweenDatesTransformer: column_upper should be str"
         ):
-
             BetweenDatesTransformer(
                 column_lower="a",
                 column_between="b",
@@ -109,7 +105,6 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="BetweenDatesTransformer: new_column_name should be str"
         ):
-
             BetweenDatesTransformer(
                 column_lower="a",
                 column_between="b",
@@ -123,7 +118,6 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="BetweenDatesTransformer: lower_inclusive should be a bool"
         ):
-
             BetweenDatesTransformer(
                 column_lower="a",
                 column_between="b",
@@ -138,7 +132,6 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="BetweenDatesTransformer: upper_inclusive should be a bool"
         ):
-
             BetweenDatesTransformer(
                 column_lower="a",
                 column_between="b",
@@ -262,7 +255,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_is_between_dates_df_1(),
         ):
-
             x.transform(df)
 
     def test_cols_not_datetime(self):
@@ -284,7 +276,6 @@ class TestTransform(object):
             TypeError,
             match=r"BetweenDatesTransformer: a should be datetime64\[ns\] type but got int64",
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(
@@ -434,5 +425,4 @@ class TestTransform(object):
         df["c"][0] = datetime.datetime(1989, 3, 1)
 
         with pytest.warns(Warning, match="not all c are greater than or equal to a"):
-
             x.transform(df)

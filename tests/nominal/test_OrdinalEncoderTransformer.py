@@ -75,7 +75,6 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="OrdinalEncoderTransformer: weights_column should be a str"
         ):
-
             OrdinalEncoderTransformer(weights_column=1)
 
     def test_values_passed_in_init_set_to_attribute(self):
@@ -221,7 +220,6 @@ class TestFit(object):
         with pytest.raises(
             ValueError, match="OrdinalEncoderTransformer: weights column z not in X"
         ):
-
             x.fit(df, df["a"])
 
     def test_response_column_nulls_error(self):
@@ -234,7 +232,6 @@ class TestFit(object):
         with pytest.raises(
             ValueError, match="OrdinalEncoderTransformer: y has 1 null values"
         ):
-
             x.fit(df, df["a"])
 
 
@@ -283,7 +280,6 @@ class TestTransform(object):
             "check_mappable_rows",
             expected_call_args,
         ):
-
             x.transform(df)
 
     def test_super_transform_called(self, mocker):
@@ -306,7 +302,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_OrdinalEncoderTransformer_test_df(),
         ):
-
             x.transform(df)
 
     def test_learnt_values_not_modified(self):
@@ -371,5 +366,4 @@ class TestTransform(object):
             ValueError,
             match="OrdinalEncoderTransformer: nulls would be introduced into column b from levels not present in mapping",
         ):
-
             x.transform(df)

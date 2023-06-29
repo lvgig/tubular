@@ -102,7 +102,6 @@ class TestInit(object):
             "set_replacement_values",
             expected_call_args,
         ):
-
             OutOfRangeNullTransformer(
                 quantiles={"c": [0, 0.99], "d": [None, 0.01]}, verbose=True, copy=True
             )
@@ -170,7 +169,6 @@ class TestFit(object):
             "set_replacement_values",
             expected_call_args,
         ):
-
             x.fit(df)
 
     def test_fit_returns_self(self):

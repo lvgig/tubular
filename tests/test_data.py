@@ -228,7 +228,6 @@ def create_large_null_df(n_col=1000):
     data_dict = {}
 
     for i in range(n_col):
-
         data_dict["col_" + str(i)] = np.NaN
 
     data_df = pd.DataFrame(data_dict, index=[0])
@@ -257,7 +256,6 @@ def create_large_half_null_df(n_col=1000):
     col_values = [1.0, np.NaN]
 
     for i in range(n_col):
-
         data_dict["col_" + str(i)] = col_values
 
     data_df = pd.DataFrame(data_dict, index=[0, 1])
@@ -393,15 +391,12 @@ def create_NearestMeanResponseImputer_test_df():
 
 
 def create_values_map(df):
-
     value_map = {}
 
     for i in df.columns:
-
         value_map[i] = {}
 
         for j in df[i].unique():
-
             value_map[i][j] = j
 
     return value_map

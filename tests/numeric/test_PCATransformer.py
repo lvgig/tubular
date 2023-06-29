@@ -378,7 +378,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_numeric_df_1(),
         ):
-
             x.transform(df)
 
     def test_check_numeric_columns_call(self, mocker):
@@ -399,7 +398,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_numeric_df_1(),
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(

@@ -48,7 +48,6 @@ class TestInit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             MedianImputer(columns=None, verbose=True, copy=True)
 
     @pytest.mark.parametrize("weight", (0, ["a"], {"a": 10}))
@@ -59,7 +58,6 @@ class TestInit(object):
             TypeError,
             match="weight should be str or None",
         ):
-
             MedianImputer(columns=None, weight=weight)
 
 
@@ -87,7 +85,6 @@ class TestFit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "fit", expected_call_args
         ):
-
             x.fit(df)
 
     def test_check_weights_column_called(self, mocker):
@@ -105,7 +102,6 @@ class TestFit(object):
             "check_weights_column",
             expected_call_args,
         ):
-
             x.fit(df)
 
     def test_learnt_values(self):
@@ -223,7 +219,6 @@ class TestTransform(object):
         )
 
         for col in ["a", "b", "c"]:
-
             df[col].loc[df[col].isnull()] = df[col].median()
 
         return df
@@ -240,7 +235,6 @@ class TestTransform(object):
         )
 
         for col in ["a"]:
-
             df[col].loc[df[col].isnull()] = df[col].median()
 
         return df
@@ -251,7 +245,6 @@ class TestTransform(object):
         df = d.create_df_9()
 
         for col in ["a"]:
-
             df[col].loc[df[col].isnull()] = 4
 
         return df
@@ -277,7 +270,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
-
             x.transform(df)
 
     def test_super_transform_called(self, mocker):
@@ -294,7 +286,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(

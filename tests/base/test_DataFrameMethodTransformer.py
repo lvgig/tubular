@@ -61,7 +61,6 @@ class TestInit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             DataFrameMethodTransformer(
                 new_column_name="a",
                 pd_method_name="sum",
@@ -77,7 +76,6 @@ class TestInit(object):
             TypeError,
             match=r"DataFrameMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_name, expecting str",
         ):
-
             DataFrameMethodTransformer(
                 new_column_name="a", pd_method_name=1, columns=["b", "c"]
             )
@@ -86,7 +84,6 @@ class TestInit(object):
             TypeError,
             match=r"DataFrameMethodTransformer: unexpected type \(\<class 'float'\>\) for new_column_name, must be str or list of strings",
         ):
-
             DataFrameMethodTransformer(
                 new_column_name=1.0, pd_method_name="sum", columns=["b", "c"]
             )
@@ -95,7 +92,6 @@ class TestInit(object):
             TypeError,
             match=r"DataFrameMethodTransformer: if new_column_name is a list, all elements must be strings but got \<class 'float'\> in position 1",
         ):
-
             DataFrameMethodTransformer(
                 new_column_name=["a", 1.0], pd_method_name="sum", columns=["b", "c"]
             )
@@ -104,7 +100,6 @@ class TestInit(object):
             TypeError,
             match=r"""DataFrameMethodTransformer: pd_method_kwargs should be a dict but got type \<class 'int'\>""",
         ):
-
             DataFrameMethodTransformer(
                 new_column_name=["a", "b"],
                 pd_method_name="sum",
@@ -116,7 +111,6 @@ class TestInit(object):
             TypeError,
             match=r"""DataFrameMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_kwargs key in position 1, must be str""",
         ):
-
             DataFrameMethodTransformer(
                 new_column_name=["a", "b"],
                 pd_method_name="sum",
@@ -128,7 +122,6 @@ class TestInit(object):
             TypeError,
             match=r"DataFrameMethodTransformer: unexpected type \(\<class 'int'\>\) for drop_original, expecting bool",
         ):
-
             DataFrameMethodTransformer(
                 new_column_name="a",
                 pd_method_name="sum",
@@ -143,7 +136,6 @@ class TestInit(object):
             AttributeError,
             match="""DataFrameMethodTransformer: error accessing "b" method on pd.DataFrame object - pd_method_name should be a pd.DataFrame method""",
         ):
-
             DataFrameMethodTransformer(
                 new_column_name="a", pd_method_name="b", columns=["b", "c"]
             )
@@ -169,14 +161,12 @@ class TestInit(object):
         )
 
     def test_unexpected_kwarg_error(self):
-
         with pytest.raises(
             TypeError,
             match=re.escape(
                 "__init__() got an unexpected keyword argument 'unexpected_kwarg'"
             ),
         ):
-
             DataFrameMethodTransformer(
                 new_column_name="a",
                 pd_method_name="sum",
@@ -239,7 +229,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(

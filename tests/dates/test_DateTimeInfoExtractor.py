@@ -69,7 +69,6 @@ class TestExtractDatetimeInfoInit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             DatetimeInfoExtractor(columns=["a"])
 
     def test_values_passed_in_init_set_to_attribute(self):
@@ -239,7 +238,6 @@ class TestMapValues(object):
         with pytest.raises(
             TypeError, match="DatetimeInfoExtractor: value should be float or int"
         ):
-
             timeofday_extractor._map_values(incorrect_type_input, "timeofday")
 
     @pytest.mark.parametrize("incorrect_size_input", [-2, 30, 5.6, 11.2])
@@ -376,7 +374,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=df,
         ):
-
             x = DatetimeInfoExtractor(columns=["a"], include=["dayofweek"])
 
             x.transform(df)

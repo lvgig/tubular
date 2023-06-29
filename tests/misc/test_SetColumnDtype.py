@@ -55,7 +55,6 @@ class TestSetColumnDtypeInit(object):
         "invalid_dtype", ["STRING", "misc_invalid", "np.int", int()]
     )
     def test_invalid_dtype_error(self, invalid_dtype):
-
         msg = f"SetColumnDtype: data type '{invalid_dtype}' not understood as a valid dtype"
         with pytest.raises(TypeError, match=msg):
             SetColumnDtype(columns=["a"], dtype=invalid_dtype)
@@ -104,7 +103,6 @@ class TestSetColumnDtypeTransform(object):
             expected_call_args,
             return_value=d.create_df_3(),
         ):
-
             x.transform(df)
 
     def base_df():

@@ -8,7 +8,6 @@ import tests.test_data as d
 
 @pytest.fixture(scope="module", autouse=True)
 def example_transformer():
-
     example_transformer = TwoColumnOperatorTransformer(
         "mul",
         ["a", "b"],
@@ -104,7 +103,6 @@ class TestTwoColumnOperatorTransformerInit(object):
             expected_call_args,
             return_value=None,
         ):
-
             TwoColumnOperatorTransformer("mul", ["a", "b"], "c")
 
 
@@ -127,7 +125,6 @@ class TestTwoColumnOperatorTransformerTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
-
             example_transformer.transform(test_data)
 
     @pytest.mark.parametrize(

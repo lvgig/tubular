@@ -48,7 +48,6 @@ class TestInit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             NearestMeanResponseImputer(columns=None, verbose=True, copy=True)
 
 
@@ -84,7 +83,6 @@ class TestFit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "fit", expected_call_args
         ):
-
             x.fit(df, df["c"])
 
     def test_null_values_in_response_error(self):
@@ -97,7 +95,6 @@ class TestFit(object):
         with pytest.raises(
             ValueError, match="NearestMeanResponseImputer: y has 1 null values"
         ):
-
             x.fit(df, df["c"])
 
     def test_columns_with_no_nulls_error(self):
@@ -113,7 +110,6 @@ class TestFit(object):
             ValueError,
             match="NearestMeanResponseImputer: Column a has no missing values, cannot use this transformer.",
         ):
-
             x.fit(df, df["c"])
 
     def test_fit_returns_self(self):
@@ -244,7 +240,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
-
             x.transform(df)
 
     def test_super_transform_called(self, mocker):
@@ -263,7 +258,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(

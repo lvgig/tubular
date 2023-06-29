@@ -33,13 +33,11 @@ class BaseNominalTransformer(BaseTransformer):
         """
 
         if self.columns is None:
-
             columns = [
                 c for c in X.columns if X[c].dtype.name in ["object", "category"]
             ]
 
             if not len(columns) > 0:
-
                 raise ValueError(
                     f"{self.classname()}: no object or category columns in X"
                 )
@@ -47,7 +45,6 @@ class BaseNominalTransformer(BaseTransformer):
             self.columns = columns
 
         else:
-
             self.columns_check(X)
 
     def check_mappable_rows(self, X):
@@ -65,11 +62,9 @@ class BaseNominalTransformer(BaseTransformer):
         self.check_is_fitted(["mappings"])
 
         for c in self.columns:
-
             mappable_rows = X[c].isin([k for k in self.mappings[c].keys()]).sum()
 
             if mappable_rows < X.shape[0]:
-
                 raise ValueError(
                     f"{self.classname()}: nulls would be introduced into column {c} from levels not present in mapping"
                 )
@@ -110,11 +105,9 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
     """
 
     def __init__(self, columns=None, start_encoding=0, **kwargs):
-
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
 
         if not isinstance(start_encoding, int):
-
             raise ValueError(f"{self.classname()}: start_encoding should be an integer")
 
         self.start_encoding = start_encoding
@@ -137,7 +130,6 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         self.mappings = {}
 
         for c in self.columns:
-
             col_values = X[c].unique()
 
             self.mappings[c] = {
@@ -194,7 +186,6 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         self.inverse_mapping_ = {}
 
         for c in self.columns:
-
             # calculate the reverse mapping
             self.inverse_mapping_[c] = {v: k for k, v in self.mappings[c].items()}
 
@@ -205,7 +196,6 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
             X[c] = X[c].replace(self.inverse_mapping_[c])
 
             if (X.shape[0] - mappable_rows) > 0:
-
                 raise ValueError(
                     f"{self.classname()}: nulls introduced from levels not present in mapping for column: "
                     + c
@@ -287,23 +277,18 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         record_rare_levels=True,
         **kwargs,
     ):
-
         super().__init__(columns=columns, **kwargs)
 
         if not isinstance(cut_off_percent, float):
-
             raise ValueError(f"{self.classname()}: cut_off_percent must be a float")
 
         if not ((cut_off_percent > 0) & (cut_off_percent < 1)):
-
             raise ValueError(f"{self.classname()}: cut_off_percent must be > 0 and < 1")
 
         self.cut_off_percent = cut_off_percent
 
         if weight is not None:
-
             if not isinstance(weight, str):
-
                 raise ValueError(
                     f"{self.classname()}: weight should be a single column (str)"
                 )
@@ -313,7 +298,6 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         self.rare_level_name = rare_level_name
 
         if not isinstance(record_rare_levels, bool):
-
             raise ValueError(f"{self.classname()}: record_rare_levels must be a bool")
 
         self.record_rare_levels = record_rare_levels
@@ -340,31 +324,23 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         super().fit(X, y)
 
         for c in self.columns:
-
             if X[c].dtype.name != "category":
-
                 if pd.Series(self.rare_level_name).dtype != X[c].dtypes:
-
                     raise ValueError(
                         f"{self.classname()}: rare_level_name must be of the same type of the columns"
                     )
 
         if self.weight is not None:
-
             if self.weight not in X.columns.values:
-
                 raise ValueError(f"{self.classname()}: weight {self.weight} not in X")
 
         self.mapping_ = {}
 
         if self.record_rare_levels:
-
             self.rare_levels_record_ = {}
 
         if self.weight is None:
-
             for c in self.columns:
-
                 col_percents = X[c].value_counts(dropna=False) / X.shape[0]
 
                 self.mapping_[c] = list(
@@ -374,7 +350,6 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                 self.mapping_[c] = sorted(self.mapping_[c], key=str)
 
                 if self.record_rare_levels:
-
                     self.rare_levels_record_[c] = list(
                         col_percents.loc[
                             col_percents < self.cut_off_percent
@@ -386,15 +361,12 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                     )
 
         else:
-
             for c in self.columns:
-
                 cols_w_percents = X.groupby(c)[self.weight].sum()
 
                 # nulls are excluded from pandas groupby; https://github.com/pandas-dev/pandas/issues/3729
                 # so add them back in
                 if cols_w_percents.sum() < X[self.weight].sum():
-
                     cols_w_percents[np.NaN] = X.loc[X[c].isnull(), self.weight].sum()
 
                 cols_w_percents = cols_w_percents / X[self.weight].sum()
@@ -408,7 +380,6 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                 self.mapping_[c] = sorted(self.mapping_[c], key=str)
 
                 if self.record_rare_levels:
-
                     self.rare_levels_record_[c] = list(
                         cols_w_percents.loc[
                             cols_w_percents < self.cut_off_percent
@@ -441,13 +412,10 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         self.check_is_fitted(["mapping_"])
 
         for c in self.columns:
-
             # for categorical dtypes have to set new category for the impute values first
             # and convert back to the categorical type, other it will convert to object
             if "category" in X[c].dtype.name:
-
                 if self.rare_level_name not in X[c].cat.categories:
-
                     X[c] = X[c].cat.add_categories(self.rare_level_name)
 
                 dtype_before = X[c].dtype
@@ -561,24 +529,18 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         unseen_level_handling=None,
         **kwargs,
     ):
-
         if weights_column is not None:
-
             if type(weights_column) is not str:
-
                 raise TypeError(f"{self.classname()}: weights_column should be a str")
 
         if type(prior) is not int:
-
             raise TypeError(f"{self.classname()}: prior should be a int")
 
         if not prior >= 0:
             raise ValueError(f"{self.classname()}: prior should be positive int")
 
         if level:
-
             if not isinstance(level, str) and not isinstance(level, list):
-
                 raise TypeError(
                     f"{self.classname()}: Level should be a NoneType, list or str but got {type(level)}"
                 )
@@ -642,9 +604,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             being encoded against in this call of _fit_binary_response.
         """
         if self.weights_column is not None:
-
             if self.weights_column not in X.columns.values:
-
                 raise ValueError(
                     f"{self.classname()}: weights column {self.weights_column} not in X"
                 )
@@ -652,7 +612,6 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         response_null_count = y.isnull().sum()
 
         if response_null_count > 0:
-
             raise ValueError(
                 f"{self.classname()}: y has {response_null_count} null values"
             )
@@ -661,11 +620,9 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         response_column = "_temporary_response"
 
         if self.weights_column is None:
-
             self.global_mean = X_y[response_column].mean()
 
         else:
-
             X_y["weighted_response"] = X_y[response_column].multiply(
                 X_y[self.weights_column]
             )
@@ -675,9 +632,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             )
 
         for c in columns:
-
             if self.weights_column is None:
-
                 group_means = X_y.groupby(c)[response_column].mean()
 
                 group_counts = X_y.groupby(c)[response_column].size()
@@ -687,7 +642,6 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                 ).to_dict()
 
             else:
-
                 groupby_sum = X_y.groupby([c])[
                     ["weighted_response", self.weights_column]
                 ].sum()
@@ -727,13 +681,10 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         X_temp = X.copy()
 
         if self.level:
-
             if self.level == "all":
-
                 self.response_levels = y.unique()
 
             else:
-
                 if isinstance(self.level, str):
                     self.level = [self.level]
 
@@ -768,7 +719,6 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             self.encoded_feature_columns = self.mapped_columns
 
         else:
-
             self._fit_binary_response(X, y, self.columns)
             self.encoded_feature_columns = self.columns
 
@@ -885,11 +835,8 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
     """
 
     def __init__(self, columns=None, weights_column=None, **kwargs):
-
         if weights_column is not None:
-
             if type(weights_column) is not str:
-
                 raise TypeError(f"{self.classname()}: weights_column should be a str")
 
         self.weights_column = weights_column
@@ -918,9 +865,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
         self.mappings = {}
 
         if self.weights_column is not None:
-
             if self.weights_column not in X.columns.values:
-
                 raise ValueError(
                     f"{self.classname()}: weights column {self.weights_column} not in X"
                 )
@@ -928,7 +873,6 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
         response_null_count = y.isnull().sum()
 
         if response_null_count > 0:
-
             raise ValueError(
                 f"{self.classname()}: y has {response_null_count} null values"
             )
@@ -937,9 +881,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
         response_column = "_temporary_response"
 
         for c in self.columns:
-
             if self.weights_column is None:
-
                 # get the indexes of the sorted target mean-encoded dict
                 _idx_target_mean = list(
                     X_y.groupby([c])[response_column]
@@ -958,7 +900,6 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
                 self.mappings[c] = ordinal_encoded_dict
 
             else:
-
                 groupby_sum = X_y.groupby([c])[
                     [response_column, self.weights_column]
                 ].sum()
@@ -1053,7 +994,6 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         verbose=False,
         **kwargs,
     ):
-
         BaseNominalTransformer.__init__(
             self, columns=columns, copy=copy, verbose=verbose
         )
@@ -1083,9 +1023,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         # Check for nulls
         for c in self.columns:
-
             if X[c].isnull().sum() > 0:
-
                 raise ValueError(
                     f"{self.classname()}: column %s has nulls - replace before proceeding"
                     % c
@@ -1093,11 +1031,9 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         # Check each field has less than 100 categories/levels
         for c in self.columns:
-
             levels = X[c].unique().tolist()
 
             if len(levels) > 100:
-
                 raise ValueError(
                     f"{self.classname()}: column %s has over 100 unique values - consider another type of encoding"
                     % c
@@ -1124,19 +1060,16 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         """
 
         if hasattr(self, "get_feature_names"):
-
             input_columns = self.get_feature_names(
                 input_features=input_features, **kwargs
             )
 
         elif hasattr(self, "get_feature_names_out"):
-
             input_columns = self.get_feature_names_out(
                 input_features=input_features, **kwargs
             )
 
         else:
-
             raise AttributeError(
                 "Cannot access scikit learn OneHotEncoder get_feature_names method, may be a version issue"
             )
@@ -1167,9 +1100,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         # Check for nulls
         for c in self.columns:
-
             if X[c].isnull().sum() > 0:
-
                 raise ValueError(
                     f"{self.classname()}: column %s has nulls - replace before proceeding"
                     % c
@@ -1188,7 +1119,6 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         # Rename dummy fields if separator is specified
         if self.separator != "_":
-
             old_names = [
                 c + "_" + str(lvl)
                 for i, c in enumerate(self.columns)
@@ -1206,13 +1136,10 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         # Print warning for unseen levels
         if self.verbose:
-
             for i, c in enumerate(self.columns):
-
                 unseen_levels = set(X[c].unique().tolist()) - set(self.categories_[i])
 
                 if len(unseen_levels) > 0:
-
                     warnings.warn(
                         f"{self.classname()}: column %s has unseen categories: %s"
                         % (c, unseen_levels)
@@ -1220,7 +1147,6 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         # Drop original columns
         if self.drop_original:
-
             X.drop(self.columns, axis=1, inplace=True)
 
         # Concatenate original and new dummy fields

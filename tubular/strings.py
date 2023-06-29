@@ -54,11 +54,8 @@ class SeriesStrMethodTransformer(BaseTransformer):
     def __init__(
         self, new_column_name, pd_method_name, columns, pd_method_kwargs={}, **kwargs
     ):
-
         if type(columns) is list:
-
             if len(columns) > 1:
-
                 raise ValueError(
                     f"{self.classname()}: columns arg should contain only 1 column name but got {len(columns)}"
                 )
@@ -66,29 +63,23 @@ class SeriesStrMethodTransformer(BaseTransformer):
         super().__init__(columns=columns, **kwargs)
 
         if type(new_column_name) is not str:
-
             raise TypeError(
                 f"{self.classname()}: unexpected type ({type(new_column_name)}) for new_column_name, must be str"
             )
 
         if type(pd_method_name) is not str:
-
             raise TypeError(
                 f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
             )
 
         if type(pd_method_kwargs) is not dict:
-
             raise TypeError(
                 f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
             )
 
         else:
-
             for i, k in enumerate(pd_method_kwargs.keys()):
-
                 if not type(k) is str:
-
                     raise TypeError(
                         f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
                     )
@@ -98,12 +89,10 @@ class SeriesStrMethodTransformer(BaseTransformer):
         self.pd_method_kwargs = pd_method_kwargs
 
         try:
-
             ser = pd.Series(["a"])
             getattr(ser.str, pd_method_name)
 
         except Exception as err:
-
             raise AttributeError(
                 f"""{self.classname()}: error accessing "str.{pd_method_name}" method on pd.Series object - pd_method_name should be a pd.Series.str method"""
             ) from err
@@ -152,7 +141,6 @@ class StringConcatenator(BaseTransformer):
     """
 
     def __init__(self, columns, new_column="new_column", separator=" "):
-
         super().__init__(columns=columns, copy=True)
 
         if not isinstance(new_column, str):

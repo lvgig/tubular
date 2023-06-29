@@ -55,7 +55,6 @@ class TestInit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             GroupRareLevelsTransformer(columns=None, verbose=True, copy=True)
 
     def test_cut_off_percent_not_float_error(self):
@@ -65,7 +64,6 @@ class TestInit(object):
             ValueError,
             match="GroupRareLevelsTransformer: cut_off_percent must be a float",
         ):
-
             GroupRareLevelsTransformer(cut_off_percent="a")
 
     def test_cut_off_percent_negative_error(self):
@@ -75,7 +73,6 @@ class TestInit(object):
             ValueError,
             match="GroupRareLevelsTransformer: cut_off_percent must be > 0 and < 1",
         ):
-
             GroupRareLevelsTransformer(cut_off_percent=-1.0)
 
     def test_cut_off_percent_gt_one_error(self):
@@ -85,7 +82,6 @@ class TestInit(object):
             ValueError,
             match="GroupRareLevelsTransformer: cut_off_percent must be > 0 and < 1",
         ):
-
             GroupRareLevelsTransformer(cut_off_percent=2.0)
 
     def test_weight_not_str_error(self):
@@ -95,7 +91,6 @@ class TestInit(object):
             ValueError,
             match="GroupRareLevelsTransformer: weight should be a single column",
         ):
-
             GroupRareLevelsTransformer(weight=2)
 
     def test_record_rare_levels_not_str_error(self):
@@ -105,7 +100,6 @@ class TestInit(object):
             ValueError,
             match="GroupRareLevelsTransformer: record_rare_levels must be a bool",
         ):
-
             GroupRareLevelsTransformer(record_rare_levels=2)
 
     def test_values_passed_in_init_set_to_attribute(self):
@@ -154,7 +148,6 @@ class TestFit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "fit", expected_call_args
         ):
-
             x.fit(df)
 
     def test_weight_column_not_in_X_error(self):
@@ -167,7 +160,6 @@ class TestFit(object):
         with pytest.raises(
             ValueError, match="GroupRareLevelsTransformer: weight aaaa not in X"
         ):
-
             x.fit(df)
 
     def test_fit_returns_self(self):
@@ -254,7 +246,6 @@ class TestFit(object):
             ValueError,
             match="GroupRareLevelsTransformer: rare_level_name must be of the same type of the columns",
         ):
-
             x = GroupRareLevelsTransformer(columns=["a", "b"], rare_level_name=2)
 
             x.fit(df)
@@ -263,7 +254,6 @@ class TestFit(object):
             ValueError,
             match="GroupRareLevelsTransformer: rare_level_name must be of the same type of the columns",
         ):
-
             x = GroupRareLevelsTransformer(columns=["c"])
 
             x.fit(df)
@@ -330,7 +320,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
-
             x.transform(df)
 
     def test_super_transform_called(self, mocker):
@@ -359,7 +348,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_df_5(),
         ):
-
             x.transform(df)
 
     def test_learnt_values_not_modified(self):
@@ -405,7 +393,8 @@ class TestTransform(object):
 
     def test_expected_output_no_weight_single_row_na(self):
         """test output from a single row transform with np.NaN value remains the same,
-        the type is perserved if using existing dataframe, so need to create a new dataframe"""
+        the type is perserved if using existing dataframe, so need to create a new dataframe
+        """
 
         one_row_df = pd.DataFrame({"b": [np.nan], "c": [np.NaN]})
         x = GroupRareLevelsTransformer(columns=["b", "c"], cut_off_percent=0.2)
@@ -423,7 +412,8 @@ class TestTransform(object):
 
     def test_expected_output_no_weight_single_row_na_category_column(self):
         """test output from a single row transform with np.NaN value remains the same, when column is type category,
-        the type is perserved if using existing dataframe, so need to create a new dataframe"""
+        the type is perserved if using existing dataframe, so need to create a new dataframe
+        """
 
         one_row_df = pd.DataFrame({"b": [np.nan], "c": [np.NaN]})
         one_row_df["c"] = one_row_df["c"].astype("category")

@@ -11,7 +11,6 @@ import numpy as np
 
 @pytest.fixture(scope="module", autouse=True)
 def example_transformer():
-
     return DatetimeSinusoidCalculator("a", "cos", "hour", 24)
 
 
@@ -33,7 +32,6 @@ class TestDatetimeSinusoidCalculatorInit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             DatetimeSinusoidCalculator(
                 "a",
                 "cos",
@@ -51,7 +49,6 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 type(incorrect_type_method)
             ),
         ):
-
             DatetimeSinusoidCalculator(
                 "a",
                 incorrect_type_method,
@@ -69,7 +66,6 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 type(incorrect_type_units)
             ),
         ):
-
             DatetimeSinusoidCalculator(
                 "a",
                 "cos",
@@ -87,7 +83,6 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 type(incorrect_type_period)
             ),
         ):
-
             DatetimeSinusoidCalculator(
                 "a",
                 "cos",
@@ -109,7 +104,6 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 set(type(v) for v in incorrect_dict_types_period.values()),
             ),
         ):
-
             DatetimeSinusoidCalculator(
                 "a",
                 "cos",
@@ -138,7 +132,6 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 set(type(v) for v in incorrect_dict_types_units.values()),
             ),
         ):
-
             DatetimeSinusoidCalculator(
                 "a",
                 "cos",
@@ -156,7 +149,6 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 set(incorrect_dict_units.values())
             ),
         ):
-
             DatetimeSinusoidCalculator(
                 "a",
                 "cos",
@@ -177,7 +169,6 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 set(incorrect_dict_columns_period.keys()),
             ),
         ):
-
             DatetimeSinusoidCalculator(
                 ["vegan_sausages", "carrots", "peas"],
                 "cos",
@@ -198,7 +189,6 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 set(incorrect_dict_columns_unit.keys()),
             ),
         ):
-
             DatetimeSinusoidCalculator(
                 ["vegan_sausages", "carrots", "peas"],
                 "cos",
@@ -216,7 +206,6 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 method
             ),
         ):
-
             DatetimeSinusoidCalculator(
                 "a",
                 method,
@@ -245,7 +234,6 @@ class TestDatetimeSinusoidCalculatorInit(object):
                 )
             ),
         ):
-
             DatetimeSinusoidCalculator(
                 "a",
                 "cos",
@@ -285,7 +273,6 @@ class TestDatetimeSinusoidCalculatorTransform(object):
             f"{column} should be datetime64[ns] type but got {not_datetime[column].dtype}"
         )
         with pytest.raises(TypeError, match=message):
-
             x = DatetimeSinusoidCalculator(
                 "a",
                 "cos",
@@ -296,7 +283,6 @@ class TestDatetimeSinusoidCalculatorTransform(object):
             x.transform(not_datetime)
 
     def test_BaseTransformer_transform_called(self, example_transformer, mocker):
-
         test_data = d.create_datediff_test_df()
 
         expected_call_args = {0: {"args": (test_data,), "kwargs": {}}}
@@ -308,11 +294,9 @@ class TestDatetimeSinusoidCalculatorTransform(object):
             expected_call_args,
             return_value=test_data,
         ):
-
             example_transformer.transform(test_data)
 
     def test_cos_called_with_correct_args(self, mocker):
-
         """Tests that the correct numpy method is called on the correct column - also implicitly checks that the column has been transformed
         into the correct units through the value of the argument."""
 
@@ -364,7 +348,6 @@ class TestDatetimeSinusoidCalculatorTransform(object):
         ],
     )
     def test_expected_output_single_method(self, transformer):
-
         expected = d.create_datediff_test_df()
         for column in transformer.columns:
             column_in_desired_unit = expected[column].dt.month
@@ -381,7 +364,6 @@ class TestDatetimeSinusoidCalculatorTransform(object):
         )
 
     def test_expected_output_both_methods(self):
-
         expected = d.create_datediff_test_df()
 
         transformer = DatetimeSinusoidCalculator(
@@ -410,7 +392,6 @@ class TestDatetimeSinusoidCalculatorTransform(object):
         )
 
     def test_expected_output_dict_units(self):
-
         expected = d.create_datediff_test_df()
 
         transformer = DatetimeSinusoidCalculator(
@@ -440,7 +421,6 @@ class TestDatetimeSinusoidCalculatorTransform(object):
         )
 
     def test_expected_output_dict_period(self):
-
         expected = d.create_datediff_test_df()
 
         transformer = DatetimeSinusoidCalculator(
@@ -470,7 +450,6 @@ class TestDatetimeSinusoidCalculatorTransform(object):
         )
 
     def test_expected_output_dict_both(self):
-
         expected = d.create_datediff_test_df()
 
         transformer = DatetimeSinusoidCalculator(
@@ -500,7 +479,6 @@ class TestDatetimeSinusoidCalculatorTransform(object):
         )
 
     def test_expected_output_dict_both_with_both_methods(self):
-
         expected = d.create_datediff_test_df()
 
         transformer = DatetimeSinusoidCalculator(

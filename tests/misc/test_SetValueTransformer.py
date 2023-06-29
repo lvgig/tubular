@@ -40,7 +40,6 @@ class TestInit:
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             SetValueTransformer(columns=["a", "b"], value=1, verbose=False, copy=False)
 
     def test_value_attribute_set(self):
@@ -85,7 +84,6 @@ class TestTransform:
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(

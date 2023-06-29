@@ -37,7 +37,6 @@ class BaseImputer(BaseTransformer):
         X = super().transform(X)
 
         for c in self.columns:
-
             X[c] = X[c].fillna(self.impute_values_[c])
 
         return X
@@ -61,9 +60,7 @@ class ArbitraryImputer(BaseImputer):
     """
 
     def __init__(self, impute_value, columns, **kwargs):
-
         if columns is None:
-
             raise ValueError(
                 f"{self.classname()}: columns must be specified in init for ArbitraryImputer"
             )
@@ -75,7 +72,6 @@ class ArbitraryImputer(BaseImputer):
             and not isinstance(impute_value, float)
             and not isinstance(impute_value, str)
         ):
-
             raise ValueError(
                 f"{self.classname()}: impute_value should be a single value (int, float or str)"
             )
@@ -105,11 +101,8 @@ class ArbitraryImputer(BaseImputer):
         self.columns_check(X)
 
         for c in self.columns:
-
             if "category" in X[c].dtype.name:
-
                 if self.impute_value not in X[c].cat.categories:
-
                     X[c] = X[c].cat.add_categories(
                         self.impute_value
                     )  # add new category
@@ -153,7 +146,6 @@ class MedianImputer(BaseImputer):
     """
 
     def __init__(self, columns=None, weight=None, **kwargs):
-
         super().__init__(columns=columns, **kwargs)
 
         if not isinstance(weight, str):
@@ -180,13 +172,11 @@ class MedianImputer(BaseImputer):
         self.impute_values_ = {}
 
         if self.weight is not None:
-
             super().check_weights_column(X, self.weight)
 
             temp = X.copy()
 
             for c in self.columns:
-
                 # filter out null rows so their weight doesn't influence calc
                 filtered = temp[temp[c].notnull()]
 
@@ -205,9 +195,7 @@ class MedianImputer(BaseImputer):
                 self.impute_values_[c] = median
 
         else:
-
             for c in self.columns:
-
                 self.impute_values_[c] = X[c].median()
 
         return self
@@ -237,7 +225,6 @@ class MeanImputer(BaseImputer):
     """
 
     def __init__(self, columns=None, weight=None, **kwargs):
-
         super().__init__(columns=columns, **kwargs)
 
         if not isinstance(weight, str):
@@ -264,11 +251,9 @@ class MeanImputer(BaseImputer):
         self.impute_values_ = {}
 
         if self.weight is not None:
-
             super().check_weights_column(X, self.weight)
 
             for c in self.columns:
-
                 # filter out null rows so they don't count towards total weight
                 filtered = X[X[c].notnull()]
 
@@ -282,9 +267,7 @@ class MeanImputer(BaseImputer):
                 self.impute_values_[c] = weighted_mean
 
         else:
-
             for c in self.columns:
-
                 self.impute_values_[c] = X[c].mean()
 
         return self
@@ -317,13 +300,10 @@ class ModeImputer(BaseImputer):
     """
 
     def __init__(self, columns=None, weight=None, **kwargs):
-
         super().__init__(columns=columns, **kwargs)
 
         if weight is not None:
-
             if not isinstance(weight, str):
-
                 raise ValueError("ModeImputer: weight should be a string or None")
 
         self.weight = weight
@@ -346,27 +326,21 @@ class ModeImputer(BaseImputer):
         self.impute_values_ = {}
 
         if self.weight is None:
-
             for c in self.columns:
-
                 mode_value = X[c].mode(dropna=True)
 
                 if len(mode_value) == 0:
-
                     self.impute_values_[c] = np.nan
 
                     warnings.warn(f"ModeImputer: The Mode of column {c} is NaN.")
 
                 else:
-
                     self.impute_values_[c] = mode_value[0]
 
         else:
-
             super().check_weights_column(X, self.weight)
 
             for c in self.columns:
-
                 self.impute_values_[c] = X.groupby(c)[self.weight].sum().idxmax()
 
         return self
@@ -385,7 +359,6 @@ class NearestMeanResponseImputer(BaseImputer):
     """
 
     def __init__(self, columns=None, **kwds):
-
         super().__init__(columns=columns, **kwds)
 
     def fit(self, X, y):
@@ -408,7 +381,6 @@ class NearestMeanResponseImputer(BaseImputer):
         n_nulls = y.isnull().sum()
 
         if n_nulls > 0:
-
             raise ValueError(f"{self.classname()}: y has {n_nulls} null values")
 
         self.impute_values_ = {}
@@ -417,17 +389,14 @@ class NearestMeanResponseImputer(BaseImputer):
         response_column = "_temporary_response"
 
         for c in self.columns:
-
             c_nulls = X[c].isnull()
 
             if c_nulls.sum() == 0:
-
                 raise ValueError(
                     f"{self.classname()}: Column {c} has no missing values, cannot use this transformer."
                 )
 
             else:
-
                 mean_response_by_levels = pd.DataFrame(
                     X_y.loc[~c_nulls].groupby(c)[response_column].mean()
                 ).reset_index()
@@ -460,7 +429,6 @@ class NullIndicator(BaseTransformer):
     """
 
     def __init__(self, columns=None, **kwds):
-
         super().__init__(columns=columns, **kwds)
 
     def transform(self, X):
@@ -476,7 +444,6 @@ class NullIndicator(BaseTransformer):
         X = super().transform(X)
 
         for c in self.columns:
-
             X[f"{c}_nulls"] = X[c].isnull().astype(int)
 
         return X

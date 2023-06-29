@@ -34,7 +34,6 @@ class TestInit(object):
             TypeError,
             match=r"""ScalingTransformer: scaler_kwargs should be a dict but got type \<class 'int'\>""",
         ):
-
             ScalingTransformer(columns="b", scaler_type="standard", scaler_kwargs=1)
 
     def test_scaler_kwargs_key_type_error(self):
@@ -44,7 +43,6 @@ class TestInit(object):
             TypeError,
             match=r"""ScalingTransformer: unexpected type \(\<class 'int'\>\) for scaler_kwargs key in position 1, must be str""",
         ):
-
             ScalingTransformer(
                 columns="b",
                 scaler_type="standard",
@@ -58,7 +56,6 @@ class TestInit(object):
             ValueError,
             match=r"""ScalingTransformer: scaler_type should be one of; \['min_max', 'max_abs', 'standard'\]""",
         ):
-
             ScalingTransformer(columns="b", scaler_type="zzz", scaler_kwargs={"a": 1})
 
     @pytest.mark.parametrize(
@@ -130,7 +127,6 @@ class TestInit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             ScalingTransformer(
                 columns=["a", "b"], scaler_type="standard", copy=True, verbose=False
             )
@@ -159,7 +155,6 @@ class TestCheckNumericColumns(object):
             TypeError,
             match=r"""ScalingTransformer: The following columns are not numeric in X; \['b', 'c'\]""",
         ):
-
             x.check_numeric_columns(df)
 
     def test_X_returned(self):
@@ -202,7 +197,6 @@ class TestFit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "fit", expected_call_args
         ):
-
             x.fit(df)
 
     def test_check_numeric_columns_call(self, mocker):
@@ -221,7 +215,6 @@ class TestFit(object):
             expected_call_args,
             return_value=d.create_df_2(),
         ):
-
             x.fit(df)
 
     @pytest.mark.parametrize(
@@ -307,7 +300,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_df_2(),
         ):
-
             x.transform(df)
 
     def test_check_numeric_columns_call(self, mocker):
@@ -328,7 +320,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_df_2(),
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(

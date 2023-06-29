@@ -59,7 +59,6 @@ class TestNominalColumnSetOrCheck(object):
         x.columns = None
 
         with pytest.raises(ValueError):
-
             x.columns_set_or_check(df)
 
     def test_columns_check_called(self, mocker):
@@ -84,7 +83,6 @@ class TestNominalColumnSetOrCheck(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "columns_check", expected_call_args
         ):
-
             x.columns_set_or_check(df)
 
 
@@ -107,5 +105,4 @@ class TestCheckMappableRows:
             ValueError,
             match="BaseNominalTransformer: nulls would be introduced into column b from levels not present in mapping",
         ):
-
             x.check_mappable_rows(df)

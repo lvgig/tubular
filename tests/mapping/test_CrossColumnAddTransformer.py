@@ -52,7 +52,6 @@ class TestInit(object):
             "__init__",
             expected_call_args,
         ):
-
             CrossColumnAddTransformer(
                 mappings={"a": {"a": 1}}, adjust_column="b", verbose=True, copy=True
             )
@@ -64,7 +63,6 @@ class TestInit(object):
             TypeError,
             match="CrossColumnAddTransformer: adjust_column should be a string",
         ):
-
             CrossColumnAddTransformer(mappings={"a": {"a": 1}}, adjust_column=1)
 
     def test_mapping_values_not_numeric_error(self):
@@ -73,7 +71,6 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="CrossColumnAddTransformer: mapping values must be numeric"
         ):
-
             CrossColumnAddTransformer(mappings={"a": {"a": "b"}}, adjust_column="b")
 
     def test_adjust_column_set_to_attribute(self):
@@ -149,7 +146,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
         ):
-
             x.transform(df)
 
     def test_super_transform_call(self, mocker):
@@ -170,7 +166,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_df_1(),
         ):
-
             x.transform(df)
 
     def test_adjust_col_not_in_x_error(self):
@@ -185,7 +180,6 @@ class TestTransform(object):
         with pytest.raises(
             ValueError, match="CrossColumnAddTransformer: variable c is not in X"
         ):
-
             x.transform(df)
 
     def test_adjust_col_not_numeric_error(self):
@@ -201,7 +195,6 @@ class TestTransform(object):
             TypeError,
             match="CrossColumnAddTransformer: variable c must have numeric dtype.",
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(

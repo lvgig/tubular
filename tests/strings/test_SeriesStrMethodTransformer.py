@@ -58,7 +58,6 @@ class TestInit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             SeriesStrMethodTransformer(
                 new_column_name="a",
                 pd_method_name="find",
@@ -74,7 +73,6 @@ class TestInit(object):
             ValueError,
             match="SeriesStrMethodTransformer: columns arg should contain only 1 column name but got 2",
         ):
-
             SeriesStrMethodTransformer(
                 new_column_name="a", pd_method_name=1, columns=["b", "c"]
             )
@@ -83,7 +81,6 @@ class TestInit(object):
             TypeError,
             match=r"SeriesStrMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_name, expecting str",
         ):
-
             SeriesStrMethodTransformer(
                 new_column_name="a", pd_method_name=1, columns=["b"]
             )
@@ -92,7 +89,6 @@ class TestInit(object):
             TypeError,
             match=r"SeriesStrMethodTransformer: unexpected type \(\<class 'float'\>\) for new_column_name, must be str",
         ):
-
             SeriesStrMethodTransformer(
                 new_column_name=1.0, pd_method_name="find", columns=["b"]
             )
@@ -101,7 +97,6 @@ class TestInit(object):
             TypeError,
             match=r"""SeriesStrMethodTransformer: pd_method_kwargs should be a dict but got type \<class 'int'\>""",
         ):
-
             SeriesStrMethodTransformer(
                 new_column_name="a",
                 pd_method_name="find",
@@ -113,7 +108,6 @@ class TestInit(object):
             TypeError,
             match=r"""SeriesStrMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_kwargs key in position 1, must be str""",
         ):
-
             SeriesStrMethodTransformer(
                 new_column_name="a",
                 pd_method_name="find",
@@ -128,7 +122,6 @@ class TestInit(object):
             AttributeError,
             match="""SeriesStrMethodTransformer: error accessing "str.b" method on pd.Series object - pd_method_name should be a pd.Series.str method""",
         ):
-
             SeriesStrMethodTransformer(
                 new_column_name="a", pd_method_name="b", columns=["b"]
             )
@@ -196,7 +189,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(

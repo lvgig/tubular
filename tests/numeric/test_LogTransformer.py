@@ -28,7 +28,6 @@ class TestInit(object):
             ValueError,
             match=re.escape("LogTransformer: base should be numeric or None"),
         ):
-
             LogTransformer(
                 columns=["a"],
                 base="a",
@@ -41,7 +40,6 @@ class TestInit(object):
             ValueError,
             match=re.escape("LogTransformer: base should be strictly positive"),
         ):
-
             LogTransformer(
                 columns=["a"],
                 base=0,
@@ -76,7 +74,6 @@ class TestInit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             LogTransformer(
                 columns=["a", "b"],
                 add_1=True,
@@ -198,7 +195,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_df_3(),
         ):
-
             x.transform(df)
 
     def test_error_with_non_numeric_columns(self):
@@ -212,7 +208,6 @@ class TestTransform(object):
             TypeError,
             match=r"LogTransformer: The following columns are not numeric in X; \['b', 'c'\]",
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(
@@ -368,5 +363,4 @@ class TestTransform(object):
             ValueError,
             match=f"LogTransformer: values less than or equal to 0 in columns{extra_exception_text}, make greater than 0 before using transform",
         ):
-
             x.transform(df)

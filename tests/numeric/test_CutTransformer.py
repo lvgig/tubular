@@ -50,7 +50,6 @@ class TestInit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             CutTransformer(column="a", new_column_name="b", verbose=False, copy=True)
 
     def test_column_type_error(self):
@@ -62,7 +61,6 @@ class TestInit(object):
                 "CutTransformer: column arg (name of column) should be a single str giving the column to discretise"
             ),
         ):
-
             CutTransformer(
                 column=["a"],
                 new_column_name="a",
@@ -74,7 +72,6 @@ class TestInit(object):
         with pytest.raises(
             TypeError, match="CutTransformer: new_column_name must be a str"
         ):
-
             CutTransformer(column="b", new_column_name=1)
 
     def test_cut_kwargs_type_error(self):
@@ -84,7 +81,6 @@ class TestInit(object):
             TypeError,
             match=r"""cut_kwargs should be a dict but got type \<class 'int'\>""",
         ):
-
             CutTransformer(column="b", new_column_name="a", cut_kwargs=1)
 
     def test_cut_kwargs_key_type_error(self):
@@ -94,7 +90,6 @@ class TestInit(object):
             TypeError,
             match=r"""CutTransformer: unexpected type \(\<class 'int'\>\) for cut_kwargs key in position 1, must be str""",
         ):
-
             CutTransformer(
                 new_column_name="a",
                 column="b",
@@ -161,7 +156,6 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_df_9(),
         ):
-
             x.transform(df)
 
     def test_pd_cut_call(self, mocker):
@@ -185,7 +179,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, pandas, "cut", expected_call_args, return_value=[1, 2, 3, 4, 5, 6]
         ):
-
             x.transform(df)
 
     def test_output_from_cut_assigned_to_column(self, mocker):
@@ -240,5 +233,4 @@ class TestTransform(object):
             TypeError,
             match="CutTransformer: b should be a numeric dtype but got object",
         ):
-
             x.transform(df)

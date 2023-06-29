@@ -54,7 +54,6 @@ class TestInit(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
         ):
-
             SeriesDtMethodTransformer(
                 new_column_name="a",
                 pd_method_name="year",
@@ -70,7 +69,6 @@ class TestInit(object):
             TypeError,
             match=r"SeriesDtMethodTransformer: column should be a str but got \<class 'list'\>",
         ):
-
             SeriesDtMethodTransformer(
                 new_column_name="a", pd_method_name=1, column=["b", "c"]
             )
@@ -79,14 +77,12 @@ class TestInit(object):
             TypeError,
             match=r"SeriesDtMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_name, expecting str",
         ):
-
             SeriesDtMethodTransformer(new_column_name="a", pd_method_name=1, column="b")
 
         with pytest.raises(
             TypeError,
             match=r"SeriesDtMethodTransformer: unexpected type \(\<class 'float'\>\) for new_column_name, must be str",
         ):
-
             SeriesDtMethodTransformer(
                 new_column_name=1.0, pd_method_name="year", column="b"
             )
@@ -95,7 +91,6 @@ class TestInit(object):
             TypeError,
             match=r"""SeriesDtMethodTransformer: pd_method_kwargs should be a dict but got type \<class 'int'\>""",
         ):
-
             SeriesDtMethodTransformer(
                 new_column_name="a",
                 pd_method_name="year",
@@ -107,7 +102,6 @@ class TestInit(object):
             TypeError,
             match=r"""SeriesDtMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_kwargs key in position 1, must be str""",
         ):
-
             SeriesDtMethodTransformer(
                 new_column_name="a",
                 pd_method_name="year",
@@ -122,7 +116,6 @@ class TestInit(object):
             AttributeError,
             match="""SeriesDtMethodTransformer: error accessing "dt.b" method on pd.Series object - pd_method_name should be a pd.Series.dt method""",
         ):
-
             SeriesDtMethodTransformer(
                 new_column_name="a", pd_method_name="b", column="b"
             )
@@ -219,7 +212,6 @@ class TestTransform(object):
         with ta.functions.assert_function_call(
             mocker, tubular.base.BaseTransformer, "transform", expected_call_args
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(
