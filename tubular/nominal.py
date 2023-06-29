@@ -692,9 +692,8 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                     self.level = [self.level]
 
                 if any([level not in list(y.unique()) for level in self.level]):
-                    raise ValueError(
-                        "Levels contains a level to encode against that is not present in the response."
-                    )
+                    msg = "Levels contains a level to encode against that is not present in the response."
+                    raise ValueError(msg)
 
                 self.response_levels = self.level
 
@@ -1074,9 +1073,8 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
             )
 
         else:
-            raise AttributeError(
-                "Cannot access scikit learn OneHotEncoder get_feature_names method, may be a version issue"
-            )
+            msg = "Cannot access scikit learn OneHotEncoder get_feature_names method, may be a version issue"
+            raise AttributeError(msg)
 
         return input_columns
 

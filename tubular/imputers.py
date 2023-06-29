@@ -148,7 +148,8 @@ class MedianImputer(BaseImputer):
 
         if not isinstance(weight, str):
             if weight is not None:
-                raise TypeError("weight should be str or None")
+                msg = "weight should be str or None"
+                raise TypeError(msg)
 
         self.weight = weight
 
@@ -227,7 +228,8 @@ class MeanImputer(BaseImputer):
 
         if not isinstance(weight, str):
             if weight is not None:
-                raise TypeError("weight should be str or None")
+                msg = "weight should be str or None"
+                raise TypeError(msg)
 
         self.weight = weight
 
@@ -302,7 +304,8 @@ class ModeImputer(BaseImputer):
 
         if weight is not None:
             if not isinstance(weight, str):
-                raise ValueError("ModeImputer: weight should be a string or None")
+                msg = "ModeImputer: weight should be a string or None"
+                raise ValueError(msg)
 
         self.weight = weight
 
