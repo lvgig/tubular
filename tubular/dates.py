@@ -83,7 +83,7 @@ class DateDiffLeapYearTransformer(BaseTransformer):
             raise TypeError(msg)
 
         if missing_replacement:
-            if not type(missing_replacement) in [int, float, str]:
+            if type(missing_replacement) not in [int, float, str]:
                 msg = f"{self.classname()}: if not None, missing_replacement should be an int, float or string"
                 raise TypeError(msg)
 
@@ -124,11 +124,11 @@ class DateDiffLeapYearTransformer(BaseTransformer):
             return self.missing_replacement
 
         else:
-            if not type(row[self.columns[1]]) in [datetime.date, datetime.datetime]:
+            if type(row[self.columns[1]]) not in [datetime.date, datetime.datetime]:
                 msg = f"{self.classname()}: upper column values should be datetime.datetime or datetime.date objects"
                 raise TypeError(msg)
 
-            if not type(row[self.columns[0]]) in [datetime.date, datetime.datetime]:
+            if type(row[self.columns[0]]) not in [datetime.date, datetime.datetime]:
                 msg = f"{self.classname()}: lower column values should be datetime.datetime or datetime.date objects"
                 raise TypeError(msg)
 
@@ -205,11 +205,11 @@ class DateDifferenceTransformer(BaseTransformer):
         copy=True,
         verbose=False,
     ):
-        if not type(column_lower) is str:
+        if type(column_lower) is not str:
             msg = f"{self.classname()}: column_lower must be a str"
             raise TypeError(msg)
 
-        if not type(column_upper) is str:
+        if type(column_upper) is not str:
             msg = f"{self.classname()}: column_upper must be a str"
             raise TypeError(msg)
 
@@ -224,7 +224,7 @@ class DateDifferenceTransformer(BaseTransformer):
             "s",
         ]
 
-        if not type(units) is str:
+        if type(units) is not str:
             msg = f"{self.classname()}: units must be a str"
             raise TypeError(msg)
 
@@ -239,7 +239,7 @@ class DateDifferenceTransformer(BaseTransformer):
         self.units = units
 
         if new_column_name is not None:
-            if not type(new_column_name) is str:
+            if type(new_column_name) is not str:
                 msg = f"{self.classname()}: new_column_name must be a str"
                 raise TypeError(msg)
 
@@ -296,21 +296,21 @@ class ToDatetimeTransformer(BaseTransformer):
     """
 
     def __init__(self, column, new_column_name, to_datetime_kwargs={}, **kwargs):
-        if not type(column) is str:
+        if type(column) is not str:
             msg = f"{self.classname()}: column should be a single str giving the column to transform to datetime"
             raise TypeError(msg)
 
-        if not type(new_column_name) is str:
+        if type(new_column_name) is not str:
             msg = f"{self.classname()}: new_column_name must be a str"
             raise TypeError(msg)
 
-        if not type(to_datetime_kwargs) is dict:
+        if type(to_datetime_kwargs) is not dict:
             msg = f"{self.classname()}: to_datetime_kwargs should be a dict but got type {type(to_datetime_kwargs)}"
             raise TypeError(msg)
 
         else:
             for i, k in enumerate(to_datetime_kwargs.keys()):
-                if not type(k) is str:
+                if type(k) is not str:
                     msg = f"{self.classname()}: unexpected type ({type(k)}) for to_datetime_kwargs key in position {i}, must be str"
                     raise TypeError(msg)
 
@@ -419,7 +419,7 @@ class SeriesDtMethodTransformer(BaseTransformer):
 
         else:
             for i, k in enumerate(pd_method_kwargs.keys()):
-                if not type(k) is str:
+                if type(k) is not str:
                     msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
                     raise TypeError(msg)
 
@@ -710,11 +710,11 @@ class DatetimeInfoExtractor(BaseTransformer):
         datetime_mappings={},
         **kwargs,
     ):
-        if not type(include) is list:
+        if type(include) is not list:
             msg = f"{self.classname()}: include should be List"
             raise TypeError(msg)
 
-        if not type(datetime_mappings) is dict:
+        if type(datetime_mappings) is not dict:
             msg = f"{self.classname()}: datetime_mappings should be Dict"
             raise TypeError(msg)
 
@@ -732,7 +732,7 @@ class DatetimeInfoExtractor(BaseTransformer):
 
         if datetime_mappings != {}:
             for key, mapping in datetime_mappings.items():
-                if not type(mapping) is dict:
+                if type(mapping) is not dict:
                     msg = f"{self.classname()}: values in datetime_mappings should be dict"
                     raise TypeError(msg)
                 if key not in include:
@@ -866,8 +866,8 @@ class DatetimeInfoExtractor(BaseTransformer):
             Mapped value
         """
 
-        if not type(value) is float:
-            if not type(value) is int:
+        if type(value) is not float:
+            if type(value) is not int:
                 msg = f"{self.classname()}: value should be float or int"
                 raise TypeError(msg)
 

@@ -75,7 +75,7 @@ class SeriesStrMethodTransformer(BaseTransformer):
 
         else:
             for i, k in enumerate(pd_method_kwargs.keys()):
-                if not type(k) is str:
+                if type(k) is not str:
                     msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
                     raise TypeError(msg)
 

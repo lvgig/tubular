@@ -161,21 +161,21 @@ class CutTransformer(BaseTransformer):
     """
 
     def __init__(self, column, new_column_name, cut_kwargs={}, **kwargs):
-        if not type(column) is str:
+        if type(column) is not str:
             msg = f"{self.classname()}: column arg (name of column) should be a single str giving the column to discretise"
             raise TypeError(msg)
 
-        if not type(new_column_name) is str:
+        if type(new_column_name) is not str:
             msg = f"{self.classname()}: new_column_name must be a str"
             raise TypeError(msg)
 
-        if not type(cut_kwargs) is dict:
+        if type(cut_kwargs) is not dict:
             msg = f"{self.classname()}: cut_kwargs should be a dict but got type {type(cut_kwargs)}"
             raise TypeError(msg)
 
         else:
             for i, k in enumerate(cut_kwargs.keys()):
-                if not type(k) is str:
+                if type(k) is not str:
                     msg = f"{self.classname()}: unexpected type ({type(k)}) for cut_kwargs key in position {i}, must be str"
                     raise TypeError(msg)
 
@@ -278,7 +278,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
             msg = f"{self.classname()}: pd_method_kwargs 'axis' must be 0 or 1"
             raise ValueError(msg)
 
-        if not type(columns) is list:
+        if type(columns) is not list:
             if len(columns) != 2:
                 msg = f"{self.classname()}: columns must be a list containing two column names but got {columns}"
                 raise ValueError(msg)
@@ -346,13 +346,13 @@ class ScalingTransformer(BaseTransformer):
     """
 
     def __init__(self, columns, scaler_type, scaler_kwargs={}, **kwargs):
-        if not type(scaler_kwargs) is dict:
+        if type(scaler_kwargs) is not dict:
             msg = f"{self.classname()}: scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
             raise TypeError(msg)
 
         else:
             for i, k in enumerate(scaler_kwargs.keys()):
-                if not type(k) is str:
+                if type(k) is not str:
                     msg = f"{self.classname()}: unexpected type ({type(k)}) for scaler_kwargs key in position {i}, must be str"
                     raise TypeError(msg)
 

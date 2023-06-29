@@ -382,29 +382,29 @@ class DataFrameMethodTransformer(BaseTransformer):
 
         if type(new_column_name) is list:
             for i, item in enumerate(new_column_name):
-                if not type(item) is str:
+                if type(item) is not str:
                     msg = f"{self.classname()}: if new_column_name is a list, all elements must be strings but got {type(item)} in position {i}"
                     raise TypeError(msg)
 
-        elif not type(new_column_name) is str:
+        elif type(new_column_name) is not str:
             msg = f"{self.classname()}: unexpected type ({type(new_column_name)}) for new_column_name, must be str or list of strings"
             raise TypeError(msg)
 
-        if not type(pd_method_name) is str:
+        if type(pd_method_name) is not str:
             msg = f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
             raise TypeError(msg)
 
-        if not type(pd_method_kwargs) is dict:
+        if type(pd_method_kwargs) is not dict:
             msg = f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
             raise TypeError(msg)
 
         else:
             for i, k in enumerate(pd_method_kwargs.keys()):
-                if not type(k) is str:
+                if type(k) is not str:
                     msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
                     raise TypeError(msg)
 
-        if not type(drop_original) is bool:
+        if type(drop_original) is not bool:
             msg = f"{self.classname()}: unexpected type ({type(drop_original)}) for drop_original, expecting bool"
             raise TypeError(msg)
 
