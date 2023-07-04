@@ -794,12 +794,9 @@ class DatetimeInfoExtractor(BaseTransformer):
                 vi: k for k, v in timeofday_mapping.items() for vi in v
             }
             if set(self.timeofday_mapping.keys()) != set(range(24)):
-                raise ValueError(
-                    "{}: timeofday mapping dictionary should contain mapping for all hours between 0-23. {} are missing".format(
-                        self.classname(),
-                        set(range(24)) - set(self.timeofday_mapping.keys()),
-                    )
-                )
+                msg = f"{self.classname()}: timeofday mapping dictionary should contain mapping for all hours between 0-23. {set(range(24)) - set(self.timeofday_mapping.keys())} are missing"
+                raise ValueError(msg)
+
             # Check if all hours in dictionary
         else:
             self.timeofday_mapping = {}
@@ -809,12 +806,8 @@ class DatetimeInfoExtractor(BaseTransformer):
                 vi: k for k, v in timeofmonth_mapping.items() for vi in v
             }
             if set(self.timeofmonth_mapping.keys()) != set(range(32)):
-                raise ValueError(
-                    "{}: timeofmonth mapping dictionary should contain mapping for all days between 1-31. {} are missing".format(
-                        self.classname(),
-                        set(range(1, 32)) - set(self.timeofmonth_mapping.keys()),
-                    )
-                )
+                msg = f"{self.classname()}: timeofmonth mapping dictionary should contain mapping for all days between 1-31. {set(range(1, 32)) - set(self.timeofmonth_mapping.keys())} are missing"
+                raise ValueError(msg)
         else:
             self.timeofmonth_mapping = {}
 
@@ -823,12 +816,9 @@ class DatetimeInfoExtractor(BaseTransformer):
                 vi: k for k, v in timeofyear_mapping.items() for vi in v
             }
             if set(self.timeofyear_mapping.keys()) != set(range(1, 13)):
-                raise ValueError(
-                    "{}: timeofyear mapping dictionary should contain mapping for all months between 1-12. {} are missing".format(
-                        self.classname(),
-                        set(range(1, 13)) - set(self.timeofyear_mapping.keys()),
-                    )
-                )
+                msg = f"{self.classname()}: timeofyear mapping dictionary should contain mapping for all months between 1-12. {set(range(1, 13)) - set(self.timeofyear_mapping.keys())} are missing"
+                raise ValueError(msg)
+
         else:
             self.timeofyear_mapping = {}
 
@@ -837,12 +827,9 @@ class DatetimeInfoExtractor(BaseTransformer):
                 vi: k for k, v in dayofweek_mapping.items() for vi in v
             }
             if set(self.dayofweek_mapping.keys()) != set(range(7)):
-                raise ValueError(
-                    "{}: dayofweek mapping dictionary should contain mapping for all days between 0-6. {} are missing".format(
-                        self.classname(),
-                        set(range(7)) - set(self.dayofweek_mapping.keys()),
-                    )
-                )
+                msg = f"{self.classname()}: dayofweek mapping dictionary should contain mapping for all days between 0-6. {set(range(7)) - set(self.dayofweek_mapping.keys())} are missing"
+                raise ValueError(msg)
+
         else:
             self.dayofweek_mapping = {}
 
@@ -1002,18 +989,16 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         super().__init__(columns, copy=True)
 
         if not isinstance(method, str) and not isinstance(method, list):
-            raise TypeError(
-                "{}: method must be a string or list but got {}".format(
-                    self.classname(), type(method)
-                )
+            msg = "{}: method must be a string or list but got {}".format(
+                self.classname(), type(method)
             )
+            raise TypeError(msg)
 
         if not isinstance(units, str) and not isinstance(units, dict):
-            raise TypeError(
-                "{}: units must be a string or dict but got {}".format(
-                    self.classname(), type(units)
-                )
+            msg = "{}: units must be a string or dict but got {}".format(
+                self.classname(), type(units)
             )
+            raise TypeError(msg)
 
         if (
             (not isinstance(period, int))
@@ -1021,23 +1006,21 @@ class DatetimeSinusoidCalculator(BaseTransformer):
             and (not isinstance(period, dict))
             or (isinstance(period, bool))
         ):
-            raise TypeError(
-                "{}: period must be an int, float or dict but got {}".format(
-                    self.classname(), type(period)
-                )
+            msg = "{}: period must be an int, float or dict but got {}".format(
+                self.classname(), type(period)
             )
+            raise TypeError(msg)
 
         if isinstance(units, dict):
             if not all(isinstance(item, str) for item in list(units.keys())) or not all(
                 isinstance(item, str) for item in list(units.values())
             ):
-                raise TypeError(
-                    "{}: units dictionary key value pair must be strings but got keys: {} and values: {}".format(
-                        self.classname(),
-                        set(type(k) for k in units.keys()),
-                        set(type(v) for v in units.values()),
-                    )
+                msg = "{}: units dictionary key value pair must be strings but got keys: {} and values: {}".format(
+                    self.classname(),
+                    set(type(k) for k in units.keys()),
+                    set(type(v) for v in units.values()),
                 )
+                raise TypeError(msg)
 
         if isinstance(period, dict):
             if (
@@ -1050,13 +1033,12 @@ class DatetimeSinusoidCalculator(BaseTransformer):
                 )
                 or any(isinstance(item, bool) for item in list(period.values()))
             ):
-                raise TypeError(
-                    "{}: period dictionary key value pair must be str:int or str:float but got keys: {} and values: {}".format(
-                        self.classname(),
-                        set(type(k) for k in period.keys()),
-                        set(type(v) for v in period.values()),
-                    )
+                msg = "{}: period dictionary key value pair must be str:int or str:float but got keys: {} and values: {}".format(
+                    self.classname(),
+                    set(type(k) for k in period.keys()),
+                    set(type(v) for v in period.values()),
                 )
+                raise TypeError(msg)
 
         valid_method_list = ["sin", "cos"]
 
@@ -1067,11 +1049,10 @@ class DatetimeSinusoidCalculator(BaseTransformer):
 
         for method in method_list:
             if method not in valid_method_list:
-                raise ValueError(
-                    '{}: Invalid method {} supplied, should be "sin", "cos" or a list containing both'.format(
-                        self.classname(), method
-                    )
+                msg = '{}: Invalid method {} supplied, should be "sin", "cos" or a list containing both'.format(
+                    self.classname(), method
                 )
+                raise ValueError(msg)
 
         valid_unit_list = [
             "year",
@@ -1085,17 +1066,15 @@ class DatetimeSinusoidCalculator(BaseTransformer):
 
         if isinstance(units, dict):
             if not set(list(units.values())).issubset(valid_unit_list):
-                raise ValueError(
-                    "{}: units dictionary values must be one of 'year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond' but got {}".format(
-                        self.classname(), set(units.values())
-                    )
+                msg = "{}: units dictionary values must be one of 'year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond' but got {}".format(
+                    self.classname(), set(units.values())
                 )
+                raise ValueError(msg)
         elif units not in valid_unit_list:
-            raise ValueError(
-                "{}: Invalid units {} supplied, should be in {}".format(
-                    self.classname(), units, valid_unit_list
-                )
+            msg = "{}: Invalid units {} supplied, should be in {}".format(
+                self.classname(), units, valid_unit_list
             )
+            raise ValueError(msg)
 
         self.method = method_list
         self.units = units
@@ -1103,19 +1082,17 @@ class DatetimeSinusoidCalculator(BaseTransformer):
 
         if isinstance(units, dict):
             if not sorted(list(units.keys())) == sorted(list(self.columns)):
-                raise ValueError(
-                    "{}: unit dictionary keys must be the same as columns but got {}".format(
-                        self.classname(), set(units.keys())
-                    )
+                msg = "{}: unit dictionary keys must be the same as columns but got {}".format(
+                    self.classname(), set(units.keys())
                 )
+                raise ValueError(msg)
 
         if isinstance(period, dict):
             if not sorted(list(period.keys())) == sorted(list(self.columns)):
-                raise ValueError(
-                    "{}: period dictionary keys must be the same as columns but got {}".format(
-                        self.classname(), set(period.keys())
-                    )
+                msg = "{}: period dictionary keys must be the same as columns but got {}".format(
+                    self.classname(), set(period.keys())
                 )
+                raise ValueError(msg)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform - creates column containing sine or cosine of another datetime column.

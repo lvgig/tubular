@@ -284,16 +284,21 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
                 raise ValueError(msg)
 
             # check weight is numeric
+
             elif not pd.api.types.is_numeric_dtype(X[weights_column]):
-                raise ValueError("weight column must be numeric.")
+                msg = "weight column must be numeric."
+                raise ValueError(msg)
 
             # check weight is positive
+
             elif not (X[weights_column] < 0).sum() == 0:
-                raise ValueError("weight column must be positive")
+                msg = "weight column must be positive"
+                raise ValueError(msg)
 
             # check weight non-null
             elif not (X[weights_column].isnull()).sum() == 0:
-                raise ValueError("weight column must be non-null")
+                msg = "weight column must be non-null"
+                raise ValueError(msg)
 
 
 class ReturnKeyDict(dict):

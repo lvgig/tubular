@@ -520,9 +520,8 @@ class InteractionTransformer(BaseTransformer):
             else:
                 self.max_degree = max_degree
             if max_degree > len(columns):
-                raise ValueError(
-                    "max_degree must be equal or lower than number of columns"
-                )
+                msg = f"{self.classname()}: max_degree must be equal or lower than number of columns"
+                raise ValueError(msg)
             else:
                 self.max_degree = max_degree
         else:
