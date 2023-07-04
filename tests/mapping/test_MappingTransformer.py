@@ -157,7 +157,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_1(), expected_df_1()),
     )
     def test_expected_output(self, df, expected):
@@ -178,7 +178,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_1(), expected_df_2()),
     )
     def test_non_specified_values_unchanged(self, df, expected):
@@ -220,7 +220,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "mapping, input_col_name, output_col_type_check",
+        ("mapping", "input_col_name", "output_col_type_check"),
         [
             ({"a": {1: 1.1, 6: 6.6}}, "a", is_float_dtype),
             ({"a": {1: "one", 6: "six"}}, "a", is_object_dtype),
@@ -251,7 +251,7 @@ class TestTransform:
         assert output_col_type_check(df[input_col_name])
 
     @pytest.mark.parametrize(
-        "mapping, input_col_name, input_col_type",
+        ("mapping", "input_col_name", "input_col_type"),
         [
             ({"a": {1: True, 6: False}}, "a", "int64"),
         ],
@@ -271,7 +271,7 @@ class TestTransform:
             x.transform(df)
 
     @pytest.mark.parametrize(
-        "mapping, input_col_name, input_col_type",
+        ("mapping", "input_col_name", "input_col_type"),
         [
             ({"a": {1: True, 6: False}}, "a", "int64"),
         ],
@@ -304,7 +304,7 @@ class TestTransform:
         assert is_categorical_dtype(df["b"])
 
     @pytest.mark.parametrize(
-        "mapping, mapped_col",
+        ("mapping", "mapped_col"),
         [({"a": {99: "99", 98: "98"}}, "a"), ({"b": {"z": 99, "y": 98}}, "b")],
     )
     def test_no_applicable_mapping(self, mapping, mapped_col):
@@ -319,7 +319,7 @@ class TestTransform:
             x.transform(df)
 
     @pytest.mark.parametrize(
-        "mapping, mapped_col",
+        ("mapping", "mapped_col"),
         [({"a": {1: "1", 99: "99"}}, "a"), ({"b": {"a": 1, "z": 99}}, "b")],
     )
     def test_excess_mapping_values(self, mapping, mapped_col):

@@ -215,7 +215,7 @@ class TestTransform:
         ), "unexpected values assigned to a_new column"
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_to_datetime_test_df(), expected_df_1()
         ),

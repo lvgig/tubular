@@ -457,7 +457,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df_test, expected",
+        ("df_test", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_7(), expected_df_1()),
     )
     def test_expected_output(self, df_test, expected):
@@ -535,7 +535,7 @@ class TestTransform:
             x.transform(df_test)
 
     @pytest.mark.parametrize(
-        "df_test, expected",
+        ("df_test", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_8(), expected_df_2()),
     )
     def test_unseen_categories_encoded_as_all_zeroes(self, df_test, expected):

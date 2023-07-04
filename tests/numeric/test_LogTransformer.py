@@ -196,7 +196,7 @@ class TestTransform:
             x.transform(df)
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
     )
     def test_expected_output_1(self, df, expected):
@@ -214,7 +214,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_2()),
     )
     def test_expected_output_2(self, df, expected):
@@ -230,7 +230,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_3()),
     )
     def test_expected_output_3(self, df, expected):
@@ -248,7 +248,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_4()),
     )
     def test_expected_output_4(self, df, expected):
@@ -266,7 +266,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_4(), expected_df_5()),
     )
     def test_expected_output_5(self, df, expected):
@@ -286,7 +286,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_4(), expected_df_6()),
     )
     def test_expected_output_6(self, df, expected):
@@ -306,7 +306,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, columns, add_1, extra_exception_text",
+        ("df", "columns", "add_1", "extra_exception_text"),
         (
             [pd.DataFrame({"a": [1, 2, 0]}), ["a"], False, ""],
             [pd.DataFrame({"a": [1, 2, 0], "b": [1, 2, 3]}), ["a", "b"], False, ""],

@@ -10,22 +10,22 @@ import tubular
 from tubular.dates import DatetimeInfoExtractor
 
 
-@pytest.fixture
+@pytest.fixture()
 def timeofday_extractor():
     return DatetimeInfoExtractor(columns=["a"], include=["timeofday"])
 
 
-@pytest.fixture
+@pytest.fixture()
 def timeofmonth_extractor():
     return DatetimeInfoExtractor(columns=["a"], include=["timeofmonth"])
 
 
-@pytest.fixture
+@pytest.fixture()
 def timeofyear_extractor():
     return DatetimeInfoExtractor(columns=["a"], include=["timeofyear"])
 
 
-@pytest.fixture
+@pytest.fixture()
 def dayofweek_extractor():
     return DatetimeInfoExtractor(columns=["a"], include=["dayofweek"])
 
@@ -149,7 +149,7 @@ class TestExtractDatetimeInfoInit:
             )
 
     @pytest.mark.parametrize(
-        "include, incorrect_datetime_mappings_keys",
+        ("include", "incorrect_datetime_mappings_keys"),
         [
             (["timeofyear"], {"invalid_key": {"valid_mapping": "valid_output"}}),
             (["timeofyear"], {"dayofweek": {"day": range(7)}}),
@@ -174,7 +174,7 @@ class TestExtractDatetimeInfoInit:
             )
 
     @pytest.mark.parametrize(
-        "incomplete_mappings, expected_exception",
+        ("incomplete_mappings", "expected_exception"),
         [
             (
                 {"timeofday": {"mapped": range(23)}},
@@ -240,7 +240,7 @@ class TestMapValues:
             timeofday_extractor._map_values(incorrect_size_input, "timeofday")
 
     @pytest.mark.parametrize(
-        "valid_hour, hour_time_of_day",
+        ("valid_hour", "hour_time_of_day"),
         [
             (0, "night"),
             (5, "night"),
@@ -263,7 +263,7 @@ class TestMapValues:
         )
 
     @pytest.mark.parametrize(
-        "valid_day, day_time_of_month",
+        ("valid_day", "day_time_of_month"),
         [
             (1, "start"),
             (6, "start"),
@@ -286,7 +286,7 @@ class TestMapValues:
         )
 
     @pytest.mark.parametrize(
-        "valid_month, month_time_of_year",
+        ("valid_month", "month_time_of_year"),
         [
             (1, "winter"),
             (3, "spring"),
@@ -308,7 +308,7 @@ class TestMapValues:
         )
 
     @pytest.mark.parametrize(
-        "valid_day, dayofweek",
+        ("valid_day", "dayofweek"),
         [
             (0, "monday"),
             (2, "wednesday"),

@@ -80,7 +80,7 @@ class TestTransform:
             x.transform(df)
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_2(), expected_df_1()),
     )
     def test_value_set_in_transform(self, df, expected):

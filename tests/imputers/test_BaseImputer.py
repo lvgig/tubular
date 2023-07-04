@@ -78,7 +78,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_2(), expected_df_1()),
     )
     def test_expected_output_1(self, df, expected):
@@ -96,7 +96,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_2(), expected_df_2()),
     )
     def test_expected_output_2(self, df, expected):
@@ -114,7 +114,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_2(), expected_df_3()),
     )
     def test_expected_output_3(self, df, expected):

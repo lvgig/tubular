@@ -193,7 +193,7 @@ class TestFit:
         return df
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.row_by_row_params(
             pd.DataFrame({"a": [np.nan, np.nan, np.nan], "b": [None, None, None]}),
             expected_df_nan(),
@@ -293,7 +293,7 @@ class TestTransform:
             x.transform(df)
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
     )
     def test_nulls_imputed_correctly(self, df, expected):
@@ -312,7 +312,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_2()),
     )
     def test_nulls_imputed_correctly_2(self, df, expected):
@@ -331,7 +331,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.row_by_row_params(d.create_df_9(), expected_df_3())
         + ta.pandas.index_preserved_params(d.create_df_9(), expected_df_3()),
     )

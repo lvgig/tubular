@@ -126,7 +126,7 @@ class TestSetColumnDtypeTransform:
         return df
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.row_by_row_params(base_df(), expected_df())
         + ta.pandas.index_preserved_params(base_df(), expected_df()),
     )

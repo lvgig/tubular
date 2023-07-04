@@ -135,7 +135,7 @@ class TestInit:
         )
 
     @pytest.mark.parametrize(
-        "pd_method_name, callable_attr", [("year", False), ("to_period", True)]
+        ("pd_method_name", "callable_attr"), [("year", False), ("to_period", True)]
     )
     def test_callable_attribute_set(self, pd_method_name, callable_attr):
         """Test the _callable attribute is set to True if pd.Series.dt.pd_method_name is callable."""
@@ -202,7 +202,7 @@ class TestTransform:
             x.transform(df)
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_1()
         ),
@@ -225,7 +225,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_2()
         ),
@@ -248,7 +248,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_3()
         ),

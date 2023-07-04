@@ -381,7 +381,7 @@ class TestTransform:
             x.transform(df)
 
     @pytest.mark.parametrize(
-        "svd_solver, svd_solver_output_str",
+        ("svd_solver", "svd_solver_output_str"),
         [("full", "full"), ("arpack", "arpack"), ("randomized", "randomized")],
     )
     def test_output_from_pca_transform_set_to_columns(

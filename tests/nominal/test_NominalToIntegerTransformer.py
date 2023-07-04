@@ -271,7 +271,7 @@ class TestTransform:
             x.transform(df)
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_1(), expected_df_1()),
     )
     def test_expected_output(self, df, expected):
@@ -321,7 +321,7 @@ class TestInverseTransform:
             x.inverse_transform(df_transformed)
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_1(), d.create_df_1()),
     )
     def test_expected_output(self, df, expected):

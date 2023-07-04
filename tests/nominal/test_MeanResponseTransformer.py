@@ -254,7 +254,7 @@ class TestFit:
         )
 
     @pytest.mark.parametrize(
-        "level, target_column, unseen_level_handling",
+        ("level", "target_column", "unseen_level_handling"),
         [
             (None, "a", "Mean"),
             ("all", "multi_level_response", 32),
@@ -276,7 +276,7 @@ class TestFit:
         ), "Returned value from create_MeanResponseTransformer_test_df.fit not as expected."
 
     @pytest.mark.parametrize(
-        "level, target_column, unseen_level_handling",
+        ("level", "target_column", "unseen_level_handling"),
         [
             (None, "a", "Mean"),
             ("all", "multi_level_response", 32),
@@ -300,7 +300,7 @@ class TestFit:
         )
 
     @pytest.mark.parametrize(
-        "level, target_column, unseen_level_handling",
+        ("level", "target_column", "unseen_level_handling"),
         [
             (None, "a", "Mean"),
             ("all", "multi_level_response", 32),
@@ -324,7 +324,7 @@ class TestFit:
             x.fit(df, df[target_column])
 
     @pytest.mark.parametrize(
-        "level, target_column, unseen_level_handling",
+        ("level", "target_column", "unseen_level_handling"),
         [
             (None, "a", "Mean"),
             ("all", "multi_level_response", 32),
@@ -366,7 +366,7 @@ class TestFit:
                 assert actual == expected
 
     @pytest.mark.parametrize(
-        "level, target_column, unseen_level_handling",
+        ("level", "target_column", "unseen_level_handling"),
         [
             (None, "a", "Mean"),
             (None, "a", "Median"),
@@ -605,7 +605,7 @@ class TestFitBinaryResponse:
                 ), "encodings using priors should be closer to the global mean than without"
 
     @pytest.mark.parametrize(
-        "low_weight, high_weight", ((1, 2), (2, 3), (3, 4), (10, 20))
+        ("low_weight", "high_weight"), ((1, 2), (2, 3), (3, 4), (10, 20))
     )
     def test_prior_logic_for_weights(self, low_weight, high_weight):
         "Test that for fixed prior a group with lower weight is moved closer to the global mean than one with higher weight."
@@ -1026,7 +1026,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_MeanResponseTransformer_test_df(), expected_df_1()
         ),
@@ -1051,7 +1051,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_MeanResponseTransformer_test_df(), expected_df_2()
         ),
@@ -1077,7 +1077,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_MeanResponseTransformer_test_df(), expected_df_3()
         ),
@@ -1125,7 +1125,7 @@ class TestTransform:
             x.transform(df)
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_MeanResponseTransformer_test_df_unseen_levels(), expected_df_4()
         ),
@@ -1151,7 +1151,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_MeanResponseTransformer_test_df_unseen_levels(), expected_df_5()
         ),
@@ -1177,7 +1177,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_MeanResponseTransformer_test_df_unseen_levels(), expected_df_6()
         ),
@@ -1203,7 +1203,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_MeanResponseTransformer_test_df_unseen_levels(), expected_df_7()
         ),
@@ -1229,7 +1229,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_MeanResponseTransformer_test_df_unseen_levels(), expected_df_8()
         ),
@@ -1253,7 +1253,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_MeanResponseTransformer_test_df_unseen_levels(), expected_df_9()
         ),
@@ -1275,7 +1275,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_MeanResponseTransformer_test_df_unseen_levels(), expected_df_10()
         ),

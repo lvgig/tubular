@@ -164,7 +164,7 @@ class TestTwoColumnOperatorTransformerTransform:
         )
 
     @pytest.mark.parametrize(
-        "pd_method_name, output",
+        ("pd_method_name", "output"),
         [
             (
                 "mul",

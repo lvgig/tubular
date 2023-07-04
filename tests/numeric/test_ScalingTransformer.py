@@ -54,7 +54,7 @@ class TestInit:
             ScalingTransformer(columns="b", scaler_type="zzz", scaler_kwargs={"a": 1})
 
     @pytest.mark.parametrize(
-        "scaler_type, scaler_actual",
+        ("scaler_type", "scaler_actual"),
         [
             ("min_max", MinMaxScaler),
             ("max_abs", MaxAbsScaler),
@@ -70,7 +70,7 @@ class TestInit:
         ), f"unexpected scaler_type set in init for {scaler_type}"
 
     @pytest.mark.parametrize(
-        "scaler_type, scaler_type_str, scaler_kwargs_value",
+        ("scaler_type", "scaler_type_str", "scaler_kwargs_value"),
         [
             ("min_max", "MinMaxScaler", {"copy": False, "feature_range": (0.5, 1.5)}),
             ("max_abs", "MaxAbsScaler", {"copy": False}),
@@ -204,7 +204,7 @@ class TestFit:
             x.fit(df)
 
     @pytest.mark.parametrize(
-        "scaler_type, scaler_type_str",
+        ("scaler_type", "scaler_type_str"),
         [
             ("min_max", "MinMaxScaler"),
             ("max_abs", "MaxAbsScaler"),
@@ -304,7 +304,7 @@ class TestTransform:
             x.transform(df)
 
     @pytest.mark.parametrize(
-        "scaler_type, scaler_type_str",
+        ("scaler_type", "scaler_type_str"),
         [
             ("min_max", "MinMaxScaler"),
             ("max_abs", "MaxAbsScaler"),
@@ -347,7 +347,7 @@ class TestTransform:
         ), f"unexpected kwargs in {scaler_type_str} transform call"
 
     @pytest.mark.parametrize(
-        "scaler_type, scaler_type_str",
+        ("scaler_type", "scaler_type_str"),
         [
             ("min_max", "MinMaxScaler"),
             ("max_abs", "MaxAbsScaler"),
@@ -385,7 +385,7 @@ class TestTransform:
 
     @pytest.mark.parametrize("columns", [("b"), ("c"), (["b", "c"])])
     @pytest.mark.parametrize(
-        "scaler_type, scaler_type_str",
+        ("scaler_type", "scaler_type_str"),
         [
             ("min_max", "MinMaxScaler"),
             ("max_abs", "MaxAbsScaler"),

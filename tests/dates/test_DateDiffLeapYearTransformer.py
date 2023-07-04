@@ -331,7 +331,7 @@ class TestTransform:
             x.transform(df)
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_date_test_df(), expected_df_1()),
     )
     def test_expected_output_drop_cols_true(self, df, expected):
@@ -353,7 +353,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_date_test_df(), expected_df_2()),
     )
     def test_expected_output_drop_cols_false(self, df, expected):
@@ -375,7 +375,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_date_test_nulls_df(), expected_df_3()
         ),

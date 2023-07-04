@@ -42,7 +42,7 @@ class TestInit:
         ta.classes.assert_inheritance(x, tubular.capping.CappingTransformer)
 
     @pytest.mark.parametrize(
-        "capping_values, quantiles, weights_column, verbose, copy",
+        ("capping_values", "quantiles", "weights_column", "verbose", "copy"),
         [
             ({"a": [1, 3], "b": [None, -1]}, None, None, True, True),
             ({"a": [1, 3], "b": [None, -1]}, None, "aa", True, False),
@@ -190,7 +190,7 @@ class TestSetReplacementValues:
         )
 
     @pytest.mark.parametrize(
-        "value_to_set, expected_replacement_values",
+        ("value_to_set", "expected_replacement_values"),
         [
             (
                 {"a": [0, 1], "b": [None, 1], "c": [3, None]},

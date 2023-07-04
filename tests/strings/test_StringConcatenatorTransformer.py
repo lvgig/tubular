@@ -6,7 +6,7 @@ import tubular
 from tubular.strings import StringConcatenator
 
 
-@pytest.fixture
+@pytest.fixture()
 def concatenate_str():
     return StringConcatenator(columns=["a", "b"], new_column="merged_values")
 

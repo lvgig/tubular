@@ -186,7 +186,7 @@ class TestTransform:
         ), "unexpected values assigned to c_new column"
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_9(), expected_df_1()),
     )
     def test_expected_output(self, df, expected):

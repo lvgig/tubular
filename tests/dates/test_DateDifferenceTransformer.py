@@ -488,7 +488,7 @@ class TestTransform:
             x.transform(df)
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_1()
         ),
@@ -517,7 +517,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_2()
         ),
@@ -546,7 +546,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_3()
         ),
@@ -575,7 +575,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_4()
         ),
@@ -604,7 +604,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_5()
         ),
@@ -633,7 +633,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(), expected_df_6()
         ),
@@ -662,7 +662,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_nulls_df(), expected_df_7()
         ),

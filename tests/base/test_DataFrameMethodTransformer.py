@@ -222,7 +222,7 @@ class TestTransform:
             x.transform(df)
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
     )
     def test_expected_output_single_columns_assignment(self, df, expected):
@@ -243,7 +243,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_2()),
     )
     def test_expected_output_multi_columns_assignment(self, df, expected):
@@ -264,7 +264,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, new_column_name, pd_method_name, columns, pd_method_kwargs",
+        ("df", "new_column_name", "pd_method_name", "columns", "pd_method_kwargs"),
         [
             (d.create_df_3(), ["d", "e"], "div", ["b", "c"], {"other": 2}),
             (d.create_df_3(), "d", "sum", ["b", "c"], {"axis": 1}),

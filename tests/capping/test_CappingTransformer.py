@@ -449,7 +449,7 @@ class TestPrepareQuantiles:
         )
 
     @pytest.mark.parametrize(
-        "values, quantiles, sample_weight, expected_quantiles",
+        ("values", "quantiles", "sample_weight", "expected_quantiles"),
         [
             (
                 d.create_df_9()["a"],
@@ -503,7 +503,7 @@ class TestPrepareQuantiles:
         ), f"unexpected kwargs in call to weighted_quantile, expecting None but got {call_kwargs}"
 
     @pytest.mark.parametrize(
-        "values, quantiles, sample_weight, expected_results",
+        ("values", "quantiles", "sample_weight", "expected_results"),
         [
             (
                 d.create_df_9()["a"],
@@ -642,7 +642,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
     )
     def test_expected_output_min_and_max_combinations(self, df, expected):
@@ -660,7 +660,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_4(), expected_df_2()),
     )
     def test_non_cap_column_left_untouched(self, df, expected):
@@ -752,7 +752,7 @@ class TestWeightedQuantile:
         )
 
     @pytest.mark.parametrize(
-        "values, sample_weight, quantiles, expected_quantiles",
+        ("values", "sample_weight", "quantiles", "expected_quantiles"),
         [
             (
                 [1, 2, 3],

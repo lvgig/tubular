@@ -347,7 +347,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_5(), expected_df_1()),
     )
     def test_expected_output_no_weight(self, df, expected):
@@ -407,7 +407,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_6(), expected_df_2()),
     )
     def test_expected_output_weight(self, df, expected):
@@ -425,7 +425,7 @@ class TestTransform:
             msg_tag="Unexpected values in GroupRareLevelsTransformer.transform (with weights)",
         )
 
-    @pytest.mark.parametrize("label,col", [(2.0, "a"), ("zzzz", "b"), (100, "c")])
+    @pytest.mark.parametrize(("label", "col"), [(2.0, "a"), ("zzzz", "b"), (100, "c")])
     def test_rare_level_name_same_col_type(self, label, col):
         """Test that checks if output columns are of the same type with respect to the input label."""
         df = d.create_df_10()
