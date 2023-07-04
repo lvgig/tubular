@@ -13,7 +13,6 @@ class TestSetColumnDtypeInit:
 
     def test_init_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=SetColumnDtype.__init__,
             expected_arguments=[
@@ -26,7 +25,6 @@ class TestSetColumnDtypeInit:
 
     def test_inheritance(self):
         """Test that SetColumnDtype inherits from tubular BaseTransformer."""
-
         x = SetColumnDtype(columns=["a"], dtype=float)
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
@@ -46,7 +44,6 @@ class TestSetColumnDtypeInit:
 
     def test_dtype_attribute_set(self):
         """Test that the value passed in the value arg is set as an attribute of the same name."""
-
         x = SetColumnDtype(columns=["a"], dtype=str)
 
         assert x.dtype == str, "unexpected value set to dtype atttribute"
@@ -69,7 +66,6 @@ class TestSetColumnDtypeTransform:
     )
     def test_class_methods(self, method_name):
         """Test that SetColumnDtype has transform method."""
-
         x = SetColumnDtype(columns=["a"], dtype=float)
 
         ta.classes.test_object_method(
@@ -78,7 +74,6 @@ class TestSetColumnDtypeTransform:
 
     def test_transform_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=SetColumnDtype.transform,
             expected_arguments=[
@@ -89,7 +84,6 @@ class TestSetColumnDtypeTransform:
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
-
         df = d.create_df_3()
 
         x = SetColumnDtype(columns=["a"], dtype=float)
@@ -107,7 +101,6 @@ class TestSetColumnDtypeTransform:
 
     def base_df():
         """Input dataframe from test_expected_output."""
-
         df = pd.DataFrame(
             {
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],
@@ -121,7 +114,6 @@ class TestSetColumnDtypeTransform:
 
     def expected_df():
         """Expected output from test_expected_output."""
-
         df = pd.DataFrame(
             {
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],
@@ -140,8 +132,7 @@ class TestSetColumnDtypeTransform:
     )
     @pytest.mark.parametrize("dtype", [float, "float"])
     def test_expected_output(self, df, expected, dtype):
-        """Test values are correctly set to float dtype"""
-
+        """Test values are correctly set to float dtype."""
         df["a"] = df["a"].astype(str)
         df["b"] = df["b"].astype(float)
         df["c"] = df["c"].astype(int)

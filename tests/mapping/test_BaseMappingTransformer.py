@@ -11,7 +11,6 @@ class TestInit:
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=BaseMappingTransformer.__init__,
             expected_arguments=["self", "mappings"],
@@ -20,7 +19,6 @@ class TestInit:
 
     def test_class_methods(self):
         """Test that BaseMappingTransformer has transform method."""
-
         x = BaseMappingTransformer(mappings={"a": {"a": 1}})
 
         ta.classes.test_object_method(
@@ -29,14 +27,12 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that BaseMappingTransformer inherits from BaseTransformer."""
-
         x = BaseMappingTransformer(mappings={"a": {"a": 1}})
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
-
         expected_call_args = {
             0: {"args": (), "kwargs": {"columns": ["a"], "verbose": True, "copy": True}}
         }
@@ -48,7 +44,6 @@ class TestInit:
 
     def test_no_keys_dict_error(self):
         """Test that an exception is raised if mappings is a dict but with no keys."""
-
         with pytest.raises(
             ValueError, match="BaseMappingTransformer: mappings has no values"
         ):
@@ -56,7 +51,6 @@ class TestInit:
 
     def test_mappings_contains_non_dict_items_error(self):
         """Test that an exception is raised if mappings contains non-dict items."""
-
         with pytest.raises(
             ValueError,
             match="BaseMappingTransformer: values in mappings dictionary should be dictionaries",
@@ -65,7 +59,6 @@ class TestInit:
 
     def test_mappings_not_dict_error(self):
         """Test that an exception is raised if mappings is not a dict."""
-
         with pytest.raises(
             ValueError, match="BaseMappingTransformer: mappings must be a dictionary"
         ):
@@ -73,7 +66,6 @@ class TestInit:
 
     def test_mappings_set_to_attribute(self):
         """Test that the value passed for mappings is saved in an attribute of the same name."""
-
         value = {"a": {"a": 1}, "b": {"a": 1}}
 
         x = BaseMappingTransformer(mappings=value)
@@ -90,7 +82,6 @@ class TestTransform:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=BaseMappingTransformer.transform,
             expected_arguments=["self", "X"],
@@ -99,7 +90,6 @@ class TestTransform:
 
     def test_check_is_fitted_call(self, mocker):
         """Test the call to check_is_fitted."""
-
         df = d.create_df_1()
 
         mapping = {
@@ -118,7 +108,6 @@ class TestTransform:
 
     def test_super_transform_call(self, mocker):
         """Test the call to BaseTransformer.transform."""
-
         df = d.create_df_1()
 
         mapping = {
@@ -141,7 +130,6 @@ class TestTransform:
     )
     def test_X_returned(self, df, expected):
         """Test that X is returned from transform."""
-
         mapping = {
             "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
             "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
@@ -159,7 +147,6 @@ class TestTransform:
 
     def test_mappings_unchanged(self):
         """Test that mappings is unchanged in transform."""
-
         df = d.create_df_1()
 
         mapping = {

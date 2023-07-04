@@ -12,7 +12,6 @@ class TestInit:
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=SeriesStrMethodTransformer.__init__,
             expected_arguments=[
@@ -27,7 +26,6 @@ class TestInit:
 
     def test_class_methods(self):
         """Test that SeriesStrMethodTransformer has transform method."""
-
         x = SeriesStrMethodTransformer(
             new_column_name="a", pd_method_name="find", columns=["b"]
         )
@@ -38,7 +36,6 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that SeriesStrMethodTransformer inherits from BaseTransformer."""
-
         x = SeriesStrMethodTransformer(
             new_column_name="a", pd_method_name="find", columns=["b"]
         )
@@ -47,7 +44,6 @@ class TestInit:
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
-
         expected_call_args = {
             0: {
                 "args": (),
@@ -68,7 +64,6 @@ class TestInit:
 
     def test_invalid_input_type_errors(self):
         """Test that an exceptions are raised for invalid input types."""
-
         with pytest.raises(
             ValueError,
             match="SeriesStrMethodTransformer: columns arg should contain only 1 column name but got 2",
@@ -117,7 +112,6 @@ class TestInit:
 
     def test_exception_raised_non_pandas_method_passed(self):
         """Test and exception is raised if a non pd.Series.str method is passed for pd_method_name."""
-
         with pytest.raises(
             AttributeError,
             match="""SeriesStrMethodTransformer: error accessing "str.b" method on pd.Series object - pd_method_name should be a pd.Series.str method""",
@@ -128,7 +122,6 @@ class TestInit:
 
     def test_attributes_set(self):
         """Test that the values passed for new_column_name, pd_method_name are saved to attributes on the object."""
-
         x = SeriesStrMethodTransformer(
             new_column_name="a",
             pd_method_name="find",
@@ -152,7 +145,6 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output of test_expected_output_no_overwrite."""
-
         df = d.create_df_7()
 
         df["b_new"] = df["b"].str.find(sub="a")
@@ -161,7 +153,6 @@ class TestTransform:
 
     def expected_df_2():
         """Expected output of test_expected_output_overwrite."""
-
         df = d.create_df_7()
 
         df["b"] = df["b"].str.pad(width=10)
@@ -170,14 +161,12 @@ class TestTransform:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=SeriesStrMethodTransformer.transform, expected_arguments=["self", "X"]
         )
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
-
         df = d.create_df_7()
 
         x = SeriesStrMethodTransformer(
@@ -197,7 +186,6 @@ class TestTransform:
     )
     def test_expected_output_no_overwrite(self, df, expected):
         """Test a single column output from transform gives expected results, when not overwriting the original column."""
-
         x = SeriesStrMethodTransformer(
             new_column_name="b_new",
             pd_method_name="find",
@@ -219,7 +207,6 @@ class TestTransform:
     )
     def test_expected_output_overwrite(self, df, expected):
         """Test a single column output from transform gives expected results, when overwriting the original column."""
-
         x = SeriesStrMethodTransformer(
             new_column_name="b",
             pd_method_name="pad",
@@ -253,7 +240,6 @@ class TestTransform:
         self, mocker, df, new_column_name, pd_method_name, columns, pd_method_kwargs
     ):
         """Test that the pandas.Series.str method is called as expected (with kwargs passed) during transform."""
-
         spy = mocker.spy(pd.Series.str, pd_method_name)
 
         x = SeriesStrMethodTransformer(
@@ -278,7 +264,6 @@ class TestTransform:
 
     def test_attributes_unchanged_by_transform(self):
         """Test that attributes set in init are unchanged by the transform method."""
-
         df = d.create_df_7()
 
         x = SeriesStrMethodTransformer(

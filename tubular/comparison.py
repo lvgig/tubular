@@ -4,7 +4,6 @@ from tubular.base import BaseTransformer
 
 
 class EqualityChecker(BaseTransformer):
-
     """Transformer to check if two columns are equal.
 
     Parameters

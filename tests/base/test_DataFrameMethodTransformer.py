@@ -15,7 +15,6 @@ class TestInit:
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=DataFrameMethodTransformer.__init__,
             expected_arguments=[
@@ -31,7 +30,6 @@ class TestInit:
 
     def test_class_methods(self):
         """Test that DataFrameMethodTransformer has transform method."""
-
         x = DataFrameMethodTransformer(
             new_column_name="a", pd_method_name="sum", columns=["b", "c"]
         )
@@ -42,7 +40,6 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that DataFrameMethodTransformer inherits from BaseTransformer."""
-
         x = DataFrameMethodTransformer(
             new_column_name="a", pd_method_name="sum", columns=["b", "c"]
         )
@@ -51,7 +48,6 @@ class TestInit:
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
-
         expected_call_args = {
             0: {
                 "args": (),
@@ -72,7 +68,6 @@ class TestInit:
 
     def test_invalid_input_type_errors(self):
         """Test that an exceptions are raised for invalid input types."""
-
         with pytest.raises(
             TypeError,
             match=r"DataFrameMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_name, expecting str",
@@ -132,7 +127,6 @@ class TestInit:
 
     def test_exception_raised_non_pandas_method_passed(self):
         """Test and exception is raised if a non pd.DataFrame method is passed for pd_method_name."""
-
         with pytest.raises(
             AttributeError,
             match="""DataFrameMethodTransformer: error accessing "b" method on pd.DataFrame object - pd_method_name should be a pd.DataFrame method""",
@@ -143,7 +137,6 @@ class TestInit:
 
     def test_attributes_set(self):
         """Test that the values passed for new_column_name, pd_method_name are saved to attributes on the object."""
-
         x = DataFrameMethodTransformer(
             new_column_name="a",
             pd_method_name="sum",
@@ -182,7 +175,6 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output of test_expected_output_single_columns_assignment."""
-
         df = pd.DataFrame(
             {
                 "a": [1, 2, 3, 4, 5, 6, np.NaN],
@@ -196,7 +188,6 @@ class TestTransform:
 
     def expected_df_2():
         """Expected output of test_expected_output_multi_columns_assignment."""
-
         df = pd.DataFrame(
             {
                 "a": [1, 2, 3, 4, 5, 6, np.NaN],
@@ -211,14 +202,12 @@ class TestTransform:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=DataFrameMethodTransformer.transform, expected_arguments=["self", "X"]
         )
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
-
         df = d.create_df_3()
 
         x = DataFrameMethodTransformer(
@@ -238,7 +227,6 @@ class TestTransform:
     )
     def test_expected_output_single_columns_assignment(self, df, expected):
         """Test a single column output from transform gives expected results."""
-
         x = DataFrameMethodTransformer(
             new_column_name="d",
             pd_method_name="sum",
@@ -260,7 +248,6 @@ class TestTransform:
     )
     def test_expected_output_multi_columns_assignment(self, df, expected):
         """Test a multiple column output from transform gives expected results."""
-
         x = DataFrameMethodTransformer(
             new_column_name=["d", "e"],
             pd_method_name="div",
@@ -291,7 +278,6 @@ class TestTransform:
         self, mocker, df, new_column_name, pd_method_name, columns, pd_method_kwargs
     ):
         """Test that the pandas method is called as expected (with kwargs passed) during transform."""
-
         spy = mocker.spy(pd.DataFrame, pd_method_name)
 
         x = DataFrameMethodTransformer(
@@ -324,7 +310,6 @@ class TestTransform:
 
     def test_original_columns_dropped_when_specified(self):
         """Test DataFrameMethodTransformer.transform drops original columns get when specified."""
-
         df = d.create_df_3()
 
         x = DataFrameMethodTransformer(
@@ -344,7 +329,6 @@ class TestTransform:
 
     def test_original_columns_kept_when_specified(self):
         """Test DataFrameMethodTransformer.transform keeps original columns when specified."""
-
         df = d.create_df_3()
 
         x = DataFrameMethodTransformer(

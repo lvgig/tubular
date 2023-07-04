@@ -1,6 +1,4 @@
-"""
-This module contains transformers that apply different types of mappings to columns.
-"""
+"""This module contains transformers that apply different types of mappings to columns."""
 
 import warnings
 from collections import OrderedDict
@@ -70,7 +68,6 @@ class BaseMappingTransformer(BaseTransformer):
             Input X, copied if specified by user.
 
         """
-
         self.check_is_fitted(["mappings"])
 
         X = super().transform(X)
@@ -101,7 +98,6 @@ class BaseMappingTransformMixin(BaseTransformer):
             Transformed input X with levels mapped accoriding to mappings dict.
 
         """
-
         self.check_is_fitted(["mappings"])
 
         X = super().transform(X)
@@ -247,7 +243,6 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
 
     Attributes
     ----------
-
     adjust_column : str
         Column containing the values to be adjusted.
 
@@ -286,7 +281,6 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
             Transformed data X with adjustments applied to specified columns.
 
         """
-
         self.check_is_fitted(["adjust_column"])
 
         X = super().transform(X)
@@ -326,7 +320,6 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
 
     Attributes
     ----------
-
     adjust_column : str
         Column containing the values to be adjusted.
 
@@ -366,7 +359,6 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
             Transformed data X with adjustments applied to specified columns.
 
         """
-
         self.check_is_fitted(["adjust_column"])
 
         X = super().transform(X)
@@ -412,7 +404,6 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
 
     Attributes
     ----------
-
     adjust_column : str
         Column containing the values to be adjusted.
 
@@ -452,7 +443,6 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
             Transformed data X with adjustments applied to specified columns.
 
         """
-
         self.check_is_fitted(["adjust_column"])
 
         X = super().transform(X)

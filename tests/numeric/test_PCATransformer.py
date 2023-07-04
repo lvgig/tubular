@@ -12,7 +12,6 @@ class TestInit:
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=PCATransformer.__init__,
             expected_arguments=[
@@ -28,14 +27,12 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that PCATransformer inherits from BaseTransformer."""
-
         x = PCATransformer(columns=["a"])
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_to_random_state_type_error(self):
         """Test that an exception is raised if random_state is not a int or None."""
-
         with pytest.raises(
             TypeError,
             match=r"""PCATransformer:unexpected type <class 'str'> for random_state, must be int or None.""",
@@ -44,7 +41,6 @@ class TestInit:
 
     def test_to_svd_solver_type_error(self):
         """Test that an exception is raised if svd_solver is not a str."""
-
         with pytest.raises(
             TypeError,
             match=r"""PCATransformer:unexpected type <class 'int'> for svd_solver, must be str""",
@@ -53,7 +49,6 @@ class TestInit:
 
     def test_to_n_components_type_error(self):
         """Test that an exception is raised if n_components is not a int or 'mle'."""
-
         with pytest.raises(
             TypeError,
             match=r"""PCATransformer:unexpected type <class 'str'> for n_components, must be int, float \(0-1\) or equal to 'mle'.""",
@@ -62,7 +57,6 @@ class TestInit:
 
     def test_to_pca_prefix_type_error(self):
         """Test that an exception is raised if pca_column_prefix is not str."""
-
         with pytest.raises(
             TypeError,
             match=r"""PCATransformer:unexpected type <class 'int'> for pca_column_prefix, must be str""",
@@ -71,7 +65,6 @@ class TestInit:
 
     def test_to_svd_solver_value_error(self):
         """Test that an exception is raised if svd_solver is not one of the allowed values."""
-
         with pytest.raises(
             ValueError,
             match=r"""PCATransformer:svd_solver zzz is unknown. Please select among 'auto', 'full', 'arpack', 'randomized'.""",
@@ -80,7 +73,6 @@ class TestInit:
 
     def test_to_n_components_value_error(self):
         """Test that an exception is raised if n_components is not one of the allowed values."""
-
         with pytest.raises(
             ValueError,
             match=r"""PCATransformer:n_components must be strictly positive got -1""",
@@ -89,7 +81,6 @@ class TestInit:
 
     def test_to_n_components_float_value_error(self):
         """Test that an exception is raised if n_components is not one of the allowed float values."""
-
         with pytest.raises(
             ValueError,
             match=r"""PCATransformer:n_components must be strictly positive and must be of type int when greater than or equal to 1. Got 1.4""",
@@ -114,7 +105,6 @@ class TestInit:
 
     def test_super_init_called(self, mocker):
         """Test that super.__init__ called."""
-
         expected_call_args = {
             0: {
                 "args": (),
@@ -133,7 +123,6 @@ class TestCheckNumericColumns:
 
     def test_arguments(self):
         """Test that check_numeric_columns has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=PCATransformer.check_numeric_columns,
             expected_arguments=["self", "X"],
@@ -142,7 +131,6 @@ class TestCheckNumericColumns:
 
     def test_exception_raised(self):
         """Test an exception is raised if non numeric columns are passed in X."""
-
         df = d.create_df_2()
 
         x = PCATransformer(columns=["a", "b", "c"], n_components=2)
@@ -155,7 +143,6 @@ class TestCheckNumericColumns:
 
     def test_X_returned(self):
         """Test that the input X is returned from the method."""
-
         df = d.create_df_2()
 
         x = PCATransformer(columns=["a"], n_components=2)
@@ -174,7 +161,6 @@ class TestFit:
 
     def test_arguments(self):
         """Test that fit has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=PCATransformer.fit,
             expected_arguments=["self", "X", "y"],
@@ -183,7 +169,6 @@ class TestFit:
 
     def test_super_fit_call(self, mocker):
         """Test the call to BaseTransformer.fit."""
-
         df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=["a", "b"], n_components=1)
@@ -199,7 +184,6 @@ class TestFit:
 
     def test_check_numeric_columns_call(self, mocker):
         """Test the call to PCATransformer.check_numeric_columns."""
-
         df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=["a", "b"], n_components=1)
@@ -230,7 +214,6 @@ class TestFit:
 
     def test_return_self(self):
         """Test that fit returns self."""
-
         df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=["a", "b"])
@@ -353,7 +336,6 @@ class TestTransform:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=PCATransformer.transform,
             expected_arguments=["self", "X"],
@@ -362,7 +344,6 @@ class TestTransform:
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
-
         df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=["a", "b"])
@@ -382,7 +363,6 @@ class TestTransform:
 
     def test_check_numeric_columns_call(self, mocker):
         """Test the call to PCATransformer.check_numeric_columns."""
-
         df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=["a", "b"], copy=True)
@@ -408,7 +388,6 @@ class TestTransform:
         self, mocker, svd_solver, svd_solver_output_str
     ):
         """Test that the call to the pca.transform method returns expected outputs."""
-
         df = d.create_numeric_df_1()
 
         x = PCATransformer(
@@ -436,7 +415,6 @@ class TestTransform:
     @pytest.mark.parametrize("columns", [("b"), ("c"), (["b", "c"])])
     def test_return_type(self, columns):
         """Test that transform returns a pd.DataFrame."""
-
         df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=columns, n_components=1)

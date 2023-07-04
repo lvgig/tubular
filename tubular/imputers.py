@@ -1,6 +1,4 @@
-"""
-This module contains transformers that deal with imputation of missing values.
-"""
+"""This module contains transformers that deal with imputation of missing values."""
 
 import warnings
 
@@ -31,7 +29,6 @@ class BaseImputer(BaseTransformer):
             Transformed input X with nulls imputed with the median value for the specified columns.
 
         """
-
         self.check_is_fitted(["impute_values_"])
 
         X = super().transform(X)
@@ -44,6 +41,7 @@ class BaseImputer(BaseTransformer):
 
 class ArbitraryImputer(BaseImputer):
     """Transformer to impute null values with an arbitrary pre-defined value.
+
     Parameters
     ----------
     impute_value : int or float or str
@@ -53,6 +51,7 @@ class ArbitraryImputer(BaseImputer):
         when the transform method is called.
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
+
     Attributes
     ----------
     impute_value : int or float or str
@@ -80,10 +79,12 @@ class ArbitraryImputer(BaseImputer):
     def transform(self, X):
         """Impute missing values with the supplied impute_value.
         If columns is None all columns in X will be imputed.
+
         Parameters
         ----------
         X : pd.DataFrame
             Data containing columns to impute.
+
         Returns
         -------
         X : pd.DataFrame
@@ -94,7 +95,6 @@ class ArbitraryImputer(BaseImputer):
         * Preserving the datatypes of columns
         * Finding the target column dtype and cast imputer values as same dtype
         """
-
         self.check_is_fitted(["impute_value"])
         self.columns_check(X)
 
@@ -165,7 +165,6 @@ class MedianImputer(BaseImputer):
             Not required.
 
         """
-
         super().fit(X, y)
 
         self.impute_values_ = {}
@@ -245,7 +244,6 @@ class MeanImputer(BaseImputer):
             Not required.
 
         """
-
         super().fit(X, y)
 
         self.impute_values_ = {}
@@ -321,7 +319,6 @@ class ModeImputer(BaseImputer):
             Not required.
 
         """
-
         super().fit(X, y)
 
         self.impute_values_ = {}
@@ -376,7 +373,6 @@ class NearestMeanResponseImputer(BaseImputer):
             to the average response of the unknown levels is selected as the imputation value.
 
         """
-
         super().fit(X, y)
 
         n_nulls = y.isnull().sum()
@@ -441,7 +437,6 @@ class NullIndicator(BaseTransformer):
             Data to add indicators to.
 
         """
-
         X = super().transform(X)
 
         for c in self.columns:

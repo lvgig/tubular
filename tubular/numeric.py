@@ -1,6 +1,4 @@
-"""
-This module contains transformers that apply numeric functions.
-"""
+"""This module contains transformers that apply numeric functions."""
 
 import numpy as np
 import pandas as pd
@@ -93,7 +91,6 @@ class LogTransformer(BaseTransformer):
             columns if self.drop is True.
 
         """
-
         X = super().transform(X)
 
         numeric_column_types = X[self.columns].apply(
@@ -197,7 +194,6 @@ class CutTransformer(BaseTransformer):
             Data with column to transform.
 
         """
-
         X = super().transform(X)
 
         if not pd.api.types.is_numeric_dtype(X[self.columns[0]]):
@@ -210,9 +206,7 @@ class CutTransformer(BaseTransformer):
 
 
 class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
-
-    """
-    This transformer applies a pandas.DataFrame method to two columns (add, sub, mul, div, mod, pow).
+    """This transformer applies a pandas.DataFrame method to two columns (add, sub, mul, div, mod, pow).
 
     Transformer assigns the output of the method to a new column. The method will be applied
     in the form (column 1)operator(column 2), so order matters (if the method does not commute). It is possible to
@@ -266,10 +260,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         pd_method_kwargs={"axis": 0},
         **kwargs,
     ):
-        """
-        Performs input checks not done in either DataFrameMethodTransformer.__init__ or BaseTransformer.__init__
-        """
-
+        """Performs input checks not done in either DataFrameMethodTransformer.__init__ or BaseTransformer.__init__."""
         if "axis" not in pd_method_kwargs.keys():
             msg = f'{self.classname()}: pd_method_kwargs must contain an entry "axis" set to 0 or 1'
             raise ValueError(msg)
@@ -297,13 +288,14 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         )
 
     def transform(self, X):
-        """
-        Transform input data by applying the chosen method to the two specified columns
+        """Transform input data by applying the chosen method to the two specified columns.
 
         Args:
+        ----
             X (pd.DataFrame): Data to transform.
 
         Returns:
+        -------
             pd.DataFrame: Input X with an additional column.
         """
         # call BaseTransformer.transform
@@ -387,7 +379,6 @@ class ScalingTransformer(BaseTransformer):
             Data containing columns to check.
 
         """
-
         numeric_column_types = X[self.columns].apply(
             pd.api.types.is_numeric_dtype, axis=0
         )
@@ -414,7 +405,6 @@ class ScalingTransformer(BaseTransformer):
             Required for pipeline.
 
         """
-
         super().fit(X, y)
 
         X = self.check_numeric_columns(X)
@@ -437,7 +427,6 @@ class ScalingTransformer(BaseTransformer):
             Input X with columns scaled.
 
         """
-
         X = super().transform(X)
 
         X = self.check_numeric_columns(X)
@@ -456,10 +445,10 @@ class InteractionTransformer(BaseTransformer):
     Ex: with 3 columns provided ["a","b","c"], if max degree is 3, the total possible combinations are :
     - of degree 1 : ["a","b","c"]
     - of degree 2 : ["a b","b c","a c"]
-    - of degree 3 : ["a b c"]
+    - of degree 3 : ["a b c"].
 
-        Parameters
-        ----------
+    Parameters
+    ----------
         columns : None or list or str
             Columns to apply the transformer to. If a str is passed this is put into a list. Value passed
             in columns is saved in the columns attribute on the object. Note this has no default value so
@@ -474,8 +463,8 @@ class InteractionTransformer(BaseTransformer):
             columns from up to 3 columns would be generated.
 
 
-         Attributes
-        ----------
+    Attributes
+    ----------
         min_degree : int
             minimum degree of interaction features to be considered
         max_degree : int
@@ -600,8 +589,8 @@ class PCATransformer(BaseTransformer):
 
     It is based on sklearn class sklearn.decomposition.PCA
 
-        Parameters
-        ----------
+    Parameters
+    ----------
         columns : None or list or str
             Columns to apply the transformer to. If a str is passed this is put into a list. Value passed
             in columns is saved in the columns attribute on the object. Note this has no default value so
@@ -649,7 +638,6 @@ class PCATransformer(BaseTransformer):
 
     Attributes
     ----------
-
     pca : PCA class from sklearn.decomposition
     n_components_ : int
         The estimated number of components. When n_components is set
@@ -745,7 +733,6 @@ class PCATransformer(BaseTransformer):
             Data containing columns to check.
 
         """
-
         numeric_column_types = X[self.columns].apply(
             pd.api.types.is_numeric_dtype, axis=0
         )
@@ -772,7 +759,6 @@ class PCATransformer(BaseTransformer):
             Required for pipeline.
 
         """
-
         super().fit(X, y)
 
         X = self.check_numeric_columns(X)
@@ -794,10 +780,12 @@ class PCATransformer(BaseTransformer):
 
     def transform(self, X):
         """Generate from input pandas DataFrame (X) PCA features and add this column or columns in X.
+
         Parameters
         ----------
         X : pd.DataFrame
             Data to transform.
+
         Returns
         -------
         X : pd.DataFrame

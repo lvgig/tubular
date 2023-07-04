@@ -1,6 +1,4 @@
-"""
-This module contains a transformer that applies capping to numeric columns.
-"""
+"""This module contains a transformer that applies capping to numeric columns."""
 
 import copy
 import warnings
@@ -99,7 +97,6 @@ class CappingTransformer(BaseTransformer):
 
     def check_capping_values_dict(self, capping_values_dict, dict_name):
         """Performs checks on a dictionary passed to ."""
-
         if type(capping_values_dict) is not dict:
             msg = f"{self.classname()}: {dict_name} should be dict of columns and capping values"
             raise TypeError(msg)
@@ -152,7 +149,6 @@ class CappingTransformer(BaseTransformer):
             Required for pipeline.
 
         """
-
         super().fit(X, y)
 
         if self.quantiles is not None:
@@ -204,7 +200,6 @@ class CappingTransformer(BaseTransformer):
             List containing computed quantiles.
 
         """
-
         if quantiles[0] is None:
             quantiles = np.array([quantiles[1]])
 
@@ -281,7 +276,6 @@ class CappingTransformer(BaseTransformer):
         [1.0, 2.0, 5.0]
 
         """
-
         if sample_weight is None:
             sample_weight = np.ones(len(values))
         else:
@@ -342,7 +336,6 @@ class CappingTransformer(BaseTransformer):
             Transformed input X with min and max capping applied to the specified columns.
 
         """
-
         self.check_is_fitted(["capping_values"])
         self.check_is_fitted(["_replacement_values"])
 
@@ -453,7 +446,6 @@ class OutOfRangeNullTransformer(CappingTransformer):
         Keeps the existing keys in the _replacement_values dict and sets all values (except None) in the lists to np.NaN. Any None
         values remain in place.
         """
-
         for k, replacements_list in self._replacement_values.items():
             null_replacements_list = [
                 np.NaN if replace_value is not None else None
@@ -478,7 +470,6 @@ class OutOfRangeNullTransformer(CappingTransformer):
             Required for pipeline.
 
         """
-
         super().fit(X=X, y=y)
 
         self.set_replacement_values()

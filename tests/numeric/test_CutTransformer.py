@@ -15,7 +15,6 @@ class TestInit:
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=CutTransformer.__init__,
             expected_arguments=["self", "column", "new_column_name", "cut_kwargs"],
@@ -24,7 +23,6 @@ class TestInit:
 
     def test_class_methods(self):
         """Test that CutTransformer has transform method."""
-
         x = CutTransformer(column="a", new_column_name="b")
 
         ta.classes.test_object_method(
@@ -33,14 +31,12 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that CutTransformer inherits from BaseTransformer."""
-
         x = CutTransformer(column="a", new_column_name="b")
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
-
         expected_call_args = {
             0: {
                 "args": (),
@@ -55,7 +51,6 @@ class TestInit:
 
     def test_column_type_error(self):
         """Test that an exception is raised if column is not a str."""
-
         with pytest.raises(
             TypeError,
             match=re.escape(
@@ -69,7 +64,6 @@ class TestInit:
 
     def test_new_column_name_type_error(self):
         """Test that an exception is raised if new_column_name is not a str."""
-
         with pytest.raises(
             TypeError, match="CutTransformer: new_column_name must be a str"
         ):
@@ -77,7 +71,6 @@ class TestInit:
 
     def test_cut_kwargs_type_error(self):
         """Test that an exception is raised if cut_kwargs is not a dict."""
-
         with pytest.raises(
             TypeError,
             match=r"""cut_kwargs should be a dict but got type \<class 'int'\>""",
@@ -86,7 +79,6 @@ class TestInit:
 
     def test_cut_kwargs_key_type_error(self):
         """Test that an exception is raised if cut_kwargs has keys which are not str."""
-
         with pytest.raises(
             TypeError,
             match=r"""CutTransformer: unexpected type \(\<class 'int'\>\) for cut_kwargs key in position 1, must be str""",
@@ -99,7 +91,6 @@ class TestInit:
 
     def test_inputs_set_to_attribute(self):
         """Test that the values passed in init are set to attributes."""
-
         x = CutTransformer(
             column="b",
             new_column_name="a",
@@ -123,7 +114,6 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output for test_expected_output."""
-
         df = d.create_df_9()
 
         df["d"] = pd.Categorical(
@@ -136,14 +126,12 @@ class TestTransform:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=CutTransformer.transform, expected_arguments=["self", "X"]
         )
 
     def test_super_transform_call(self, mocker):
         """Test the call to BaseTransformer.transform is as expected."""
-
         df = d.create_df_9()
 
         x = CutTransformer(column="a", new_column_name="Y", cut_kwargs={"bins": 3})
@@ -161,7 +149,6 @@ class TestTransform:
 
     def test_pd_cut_call(self, mocker):
         """Test the call to pd.cut is as expected."""
-
         df = d.create_df_9()
 
         x = CutTransformer(
@@ -184,7 +171,6 @@ class TestTransform:
 
     def test_output_from_cut_assigned_to_column(self, mocker):
         """Test that the output from pd.cut is assigned to column with name new_column_name."""
-
         df = d.create_df_9()
 
         x = CutTransformer(column="c", new_column_name="c_new", cut_kwargs={"bins": 2})
@@ -205,7 +191,6 @@ class TestTransform:
     )
     def test_expected_output(self, df, expected):
         """Test input data is transformed as expected."""
-
         cut_1 = CutTransformer(
             column="c",
             new_column_name="d",
@@ -225,7 +210,6 @@ class TestTransform:
 
     def test_non_numeric_column_error(self):
         """Test that an exception is raised if the column to discretise is not numeric."""
-
         df = d.create_df_8()
 
         x = CutTransformer(column="b", new_column_name="d")

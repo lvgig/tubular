@@ -11,7 +11,6 @@ class TestInit:
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=SetValueTransformer.__init__,
             expected_arguments=["self", "columns", "value"],
@@ -20,7 +19,6 @@ class TestInit:
 
     def test_inheritance(self):
         """Test SetValueTransformer inherits from BaseTransformer."""
-
         x = SetValueTransformer(columns=["a"], value=1)
 
         assert isinstance(
@@ -29,7 +27,6 @@ class TestInit:
 
     def test_super_init_call(self, mocker):
         """Test that BaseTransformer.init us called as expected."""
-
         expected_call_args = {
             0: {
                 "args": (),
@@ -44,7 +41,6 @@ class TestInit:
 
     def test_value_attribute_set(self):
         """Test that the value passed in the value arg is set as an attribute of the same name."""
-
         x = SetValueTransformer(columns=["a", "b"], value=1)
 
         assert x.value == 1, "unexpected value set to value atttribute"
@@ -55,7 +51,6 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output of test_value_set_in_transform."""
-
         df = d.create_df_2()
 
         df["a"] = "a"
@@ -65,7 +60,6 @@ class TestTransform:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=SetValueTransformer.transform,
             expected_arguments=["self", "X"],
@@ -74,7 +68,6 @@ class TestTransform:
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
-
         df = d.create_df_7()
 
         x = SetValueTransformer(columns=["a", "b"], value=1)
@@ -92,7 +85,6 @@ class TestTransform:
     )
     def test_value_set_in_transform(self, df, expected):
         """Test that transform sets the value as expected."""
-
         x = SetValueTransformer(columns=["a", "b"], value="a")
 
         df_transformed = x.transform(df)

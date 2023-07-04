@@ -1,5 +1,4 @@
-"""
-This module contains transformers that other transformers in the package inherit
+"""This module contains transformers that other transformers in the package inherit
 from. These transformers contain key checks to be applied in all cases.
 """
 
@@ -48,7 +47,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
     """
 
     def classname(self):
-        """Method that returns the name of the current class when called"""
+        """Method that returns the name of the current class when called."""
         return type(self).__name__
 
     def __init__(self, columns=None, copy=True, verbose=False):
@@ -111,7 +110,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             Optional argument only required for the transformer to work with sklearn pipelines.
 
         """
-
         if self.verbose:
             print("BaseTransformer.fit() called")
 
@@ -151,7 +149,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             Response variable.
 
         """
-
         if not isinstance(X, pd.DataFrame):
             msg = f"{self.classname()}: X should be a pd.DataFrame"
             raise TypeError(msg)
@@ -189,7 +186,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             Input X, copied if specified by user.
 
         """
-
         self.columns_check(X)
 
         if self.verbose:
@@ -216,7 +212,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             List of str values giving names of attribute to check exist on self.
 
         """
-
         check_is_fitted(self, attribute)
 
     def columns_check(self, X):
@@ -228,7 +223,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             Data to check columns are in.
 
         """
-
         if not isinstance(X, pd.DataFrame):
             msg = f"{self.classname()}: X should be a pd.DataFrame"
             raise TypeError(msg)
@@ -256,7 +250,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             Data to check columns are in.
 
         """
-
         if not isinstance(X, pd.DataFrame):
             msg = f"{self.classname()}: X should be a pd.DataFrame"
             raise TypeError(msg)
@@ -269,14 +262,14 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
     @staticmethod
     def check_weights_column(X, weights_column):
-        """Helper method for validating weights column in dataframe
+        """Helper method for validating weights column in dataframe.
 
         Args:
+        ----
             X (pd.DataFrame): df containing weight column
             weights_column (str): name of weight column
 
         """
-
         if weights_column is not None:
             # check if given weight is in columns
             if weights_column not in X.columns:
@@ -322,7 +315,6 @@ class ReturnKeyDict(dict):
         key : input key
 
         """
-
         return key
 
 
@@ -444,7 +436,6 @@ class DataFrameMethodTransformer(BaseTransformer):
             running the pandas DataFrame method.
 
         """
-
         X = super().transform(X)
 
         X[self.new_column_name] = getattr(X[self.columns], self.pd_method_name)(

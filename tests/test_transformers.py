@@ -19,7 +19,6 @@ class TestInit:
 
     def ListOfTransformers():
         """List of transformers in tubular to be used in subsequent tests."""
-
         list_of_transformers = [
             base.BaseTransformer(columns=["a"]),
             base.DataFrameMethodTransformer(
@@ -98,26 +97,18 @@ class TestInit:
 
     @pytest.mark.parametrize("transformer", ListOfTransformers())
     def test_print(self, transformer):
-        """
-        Test that transformer can be printed.
+        """Test that transformer can be printed.
         If an error is raised in this test it will not prevent the transformer from working correctly,
         but will stop other unit tests passing.
         """
-
         print(transformer)
 
     @pytest.mark.parametrize("transformer", ListOfTransformers())
     def test_clone(self, transformer):
-        """
-        Test that transformer can be used in sklearn.base.clone function.
-        """
-
+        """Test that transformer can be used in sklearn.base.clone function."""
         b.clone(transformer)
 
     @pytest.mark.parametrize("transformer", ListOfTransformers())
     def test_unexpected_kwarg(self, transformer):
-        """
-        Test that transformer can be used in sklearn.base.clone function.
-        """
-
+        """Test that transformer can be used in sklearn.base.clone function."""
         b.clone(transformer)

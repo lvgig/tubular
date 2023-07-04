@@ -16,7 +16,6 @@ class TestInit:
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=ToDatetimeTransformer.__init__,
             expected_arguments=[
@@ -30,7 +29,6 @@ class TestInit:
 
     def test_class_methods(self):
         """Test that ToDatetimeTransformer has fit and transform methods."""
-
         to_dt = ToDatetimeTransformer(column="a", new_column_name="b")
 
         ta.classes.test_object_method(
@@ -39,14 +37,12 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that ToDatetimeTransformer inherits from BaseTransformer."""
-
         to_dt = ToDatetimeTransformer(column="a", new_column_name="b")
 
         ta.classes.assert_inheritance(to_dt, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
-
         expected_call_args = {
             0: {
                 "args": (),
@@ -67,7 +63,6 @@ class TestInit:
 
     def test_column_type_error(self):
         """Test that an exception is raised if column is not a str."""
-
         with pytest.raises(
             TypeError,
             match="ToDatetimeTransformer: column should be a single str giving the column to transform to datetime",
@@ -79,7 +74,6 @@ class TestInit:
 
     def test_new_column_name_type_error(self):
         """Test that an exception is raised if new_column_name is not a str."""
-
         with pytest.raises(
             TypeError, match="ToDatetimeTransformer: new_column_name must be a str"
         ):
@@ -87,7 +81,6 @@ class TestInit:
 
     def test_to_datetime_kwargs_type_error(self):
         """Test that an exception is raised if to_datetime_kwargs is not a dict."""
-
         with pytest.raises(
             TypeError,
             match=r"""ToDatetimeTransformer: to_datetime_kwargs should be a dict but got type \<class 'int'\>""",
@@ -96,7 +89,6 @@ class TestInit:
 
     def test_to_datetime_kwargs_key_type_error(self):
         """Test that an exception is raised if to_datetime_kwargs has keys which are not str."""
-
         with pytest.raises(
             TypeError,
             match=r"""ToDatetimeTransformer: unexpected type \(\<class 'int'\>\) for to_datetime_kwargs key in position 1, must be str""",
@@ -109,7 +101,6 @@ class TestInit:
 
     def test_inputs_set_to_attribute(self):
         """Test that the values passed in init are set to attributes."""
-
         to_dt = ToDatetimeTransformer(
             column="b",
             new_column_name="a",
@@ -133,7 +124,6 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output for test_expected_output."""
-
         df = pd.DataFrame(
             {
                 "a": [1950, 1960, 2000, 2001, np.NaN, 2010],
@@ -161,14 +151,12 @@ class TestTransform:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=ToDatetimeTransformer.transform, expected_arguments=["self", "X"]
         )
 
     def test_super_transform_call(self, mocker):
         """Test the call to BaseTransformer.transform is as expected."""
-
         df = d.create_datediff_test_df()
 
         to_dt = ToDatetimeTransformer(column="a", new_column_name="Y")
@@ -186,7 +174,6 @@ class TestTransform:
 
     def test_to_datetime_call(self, mocker):
         """Test the call to pandas.to_datetime is as expected."""
-
         df = d.create_to_datetime_test_df()
 
         to_dt = ToDatetimeTransformer(
@@ -211,7 +198,6 @@ class TestTransform:
 
     def test_output_from_to_datetime_assigned_to_column(self, mocker):
         """Test that the output from pd.to_datetime is assigned to column with name new_column_name."""
-
         df = d.create_to_datetime_test_df()
 
         to_dt = ToDatetimeTransformer(
@@ -236,7 +222,6 @@ class TestTransform:
     )
     def test_expected_output(self, df, expected):
         """Test input data is transformed as expected."""
-
         to_dt_1 = ToDatetimeTransformer(
             column="a", new_column_name="a_Y", to_datetime_kwargs={"format": "%Y"}
         )

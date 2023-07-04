@@ -15,7 +15,6 @@ class TestInit:
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=DateDifferenceTransformer.__init__,
             expected_arguments=[
@@ -32,7 +31,6 @@ class TestInit:
 
     def test_class_methods(self):
         """Test that DateDifferenceTransformer has fit and transform methods."""
-
         x = DateDifferenceTransformer(
             "column_lower",
             "column_upper",
@@ -44,14 +42,12 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that DateDifferenceTransformer inherits from BaseTransformer."""
-
         x = DateDifferenceTransformer("column_lower", "column_upper")
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
-
         expected_call_args = {
             0: {
                 "args": (),
@@ -75,7 +71,6 @@ class TestInit:
 
     def test_column_lower_type_error(self):
         """Test that an exception is raised if column_lower is not a str."""
-
         with pytest.raises(
             TypeError, match="DateDifferenceTransformer: column_lower must be a str"
         ):
@@ -90,7 +85,6 @@ class TestInit:
 
     def test_column_2_type_error(self):
         """Test that an exception is raised if column_upper is not a str."""
-
         with pytest.raises(
             TypeError, match="DateDifferenceTransformer: column_upper must be a str"
         ):
@@ -105,7 +99,6 @@ class TestInit:
 
     def test_new_column_name_type_error(self):
         """Test that an exception is raised if new_column_name is not a str."""
-
         with pytest.raises(
             TypeError, match="DateDifferenceTransformer: new_column_name must be a str"
         ):
@@ -120,7 +113,6 @@ class TestInit:
 
     def test_units_type_error(self):
         """Test that an exception is raised if new_column_name is not a str."""
-
         with pytest.raises(
             TypeError, match="DateDifferenceTransformer: units must be a str"
         ):
@@ -135,7 +127,6 @@ class TestInit:
 
     def test_units_values_error(self):
         """Test that an exception is raised if the value of inits is not one of accepted_values_units."""
-
         with pytest.raises(
             ValueError,
             match=r"DateDifferenceTransformer: units must be one of \['Y', 'M', 'D', 'h', 'm', 's'\], got y",
@@ -152,7 +143,6 @@ class TestInit:
     @pytest.mark.parametrize("unit", ["M", "Y"])
     def test_units_warning(self, unit):
         """Test that a warning is raised if M units passed to init."""
-
         with pytest.warns(
             Warning,
             match="DateDifferenceTransformer: Y/M units will be changed or deprecated in a future version, consider using DateDiffLeapYearTransformer or D units instead",
@@ -168,7 +158,6 @@ class TestInit:
 
     def test_inputs_set_to_attribute(self):
         """Test that the value passed for new_column_name and units are saved in attributes of the same name."""
-
         x = DateDifferenceTransformer(
             column_lower="dummy_1",
             column_upper="dummy_2",
@@ -192,7 +181,6 @@ class TestInit:
 
     def test_inputs_set_to_attribute_name_not_set(self):
         """Test that the value passed for new_column_new_column_name and units are saved in attributes of the same new_column_name."""
-
         x = DateDifferenceTransformer(
             column_lower="dummy_1",
             column_upper="dummy_2",
@@ -221,7 +209,6 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output for test_expected_output_units_Y."""
-
         df = pd.DataFrame(
             {
                 "a": [
@@ -260,7 +247,6 @@ class TestTransform:
 
     def expected_df_2():
         """Expected output for test_expected_output_units_M."""
-
         df = pd.DataFrame(
             {
                 "a": [
@@ -299,7 +285,6 @@ class TestTransform:
 
     def expected_df_3():
         """Expected output for test_expected_output_units_D."""
-
         df = pd.DataFrame(
             {
                 "a": [
@@ -338,7 +323,6 @@ class TestTransform:
 
     def expected_df_4():
         """Expected output for test_expected_output_units_h."""
-
         df = pd.DataFrame(
             {
                 "a": [
@@ -377,7 +361,6 @@ class TestTransform:
 
     def expected_df_5():
         """Expected output for test_expected_output_units_m."""
-
         df = pd.DataFrame(
             {
                 "a": [
@@ -416,7 +399,6 @@ class TestTransform:
 
     def expected_df_6():
         """Expected output for test_expected_output_units_s."""
-
         df = pd.DataFrame(
             {
                 "a": [
@@ -455,7 +437,6 @@ class TestTransform:
 
     def expected_df_7():
         """Expected output for test_expected_output_nulls."""
-
         df = pd.DataFrame(
             {
                 "a": [
@@ -478,14 +459,12 @@ class TestTransform:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=DateDifferenceTransformer.transform, expected_arguments=["self", "X"]
         )
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
-
         df = d.create_datediff_test_df()
 
         x = DateDifferenceTransformer(
@@ -520,7 +499,6 @@ class TestTransform:
         This tests positive year gaps and negative year gaps.
 
         """
-
         x = DateDifferenceTransformer(
             column_lower="a",
             column_upper="b",
@@ -550,7 +528,6 @@ class TestTransform:
         This tests positive month gaps, negative month gaps, and missing values.
 
         """
-
         x = DateDifferenceTransformer(
             column_lower="a",
             column_upper="b",
@@ -580,7 +557,6 @@ class TestTransform:
         This tests positive month gaps, negative month gaps, and missing values.
 
         """
-
         x = DateDifferenceTransformer(
             column_lower="a",
             column_upper="b",
@@ -610,7 +586,6 @@ class TestTransform:
         This tests positive month gaps, negative month gaps, and missing values.
 
         """
-
         x = DateDifferenceTransformer(
             column_lower="a",
             column_upper="b",
@@ -640,7 +615,6 @@ class TestTransform:
         This tests positive month gaps, negative month gaps, and missing values.
 
         """
-
         x = DateDifferenceTransformer(
             column_lower="a",
             column_upper="b",
@@ -670,7 +644,6 @@ class TestTransform:
         This tests positive month gaps, negative month gaps, and missing values.
 
         """
-
         x = DateDifferenceTransformer(
             column_lower="a",
             column_upper="b",
@@ -696,7 +669,6 @@ class TestTransform:
     )
     def test_expected_output_nulls(self, df, expected):
         """Test that the output is expected from transform, when columns are nulls."""
-
         x = DateDifferenceTransformer(
             column_lower="a",
             column_upper="b",

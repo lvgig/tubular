@@ -13,7 +13,6 @@ class TestInit:
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=CappingTransformer.__init__,
             expected_arguments=[
@@ -37,7 +36,6 @@ class TestInit:
     )
     def test_class_methods(self, method_name):
         """Test that CappingTransformer has transform method."""
-
         x = CappingTransformer(capping_values={"a": [1, 3]})
 
         ta.classes.test_object_method(
@@ -46,14 +44,12 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that CappingTransformer inherits from BaseTransformer."""
-
         x = CappingTransformer(capping_values={"a": [1, 3]})
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_capping_values_quantiles_both_none_error(self):
         """Test that an exception is raised if both capping_values and quantiles are passed as None."""
-
         with pytest.raises(
             ValueError,
             match="CappingTransformer: both capping_values and quantiles are None, either supply capping values in the "
@@ -63,7 +59,6 @@ class TestInit:
 
     def test_capping_values_quantiles_both_specified_error(self):
         """Test that an exception is raised if both capping_values and quantiles are specified."""
-
         with pytest.raises(
             ValueError,
             match="CappingTransformer: both capping_values and quantiles are not None, supply one or the other",
@@ -75,7 +70,6 @@ class TestInit:
     @pytest.mark.parametrize("out_range_value", [(-2), (1.2)])
     def test_quantiles_outside_range_error(self, out_range_value):
         """Test that an exception is raised if quanties contain values outisde [0, 1] range."""
-
         with pytest.raises(
             ValueError,
             match=rf"CappingTransformer: quantile values must be in the range \[0, 1\] but got {out_range_value} for key f",
@@ -86,7 +80,6 @@ class TestInit:
 
     def test_super_init_called_capping_values(self, mocker):
         """Test that init calls BaseTransformer.init when capping_values are passed."""
-
         expected_call_args = {
             0: {
                 "args": (),
@@ -103,7 +96,6 @@ class TestInit:
 
     def test_super_init_called_quantiles(self, mocker):
         """Test that init calls BaseTransformer.init when quantiles are passed."""
-
         expected_call_args = {
             0: {
                 "args": (),
@@ -120,7 +112,6 @@ class TestInit:
 
     def test_check_capping_values_dict_called_quantiles(self, mocker):
         """Test that init calls check_capping_values_dict when quantiles are passed."""
-
         expected_call_args = {
             0: {
                 "args": ({"c": [0, 0.99], "d": [None, 0.01]}, "quantiles"),
@@ -138,7 +129,6 @@ class TestInit:
 
     def test_check_capping_values_dict_called_capping_values(self, mocker):
         """Test that init calls check_capping_values_dict when capping_values are passed."""
-
         expected_call_args = {
             0: {
                 "args": ({"a": [1, 3], "b": [None, -1]}, "capping_values"),
@@ -156,7 +146,6 @@ class TestInit:
 
     def test_values_passed_in_init_set_to_attribute_capping_values(self):
         """Test that the capping_values passed in init are saved in an attribute of the same name."""
-
         capping_values_dict = {"a": [1, 3], "b": [None, -1]}
 
         x = CappingTransformer(capping_values=capping_values_dict)
@@ -174,7 +163,6 @@ class TestInit:
 
     def test_values_passed_in_init_set_to_attribute_quantiles(self):
         """Test that the capping_values passed in init are saved in an attribute of the same name."""
-
         quantiles_dict = {"a": [0.2, 1], "b": [None, 0.9]}
 
         x = CappingTransformer(quantiles=quantiles_dict)
@@ -196,7 +184,6 @@ class TestCheckCappingValuesDict:
 
     def test_arguments(self):
         """Test that check_capping_values_dict has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=CappingTransformer.check_capping_values_dict,
             expected_arguments=["self", "capping_values_dict", "dict_name"],
@@ -205,7 +192,6 @@ class TestCheckCappingValuesDict:
 
     def test_capping_values_not_dict_error(self):
         """Test that an exception is raised if capping_values_dict is not a dict."""
-
         x = CappingTransformer(capping_values={"a": [1, 3], "b": [None, -1]})
 
         with pytest.raises(
@@ -218,7 +204,6 @@ class TestCheckCappingValuesDict:
 
     def test_capping_values_non_str_key_error(self):
         """Test that an exception is raised if capping_values_dict has any non str keys."""
-
         x = CappingTransformer(capping_values={"a": [1, 3], "b": [None, -1]})
 
         with pytest.raises(
@@ -231,7 +216,6 @@ class TestCheckCappingValuesDict:
 
     def test_capping_values_non_list_item_error(self):
         """Test that an exception is raised if capping_values_dict has any non list items."""
-
         x = CappingTransformer(capping_values={"a": [1, 3], "b": [None, -1]})
 
         with pytest.raises(
@@ -244,7 +228,6 @@ class TestCheckCappingValuesDict:
 
     def test_capping_values_non_length_2_list_item_error(self):
         """Test that an exception is raised if capping_values_dict has any non length 2 list items."""
-
         x = CappingTransformer(capping_values={"a": [1, 3], "b": [None, -1]})
 
         with pytest.raises(
@@ -257,7 +240,6 @@ class TestCheckCappingValuesDict:
 
     def test_capping_values_non_numeric_error(self):
         """Test that an exception is raised if capping_values_dict contains any non-nulls and non-numeric values."""
-
         x = CappingTransformer(capping_values={"a": [1, 3], "b": [None, -1]})
 
         with pytest.raises(
@@ -270,7 +252,6 @@ class TestCheckCappingValuesDict:
 
     def test_lower_value_gte_upper_value_error(self):
         """Test that an exception is raised if capping_values_dict[0] >= capping_values_dict[1]."""
-
         x = CappingTransformer(capping_values={"a": [1, 2], "b": [None, -1]})
 
         with pytest.raises(
@@ -284,7 +265,6 @@ class TestCheckCappingValuesDict:
     @pytest.mark.parametrize("value", [(np.NaN), (np.inf), (-np.inf)])
     def test_capping_value_nan_inf_error(self, value):
         """Test that an exception is raised if capping_values are np.nan or np.inf values."""
-
         x = CappingTransformer(capping_values={"a": [1, 3], "b": [None, 1]})
 
         with pytest.raises(
@@ -297,7 +277,6 @@ class TestCheckCappingValuesDict:
 
     def test_capping_values_both_null_error(self):
         """Test that an exception is raised if both capping_values are null."""
-
         x = CappingTransformer(capping_values={"a": [1, 3], "b": [None, -1]})
 
         with pytest.raises(
@@ -313,7 +292,6 @@ class TestFit:
 
     def test_arguments(self):
         """Test that fit has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=CappingTransformer.fit,
             expected_arguments=["self", "X", "y"],
@@ -322,7 +300,6 @@ class TestFit:
 
     def test_quantiles_none_error(self):
         """Test that an exception is raised if quantiles is None when fit is run."""
-
         with pytest.warns(
             UserWarning,
             match="CappingTransformer: quantiles not set so no fitting done in CappingTransformer",
@@ -335,7 +312,6 @@ class TestFit:
 
     def test_super_fit_call(self, mocker):
         """Test the call to BaseTransformer.fit."""
-
         df = d.create_df_9()
 
         x = CappingTransformer(
@@ -351,7 +327,6 @@ class TestFit:
 
     def test_prepare_quantiles_call_weight(self, mocker):
         """Test the call to prepare_quantiles if weights_column is set."""
-
         df = d.create_df_9()
 
         x = CappingTransformer(
@@ -387,7 +362,6 @@ class TestFit:
 
     def test_prepare_quantiles_call_no_weight(self, mocker):
         """Test the call to prepare_quantiles if weights_column is not set."""
-
         df = d.create_df_9()
 
         x = CappingTransformer(quantiles={"a": [0.1, 1], "b": [0.5, None]})
@@ -414,7 +388,6 @@ class TestFit:
     @pytest.mark.parametrize("weights_column", [("c"), (None)])
     def test_prepare_quantiles_output_set_attributes(self, mocker, weights_column):
         """Test the output of prepare_quantiles is set to capping_values and_replacement_values attributes."""
-
         df = d.create_df_9()
 
         x = CappingTransformer(
@@ -449,7 +422,6 @@ class TestFit:
     @pytest.mark.parametrize("quantiles", [([0.2, 0.8]), ([None, 0.5]), ([0.6, None])])
     def test_quantile_combinations_handled(self, quantiles, weights_column):
         """Test that a given combination of None and non-None quantile values can be calculated successfully."""
-
         df = d.create_df_9()
 
         x = CappingTransformer(
@@ -470,7 +442,6 @@ class TestPrepareQuantiles:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=CappingTransformer.prepare_quantiles,
             expected_arguments=["self", "values", "quantiles", "sample_weight"],
@@ -507,7 +478,6 @@ class TestPrepareQuantiles:
         self, mocker, values, quantiles, sample_weight, expected_quantiles
     ):
         """Test the call to weighted_quantile, inlcuding the filtering out of None values."""
-
         x = CappingTransformer(quantiles={"a": [0.1, 1], "b": [0.5, None]})
 
         mocked = mocker.patch("tubular.capping.CappingTransformer.weighted_quantile")
@@ -562,7 +532,6 @@ class TestPrepareQuantiles:
         self, mocker, values, quantiles, sample_weight, expected_results
     ):
         """Test the output from weighted_quantile is returned from the function, inlcuding None values added back in."""
-
         x = CappingTransformer(quantiles={"a": [0.1, 1], "b": [0.5, None]})
 
         mocker.patch(
@@ -582,7 +551,6 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output from test_expected_output_min_and_max."""
-
         df = pd.DataFrame(
             {
                 "a": [2, 2, 3, 4, 5, 5, np.NaN],
@@ -595,7 +563,6 @@ class TestTransform:
 
     def expected_df_2():
         """Expected output from test_expected_output_max."""
-
         df = pd.DataFrame(
             {
                 "a": [2, 2, 3, 4, 5, 6, 7, np.NaN],
@@ -610,14 +577,12 @@ class TestTransform:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=CappingTransformer.transform, expected_arguments=["self", "X"]
         )
 
     def test_check_is_fitted_call_count(self, mocker):
         """Test there are 2 calls to BaseTransformer check_is_fitted in transform."""
-
         df = d.create_df_3()
 
         x = CappingTransformer(capping_values={"a": [2, 5], "b": [-1, 8]})
@@ -629,7 +594,6 @@ class TestTransform:
 
     def test_check_is_fitted_call_1(self, mocker):
         """Test the first call to BaseTransformer check_is_fitted in transform."""
-
         df = d.create_df_3()
 
         x = CappingTransformer(capping_values={"a": [2, 5], "b": [-1, 8]})
@@ -646,7 +610,6 @@ class TestTransform:
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
-
         df = d.create_df_3()
 
         x = CappingTransformer(capping_values={"a": [2, 5], "b": [-1, 8]})
@@ -664,7 +627,6 @@ class TestTransform:
 
     def test_learnt_values_not_modified(self):
         """Test that the replacements from fit are not changed in transform."""
-
         capping_values_dict = {"a": [2, 5], "b": [-1, 8]}
 
         df = d.create_df_3()
@@ -685,7 +647,6 @@ class TestTransform:
     )
     def test_expected_output_min_and_max_combinations(self, df, expected):
         """Test that capping is applied correctly in transform."""
-
         x = CappingTransformer(
             capping_values={"a": [2, 5], "b": [None, 7], "c": [0, None]}
         )
@@ -704,7 +665,6 @@ class TestTransform:
     )
     def test_non_cap_column_left_untouched(self, df, expected):
         """Test that capping is applied only to specific columns, others remain the same."""
-
         x = CappingTransformer(capping_values={"a": [2, 10]})
 
         df_transformed = x.transform(df)
@@ -717,7 +677,6 @@ class TestTransform:
 
     def test_non_numeric_column_error(self):
         """Test that transform will raise an error if a column to transform is not numeric."""
-
         df = d.create_df_5()
 
         x = CappingTransformer(capping_values={"a": [2, 5], "b": [-1, 8], "c": [-1, 8]})
@@ -730,7 +689,6 @@ class TestTransform:
 
     def test_quantile_not_fit_error(self):
         """Test that transform will raise an error if quantiles are specified in init but fit is not run before calling transform."""
-
         df = d.create_df_9()
 
         x = CappingTransformer(quantiles={"a": [0.2, 1], "b": [0, 1]})
@@ -743,7 +701,6 @@ class TestTransform:
 
     def test_replacement_values_dict_not_set_error(self):
         """Test that transform will raise an error if _replacement_values is an empty dict."""
-
         df = d.create_df_9()
 
         x = CappingTransformer(quantiles={"a": [0.2, 1], "b": [0, 1]})
@@ -759,7 +716,6 @@ class TestTransform:
 
     def test_attributes_unchanged_from_transform(self):
         """Test that attributes are unchanged after transform is run."""
-
         df = d.create_df_9()
 
         x = CappingTransformer(quantiles={"a": [0.2, 1], "b": [0, 1]})
@@ -789,7 +745,6 @@ class TestWeightedQuantile:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=CappingTransformer.weighted_quantile,
             expected_arguments=["self", "values", "quantiles", "sample_weight"],
@@ -830,7 +785,6 @@ class TestWeightedQuantile:
         self, values, sample_weight, quantiles, expected_quantiles
     ):
         """Test that weighted_quantile gives the expected outputs."""
-
         x = CappingTransformer(capping_values={"a": [2, 10]})
 
         values = pd.Series(values)
@@ -846,7 +800,6 @@ class TestWeightedQuantile:
 
     def test_zero_total_weight_error(self):
         """Test that an exception is raised if the total sample weights are 0."""
-
         x = CappingTransformer(capping_values={"a": [2, 10]})
 
         with pytest.raises(
@@ -857,7 +810,6 @@ class TestWeightedQuantile:
 
     def test_null_values_in_weights_error(self):
         """Test that an exception is raised if there are null values in sample_weight."""
-
         x = CappingTransformer(capping_values={"a": [2, 10]})
 
         with pytest.raises(
@@ -867,7 +819,6 @@ class TestWeightedQuantile:
 
     def test_inf_values_in_weights_error(self):
         """Test that an exception is raised if there are inf values in sample_weight."""
-
         x = CappingTransformer(capping_values={"a": [2, 10]})
 
         with pytest.raises(
@@ -882,7 +833,6 @@ class TestWeightedQuantile:
 
     def test_negative_values_in_weights_error(self):
         """Test that an exception is raised if there are negative values in sample_weight."""
-
         x = CappingTransformer(capping_values={"a": [2, 10]})
 
         with pytest.raises(

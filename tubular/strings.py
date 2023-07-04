@@ -1,6 +1,4 @@
-"""
-This module contains transformers that apply string functions.
-"""
+"""This module contains transformers that apply string functions."""
 
 import pandas as pd
 
@@ -110,7 +108,6 @@ class SeriesStrMethodTransformer(BaseTransformer):
             running the pd.Series.str method.
 
         """
-
         X = super().transform(X)
 
         X[self.new_column_name] = getattr(X[self.columns[0]].str, self.pd_method_name)(
@@ -121,8 +118,7 @@ class SeriesStrMethodTransformer(BaseTransformer):
 
 
 class StringConcatenator(BaseTransformer):
-    """
-    Transformer to combine data from specified columns, of mixed datatypes, into a new column containing one string.
+    """Transformer to combine data from specified columns, of mixed datatypes, into a new column containing one string.
 
     Parameters
     ----------
@@ -150,10 +146,9 @@ class StringConcatenator(BaseTransformer):
         self.separator = separator
 
     def transform(self, X):
-        """
-        Combine data from specified columns, of mixed datatypes, into a new column containing one string.
+        """Combine data from specified columns, of mixed datatypes, into a new column containing one string.
 
-         Parameters
+        Parameters
         ----------
         X : df
             Data to concatenate values on.
@@ -164,7 +159,6 @@ class StringConcatenator(BaseTransformer):
             Returns a dataframe with concatenated values.
 
         """
-
         X = super().transform(X)
 
         X[self.new_column] = (

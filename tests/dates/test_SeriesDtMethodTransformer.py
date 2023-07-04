@@ -11,7 +11,6 @@ class TestInit:
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=SeriesDtMethodTransformer.__init__,
             expected_arguments=[
@@ -26,7 +25,6 @@ class TestInit:
 
     def test_class_methods(self):
         """Test that SeriesDtMethodTransformer has transform method."""
-
         x = SeriesDtMethodTransformer(
             new_column_name="a", pd_method_name="year", column="b"
         )
@@ -37,7 +35,6 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that SeriesDtMethodTransformer inherits from BaseTransformer."""
-
         x = SeriesDtMethodTransformer(
             new_column_name="a", pd_method_name="year", column="b"
         )
@@ -46,7 +43,6 @@ class TestInit:
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
-
         expected_call_args = {
             0: {"args": (), "kwargs": {"columns": "b", "verbose": True, "copy": False}}
         }
@@ -64,7 +60,6 @@ class TestInit:
 
     def test_invalid_input_type_errors(self):
         """Test that an exceptions are raised for invalid input types."""
-
         with pytest.raises(
             TypeError,
             match=r"SeriesDtMethodTransformer: column should be a str but got \<class 'list'\>",
@@ -111,7 +106,6 @@ class TestInit:
 
     def test_exception_raised_non_pandas_method_passed(self):
         """Test and exception is raised if a non pd.Series.dt method is passed for pd_method_name."""
-
         with pytest.raises(
             AttributeError,
             match="""SeriesDtMethodTransformer: error accessing "dt.b" method on pd.Series object - pd_method_name should be a pd.Series.dt method""",
@@ -122,7 +116,6 @@ class TestInit:
 
     def test_attributes_set(self):
         """Test that the values passed for new_column_name, pd_method_name are saved to attributes on the object."""
-
         x = SeriesDtMethodTransformer(
             new_column_name="a",
             pd_method_name="year",
@@ -146,7 +139,6 @@ class TestInit:
     )
     def test_callable_attribute_set(self, pd_method_name, callable_attr):
         """Test the _callable attribute is set to True if pd.Series.dt.pd_method_name is callable."""
-
         x = SeriesDtMethodTransformer(
             new_column_name="a",
             pd_method_name=pd_method_name,
@@ -166,7 +158,6 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output of test_expected_output_no_overwrite."""
-
         df = d.create_datediff_test_df()
 
         df["a_year"] = [1993, 2000, 2018, 2018, 2018, 2018, 2018, 1985]
@@ -175,7 +166,6 @@ class TestTransform:
 
     def expected_df_2():
         """Expected output of test_expected_output_overwrite."""
-
         df = d.create_datediff_test_df()
 
         df["a"] = [1993, 2000, 2018, 2018, 2018, 2018, 2018, 1985]
@@ -184,7 +174,6 @@ class TestTransform:
 
     def expected_df_3():
         """Expected output of test_expected_output_callable."""
-
         df = d.create_datediff_test_df()
 
         df["b_new"] = df["b"].dt.to_period("M")
@@ -193,14 +182,12 @@ class TestTransform:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=SeriesDtMethodTransformer.transform, expected_arguments=["self", "X"]
         )
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
-
         df = d.create_datediff_test_df()
 
         x = SeriesDtMethodTransformer(
@@ -222,7 +209,6 @@ class TestTransform:
     )
     def test_expected_output_no_overwrite(self, df, expected):
         """Test a single column output from transform gives expected results, when not overwriting the original column."""
-
         x = SeriesDtMethodTransformer(
             new_column_name="a_year",
             pd_method_name="year",
@@ -246,7 +232,6 @@ class TestTransform:
     )
     def test_expected_output_overwrite(self, df, expected):
         """Test a single column output from transform gives expected results, when overwriting the original column."""
-
         x = SeriesDtMethodTransformer(
             new_column_name="a",
             pd_method_name="year",
@@ -270,7 +255,6 @@ class TestTransform:
     )
     def test_expected_output_callable(self, df, expected):
         """Test transform gives expected results, when pd_method_name is a callable."""
-
         x = SeriesDtMethodTransformer(
             new_column_name="b_new",
             pd_method_name="to_period",
@@ -288,7 +272,6 @@ class TestTransform:
 
     def test_attributes_unchanged_by_transform(self):
         """Test that attributes set in init are unchanged by the transform method."""
-
         df = d.create_datediff_test_df()
 
         x = SeriesDtMethodTransformer(

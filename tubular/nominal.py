@@ -1,6 +1,4 @@
-"""
-This module contains transformers that apply encodings to nominal columns.
-"""
+"""This module contains transformers that apply encodings to nominal columns."""
 
 import warnings
 
@@ -32,7 +30,6 @@ class BaseNominalTransformer(BaseTransformer):
             Data to check columns are in.
 
         """
-
         if self.columns is None:
             columns = [
                 c for c in X.columns if X[c].dtype.name in ["object", "category"]
@@ -58,7 +55,6 @@ class BaseNominalTransformer(BaseTransformer):
             the mapping dict in mappings[c].
 
         """
-
         self.check_is_fitted(["mappings"])
 
         for c in self.columns:
@@ -124,7 +120,6 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
             Optional argument only required for the transformer to work with sklearn pipelines.
 
         """
-
         BaseNominalTransformer.fit(self, X, y)
 
         self.mappings = {}
@@ -157,7 +152,6 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
             Transformed input X with levels mapped accoriding to mappings dict.
 
         """
-
         self.check_mappable_rows(X)
 
         X = BaseMappingTransformMixin.transform(self, X)
@@ -178,7 +172,6 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
             Transformed input X with integers mapped back to categorical levels.
 
         """
-
         X = BaseNominalTransformer.transform(self, X)
 
         self.check_is_fitted(["mappings"])
@@ -322,7 +315,6 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
             Optional argument only required for the transformer to work with sklearn pipelines.
 
         """
-
         super().fit(X, y)
 
         for c in self.columns:
@@ -408,7 +400,6 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
             Transformed input X with rare levels grouped for into a new rare level.
 
         """
-
         X = BaseNominalTransformer.transform(self, X)
 
         self.check_is_fitted(["mapping_"])
@@ -578,7 +569,6 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         regularised : pd.Series
             Series of regularised encoding values
         """
-
         self.check_is_fitted(["global_mean"])
 
         regularised = (
@@ -589,8 +579,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         return regularised
 
     def _fit_binary_response(self, X, y, columns):
-        """
-        Function to learn the MRE mappings for a given binary or continuous response.
+        """Function to learn the MRE mappings for a given binary or continuous response.
 
         Parameters
         ----------
@@ -676,7 +665,6 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             Response variable or target.
 
         """
-
         BaseNominalTransformer.fit(self, X, y)
 
         self.mappings = {}
@@ -862,7 +850,6 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
             Response column or target.
 
         """
-
         BaseNominalTransformer.fit(self, X, y)
 
         self.mappings = {}
@@ -944,7 +931,6 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
             Transformed data with levels mapped to ordinal encoded values for categorical variables.
 
         """
-
         self.check_mappable_rows(X)
 
         X = BaseMappingTransformMixin.transform(self, X)
@@ -1021,7 +1007,6 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
             Ignored. This parameter exists only for compatibility with sklearn.pipeline.Pipeline.
 
         """
-
         BaseNominalTransformer.fit(self, X=X, y=y)
 
         # Check for nulls
@@ -1047,8 +1032,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         return self
 
     def _get_feature_names(self, input_features, **kwargs):
-        """
-        Function to access the get_feature_names attribute of the scikit learn attribute. Will return the output columns of the OHE transformer.
+        """Function to access the get_feature_names attribute of the scikit learn attribute. Will return the output columns of the OHE transformer.
 
         In scikit learn 1.0 "get_feature_names" was deprecated and then replaced with "get_feature_names_out" in version 1.2. The logic in this
         function will call the correct attribute, or raise an error if it can't be found.
@@ -1061,7 +1045,6 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         kwargs : dict
             Keyword arguments to be passed on to the scikit learn attriute.
         """
-
         if hasattr(self, "get_feature_names"):
             input_columns = self.get_feature_names(
                 input_features=input_features, **kwargs
@@ -1094,7 +1077,6 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
             the output X.
 
         """
-
         self.check_is_fitted(["separator"])
         self.check_is_fitted(["drop_original"])
 

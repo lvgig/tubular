@@ -33,14 +33,12 @@ def dayofweek_extractor():
 class TestExtractDatetimeInfoInit:
     def test_assert_inheritance(self):
         """Test that ExtractDatetimeInfo inherits from BaseTransformer."""
-
         x = DatetimeInfoExtractor(columns=["a"])
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_arguments(self):
-        """Test that init has the expected arguments"""
-
+        """Test that init has the expected arguments."""
         default_include = [
             "timeofday",
             "timeofmonth",
@@ -58,7 +56,6 @@ class TestExtractDatetimeInfoInit:
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
-
         expected_call_args = {
             0: {
                 "args": (),
@@ -73,7 +70,6 @@ class TestExtractDatetimeInfoInit:
 
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that the values passed in init are saved in an attribute of the same name."""
-
         x = DatetimeInfoExtractor(
             columns=["a"],
             include=["timeofmonth", "timeofday"],
@@ -94,7 +90,6 @@ class TestExtractDatetimeInfoInit:
 
     def test_class_methods(self):
         """Test that DatetimeInfoExtractor has fit and transform methods."""
-
         x = DatetimeInfoExtractor(columns=["a"])
 
         ta.classes.test_object_method(
@@ -106,8 +101,7 @@ class TestExtractDatetimeInfoInit:
 
     @pytest.mark.parametrize("incorrect_type_include", [2, 3.0, "invalid", "dayofweek"])
     def test_error_when_include_not_list(self, incorrect_type_include):
-        """Test that an exception is raised when value include variable is not a list"""
-
+        """Test that an exception is raised when value include variable is not a list."""
         with pytest.raises(
             TypeError,
             match="include should be List",
@@ -115,8 +109,7 @@ class TestExtractDatetimeInfoInit:
             DatetimeInfoExtractor(columns=["a"], include=incorrect_type_include)
 
     def test_error_when_invalid_include_option(self):
-        """Test that an exception is raised when include contains incorrect values"""
-
+        """Test that an exception is raised when include contains incorrect values."""
         with pytest.raises(
             ValueError,
             match=r'elements in include should be in \["timeofday", "timeofmonth", "timeofyear", "dayofweek"\]',
@@ -131,8 +124,7 @@ class TestExtractDatetimeInfoInit:
     def test_error_when_datetime_mappings_not_dict(
         self, incorrect_type_datetime_mappings
     ):
-        """Test that an exception is raised when datetime_mappings is not a dict"""
-
+        """Test that an exception is raised when datetime_mappings is not a dict."""
         with pytest.raises(
             TypeError,
             match="datetime_mappings should be Dict",
@@ -147,8 +139,7 @@ class TestExtractDatetimeInfoInit:
     def test_error_when_datetime_mapping_value_not_dict(
         self, incorrect_type_datetime_mappings_values
     ):
-        """Test that an exception is raised when values in datetime_mappings are not dict"""
-
+        """Test that an exception is raised when values in datetime_mappings are not dict."""
         with pytest.raises(
             TypeError,
             match="values in datetime_mappings should be dict",
@@ -171,8 +162,7 @@ class TestExtractDatetimeInfoInit:
     def test_error_when_datetime_mapping_key_not_in_include(
         self, include, incorrect_datetime_mappings_keys
     ):
-        """Test that an exception is raised when keys in datetime_mappings are not in include"""
-
+        """Test that an exception is raised when keys in datetime_mappings are not in include."""
         with pytest.raises(
             ValueError,
             match="keys in datetime_mappings should be in include",
@@ -215,15 +205,14 @@ class TestExtractDatetimeInfoInit:
     def test_error_when_incomplete_mappings_passed(
         self, incomplete_mappings, expected_exception
     ):
-        """Test that error is raised when incomplete mappings are passed"""
-
+        """Test that error is raised when incomplete mappings are passed."""
         with pytest.raises(ValueError, match=expected_exception):
             DatetimeInfoExtractor(columns=["a"], datetime_mappings=incomplete_mappings)
 
 
 class TestMapValues:
     def test_arguments(self):
-        """Test that identify_timeofday has the expected arguments"""
+        """Test that identify_timeofday has the expected arguments."""
 
     ta.functions.test_function_arguments(
         func=DatetimeInfoExtractor._map_values,
@@ -233,8 +222,7 @@ class TestMapValues:
 
     @pytest.mark.parametrize("incorrect_type_input", ["2", [1, 2]])
     def test_incorrect_type_input(self, incorrect_type_input, timeofday_extractor):
-        """Test that an error is raised if input is the wrong type"""
-
+        """Test that an error is raised if input is the wrong type."""
         with pytest.raises(
             TypeError, match="DatetimeInfoExtractor: value should be float or int"
         ):
@@ -244,8 +232,7 @@ class TestMapValues:
     def test_out_of_bounds_or_fractional_input(
         self, incorrect_size_input, timeofday_extractor
     ):
-        """Test that an error is raised when value is outside of 0-23 range"""
-
+        """Test that an error is raised when value is outside of 0-23 range."""
         with pytest.raises(
             ValueError,
             match="DatetimeInfoExtractor: value for timeofday mapping  in self._map_values should be an integer value in 0-23",
@@ -268,8 +255,7 @@ class TestMapValues:
     def test_valid_inputs_timeofday(
         self, valid_hour, hour_time_of_day, timeofday_extractor
     ):
-        """Trial test to check all in one go"""
-
+        """Trial test to check all in one go."""
         output = timeofday_extractor._map_values(valid_hour, "timeofday")
 
         assert output == hour_time_of_day, "expected {}, output {}".format(
@@ -293,7 +279,7 @@ class TestMapValues:
     def test_valid_inputs_timeofmonth(
         self, valid_day, day_time_of_month, timeofmonth_extractor
     ):
-        """Test that correct values are return with valid inputs"""
+        """Test that correct values are return with valid inputs."""
         output = timeofmonth_extractor._map_values(valid_day, "timeofmonth")
         assert output == day_time_of_month, "expected {}, output {}".format(
             day_time_of_month, output
@@ -315,7 +301,7 @@ class TestMapValues:
     def test_valid_inputs_timeofyear(
         self, valid_month, month_time_of_year, timeofyear_extractor
     ):
-        """Test that correct values are return with valid inputs"""
+        """Test that correct values are return with valid inputs."""
         output = timeofyear_extractor._map_values(valid_month, "timeofyear")
         assert output == month_time_of_year, "expected {}, output {}".format(
             month_time_of_year, output
@@ -331,12 +317,12 @@ class TestMapValues:
         ],
     )
     def test_valid_inputs_dayofweek(self, valid_day, dayofweek, dayofweek_extractor):
-        """Test that correct values are return with valid inputs"""
+        """Test that correct values are return with valid inputs."""
         output = dayofweek_extractor._map_values(valid_day, "dayofweek")
         assert output == dayofweek, f"expected {dayofweek}, output {output}"
 
     def test_valid_nan_output(self, timeofday_extractor):
-        """Test that correct values are return with valid inputs"""
+        """Test that correct values are return with valid inputs."""
         output = timeofday_extractor._map_values(np.nan, "timeofday")
         print(output)
         assert np.isnan(
@@ -346,8 +332,7 @@ class TestMapValues:
 
 class TestTransform:
     def test_arguments(self):
-        """Test that init has the expected arguments"""
-
+        """Test that init has the expected arguments."""
         ta.functions.test_function_arguments(
             func=DatetimeInfoExtractor.transform,
             expected_arguments=["self", "X"],
@@ -356,7 +341,6 @@ class TestTransform:
 
     def test_super_transform_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
-
         df = d.create_date_test_df()
         df = df.astype("datetime64[ns]")
 
@@ -379,8 +363,7 @@ class TestTransform:
             x.transform(df)
 
     def test_non_datetime_column(self):
-        """Test that error is raised if input columns do not contain datetime values"""
-
+        """Test that error is raised if input columns do not contain datetime values."""
         df = d.create_df_1()  # Mix of int values
 
         x = DatetimeInfoExtractor(columns=["a"], include=["dayofweek"])
@@ -391,8 +374,7 @@ class TestTransform:
             x.transform(df),
 
     def test_correct_col_returned(self):
-        """Test that the added column is correct"""
-
+        """Test that the added column is correct."""
         df = d.create_date_test_df()
         df = df.astype("datetime64[ns]")
 
@@ -421,8 +403,7 @@ class TestTransform:
         )
 
     def test_map_values_calls(self, mocker):
-        """Test all intermediary methods are being called correct number of times"""
-
+        """Test all intermediary methods are being called correct number of times."""
         # df is 8 rows long so each intermediate function must have 8 calls
         df = d.create_date_test_df()
         df = df.astype("datetime64[ns]")
@@ -438,8 +419,7 @@ class TestTransform:
         assert mocked_map_values.call_count == 32
 
     def test_correct_df_returned(self):
-        """Test that correct df is returned after transformation"""
-
+        """Test that correct df is returned after transformation."""
         df = d.create_date_test_df()
         df.loc[0, "b"] = np.nan
         df = df.astype("datetime64[ns]")

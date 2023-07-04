@@ -12,7 +12,6 @@ class TestInit:
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=NominalToIntegerTransformer.__init__,
             expected_arguments=["self", "columns", "start_encoding"],
@@ -21,7 +20,6 @@ class TestInit:
 
     def test_class_methods(self):
         """Test that NominalToIntegerTransformer has fit and transform methods."""
-
         x = NominalToIntegerTransformer()
 
         ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
@@ -36,14 +34,12 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that NominalToIntegerTransformer inherits from BaseNominalTransformer."""
-
         x = NominalToIntegerTransformer()
 
         ta.classes.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
-
         spy = mocker.spy(tubular.base.BaseTransformer, "__init__")
 
         x = NominalToIntegerTransformer(columns=None, verbose=True, copy=True)
@@ -74,13 +70,11 @@ class TestInit:
 
     def test_start_encoding_not_int_error(self):
         """Test that an exception is raised if start_encoding is not an int."""
-
         with pytest.raises(ValueError):
             NominalToIntegerTransformer(start_encoding="a")
 
     def test_start_encoding_set_to_attribute(self):
         """Test that the value passed for start_encoding is saved in an attribute of the same name."""
-
         value = 1
 
         x = NominalToIntegerTransformer(start_encoding=value)
@@ -93,11 +87,10 @@ class TestInit:
 
 
 class TestFit:
-    """Tests for NominalToIntegerTransformer.fit()"""
+    """Tests for NominalToIntegerTransformer.fit()."""
 
     def test_arguments(self):
         """Test that init fit expected arguments."""
-
         ta.functions.test_function_arguments(
             func=NominalToIntegerTransformer.fit,
             expected_arguments=["self", "X", "y"],
@@ -106,7 +99,6 @@ class TestFit:
 
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseTransformer.fit."""
-
         df = d.create_df_1()
 
         x = NominalToIntegerTransformer(columns=["a", "b"])
@@ -145,7 +137,6 @@ class TestFit:
 
     def test_learnt_values(self):
         """Test that the impute values learnt during fit are expected."""
-
         df = d.create_df_1()
 
         x = NominalToIntegerTransformer(columns=["a", "b"], start_encoding=1)
@@ -164,8 +155,7 @@ class TestFit:
         )
 
     def test_fit_returns_self(self):
-        """Test fit returns self?"""
-
+        """Test fit returns self?."""
         df = d.create_df_1()
 
         x = NominalToIntegerTransformer(columns=["a", "b"])
@@ -178,7 +168,6 @@ class TestFit:
 
     def test_fit_not_changing_data(self):
         """Test fit does not change X."""
-
         df = d.create_df_1()
 
         x = NominalToIntegerTransformer(columns=["a", "b"])
@@ -197,7 +186,6 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output for test_expected_output."""
-
         df = pd.DataFrame(
             {"a": [1, 2, 3, 4, 5, 6], "b": ["a", "b", "c", "d", "e", "f"]}
         )
@@ -210,14 +198,12 @@ class TestTransform:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=NominalToIntegerTransformer.transform, expected_arguments=["self", "X"]
         )
 
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""
-
         df = d.create_df_1()
 
         x = NominalToIntegerTransformer(columns=["a", "b"])
@@ -233,7 +219,6 @@ class TestTransform:
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
-
         df = d.create_df_1()
 
         x = NominalToIntegerTransformer(columns="a")
@@ -253,7 +238,6 @@ class TestTransform:
 
     def test_learnt_values_not_modified(self):
         """Test that the mappings from fit are not changed in transform."""
-
         df = d.create_df_1()
 
         x = NominalToIntegerTransformer(columns=["a", "b"])
@@ -272,7 +256,6 @@ class TestTransform:
 
     def test_non_mappable_rows_raises_error(self):
         """Test that rows that cannot be mapped result in an exception."""
-
         df = d.create_df_1()
 
         x = NominalToIntegerTransformer(columns=["a", "b"])
@@ -293,7 +276,6 @@ class TestTransform:
     )
     def test_expected_output(self, df, expected):
         """Test that the output is expected from transform."""
-
         x = NominalToIntegerTransformer(columns=["a", "b"])
 
         # set the mapping dict directly rather than fitting x on df so test works with helpers
@@ -316,7 +298,6 @@ class TestInverseTransform:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=NominalToIntegerTransformer.inverse_transform,
             expected_arguments=["self", "X"],
@@ -324,7 +305,6 @@ class TestInverseTransform:
 
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""
-
         df = d.create_df_1()
 
         x = NominalToIntegerTransformer(columns=["a", "b"])
@@ -346,7 +326,6 @@ class TestInverseTransform:
     )
     def test_expected_output(self, df, expected):
         """Test that transform then inverse_transform gets back to the original df."""
-
         x = NominalToIntegerTransformer(columns=["a", "b"])
 
         # set the mapping dict directly rather than fitting x on df so test works with helpers
@@ -367,7 +346,6 @@ class TestInverseTransform:
 
     def test_non_mappable_rows_raises_error(self):
         """Test that rows that cannot be mapped result in an exception."""
-
         x = NominalToIntegerTransformer(columns=["a", "b"])
 
         df = d.create_df_1()
@@ -386,7 +364,6 @@ class TestInverseTransform:
 
     def test_learnt_values_not_modified(self):
         """Test that the mappings from fit are not changed in inverse_transform."""
-
         df = d.create_df_1()
 
         x = NominalToIntegerTransformer(columns=["a", "b"])

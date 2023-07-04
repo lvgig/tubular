@@ -13,7 +13,6 @@ class TestInit:
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=GroupRareLevelsTransformer.__init__,
             expected_arguments=[
@@ -29,7 +28,6 @@ class TestInit:
 
     def test_class_methods(self):
         """Test that GroupRareLevelsTransformer has fit and transform methods."""
-
         x = GroupRareLevelsTransformer()
 
         ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
@@ -40,14 +38,12 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that NominalToIntegerTransformer inherits from BaseNominalTransformer."""
-
         x = GroupRareLevelsTransformer()
 
         ta.classes.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
-
         expected_call_args = {
             0: {"args": (), "kwargs": {"columns": None, "verbose": True, "copy": True}}
         }
@@ -59,7 +55,6 @@ class TestInit:
 
     def test_cut_off_percent_not_float_error(self):
         """Test that an exception is raised if cut_off_percent is not an float."""
-
         with pytest.raises(
             ValueError,
             match="GroupRareLevelsTransformer: cut_off_percent must be a float",
@@ -68,7 +63,6 @@ class TestInit:
 
     def test_cut_off_percent_negative_error(self):
         """Test that an exception is raised if cut_off_percent is negative."""
-
         with pytest.raises(
             ValueError,
             match="GroupRareLevelsTransformer: cut_off_percent must be > 0 and < 1",
@@ -77,7 +71,6 @@ class TestInit:
 
     def test_cut_off_percent_gt_one_error(self):
         """Test that an exception is raised if cut_off_percent is greater than 1."""
-
         with pytest.raises(
             ValueError,
             match="GroupRareLevelsTransformer: cut_off_percent must be > 0 and < 1",
@@ -86,7 +79,6 @@ class TestInit:
 
     def test_weight_not_str_error(self):
         """Test that an exception is raised if weight is not a str, if supplied."""
-
         with pytest.raises(
             ValueError,
             match="GroupRareLevelsTransformer: weight should be a single column",
@@ -95,7 +87,6 @@ class TestInit:
 
     def test_record_rare_levels_not_str_error(self):
         """Test that an exception is raised if record_rare_levels is not a bool."""
-
         with pytest.raises(
             ValueError,
             match="GroupRareLevelsTransformer: record_rare_levels must be a bool",
@@ -104,7 +95,6 @@ class TestInit:
 
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that the values passed in init are saved in an attribute of the same name."""
-
         x = GroupRareLevelsTransformer(
             cut_off_percent=0.05,
             weight="aaa",
@@ -125,11 +115,10 @@ class TestInit:
 
 
 class TestFit:
-    """Tests for GroupRareLevelsTransformer.fit()"""
+    """Tests for GroupRareLevelsTransformer.fit()."""
 
     def test_arguments(self):
         """Test that init fit expected arguments."""
-
         ta.functions.test_function_arguments(
             func=GroupRareLevelsTransformer.fit,
             expected_arguments=["self", "X", "y"],
@@ -138,7 +127,6 @@ class TestFit:
 
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseTransformer.fit."""
-
         df = d.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
@@ -152,7 +140,6 @@ class TestFit:
 
     def test_weight_column_not_in_X_error(self):
         """Test that an exception is raised if weight is not in X."""
-
         df = d.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"], weight="aaaa")
@@ -163,8 +150,7 @@ class TestFit:
             x.fit(df)
 
     def test_fit_returns_self(self):
-        """Test fit returns self?"""
-
+        """Test fit returns self?."""
         df = d.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
@@ -177,7 +163,6 @@ class TestFit:
 
     def test_fit_not_changing_data(self):
         """Test fit does not change X."""
-
         df = d.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
@@ -192,7 +177,6 @@ class TestFit:
 
     def test_learnt_values_no_weight(self):
         """Test that the impute values learnt during fit, without using a weight, are expected."""
-
         df = d.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"], cut_off_percent=0.2)
@@ -209,7 +193,6 @@ class TestFit:
 
     def test_learnt_values_weight(self):
         """Test that the impute values learnt during fit, using a weight, are expected."""
-
         df = d.create_df_6()
 
         x = GroupRareLevelsTransformer(columns=["b"], cut_off_percent=0.3, weight="a")
@@ -224,7 +207,6 @@ class TestFit:
 
     def test_learnt_values_weight_2(self):
         """Test that the impute values learnt during fit, using a weight, are expected."""
-
         df = d.create_df_6()
 
         x = GroupRareLevelsTransformer(columns=["c"], cut_off_percent=0.2, weight="a")
@@ -239,7 +221,6 @@ class TestFit:
 
     def test_rare_level_name_not_diff_col_type(self):
         """Test that an exception is raised if rare_level_name is of a different type with respect columns."""
-
         df = d.create_df_10()
 
         with pytest.raises(
@@ -264,7 +245,6 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output for test_expected_output_no_weight."""
-
         df = pd.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.NaN]})
 
         df["b"] = pd.Series(
@@ -282,7 +262,6 @@ class TestTransform:
 
     def expected_df_2():
         """Expected output for test_expected_output_weight."""
-
         df = pd.DataFrame(
             {
                 "a": [2, 2, 2, 2, np.NaN, 2, 2, 2, 3, 3],
@@ -301,14 +280,12 @@ class TestTransform:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=GroupRareLevelsTransformer.transform, expected_arguments=["self", "X"]
         )
 
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""
-
         df = d.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
@@ -324,7 +301,6 @@ class TestTransform:
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
-
         df = d.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
@@ -352,7 +328,6 @@ class TestTransform:
 
     def test_learnt_values_not_modified(self):
         """Test that the mapping_ from fit are not changed in transform."""
-
         df = d.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
@@ -377,7 +352,6 @@ class TestTransform:
     )
     def test_expected_output_no_weight(self, df, expected):
         """Test that the output is expected from transform."""
-
         x = GroupRareLevelsTransformer(columns=["b", "c"], cut_off_percent=0.2)
 
         # set the mappging dict directly rather than fitting x on df so test works with decorators
@@ -392,10 +366,9 @@ class TestTransform:
         )
 
     def test_expected_output_no_weight_single_row_na(self):
-        """test output from a single row transform with np.NaN value remains the same,
-        the type is perserved if using existing dataframe, so need to create a new dataframe
+        """Test output from a single row transform with np.NaN value remains the same,
+        the type is perserved if using existing dataframe, so need to create a new dataframe.
         """
-
         one_row_df = pd.DataFrame({"b": [np.nan], "c": [np.NaN]})
         x = GroupRareLevelsTransformer(columns=["b", "c"], cut_off_percent=0.2)
 
@@ -411,10 +384,9 @@ class TestTransform:
         )
 
     def test_expected_output_no_weight_single_row_na_category_column(self):
-        """test output from a single row transform with np.NaN value remains the same, when column is type category,
-        the type is perserved if using existing dataframe, so need to create a new dataframe
+        """Test output from a single row transform with np.NaN value remains the same, when column is type category,
+        the type is perserved if using existing dataframe, so need to create a new dataframe.
         """
-
         one_row_df = pd.DataFrame({"b": [np.nan], "c": [np.NaN]})
         one_row_df["c"] = one_row_df["c"].astype("category")
 
@@ -440,7 +412,6 @@ class TestTransform:
     )
     def test_expected_output_weight(self, df, expected):
         """Test that the output is expected from transform, when weights are used."""
-
         x = GroupRareLevelsTransformer(columns=["b"], cut_off_percent=0.3, weight="a")
 
         # set the mappging dict directly rather than fitting x on df so test works with decorators
@@ -457,7 +428,6 @@ class TestTransform:
     @pytest.mark.parametrize("label,col", [(2.0, "a"), ("zzzz", "b"), (100, "c")])
     def test_rare_level_name_same_col_type(self, label, col):
         """Test that checks if output columns are of the same type with respect to the input label."""
-
         df = d.create_df_10()
 
         x = GroupRareLevelsTransformer(columns=[col], rare_level_name=label)

@@ -20,7 +20,6 @@ class TestInit:
 
     def test_class_methods(self):
         """Test that MappingTransformer has transform method."""
-
         x = MappingTransformer(mappings={"a": {"a": 1}})
 
         ta.classes.test_object_method(
@@ -29,7 +28,6 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that MappingTransformer inherits from BaseMappingTransformer and BaseMappingTransformMixin."""
-
         x = MappingTransformer(mappings={"a": {"a": 1}})
 
         ta.classes.assert_inheritance(x, tubular.mapping.BaseMappingTransformer)
@@ -37,7 +35,6 @@ class TestInit:
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseMappingTransformer.init."""
-
         spy = mocker.spy(tubular.mapping.BaseMappingTransformer, "__init__")
 
         x = MappingTransformer(mappings={"a": {"a": 1}}, verbose=True, copy=True)
@@ -68,7 +65,6 @@ class TestInit:
 
     def test_mapping_arg_conversion(self):
         """Test that sub dict in mappings arg are converted into ReturnKeyDict objects."""
-
         mappings = {
             "a": {"a": 1, "b": 2},
             "b": {1: 4.5, 2: 3.1},
@@ -91,7 +87,6 @@ class TestInit:
 
     def test_mapping_non_dict_item_error(self):
         """Test an exception is raised if mappings contains non-dict values."""
-
         mappings = {"a": {"a": 1, "b": 2}, "b": {1: 4.5, 2: 3.1}, "c": 1}
 
         with pytest.raises(
@@ -106,7 +101,6 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output for test_expected_output."""
-
         df = pd.DataFrame(
             {"a": ["a", "b", "c", "d", "e", "f"], "b": [1, 2, 3, 4, 5, 6]}
         )
@@ -115,7 +109,6 @@ class TestTransform:
 
     def expected_df_2():
         """Expected output for test_non_specified_values_unchanged."""
-
         df = pd.DataFrame(
             {"a": [5, 6, 7, 4, 5, 6], "b": ["z", "y", "x", "d", "e", "f"]}
         )
@@ -124,7 +117,6 @@ class TestTransform:
 
     def test_super_transform_call(self, mocker):
         """Test the call to BaseMappingTransformMixin.transform."""
-
         df = d.create_df_1()
 
         mapping = {
@@ -170,7 +162,6 @@ class TestTransform:
     )
     def test_expected_output(self, df, expected):
         """Test that transform is giving the expected output."""
-
         mapping = {
             "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
             "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
@@ -192,7 +183,6 @@ class TestTransform:
     )
     def test_non_specified_values_unchanged(self, df, expected):
         """Test that values not specified in mappings are left unchanged in transform."""
-
         mapping = {"a": {1: 5, 2: 6, 3: 7}, "b": {"a": "z", "b": "y", "c": "x"}}
 
         x = MappingTransformer(mappings=mapping)
@@ -207,7 +197,6 @@ class TestTransform:
 
     def test_mappings_unchanged(self):
         """Test that mappings is unchanged in transform."""
-
         df = d.create_df_1()
 
         mapping = {
@@ -300,11 +289,10 @@ class TestTransform:
             assert len(warnings_record) == 0
 
     def test_category_dtype_is_conserved(self):
-        """This is a separate test due to the behaviour of category dtypes
+        """This is a separate test due to the behaviour of category dtypes.
 
         See documentation of transform method
         """
-
         df = d.create_df_1()
         df["b"] = df["b"].astype("category")
 

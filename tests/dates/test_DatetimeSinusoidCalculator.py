@@ -20,7 +20,6 @@ class TestDatetimeSinusoidCalculatorInit:
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
-
         expected_call_args = {
             0: {
                 "args": ("a",),
@@ -43,7 +42,6 @@ class TestDatetimeSinusoidCalculatorInit:
     @pytest.mark.parametrize("incorrect_type_method", [2, 2.0, True, {"a": 4}])
     def test_method_type_error(self, incorrect_type_method):
         """Test that an exception is raised if method is not a str or a list."""
-
         with pytest.raises(
             TypeError,
             match="method must be a string or list but got {}".format(
@@ -60,7 +58,6 @@ class TestDatetimeSinusoidCalculatorInit:
     @pytest.mark.parametrize("incorrect_type_units", [2, 2.0, True, ["help"]])
     def test_units_type_error(self, incorrect_type_units):
         """Test that an exception is raised if units is not a str or a dict."""
-
         with pytest.raises(
             TypeError,
             match="units must be a string or dict but got {}".format(
@@ -76,8 +73,7 @@ class TestDatetimeSinusoidCalculatorInit:
 
     @pytest.mark.parametrize("incorrect_type_period", ["2", True, ["help"]])
     def test_period_type_error(self, incorrect_type_period):
-        """Test that an error is raised if period is not an int or a float or a dictionary"""
-
+        """Test that an error is raised if period is not an int or a float or a dictionary."""
         with pytest.raises(
             TypeError,
             match="period must be an int, float or dict but got {}".format(
@@ -96,8 +92,7 @@ class TestDatetimeSinusoidCalculatorInit:
         [{"str": True}, {2: "str"}, {2: 2}, {"str": ["str"]}],
     )
     def test_period_dict_type_error(self, incorrect_dict_types_period):
-        """Test that an error is raised if period dict is not a str:int or str:float kv pair"""
-
+        """Test that an error is raised if period dict is not a str:int or str:float kv pair."""
         with pytest.raises(
             TypeError,
             match="period dictionary key value pair must be str:int or str:float but got keys: {} and values: {}".format(
@@ -124,8 +119,7 @@ class TestDatetimeSinusoidCalculatorInit:
         ],
     )
     def test_units_dict_type_error(self, incorrect_dict_types_units):
-        """Test that an error is raised if units dict is not a str:str kv pair"""
-
+        """Test that an error is raised if units dict is not a str:str kv pair."""
         with pytest.raises(
             TypeError,
             match="units dictionary key value pair must be strings but got keys: {} and values: {}".format(
@@ -143,7 +137,6 @@ class TestDatetimeSinusoidCalculatorInit:
     @pytest.mark.parametrize("incorrect_dict_units", [{"str": "tweet"}])
     def test_units_dict_value_error(self, incorrect_dict_units):
         """Test that an error is raised if units dict value is not from the valid units list."""
-
         with pytest.raises(
             ValueError,
             match="units dictionary values must be one of 'year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond' but got {}".format(
@@ -162,8 +155,7 @@ class TestDatetimeSinusoidCalculatorInit:
         [{"ham": 24}, {"str": 34.0}],
     )
     def test_period_dict_col_error(self, incorrect_dict_columns_period):
-        """Test that an error is raised if period dict keys are not equal to columns"""
-
+        """Test that an error is raised if period dict keys are not equal to columns."""
         with pytest.raises(
             ValueError,
             match="period dictionary keys must be the same as columns but got {}".format(
@@ -182,8 +174,7 @@ class TestDatetimeSinusoidCalculatorInit:
         [{"sausage_roll": "hour"}],
     )
     def test_unit_dict_col_error(self, incorrect_dict_columns_unit):
-        """Test that an error is raised if unit dict keys is not equal to columns"""
-
+        """Test that an error is raised if unit dict keys is not equal to columns."""
         with pytest.raises(
             ValueError,
             match="unit dictionary keys must be the same as columns but got {}".format(
@@ -244,7 +235,6 @@ class TestDatetimeSinusoidCalculatorInit:
 
     def test_attributes(self, example_transformer):
         """Test that the value passed for new_column_name and units are saved in attributes of the same name."""
-
         ta.classes.test_object_attributes(
             obj=example_transformer,
             expected_attributes={
@@ -259,7 +249,6 @@ class TestDatetimeSinusoidCalculatorInit:
 class TestDatetimeSinusoidCalculatorTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=DatetimeSinusoidCalculator.transform,
             expected_arguments=["self", "X"],
@@ -299,8 +288,8 @@ class TestDatetimeSinusoidCalculatorTransform:
 
     def test_cos_called_with_correct_args(self, mocker):
         """Tests that the correct numpy method is called on the correct column - also implicitly checks that the column has been transformed
-        into the correct units through the value of the argument."""
-
+        into the correct units through the value of the argument.
+        """
         method = "cos"
 
         data = d.create_datediff_test_df()

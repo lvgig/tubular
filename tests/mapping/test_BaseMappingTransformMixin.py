@@ -11,7 +11,6 @@ class TestInit:
 
     def test_class_methods(self):
         """Test that BaseMappingTransformMixin has transform method."""
-
         x = BaseMappingTransformMixin()
 
         ta.classes.test_object_method(
@@ -20,7 +19,6 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that BaseMappingTransformMixin inherits from BaseTransformer."""
-
         x = BaseMappingTransformMixin()
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
@@ -31,7 +29,6 @@ class TestTransform:
 
     def test_check_is_fitted_call(self, mocker):
         """Test the call to check_is_fitted."""
-
         df = d.create_df_1()
 
         mapping = {
@@ -52,7 +49,6 @@ class TestTransform:
 
     def test_super_transform_call(self, mocker):
         """Test the call to BaseTransformer.transform."""
-
         df = d.create_df_1()
 
         mapping = {
@@ -73,7 +69,6 @@ class TestTransform:
 
     def test_pd_series_map_call(self, mocker):
         """Test the call to pd.Series.map."""
-
         spy = mocker.spy(pd.Series, "map")
 
         df = d.create_df_1()

@@ -13,7 +13,6 @@ class TestInit:
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=MedianImputer.__init__,
             expected_arguments=["self", "columns", "weight"],
@@ -22,7 +21,6 @@ class TestInit:
 
     def test_class_methods(self):
         """Test that MedianImputer has fit and transform methods."""
-
         x = MedianImputer()
 
         ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
@@ -33,14 +31,12 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that MedianImputer inherits from BaseImputer."""
-
         x = MedianImputer()
 
         ta.classes.assert_inheritance(x, tubular.imputers.BaseImputer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
-
         expected_call_args = {
             0: {"args": (), "kwargs": {"columns": None, "verbose": True, "copy": True}}
         }
@@ -52,8 +48,7 @@ class TestInit:
 
     @pytest.mark.parametrize("weight", (0, ["a"], {"a": 10}))
     def test_weight_arg_errors(self, weight):
-        """Test that appropriate errors are throw for bad weight arg"""
-
+        """Test that appropriate errors are throw for bad weight arg."""
         with pytest.raises(
             TypeError,
             match="weight should be str or None",
@@ -62,11 +57,10 @@ class TestInit:
 
 
 class TestFit:
-    """Tests for MedianImputer.fit()"""
+    """Tests for MedianImputer.fit()."""
 
     def test_arguments(self):
         """Test that fit has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=MedianImputer.fit,
             expected_arguments=["self", "X", "y"],
@@ -75,7 +69,6 @@ class TestFit:
 
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseTransformer.fit."""
-
         df = d.create_df_3()
 
         x = MedianImputer(columns=["a", "b", "c"])
@@ -89,7 +82,6 @@ class TestFit:
 
     def test_check_weights_column_called(self, mocker):
         """Test that fit calls BaseTransformer.check_weights_column - when weights are used."""
-
         df = d.create_df_9()
 
         x = MedianImputer(columns=["a", "b"], weight="c")
@@ -106,7 +98,6 @@ class TestFit:
 
     def test_learnt_values(self):
         """Test that the impute values learnt during fit are expected."""
-
         df = d.create_df_3()
 
         x = MedianImputer(columns=["a", "b", "c"])
@@ -127,7 +118,6 @@ class TestFit:
 
     def test_learnt_values_weighted(self):
         """Test that the impute values learnt during fit are expected - when using weights."""
-
         df = d.create_df_9()
 
         df = pd.DataFrame(
@@ -152,8 +142,7 @@ class TestFit:
         )
 
     def test_fit_returns_self(self):
-        """Test fit returns self?"""
-
+        """Test fit returns self?."""
         df = d.create_df_1()
 
         x = MedianImputer(columns="a")
@@ -163,8 +152,7 @@ class TestFit:
         assert x_fitted is x, "Returned value from MedianImputer.fit not as expected."
 
     def test_fit_returns_self_weighted(self):
-        """Test fit returns self?"""
-
+        """Test fit returns self?."""
         df = d.create_df_9()
 
         x = MedianImputer(columns="a", weight="c")
@@ -175,7 +163,6 @@ class TestFit:
 
     def test_fit_not_changing_data(self):
         """Test fit does not change X."""
-
         df = d.create_df_1()
 
         x = MedianImputer(columns="a")
@@ -190,7 +177,6 @@ class TestFit:
 
     def test_fit_not_changing_data_weighted(self):
         """Test fit does not change X."""
-
         df = d.create_df_9()
 
         x = MedianImputer(columns="a", weight="c")
@@ -209,7 +195,6 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output for test_nulls_imputed_correctly."""
-
         df = pd.DataFrame(
             {
                 "a": [1, 2, 3, 4, 5, 6, np.NaN],
@@ -225,7 +210,6 @@ class TestTransform:
 
     def expected_df_2():
         """Expected output for test_nulls_imputed_correctly_2."""
-
         df = pd.DataFrame(
             {
                 "a": [1, 2, 3, 4, 5, 6, np.NaN],
@@ -241,7 +225,6 @@ class TestTransform:
 
     def expected_df_3():
         """Expected output for test_nulls_imputed_correctly_3."""
-
         df = d.create_df_9()
 
         for col in ["a"]:
@@ -251,14 +234,12 @@ class TestTransform:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=MedianImputer.transform, expected_arguments=["self", "X"]
         )
 
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""
-
         df = d.create_df_1()
 
         x = MedianImputer(columns="a")
@@ -274,7 +255,6 @@ class TestTransform:
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
-
         df = d.create_df_1()
 
         x = MedianImputer(columns="a")
@@ -294,7 +274,6 @@ class TestTransform:
     )
     def test_nulls_imputed_correctly(self, df, expected):
         """Test missing values are filled with the correct values."""
-
         x = MedianImputer(columns=["a", "b", "c"])
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
@@ -314,7 +293,6 @@ class TestTransform:
     )
     def test_nulls_imputed_correctly_2(self, df, expected):
         """Test missing values are filled with the correct values - and unrelated columns are not changed."""
-
         x = MedianImputer(columns=["a"])
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
@@ -335,8 +313,8 @@ class TestTransform:
     )
     def test_nulls_imputed_correctly_3(self, df, expected):
         """Test missing values are filled with the correct values - and unrelated columns are not changed
-        (when weight is used)."""
-
+        (when weight is used).
+        """
         x = MedianImputer(columns=["a"], weight="c")
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
@@ -352,7 +330,6 @@ class TestTransform:
 
     def test_learnt_values_not_modified(self):
         """Test that the impute_values_ from fit are not changed in transform."""
-
         df = d.create_df_3()
 
         x = MedianImputer(columns=["a", "b", "c"])
@@ -371,7 +348,6 @@ class TestTransform:
 
     def test_learnt_values_not_modified_weights(self):
         """Test that the impute_values_ from fit are not changed in transform - when using weights."""
-
         df = d.create_df_9()
 
         x = MedianImputer(columns=["a", "b"], weight="c")

@@ -11,11 +11,10 @@ from tubular.dates import BetweenDatesTransformer
 
 
 class TestInit:
-    "tests for BetweenDatesTransformer.__init__"
+    "tests for BetweenDatesTransformer.__init__."
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=BetweenDatesTransformer.__init__,
             expected_arguments=[
@@ -32,7 +31,6 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that BetweenDatesTransformer inherits from BaseTransformer."""
-
         x = BetweenDatesTransformer(
             column_lower="a", column_between="b", column_upper="c", new_column_name="d"
         )
@@ -41,7 +39,6 @@ class TestInit:
 
     def test_super_init_called(self, mocker):
         """Test that super.__init__ called."""
-
         expected_call_args = {
             0: {
                 "args": (),
@@ -63,7 +60,6 @@ class TestInit:
 
     def test_first_non_str_error(self):
         """Test that an exception is raised if column_lower not str."""
-
         with pytest.raises(
             TypeError, match="BetweenDatesTransformer: column_lower should be str"
         ):
@@ -76,7 +72,6 @@ class TestInit:
 
     def test_column_between_non_str_error(self):
         """Test that an exception is raised if column_between not str."""
-
         with pytest.raises(
             TypeError, match="BetweenDatesTransformer: column_between should be str"
         ):
@@ -89,7 +84,6 @@ class TestInit:
 
     def test_column_upper_non_str_error(self):
         """Test that an exception is raised if column_upper not str."""
-
         with pytest.raises(
             TypeError, match="BetweenDatesTransformer: column_upper should be str"
         ):
@@ -102,7 +96,6 @@ class TestInit:
 
     def test_new_column_name_non_str_error(self):
         """Test that an exception is raised if new_column_name not str."""
-
         with pytest.raises(
             TypeError, match="BetweenDatesTransformer: new_column_name should be str"
         ):
@@ -115,7 +108,6 @@ class TestInit:
 
     def test_lower_inclusive_non_bool_error(self):
         """Test that an exception is raised if lower_inclusive not a bool."""
-
         with pytest.raises(
             TypeError, match="BetweenDatesTransformer: lower_inclusive should be a bool"
         ):
@@ -129,7 +121,6 @@ class TestInit:
 
     def test_upper_inclusive_non_bool_error(self):
         """Test that an exception is raised if upper_inclusive not a bool."""
-
         with pytest.raises(
             TypeError, match="BetweenDatesTransformer: upper_inclusive should be a bool"
         ):
@@ -143,7 +134,6 @@ class TestInit:
 
     def test_class_methods(self):
         """Test that BetweenDatesTransformer has transform method."""
-
         x = BetweenDatesTransformer(
             column_lower="a", column_between="b", column_upper="c", new_column_name="d"
         )
@@ -154,7 +144,6 @@ class TestInit:
 
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that attributes are set by init."""
-
         x = BetweenDatesTransformer(
             column_lower="a",
             column_between="b",
@@ -180,11 +169,10 @@ class TestInit:
 
 
 class TestTransform:
-    """Tests for BetweenDatesTransformer.transform"""
+    """Tests for BetweenDatesTransformer.transform."""
 
     def expected_df_1():
         """Expected output from transform in test_output."""
-
         df = d.create_is_between_dates_df_1()
 
         df["d"] = [True, False]
@@ -193,7 +181,6 @@ class TestTransform:
 
     def expected_df_2():
         """Expected output from transform in test_output_both_exclusive."""
-
         df = d.create_is_between_dates_df_2()
 
         df["e"] = [False, False, True, True, False, False]
@@ -202,7 +189,6 @@ class TestTransform:
 
     def expected_df_3():
         """Expected output from transform in test_output_lower_exclusive."""
-
         df = d.create_is_between_dates_df_2()
 
         df["e"] = [False, False, True, True, True, False]
@@ -211,7 +197,6 @@ class TestTransform:
 
     def expected_df_4():
         """Expected output from transform in test_output_upper_exclusive."""
-
         df = d.create_is_between_dates_df_2()
 
         df["e"] = [False, True, True, True, False, False]
@@ -220,7 +205,6 @@ class TestTransform:
 
     def expected_df_5():
         """Expected output from transform in test_output_both_inclusive."""
-
         df = d.create_is_between_dates_df_2()
 
         df["e"] = [False, True, True, True, True, False]
@@ -229,7 +213,6 @@ class TestTransform:
 
     def test_arguments(self):
         """Test that fit has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=BetweenDatesTransformer.transform,
             expected_arguments=["self", "X"],
@@ -238,7 +221,6 @@ class TestTransform:
 
     def test_super_transform_call(self, mocker):
         """Test that call the BaseTransformer.transform() is as expected."""
-
         df = d.create_is_between_dates_df_1()
 
         x = BetweenDatesTransformer(
@@ -260,7 +242,6 @@ class TestTransform:
 
     def test_cols_not_datetime(self):
         """Test that an exception is raised if cols not datetime."""
-
         df = pd.DataFrame(
             {
                 "a": [2, 1],
@@ -287,7 +268,6 @@ class TestTransform:
     )
     def test_output(self, df, expected):
         """Test the output of transform is as expected."""
-
         x = BetweenDatesTransformer(
             column_lower="a",
             column_between="b",
@@ -313,7 +293,6 @@ class TestTransform:
     )
     def test_output_both_exclusive(self, df, expected):
         """Test the output of transform is as expected if both limits are exclusive."""
-
         x = BetweenDatesTransformer(
             column_lower="a",
             column_between="b",
@@ -339,7 +318,6 @@ class TestTransform:
     )
     def test_output_lower_exclusive(self, df, expected):
         """Test the output of transform is as expected if the lower limits are exclusive only."""
-
         x = BetweenDatesTransformer(
             column_lower="a",
             column_between="b",
@@ -365,7 +343,6 @@ class TestTransform:
     )
     def test_output_upper_exclusive(self, df, expected):
         """Test the output of transform is as expected if the upper limits are exclusive only."""
-
         x = BetweenDatesTransformer(
             column_lower="a",
             column_between="b",
@@ -391,7 +368,6 @@ class TestTransform:
     )
     def test_output_both_inclusive(self, df, expected):
         """Test the output of transform is as expected if the both limits are inclusive."""
-
         x = BetweenDatesTransformer(
             column_lower="a",
             column_between="b",
@@ -411,7 +387,6 @@ class TestTransform:
 
     def test_warning_message(self):
         """Test a warning is generated if not all the values in column_upper are greater than or equal to column_lower."""
-
         x = BetweenDatesTransformer(
             column_lower="a",
             column_between="b",

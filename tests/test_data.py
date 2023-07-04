@@ -8,7 +8,6 @@ import pandas as pd
 
 def create_series_1(n=6):
     """Create simple series of [0:n-1]."""
-
     df = pd.Series(np.arange(n))
 
     return df
@@ -16,7 +15,6 @@ def create_series_1(n=6):
 
 def create_1_int_column_df(n=6):
     """Create single column DataFrame of [0:n-1]."""
-
     df = pd.DataFrame({"a": np.arange(n)})
 
     return df
@@ -24,14 +22,13 @@ def create_1_int_column_df(n=6):
 
 def create_zeros_array(shape=(10, 3)):
     """Create simple 2d numpy array of zeros of given shape."""
-
     arr = np.zeros(shape)
 
     return arr
 
 
 def create_numeric_df_1():
-    """Example with numeric dataframe"""
+    """Example with numeric dataframe."""
     df = pd.DataFrame(
         {
             "a": [34.48, 21.71, 32.83, 1.08, 32.93, 4.74, 2.76, 75.7, 14.08, 61.31],
@@ -53,15 +50,13 @@ def create_df_1():
     - b object a:f
     no nulls
     """
-
     df = pd.DataFrame({"a": [1, 2, 3, 4, 5, 6], "b": ["a", "b", "c", "d", "e", "f"]})
 
     return df
 
 
 def create_df_2():
-    """Create simple DataFrame to use in other tests"""
-
+    """Create simple DataFrame to use in other tests."""
     df = pd.DataFrame(
         {
             "a": [1, 2, 3, 4, 5, 6, np.NaN],
@@ -76,8 +71,7 @@ def create_df_2():
 
 
 def create_df_4():
-    """Create simple DataFrame to use in other tests"""
-
+    """Create simple DataFrame to use in other tests."""
     df = pd.DataFrame(
         {
             "a": [1, 2, 3, 4, 5, 6, 7, np.NaN],
@@ -92,8 +86,7 @@ def create_df_4():
 
 
 def create_df_3():
-    """Create simple DataFrame to use in other tests"""
-
+    """Create simple DataFrame to use in other tests."""
     df = pd.DataFrame(
         {
             "a": [1, 2, 3, 4, 5, 6, np.NaN],
@@ -106,8 +99,7 @@ def create_df_3():
 
 
 def create_df_5():
-    """Create simple DataFrame to use in other tests"""
-
+    """Create simple DataFrame to use in other tests."""
     df = pd.DataFrame(
         {
             "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.NaN],
@@ -122,8 +114,7 @@ def create_df_5():
 
 
 def create_df_6():
-    """Nulls in different positions to check summing weights by col with nulls"""
-
+    """Nulls in different positions to check summing weights by col with nulls."""
     df = pd.DataFrame(
         {
             "a": [2, 2, 2, 2, np.NaN, 2, 2, 2, 3, 3],
@@ -138,8 +129,7 @@ def create_df_6():
 
 
 def create_df_7():
-    """Create simple DataFrame to use in other tests"""
-
+    """Create simple DataFrame to use in other tests."""
     df = pd.DataFrame(
         {
             "a": [4, 2, 2, 1, 3],
@@ -154,8 +144,7 @@ def create_df_7():
 
 
 def create_df_8():
-    """Create simple DataFrame to use in other tests"""
-
+    """Create simple DataFrame to use in other tests."""
     df = pd.DataFrame(
         {
             "a": [1, 5, 2, 3, 3],
@@ -171,8 +160,7 @@ def create_df_8():
 
 
 def create_df_9():
-    """Create simple DataFrame to use in other tests"""
-
+    """Create simple DataFrame to use in other tests."""
     df = pd.DataFrame(
         {
             "a": [1, 2, np.nan, 4, np.nan, 6],
@@ -185,8 +173,7 @@ def create_df_9():
 
 
 def create_df_10():
-    """Create simple DataFrame to use in other tests"""
-
+    """Create simple DataFrame to use in other tests."""
     df = pd.DataFrame(
         {
             "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.NaN],
@@ -199,8 +186,7 @@ def create_df_10():
 
 
 def create_df_11():
-    """Create simple DataFrame to use in other tests"""
-
+    """Create simple DataFrame to use in other tests."""
     df = pd.DataFrame(
         {
             "a": [1, 2, 3],
@@ -225,7 +211,6 @@ def create_large_null_df(n_col=1000):
         Single row dataframe with n_col columns; entirely populated with null values.
 
     """
-
     data_dict = {}
 
     for i in range(n_col):
@@ -251,7 +236,6 @@ def create_large_half_null_df(n_col=1000):
         second taking entirely null values.
 
     """
-
     data_dict = {}
 
     col_values = [1.0, np.NaN]
@@ -265,11 +249,10 @@ def create_large_half_null_df(n_col=1000):
 
 
 def create_weighted_imputers_test_df():
-    """Create DataFrame to use imputer tests that correct values are imputed for weighted dataframes
+    """Create DataFrame to use imputer tests that correct values are imputed for weighted dataframes.
 
     weight column contains the weights between 0 and 1
     """
-
     df = pd.DataFrame(
         {
             "a": [1.0, 1.0, 1.0, 3.0, 5.0, 5.0],
@@ -285,13 +268,12 @@ def create_weighted_imputers_test_df():
 
 
 def create_MeanResponseTransformer_test_df():
-    """Create DataFrame to use MeanResponseTransformer tests that correct values are
+    """Create DataFrame to use MeanResponseTransformer tests that correct values are.
 
     DataFrame column a is the response, the other columns are categorical columns
     of types; object, category, int, float, bool.
 
     """
-
     df = pd.DataFrame(
         {
             "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
@@ -350,13 +332,12 @@ def create_MeanResponseTransformer_test_df_unseen_levels():
 
 
 def create_OrdinalEncoderTransformer_test_df():
-    """Create DataFrame to use OrdinalEncoderTransformer tests that correct values are
+    """Create DataFrame to use OrdinalEncoderTransformer tests that correct values are.
 
     DataFrame column a is the response, the other columns are categorical columns
     of types; object, category, int, float, bool.
 
     """
-
     df = pd.DataFrame(
         {
             "a": [1, 2, 3, 4, 5, 6],
@@ -379,7 +360,6 @@ def create_NearestMeanResponseImputer_test_df():
     DataFrame column c is the response, the other columns are numerical columns containing null entries.
 
     """
-
     df = pd.DataFrame(
         {
             "a": [1, 1, 2, 3, 3, np.nan],
@@ -405,7 +385,6 @@ def create_values_map(df):
 
 def create_date_test_df():
     """Create DataFrame for DateDiffLeapYearTransformer tests."""
-
     df = pd.DataFrame(
         {
             "a": [
@@ -436,7 +415,6 @@ def create_date_test_df():
 
 def create_date_test_nulls_df():
     """Create DataFrame with nulls only for DateDiffLeapYearTransformer, DateDifferenceTransformer tests."""
-
     df = pd.DataFrame(
         {
             "a": [
@@ -454,7 +432,6 @@ def create_date_test_nulls_df():
 
 def create_datediff_test_df():
     """Create DataFrame for DateDifferenceTransformer tests."""
-
     df = pd.DataFrame(
         {
             "a": [
@@ -485,7 +462,6 @@ def create_datediff_test_df():
 
 def create_datediff_test_nulls_df():
     """Create DataFrame with nulls only for DateDifferenceTransformer tests."""
-
     df = pd.DataFrame(
         {
             "a": [
@@ -505,7 +481,6 @@ def create_datediff_test_nulls_df():
 
 def create_to_datetime_test_df():
     """Create DataFrame to be used in the ToDatetimeTransformer tests."""
-
     df = pd.DataFrame(
         {"a": [1950, 1960, 2000, 2001, np.NaN, 2010], "b": [1, 2, 3, 4, 5, np.NaN]}
     )
@@ -515,7 +490,6 @@ def create_to_datetime_test_df():
 
 def create_is_between_dates_df_1():
     """Create df to use in IsBetweenDates tests. Contains 3 columns of 2 datatime values."""
-
     df = pd.DataFrame(
         {
             "a": pd.date_range(start="1/1/2016", end="27/02/2017", periods=2),
@@ -529,7 +503,6 @@ def create_is_between_dates_df_1():
 
 def create_is_between_dates_df_2():
     """Create df to use in IsBetweenDates tests. Contains 3 columns of 5 datatime values, covers edge cases."""
-
     df = pd.DataFrame(
         {
             "a": [

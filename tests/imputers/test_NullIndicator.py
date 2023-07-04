@@ -9,11 +9,10 @@ from tubular.imputers import NullIndicator
 
 
 class TestInit:
-    """Tests for NullIndicator.init()"""
+    """Tests for NullIndicator.init()."""
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=NullIndicator.__init__,
             expected_arguments=["self", "columns"],
@@ -22,7 +21,6 @@ class TestInit:
 
     def test_class_methods(self):
         """Test that NullIndicator has transform method."""
-
         x = NullIndicator()
 
         ta.classes.test_object_method(
@@ -31,14 +29,12 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that NullIndicator inherits from BaseTransformer."""
-
         x = NullIndicator()
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
-
         expected_call_args = {
             0: {"args": (), "kwargs": {"columns": None, "verbose": True, "copy": True}}
         }
@@ -50,11 +46,10 @@ class TestInit:
 
 
 class TestTransform:
-    """Tests for NullIndicator.transform()"""
+    """Tests for NullIndicator.transform()."""
 
     def expected_df_1():
         """Expected output for test_null_indicator_columns_correct."""
-
         df = pd.DataFrame(
             {
                 "a": [1, 2, np.nan, 4, np.nan, 6],
@@ -69,14 +64,12 @@ class TestTransform:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=NullIndicator.transform, expected_arguments=["self", "X"]
         )
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
-
         df = d.create_df_1()
 
         x = NullIndicator(columns="a")
@@ -93,8 +86,7 @@ class TestTransform:
         ta.pandas.adjusted_dataframe_params(d.create_df_9(), expected_df_1()),
     )
     def test_null_indicator_columns_correct(self, df, expected):
-        """Test that the created indicator column is correct - and unrelated columns are unchanged"""
-
+        """Test that the created indicator column is correct - and unrelated columns are unchanged."""
         x = NullIndicator(columns=["b", "c"])
 
         df_transformed = x.transform(df)

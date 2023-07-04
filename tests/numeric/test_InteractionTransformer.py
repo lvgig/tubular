@@ -15,7 +15,6 @@ class TestInit:
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=InteractionTransformer.__init__,
             expected_arguments=[
@@ -29,7 +28,6 @@ class TestInit:
 
     def test_class_methods(self):
         """Test that InteractionTransformer has transform method."""
-
         x = InteractionTransformer(columns=["a", "b"])
 
         ta.classes.test_object_method(
@@ -38,14 +36,12 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that InteractionTransformer inherits from BaseTransformer."""
-
         x = InteractionTransformer(columns=["a", "b"])
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
-
         expected_call_args = {
             0: {
                 "args": (),
@@ -154,7 +150,6 @@ class TestInit:
 
     def test_attributes_set(self):
         """Test that the values passed for columns, degrees are saved to attributes on the object."""
-
         x = InteractionTransformer(
             columns=["A", "B", "C"],
             min_degree=2,
@@ -177,7 +172,6 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output of test_expected_output_default_assignment."""
-
         df = pd.DataFrame(
             {
                 "a": {0: 1.0, 1: 2.0, 2: 3.0, 3: 4.0, 4: 5.0, 5: 6.0, 6: np.NaN},
@@ -209,7 +203,6 @@ class TestTransform:
 
     def expected_df_2():
         """Expected output of test_expected_output_multiple_columns_assignment."""
-
         df = pd.DataFrame(
             {
                 "a": {0: 1.0, 1: 2.0, 2: 3.0, 3: 4.0, 4: 5.0, 5: 6.0, 6: np.NaN},
@@ -223,14 +216,12 @@ class TestTransform:
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=InteractionTransformer.transform, expected_arguments=["self", "X"]
         )
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
-
         df = d.create_df_3()
 
         x = InteractionTransformer(columns=["b", "c"])
@@ -248,7 +239,6 @@ class TestTransform:
     )
     def test_expected_output_default_assignment(self, df, expected):
         """Test default values and multiple columns assignment from transform gives expected results."""
-
         x = InteractionTransformer(columns=["a", "b", "c"])
 
         df_transformed = x.transform(df)
@@ -265,7 +255,6 @@ class TestTransform:
     )
     def test_expected_output_multiple_columns_assignment(self, df, expected):
         """Test a multiple columns assignment from transform gives expected results."""
-
         x = InteractionTransformer(columns=["a", "b"])
 
         df_transformed = x.transform(df)

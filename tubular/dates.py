@@ -1,6 +1,4 @@
-"""
-This module contains a transformer that applies capping to numeric columns.
-"""
+"""This module contains a transformer that applies capping to numeric columns."""
 
 import datetime
 import warnings
@@ -115,7 +113,6 @@ class DateDiffLeapYearTransformer(BaseTransformer):
             Year gap between the upper and lower date values passes.
 
         """
-
         if not isinstance(row, pd.Series):
             msg = f"{self.classname()}: row should be a pd.Series"
             raise TypeError(msg)
@@ -166,7 +163,6 @@ class DateDiffLeapYearTransformer(BaseTransformer):
             Transformed data with new_column_name column.
 
         """
-
         X = super().transform(X)
 
         X[self.new_column_name] = X.apply(lambda x: self.calculate_age(x), axis=1)
@@ -264,7 +260,6 @@ class DateDifferenceTransformer(BaseTransformer):
             Data to transform.
 
         """
-
         X = super().transform(X)
 
         X[self.new_column_name] = (
@@ -332,7 +327,6 @@ class ToDatetimeTransformer(BaseTransformer):
             Data with column to transform.
 
         """
-
         X = super().transform(X)
 
         X[self.new_column_name] = pd.to_datetime(
@@ -464,7 +458,6 @@ class SeriesDtMethodTransformer(BaseTransformer):
             running the pd.Series.dt method.
 
         """
-
         X = super().transform(X)
 
         if self._callable:
@@ -587,7 +580,7 @@ class BetweenDatesTransformer(BaseTransformer):
         self.column_between = column_between
 
     def transform(self, X):
-        """Transform - creates column indicating if middle date is between the other two
+        """Transform - creates column indicating if middle date is between the other two.
 
         If not all column_lower values are less than or equal to column_upper when transform is run
         then a warning will be raised.
@@ -604,7 +597,6 @@ class BetweenDatesTransformer(BaseTransformer):
             boolean and indicates if the middle column is between the other 2.
 
         """
-
         X = super().transform(X)
 
         for col in self.columns:
@@ -635,7 +627,7 @@ class BetweenDatesTransformer(BaseTransformer):
 
 
 class DatetimeInfoExtractor(BaseTransformer):
-    """Transformer to extract various features from datetime var
+    """Transformer to extract various features from datetime var.
 
     Parameters
     ----------
@@ -834,8 +826,7 @@ class DatetimeInfoExtractor(BaseTransformer):
             self.dayofweek_mapping = {}
 
     def _map_values(self, value, interval: str):
-        """
-        Method to apply mappings for a specified interval ("timeofday", "timeofmonth", "timeofyear" or "dayofweek")
+        """Method to apply mappings for a specified interval ("timeofday", "timeofmonth", "timeofyear" or "dayofweek")
         from corresponding mapping attribute to a single value.
 
         Parameters
@@ -852,7 +843,6 @@ class DatetimeInfoExtractor(BaseTransformer):
         str : str
             Mapped value
         """
-
         if type(value) is not float:
             if type(value) is not int:
                 msg = f"{self.classname()}: value should be float or int"
@@ -888,7 +878,7 @@ class DatetimeInfoExtractor(BaseTransformer):
             return mappings[interval][value]
 
     def transform(self, X):
-        """Transform - Extracts new features from datetime variables
+        """Transform - Extracts new features from datetime variables.
 
         Parameters
         ----------
@@ -900,7 +890,6 @@ class DatetimeInfoExtractor(BaseTransformer):
         X : pd.DataFrame
             Transformed input X with added columns of extracted information.
         """
-
         X = super().transform(X)
 
         for col in self.columns:
@@ -938,9 +927,7 @@ class DatetimeInfoExtractor(BaseTransformer):
 
 
 class DatetimeSinusoidCalculator(BaseTransformer):
-
-    """
-    Transformer to derive a feature in a dataframe by calculating the
+    """Transformer to derive a feature in a dataframe by calculating the
     sine or cosine of a datetime column in a given unit (e.g hour), with the option to scale
     period of the sine or cosine to match the natural period of the unit (e.g. 24).
 
@@ -962,7 +949,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         Can be a string or a dict containing key-value pairs of column name and period to be used for that column.
 
     Attributes
-    -----------
+    ----------
     columns : str or list
         Columns to take the sine or cosine of.
 
@@ -1109,7 +1096,6 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         X : pd.DataFrame
             Input X with additional columns added, these are named "<method>_<original_column>"
         """
-
         X = super().transform(X)
 
         for column in self.columns:

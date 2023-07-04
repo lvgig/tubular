@@ -12,7 +12,6 @@ class TestInit:
 
     def test_class_methods(self):
         """Test that BaseNominalTransformer has columns_set_or_check method."""
-
         x = BaseNominalTransformer()
 
         ta.classes.test_object_method(
@@ -25,7 +24,6 @@ class TestInit:
 
     def test_inheritance(self):
         """Test that BaseNominalTransformer inherits from BaseTransformer."""
-
         x = BaseNominalTransformer()
 
         ta.classes.assert_inheritance(x, BaseTransformer)
@@ -36,7 +34,6 @@ class TestNominalColumnSetOrCheck:
 
     def test_columns_none_get_cat_columns(self):
         """If self.columns is None then object and categorical columns are set as self.columns."""
-
         df = d.create_df_4()
 
         x = BaseNominalTransformer()
@@ -51,7 +48,6 @@ class TestNominalColumnSetOrCheck:
 
     def test_columns_none_no_cat_columns_error(self):
         """If self.columns is None and there are no object and categorical columns then an exception is raised."""
-
         df = d.create_1_int_column_df()
 
         x = BaseNominalTransformer()
@@ -91,7 +87,6 @@ class TestCheckMappableRows:
 
     def test_exception_raised(self):
         """Test an exception is raised if non-mappable rows are present in X."""
-
         df = d.create_df_1()
 
         x = BaseNominalTransformer()

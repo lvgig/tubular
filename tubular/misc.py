@@ -40,7 +40,6 @@ class SetValueTransformer(BaseTransformer):
             Transformed input X with columns set to value.
 
         """
-
         X = super().transform(X)
 
         X[self.columns] = self.value
@@ -49,8 +48,7 @@ class SetValueTransformer(BaseTransformer):
 
 
 class SetColumnDtype(BaseTransformer):
-    """
-    Transformer to set transform columns in a dataframe to a dtype
+    """Transformer to set transform columns in a dataframe to a dtype.
 
     Parameters
     ----------
@@ -77,8 +75,7 @@ class SetColumnDtype(BaseTransformer):
         return X
 
     def __validate_dtype(self, dtype: str):
-        """Check string is a valid dtype"""
-
+        """Check string is a valid dtype."""
         try:
             pd.api.types.pandas_dtype(dtype)
         except TypeError:
