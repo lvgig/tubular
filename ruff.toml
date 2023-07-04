@@ -44,4 +44,4 @@ target-version = "py38"
 
 # Ignore `E402` (import violations) in all `__init__.py` file.
 [per-file-ignores]
-"__init__.py" = ["E402"]
+"__init__.py" = ["E402", "F401"]
