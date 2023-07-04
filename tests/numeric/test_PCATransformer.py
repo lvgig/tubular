@@ -109,11 +109,14 @@ class TestInit:
             0: {
                 "args": (),
                 "kwargs": {"columns": ["a", "b"], "copy": True, "verbose": False},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             PCATransformer(columns=["a", "b"], n_components=1, copy=True, verbose=False)
 
@@ -174,11 +177,14 @@ class TestFit:
         x = PCATransformer(columns=["a", "b"], n_components=1)
 
         expected_call_args = {
-            0: {"args": (d.create_numeric_df_1(), None), "kwargs": {}}
+            0: {"args": (d.create_numeric_df_1(), None), "kwargs": {}},
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "fit", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "fit",
+            expected_call_args,
         ):
             x.fit(df)
 
@@ -258,7 +264,7 @@ def create_svd_sovler_output():
                 2.6606364975891146,
                 -8.124090398439629,
             ],
-        }
+        },
     )
 
     svd_sovler_output["randomized"] = pd.DataFrame(
@@ -292,7 +298,7 @@ def create_svd_sovler_output():
                 2.660636497589127,
                 -8.12409039843965,
             ],
-        }
+        },
     )
 
     svd_sovler_output["arpack"] = pd.DataFrame(
@@ -326,7 +332,7 @@ def create_svd_sovler_output():
                 2.660636497589114,
                 -8.124090398439632,
             ],
-        }
+        },
     )
     return svd_sovler_output
 
@@ -385,7 +391,10 @@ class TestTransform:
         [("full", "full"), ("arpack", "arpack"), ("randomized", "randomized")],
     )
     def test_output_from_pca_transform_set_to_columns(
-        self, mocker, svd_solver, svd_solver_output_str
+        self,
+        mocker,
+        svd_solver,
+        svd_solver_output_str,
     ):
         """Test that the call to the pca.transform method returns expected outputs."""
         df = d.create_numeric_df_1()

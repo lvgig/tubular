@@ -26,17 +26,23 @@ class TestInit:
     def test_class_methods(self):
         """Test that SeriesDtMethodTransformer has transform method."""
         x = SeriesDtMethodTransformer(
-            new_column_name="a", pd_method_name="year", column="b"
+            new_column_name="a",
+            pd_method_name="year",
+            column="b",
         )
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
         """Test that SeriesDtMethodTransformer inherits from BaseTransformer."""
         x = SeriesDtMethodTransformer(
-            new_column_name="a", pd_method_name="year", column="b"
+            new_column_name="a",
+            pd_method_name="year",
+            column="b",
         )
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
@@ -44,11 +50,14 @@ class TestInit:
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
-            0: {"args": (), "kwargs": {"columns": "b", "verbose": True, "copy": False}}
+            0: {"args": (), "kwargs": {"columns": "b", "verbose": True, "copy": False}},
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             SeriesDtMethodTransformer(
                 new_column_name="a",
@@ -65,7 +74,9 @@ class TestInit:
             match=r"SeriesDtMethodTransformer: column should be a str but got \<class 'list'\>",
         ):
             SeriesDtMethodTransformer(
-                new_column_name="a", pd_method_name=1, column=["b", "c"]
+                new_column_name="a",
+                pd_method_name=1,
+                column=["b", "c"],
             )
 
         with pytest.raises(
@@ -79,7 +90,9 @@ class TestInit:
             match=r"SeriesDtMethodTransformer: unexpected type \(\<class 'float'\>\) for new_column_name, must be str",
         ):
             SeriesDtMethodTransformer(
-                new_column_name=1.0, pd_method_name="year", column="b"
+                new_column_name=1.0,
+                pd_method_name="year",
+                column="b",
             )
 
         with pytest.raises(
@@ -111,7 +124,9 @@ class TestInit:
             match="""SeriesDtMethodTransformer: error accessing "dt.b" method on pd.Series object - pd_method_name should be a pd.Series.dt method""",
         ):
             SeriesDtMethodTransformer(
-                new_column_name="a", pd_method_name="b", column="b"
+                new_column_name="a",
+                pd_method_name="b",
+                column="b",
             )
 
     def test_attributes_set(self):
@@ -135,7 +150,8 @@ class TestInit:
         )
 
     @pytest.mark.parametrize(
-        ("pd_method_name", "callable_attr"), [("year", False), ("to_period", True)]
+        ("pd_method_name", "callable_attr"),
+        [("year", False), ("to_period", True)],
     )
     def test_callable_attribute_set(self, pd_method_name, callable_attr):
         """Test the _callable attribute is set to True if pd.Series.dt.pd_method_name is callable."""
@@ -183,7 +199,8 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
         ta.functions.test_function_arguments(
-            func=SeriesDtMethodTransformer.transform, expected_arguments=["self", "X"]
+            func=SeriesDtMethodTransformer.transform,
+            expected_arguments=["self", "X"],
         )
 
     def test_super_transform_called(self, mocker):
@@ -191,20 +208,26 @@ class TestTransform:
         df = d.create_datediff_test_df()
 
         x = SeriesDtMethodTransformer(
-            new_column_name="a2", pd_method_name="year", column="a"
+            new_column_name="a2",
+            pd_method_name="year",
+            column="a",
         )
 
         expected_call_args = {0: {"args": (d.create_datediff_test_df(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "transform", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "transform",
+            expected_call_args,
         ):
             x.transform(df)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_datediff_test_df(), expected_df_1()
+            d.create_datediff_test_df(),
+            expected_df_1(),
         ),
     )
     def test_expected_output_no_overwrite(self, df, expected):
@@ -227,7 +250,8 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_datediff_test_df(), expected_df_2()
+            d.create_datediff_test_df(),
+            expected_df_2(),
         ),
     )
     def test_expected_output_overwrite(self, df, expected):
@@ -250,7 +274,8 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_datediff_test_df(), expected_df_3()
+            d.create_datediff_test_df(),
+            expected_df_3(),
         ),
     )
     def test_expected_output_callable(self, df, expected):

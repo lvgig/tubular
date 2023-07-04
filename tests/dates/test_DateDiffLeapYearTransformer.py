@@ -17,11 +17,15 @@ class TestCalculateAge:
         """Test that an exception is raised if row is not a pd.Series."""
         row = "dummy_row"
         date_transformer = DateDiffLeapYearTransformer(
-            column_lower="a", column_upper="b", new_column_name="c", drop_cols=True
+            column_lower="a",
+            column_upper="b",
+            new_column_name="c",
+            drop_cols=True,
         )
 
         with pytest.raises(
-            TypeError, match="DateDiffLeapYearTransformer: row should be a pd.Series"
+            TypeError,
+            match="DateDiffLeapYearTransformer: row should be a pd.Series",
         ):
             date_transformer.calculate_age(row=row)
 
@@ -44,7 +48,10 @@ class TestCalculateAge:
         """Test that an exception is raised if uppder date value is not a datetime object."""
         row = pd.Series({"a": datetime.date(2020, 5, 10), "b": "dummy_val"})
         date_transformer = DateDiffLeapYearTransformer(
-            column_lower="a", column_upper="b", new_column_name="c", drop_cols=True
+            column_lower="a",
+            column_upper="b",
+            new_column_name="c",
+            drop_cols=True,
         )
 
         with pytest.raises(
@@ -57,7 +64,10 @@ class TestCalculateAge:
         """Test that an exception is raised if lower date value is not a datetime object."""
         row = pd.Series({"a": "dummy_val", "b": datetime.date(2020, 5, 10)})
         date_transformer = DateDiffLeapYearTransformer(
-            column_lower="a", column_upper="b", new_column_name="c", drop_cols=True
+            column_lower="a",
+            column_upper="b",
+            new_column_name="c",
+            drop_cols=True,
         )
 
         with pytest.raises(
@@ -95,10 +105,14 @@ class TestInit:
         )
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
         ta.classes.test_object_method(
-            obj=x, expected_method="calculate_age", msg="calculate_message"
+            obj=x,
+            expected_method="calculate_age",
+            msg="calculate_message",
         )
 
     def test_inheritance(self):
@@ -122,11 +136,14 @@ class TestInit:
                     "verbose": True,
                     "copy": True,
                 },
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             DateDiffLeapYearTransformer(
                 column_lower="dummy_1",
@@ -140,7 +157,8 @@ class TestInit:
     def test_column_lower_type_error(self):
         """Test that an exception is raised if column_lower is not a str."""
         with pytest.raises(
-            TypeError, match="DateDiffLeapYearTransformer: column_lower should be a str"
+            TypeError,
+            match="DateDiffLeapYearTransformer: column_lower should be a str",
         ):
             DateDiffLeapYearTransformer(
                 column_lower=123,
@@ -152,7 +170,8 @@ class TestInit:
     def test_column_upper_type_error(self):
         """Test that an exception is raised if column_upper is not a str."""
         with pytest.raises(
-            TypeError, match="DateDiffLeapYearTransformer: column_upper should be a str"
+            TypeError,
+            match="DateDiffLeapYearTransformer: column_upper should be a str",
         ):
             DateDiffLeapYearTransformer(
                 column_lower="dummy_1",
@@ -177,7 +196,8 @@ class TestInit:
     def test_drop_cols_type_error(self):
         """Test that an exception is raised if drop_cols is not a bool."""
         with pytest.raises(
-            TypeError, match="DateDiffLeapYearTransformer: drop_cols should be a bool"
+            TypeError,
+            match="DateDiffLeapYearTransformer: drop_cols should be a bool",
         ):
             DateDiffLeapYearTransformer(
                 column_lower="dummy_1",
@@ -242,8 +262,8 @@ class TestTransform:
                     -2,
                     -3,
                     30,
-                ]
-            }
+                ],
+            },
         )
 
         return df
@@ -261,7 +281,9 @@ class TestTransform:
                     datetime.date(2018, 10, 10),  # negative day/month less than
                     datetime.date(2018, 12, 10),  # negative day/month greater than
                     datetime.date(
-                        1985, 7, 23
+                        1985,
+                        7,
+                        23,
                     ),  # large gap, this is incorrect with timedelta64 solutions
                 ],
                 "b": [
@@ -284,7 +306,7 @@ class TestTransform:
                     -3,
                     30,
                 ],
-            }
+            },
         )
 
         return df
@@ -300,7 +322,7 @@ class TestTransform:
                     np.NaN,
                 ],
                 "c": [None],
-            }
+            },
         )
 
         return df
@@ -308,7 +330,8 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
         ta.functions.test_function_arguments(
-            func=DateDiffLeapYearTransformer.transform, expected_arguments=["self", "X"]
+            func=DateDiffLeapYearTransformer.transform,
+            expected_arguments=["self", "X"],
         )
 
     def test_super_transform_called(self, mocker):
@@ -316,7 +339,10 @@ class TestTransform:
         df = d.create_date_test_df()
 
         x = DateDiffLeapYearTransformer(
-            column_lower="a", column_upper="b", new_column_name="c", drop_cols=True
+            column_lower="a",
+            column_upper="b",
+            new_column_name="c",
+            drop_cols=True,
         )
 
         expected_call_args = {0: {"args": (d.create_date_test_df(),), "kwargs": {}}}
@@ -341,7 +367,10 @@ class TestTransform:
 
         """
         x = DateDiffLeapYearTransformer(
-            column_lower="a", column_upper="b", new_column_name="c", drop_cols=True
+            column_lower="a",
+            column_upper="b",
+            new_column_name="c",
+            drop_cols=True,
         )
 
         df_transformed = x.transform(df)
@@ -363,7 +392,10 @@ class TestTransform:
 
         """
         x = DateDiffLeapYearTransformer(
-            column_lower="a", column_upper="b", new_column_name="c", drop_cols=False
+            column_lower="a",
+            column_upper="b",
+            new_column_name="c",
+            drop_cols=False,
         )
 
         df_transformed = x.transform(df)
@@ -377,13 +409,17 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_date_test_nulls_df(), expected_df_3()
+            d.create_date_test_nulls_df(),
+            expected_df_3(),
         ),
     )
     def test_expected_output_nulls(self, df, expected):
         """Test that the output is expected from transform, when columns are nulls."""
         x = DateDiffLeapYearTransformer(
-            column_lower="a", column_upper="b", new_column_name="c", drop_cols=False
+            column_lower="a",
+            column_upper="b",
+            new_column_name="c",
+            drop_cols=False,
         )
 
         df_transformed = x.transform(df)

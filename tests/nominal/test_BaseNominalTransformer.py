@@ -15,11 +15,15 @@ class TestInit:
         x = BaseNominalTransformer()
 
         ta.classes.test_object_method(
-            obj=x, expected_method="columns_set_or_check", msg="columns_set_or_check"
+            obj=x,
+            expected_method="columns_set_or_check",
+            msg="columns_set_or_check",
         )
 
         ta.classes.test_object_method(
-            obj=x, expected_method="check_mappable_rows", msg="check_mappable_rows"
+            obj=x,
+            expected_method="check_mappable_rows",
+            msg="check_mappable_rows",
         )
 
     def test_inheritance(self):
@@ -43,7 +47,9 @@ class TestNominalColumnSetOrCheck:
         x.columns_set_or_check(df)
 
         ta.equality.assert_equal_dispatch(
-            expected=["b", "c"], actual=x.columns, msg="nominal columns getting"
+            expected=["b", "c"],
+            actual=x.columns,
+            msg="nominal columns getting",
         )
 
     def test_columns_none_no_cat_columns_error(self):
@@ -77,7 +83,10 @@ class TestNominalColumnSetOrCheck:
         expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "columns_check", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "columns_check",
+            expected_call_args,
         ):
             x.columns_set_or_check(df)
 

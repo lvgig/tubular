@@ -60,7 +60,11 @@ class CappingTransformer(BaseTransformer):
     """
 
     def __init__(
-        self, capping_values=None, quantiles=None, weights_column=None, **kwargs
+        self,
+        capping_values=None,
+        quantiles=None,
+        weights_column=None,
+        **kwargs,
     ):
         if capping_values is None and quantiles is None:
             msg = f"{self.classname()}: both capping_values and quantiles are None, either supply capping values in the capping_values argument or supply quantiles that can be learnt in the fit method"
@@ -155,19 +159,23 @@ class CappingTransformer(BaseTransformer):
             for col in self.columns:
                 if self.weights_column is None:
                     cap_values = self.prepare_quantiles(
-                        X[col], self.quantiles[col], self.weights_column
+                        X[col],
+                        self.quantiles[col],
+                        self.weights_column,
                     )
 
                 else:
                     cap_values = self.prepare_quantiles(
-                        X[col], self.quantiles[col], X[self.weights_column]
+                        X[col],
+                        self.quantiles[col],
+                        X[self.weights_column],
                     )
 
                 self.capping_values[col] = cap_values
 
         else:
             warnings.warn(
-                f"{self.classname()}: quantiles not set so no fitting done in CappingTransformer"
+                f"{self.classname()}: quantiles not set so no fitting done in CappingTransformer",
             )
 
         self._replacement_values = copy.deepcopy(self.capping_values)
@@ -350,12 +358,13 @@ class CappingTransformer(BaseTransformer):
         X = super().transform(X)
 
         numeric_column_types = X[self.columns].apply(
-            pd.api.types.is_numeric_dtype, axis=0
+            pd.api.types.is_numeric_dtype,
+            axis=0,
         )
 
         if not numeric_column_types.all():
             non_numeric_columns = list(
-                numeric_column_types.loc[~numeric_column_types].index
+                numeric_column_types.loc[~numeric_column_types].index,
             )
 
             msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
@@ -429,7 +438,11 @@ class OutOfRangeNullTransformer(CappingTransformer):
     """
 
     def __init__(
-        self, capping_values=None, quantiles=None, weights_column=None, **kwargs
+        self,
+        capping_values=None,
+        quantiles=None,
+        weights_column=None,
+        **kwargs,
     ):
         super().__init__(
             capping_values=capping_values,

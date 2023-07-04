@@ -22,7 +22,8 @@ class TestInit:
         x = SetValueTransformer(columns=["a"], value=1)
 
         assert isinstance(
-            x, tubular.base.BaseTransformer
+            x,
+            tubular.base.BaseTransformer,
         ), "SetValueTransformer is not instance of tubular.base.BaseTransformer"
 
     def test_super_init_call(self, mocker):
@@ -31,11 +32,14 @@ class TestInit:
             0: {
                 "args": (),
                 "kwargs": {"columns": ["a", "b"], "verbose": False, "copy": False},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             SetValueTransformer(columns=["a", "b"], value=1, verbose=False, copy=False)
 
@@ -75,7 +79,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (d.create_df_7(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "transform", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "transform",
+            expected_call_args,
         ):
             x.transform(df)
 

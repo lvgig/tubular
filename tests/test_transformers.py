@@ -22,21 +22,31 @@ class TestInit:
         list_of_transformers = [
             base.BaseTransformer(columns=["a"]),
             base.DataFrameMethodTransformer(
-                new_column_name="a", pd_method_name="sum", columns="b"
+                new_column_name="a",
+                pd_method_name="sum",
+                columns="b",
             ),
             capping.CappingTransformer(capping_values={"a": [0.1, 0.2]}),
             capping.OutOfRangeNullTransformer(capping_values={"a": [0.1, 0.2]}),
             comparison.EqualityChecker(columns=["a", "b"], new_col_name="c"),
             dates.DateDiffLeapYearTransformer(
-                column_lower="a", column_upper="b", new_column_name="c", drop_cols=True
+                column_lower="a",
+                column_upper="b",
+                new_column_name="c",
+                drop_cols=True,
             ),
             dates.DateDifferenceTransformer(
-                column_lower="a", column_upper="b", new_column_name="c", units="D"
+                column_lower="a",
+                column_upper="b",
+                new_column_name="c",
+                units="D",
             ),
             dates.ToDatetimeTransformer(column="a", new_column_name="b"),
             dates.DatetimeInfoExtractor(columns="a"),
             dates.SeriesDtMethodTransformer(
-                new_column_name="a", pd_method_name="month", column="b"
+                new_column_name="a",
+                pd_method_name="month",
+                column="b",
             ),
             dates.BetweenDatesTransformer(
                 column_lower="a",
@@ -61,13 +71,16 @@ class TestInit:
             mapping.BaseMappingTransformMixin(),
             mapping.MappingTransformer(mappings={"a": {1: 2, 3: 4}}),
             mapping.CrossColumnMappingTransformer(
-                adjust_column="b", mappings={"a": {1: 2, 3: 4}}
+                adjust_column="b",
+                mappings={"a": {1: 2, 3: 4}},
             ),
             mapping.CrossColumnMultiplyTransformer(
-                adjust_column="b", mappings={"a": {1: 2, 3: 4}}
+                adjust_column="b",
+                mappings={"a": {1: 2, 3: 4}},
             ),
             mapping.CrossColumnAddTransformer(
-                adjust_column="b", mappings={"a": {1: 2, 3: 4}}
+                adjust_column="b",
+                mappings={"a": {1: 2, 3: 4}},
             ),
             misc.SetValueTransformer(columns="a", value=1),
             misc.SetColumnDtype(columns="a", dtype=str),

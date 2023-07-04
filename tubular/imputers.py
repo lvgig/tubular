@@ -102,7 +102,7 @@ class ArbitraryImputer(BaseImputer):
             if "category" in X[c].dtype.name:
                 if self.impute_value not in X[c].cat.categories:
                     X[c] = X[c].cat.add_categories(
-                        self.impute_value
+                        self.impute_value,
                     )  # add new category
 
             dtype = X[c].dtype  # get the dtype of column
@@ -395,13 +395,13 @@ class NearestMeanResponseImputer(BaseImputer):
 
             else:
                 mean_response_by_levels = pd.DataFrame(
-                    X_y.loc[~c_nulls].groupby(c)[response_column].mean()
+                    X_y.loc[~c_nulls].groupby(c)[response_column].mean(),
                 ).reset_index()
 
                 mean_response_nulls = X_y.loc[c_nulls, response_column].mean()
 
                 mean_response_by_levels["abs_diff_response"] = np.abs(
-                    mean_response_by_levels[response_column] - mean_response_nulls
+                    mean_response_by_levels[response_column] - mean_response_nulls,
                 )
 
                 # take first value having the minimum difference in terms of average response

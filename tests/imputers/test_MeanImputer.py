@@ -26,7 +26,9 @@ class TestInit:
         ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
@@ -38,11 +40,14 @@ class TestInit:
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
-            0: {"args": (), "kwargs": {"columns": None, "verbose": True, "copy": True}}
+            0: {"args": (), "kwargs": {"columns": None, "verbose": True, "copy": True}},
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             MeanImputer(columns=None, verbose=True, copy=True)
 
@@ -76,7 +81,10 @@ class TestFit:
         expected_call_args = {0: {"args": (d.create_df_3(), None), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "fit", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "fit",
+            expected_call_args,
         ):
             x.fit(df)
 
@@ -111,7 +119,7 @@ class TestFit:
                     "a": df["a"].mean(),
                     "b": df["b"].mean(),
                     "c": df["c"].mean(),
-                }
+                },
             },
             msg="impute_values_ attribute",
         )
@@ -130,7 +138,7 @@ class TestFit:
                 "impute_values_": {
                     "a": np.float64((3 + 4 + 16 + 36) / (3 + 2 + 4 + 6)),
                     "b": np.float64((10 + 4 + 12 + 10 + 6) / (2 + 1 + 4 + 5 + 6)),
-                }
+                },
             },
             msg="impute_values_ attribute",
         )
@@ -194,7 +202,7 @@ class TestTransform:
                 "a": [1, 2, 3, 4, 5, 6, np.NaN],
                 "b": [1, 2, 3, np.NaN, 7, 8, 9],
                 "c": [np.NaN, 1, 2, 3, -4, -5, -6],
-            }
+            },
         )
 
         for col in ["a", "b", "c"]:
@@ -209,7 +217,7 @@ class TestTransform:
                 "a": [1, 2, 3, 4, 5, 6, np.NaN],
                 "b": [1, 2, 3, np.NaN, 7, 8, 9],
                 "c": [np.NaN, 1, 2, 3, -4, -5, -6],
-            }
+            },
         )
 
         for col in ["a"]:
@@ -229,7 +237,8 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
         ta.functions.test_function_arguments(
-            func=MeanImputer.transform, expected_arguments=["self", "X"]
+            func=MeanImputer.transform,
+            expected_arguments=["self", "X"],
         )
 
     def test_check_is_fitted_called(self, mocker):
@@ -243,7 +252,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (["impute_values_"],), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "check_is_fitted",
+            expected_call_args,
         ):
             x.transform(df)
 
@@ -258,7 +270,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "transform", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "transform",
+            expected_call_args,
         ):
             x.transform(df)
 

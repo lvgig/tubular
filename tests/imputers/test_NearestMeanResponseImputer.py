@@ -26,7 +26,9 @@ class TestInit:
         ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
@@ -38,11 +40,14 @@ class TestInit:
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
-            0: {"args": (), "kwargs": {"columns": None, "verbose": True, "copy": True}}
+            0: {"args": (), "kwargs": {"columns": None, "verbose": True, "copy": True}},
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             NearestMeanResponseImputer(columns=None, verbose=True, copy=True)
 
@@ -71,11 +76,14 @@ class TestFit:
                     d.create_NearestMeanResponseImputer_test_df()["c"],
                 ),
                 "kwargs": {},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "fit", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "fit",
+            expected_call_args,
         ):
             x.fit(df, df["c"])
 
@@ -86,14 +94,15 @@ class TestFit:
         x = NearestMeanResponseImputer(columns=["a", "b"])
 
         with pytest.raises(
-            ValueError, match="NearestMeanResponseImputer: y has 1 null values"
+            ValueError,
+            match="NearestMeanResponseImputer: y has 1 null values",
         ):
             x.fit(df, df["c"])
 
     def test_columns_with_no_nulls_error(self):
         """Test an error is raised if a non-response column contains no nulls."""
         df = pd.DataFrame(
-            {"a": [1, 2, 3, 4, 5], "b": [5, 4, 3, 2, 1], "c": [3, 2, 1, 4, 5]}
+            {"a": [1, 2, 3, 4, 5], "b": [5, 4, 3, 2, 1], "c": [3, 2, 1, 4, 5]},
         )
 
         x = NearestMeanResponseImputer(columns=["a", "b"])
@@ -141,7 +150,7 @@ class TestFit:
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
-                "impute_values_": {"a": np.float64(2), "b": np.float64(3)}
+                "impute_values_": {"a": np.float64(2), "b": np.float64(3)},
             },
             msg="impute_values_ attribute",
         )
@@ -153,7 +162,7 @@ class TestFit:
                 "a": [1, 1, np.nan, np.nan, 3, 5],
                 "b": [np.nan, np.nan, 1, 3, 3, 4],
                 "c": [2, 3, 2, 1, 4, 1],
-            }
+            },
         )
 
         x = NearestMeanResponseImputer(columns=["a", "b"])
@@ -163,7 +172,7 @@ class TestFit:
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
-                "impute_values_": {"a": np.float64(5), "b": np.float64(3)}
+                "impute_values_": {"a": np.float64(5), "b": np.float64(3)},
             },
             msg="impute_values_ attribute",
         )
@@ -175,7 +184,7 @@ class TestTransform:
     def expected_df_1():
         """Expected output for ."""
         df = pd.DataFrame(
-            {"a": [1, 1, 2, 3, 3, 2], "b": [3, 3, 1, 3, 3, 4], "c": [2, 3, 2, 1, 4, 1]}
+            {"a": [1, 1, 2, 3, 3, 2], "b": [3, 3, 1, 3, 3, 4], "c": [2, 3, 2, 1, 4, 1]},
         )
 
         df[["a", "b"]] = df[["a", "b"]].astype("float64")
@@ -189,7 +198,7 @@ class TestTransform:
                 "a": [1, 1, 2, 3, 3, 2],
                 "b": [np.nan, np.nan, 1, 3, 3, 4],
                 "c": [2, 3, 2, 1, 4, 1],
-            }
+            },
         )
 
         df["a"] = df["a"].astype("float64")
@@ -207,7 +216,8 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
         ta.functions.test_function_arguments(
-            func=NearestMeanResponseImputer.transform, expected_arguments=["self", "X"]
+            func=NearestMeanResponseImputer.transform,
+            expected_arguments=["self", "X"],
         )
 
     def test_check_is_fitted_called(self, mocker):
@@ -221,7 +231,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (["impute_values_"],), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "check_is_fitted",
+            expected_call_args,
         ):
             x.transform(df)
 
@@ -234,18 +247,22 @@ class TestTransform:
         x.fit(df, df["c"])
 
         expected_call_args = {
-            0: {"args": (d.create_NearestMeanResponseImputer_test_df(),), "kwargs": {}}
+            0: {"args": (d.create_NearestMeanResponseImputer_test_df(),), "kwargs": {}},
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "transform", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "transform",
+            expected_call_args,
         ):
             x.transform(df)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_NearestMeanResponseImputer_test_df(), expected_df_1()
+            d.create_NearestMeanResponseImputer_test_df(),
+            expected_df_1(),
         ),
     )
     def test_nulls_imputed_correctly(self, df, expected):
@@ -266,7 +283,8 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_NearestMeanResponseImputer_test_df(), expected_df_2()
+            d.create_NearestMeanResponseImputer_test_df(),
+            expected_df_2(),
         ),
     )
     def test_nulls_imputed_correctly2(self, df, expected):
@@ -287,7 +305,8 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            pd.DataFrame({"a": [np.nan, 3, 4, 1, 4, np.nan]}), expected_df_3()
+            pd.DataFrame({"a": [np.nan, 3, 4, 1, 4, np.nan]}),
+            expected_df_3(),
         ),
     )
     def test_nulls_imputed_correctly3(self, df, expected):

@@ -32,7 +32,9 @@ class TestInit:
         x = OutOfRangeNullTransformer(capping_values={"a": [1, 3]})
 
         ta.classes.test_object_method(
-            obj=x, expected_method=method_name, msg=method_name
+            obj=x,
+            expected_method=method_name,
+            msg=method_name,
         )
 
     def test_inheritance(self):
@@ -50,7 +52,13 @@ class TestInit:
         ],
     )
     def test_super_init_called(
-        self, mocker, capping_values, quantiles, weights_column, verbose, copy
+        self,
+        mocker,
+        capping_values,
+        quantiles,
+        weights_column,
+        verbose,
+        copy,
     ):
         """Test that init calls CappingTransformer.init."""
         spy = mocker.spy(tubular.capping.CappingTransformer, "__init__")
@@ -98,7 +106,9 @@ class TestInit:
             expected_call_args,
         ):
             OutOfRangeNullTransformer(
-                quantiles={"c": [0, 0.99], "d": [None, 0.01]}, verbose=True, copy=True
+                quantiles={"c": [0, 0.99], "d": [None, 0.01]},
+                verbose=True,
+                copy=True,
             )
 
 
@@ -120,7 +130,8 @@ class TestFit:
         df = d.create_df_9()
 
         x = OutOfRangeNullTransformer(
-            quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
+            quantiles={"a": [0.1, 1], "b": [0.5, None]},
+            weights_column="c",
         )
 
         x.fit(df)
@@ -150,7 +161,8 @@ class TestFit:
         df = d.create_df_9()
 
         x = OutOfRangeNullTransformer(
-            quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
+            quantiles={"a": [0.1, 1], "b": [0.5, None]},
+            weights_column="c",
         )
 
         expected_call_args = {0: {"args": (), "kwargs": {}}}
@@ -168,7 +180,8 @@ class TestFit:
         df = d.create_df_9()
 
         x = OutOfRangeNullTransformer(
-            quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
+            quantiles={"a": [0.1, 1], "b": [0.5, None]},
+            weights_column="c",
         )
 
         x_fitted = x.fit(df)
@@ -201,7 +214,9 @@ class TestSetReplacementValues:
         ],
     )
     def test_expected_replacement_values_set(
-        self, value_to_set, expected_replacement_values
+        self,
+        value_to_set,
+        expected_replacement_values,
     ):
         """Test the _replacement_values attribute is modified as expected given the prior values of the attribute."""
         x = OutOfRangeNullTransformer(capping_values={"a": [0, 1]})

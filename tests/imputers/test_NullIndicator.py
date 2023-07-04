@@ -24,7 +24,9 @@ class TestInit:
         x = NullIndicator()
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
@@ -36,11 +38,14 @@ class TestInit:
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
-            0: {"args": (), "kwargs": {"columns": None, "verbose": True, "copy": True}}
+            0: {"args": (), "kwargs": {"columns": None, "verbose": True, "copy": True}},
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             NullIndicator(columns=None, verbose=True, copy=True)
 
@@ -57,7 +62,7 @@ class TestTransform:
                 "c": [3, 2, 1, 4, 5, 6],
                 "b_nulls": [1, 0, 0, 0, 0, 0],
                 "c_nulls": [0, 0, 0, 0, 0, 0],
-            }
+            },
         )
 
         return df
@@ -65,7 +70,8 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
         ta.functions.test_function_arguments(
-            func=NullIndicator.transform, expected_arguments=["self", "X"]
+            func=NullIndicator.transform,
+            expected_arguments=["self", "X"],
         )
 
     def test_super_transform_called(self, mocker):
@@ -77,7 +83,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "transform", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "transform",
+            expected_call_args,
         ):
             x.transform(df)
 

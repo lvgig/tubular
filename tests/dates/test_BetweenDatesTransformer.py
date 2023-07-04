@@ -32,7 +32,10 @@ class TestInit:
     def test_inheritance(self):
         """Test that BetweenDatesTransformer inherits from BaseTransformer."""
         x = BetweenDatesTransformer(
-            column_lower="a", column_between="b", column_upper="c", new_column_name="d"
+            column_lower="a",
+            column_between="b",
+            column_upper="c",
+            new_column_name="d",
         )
 
         ta.classes.assert_inheritance(x, BaseTransformer)
@@ -43,11 +46,14 @@ class TestInit:
             0: {
                 "args": (),
                 "kwargs": {"columns": ["a", "b", "c"], "verbose": False, "copy": True},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             BetweenDatesTransformer(
                 column_lower="a",
@@ -61,7 +67,8 @@ class TestInit:
     def test_first_non_str_error(self):
         """Test that an exception is raised if column_lower not str."""
         with pytest.raises(
-            TypeError, match="BetweenDatesTransformer: column_lower should be str"
+            TypeError,
+            match="BetweenDatesTransformer: column_lower should be str",
         ):
             BetweenDatesTransformer(
                 column_lower=False,
@@ -73,7 +80,8 @@ class TestInit:
     def test_column_between_non_str_error(self):
         """Test that an exception is raised if column_between not str."""
         with pytest.raises(
-            TypeError, match="BetweenDatesTransformer: column_between should be str"
+            TypeError,
+            match="BetweenDatesTransformer: column_between should be str",
         ):
             BetweenDatesTransformer(
                 column_lower="a",
@@ -85,7 +93,8 @@ class TestInit:
     def test_column_upper_non_str_error(self):
         """Test that an exception is raised if column_upper not str."""
         with pytest.raises(
-            TypeError, match="BetweenDatesTransformer: column_upper should be str"
+            TypeError,
+            match="BetweenDatesTransformer: column_upper should be str",
         ):
             BetweenDatesTransformer(
                 column_lower="a",
@@ -97,7 +106,8 @@ class TestInit:
     def test_new_column_name_non_str_error(self):
         """Test that an exception is raised if new_column_name not str."""
         with pytest.raises(
-            TypeError, match="BetweenDatesTransformer: new_column_name should be str"
+            TypeError,
+            match="BetweenDatesTransformer: new_column_name should be str",
         ):
             BetweenDatesTransformer(
                 column_lower="a",
@@ -109,7 +119,8 @@ class TestInit:
     def test_lower_inclusive_non_bool_error(self):
         """Test that an exception is raised if lower_inclusive not a bool."""
         with pytest.raises(
-            TypeError, match="BetweenDatesTransformer: lower_inclusive should be a bool"
+            TypeError,
+            match="BetweenDatesTransformer: lower_inclusive should be a bool",
         ):
             BetweenDatesTransformer(
                 column_lower="a",
@@ -122,7 +133,8 @@ class TestInit:
     def test_upper_inclusive_non_bool_error(self):
         """Test that an exception is raised if upper_inclusive not a bool."""
         with pytest.raises(
-            TypeError, match="BetweenDatesTransformer: upper_inclusive should be a bool"
+            TypeError,
+            match="BetweenDatesTransformer: upper_inclusive should be a bool",
         ):
             BetweenDatesTransformer(
                 column_lower="a",
@@ -135,11 +147,16 @@ class TestInit:
     def test_class_methods(self):
         """Test that BetweenDatesTransformer has transform method."""
         x = BetweenDatesTransformer(
-            column_lower="a", column_between="b", column_upper="c", new_column_name="d"
+            column_lower="a",
+            column_between="b",
+            column_upper="c",
+            new_column_name="d",
         )
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform method not present"
+            obj=x,
+            expected_method="transform",
+            msg="transform method not present",
         )
 
     def test_values_passed_in_init_set_to_attribute(self):
@@ -224,11 +241,14 @@ class TestTransform:
         df = d.create_is_between_dates_df_1()
 
         x = BetweenDatesTransformer(
-            column_lower="a", column_between="b", column_upper="c", new_column_name="d"
+            column_lower="a",
+            column_between="b",
+            column_upper="c",
+            new_column_name="d",
         )
 
         expected_call_args = {
-            0: {"args": (d.create_is_between_dates_df_1(),), "kwargs": {}}
+            0: {"args": (d.create_is_between_dates_df_1(),), "kwargs": {}},
         }
 
         with ta.functions.assert_function_call(
@@ -247,11 +267,14 @@ class TestTransform:
                 "a": [2, 1],
                 "b": pd.date_range(start="1/3/2016", end="27/09/2017", periods=2),
                 "c": pd.date_range(start="1/2/2016", end="27/04/2017", periods=2),
-            }
+            },
         )
 
         x = BetweenDatesTransformer(
-            column_lower="a", column_between="b", column_upper="c", new_column_name="d"
+            column_lower="a",
+            column_between="b",
+            column_upper="c",
+            new_column_name="d",
         )
 
         with pytest.raises(
@@ -263,7 +286,8 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_is_between_dates_df_1(), expected_df_1()
+            d.create_is_between_dates_df_1(),
+            expected_df_1(),
         ),
     )
     def test_output(self, df, expected):
@@ -288,7 +312,8 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_is_between_dates_df_2(), expected_df_2()
+            d.create_is_between_dates_df_2(),
+            expected_df_2(),
         ),
     )
     def test_output_both_exclusive(self, df, expected):
@@ -313,7 +338,8 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_is_between_dates_df_2(), expected_df_3()
+            d.create_is_between_dates_df_2(),
+            expected_df_3(),
         ),
     )
     def test_output_lower_exclusive(self, df, expected):
@@ -338,7 +364,8 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_is_between_dates_df_2(), expected_df_4()
+            d.create_is_between_dates_df_2(),
+            expected_df_4(),
         ),
     )
     def test_output_upper_exclusive(self, df, expected):
@@ -363,7 +390,8 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_is_between_dates_df_2(), expected_df_5()
+            d.create_is_between_dates_df_2(),
+            expected_df_5(),
         ),
     )
     def test_output_both_inclusive(self, df, expected):

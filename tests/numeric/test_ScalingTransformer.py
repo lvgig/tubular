@@ -82,15 +82,22 @@ class TestInit:
         ],
     )
     def test_scaler_initialised_with_scaler_kwargs(
-        self, mocker, scaler_type, scaler_type_str, scaler_kwargs_value
+        self,
+        mocker,
+        scaler_type,
+        scaler_type_str,
+        scaler_kwargs_value,
     ):
         """Test that the scaler_type is initialised with the scaler_kwargs arguments."""
         mocked = mocker.patch(
-            f"sklearn.preprocessing.{scaler_type_str}.__init__", return_value=None
+            f"sklearn.preprocessing.{scaler_type_str}.__init__",
+            return_value=None,
         )
 
         ScalingTransformer(
-            columns="b", scaler_type=scaler_type, scaler_kwargs=scaler_kwargs_value
+            columns="b",
+            scaler_type=scaler_type,
+            scaler_kwargs=scaler_kwargs_value,
         )
 
         assert mocked.call_count == 1, "unexpected number of calls to init"
@@ -113,14 +120,20 @@ class TestInit:
             0: {
                 "args": (),
                 "kwargs": {"columns": ["a", "b"], "copy": True, "verbose": False},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             ScalingTransformer(
-                columns=["a", "b"], scaler_type="standard", copy=True, verbose=False
+                columns=["a", "b"],
+                scaler_type="standard",
+                copy=True,
+                verbose=False,
             )
 
 
@@ -182,7 +195,10 @@ class TestFit:
         expected_call_args = {0: {"args": (d.create_df_2(), None), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "fit", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "fit",
+            expected_call_args,
         ):
             x.fit(df)
 
@@ -216,11 +232,14 @@ class TestFit:
         df = d.create_df_3()
 
         x = ScalingTransformer(
-            columns=["b", "c"], scaler_type=scaler_type, scaler_kwargs={"copy": True}
+            columns=["b", "c"],
+            scaler_type=scaler_type,
+            scaler_kwargs={"copy": True},
         )
 
         mocked = mocker.patch(
-            f"sklearn.preprocessing.{scaler_type_str}.fit", return_value=None
+            f"sklearn.preprocessing.{scaler_type_str}.fit",
+            return_value=None,
         )
 
         x.fit(df)
@@ -316,7 +335,9 @@ class TestTransform:
         df = d.create_df_3()
 
         x = ScalingTransformer(
-            columns=["b", "c"], scaler_type=scaler_type, scaler_kwargs={"copy": True}
+            columns=["b", "c"],
+            scaler_type=scaler_type,
+            scaler_kwargs={"copy": True},
         )
 
         x.fit(df)
@@ -355,19 +376,24 @@ class TestTransform:
         ],
     )
     def test_output_from_scaler_transform_set_to_columns(
-        self, mocker, scaler_type, scaler_type_str
+        self,
+        mocker,
+        scaler_type,
+        scaler_type_str,
     ):
         """Test that the call to the scaler.transform method."""
         df = d.create_df_3()
 
         x = ScalingTransformer(
-            columns=["b", "c"], scaler_type=scaler_type, scaler_kwargs={"copy": True}
+            columns=["b", "c"],
+            scaler_type=scaler_type,
+            scaler_kwargs={"copy": True},
         )
 
         x.fit(df)
 
         scaler_transform_output = pd.DataFrame(
-            {"b": [1, 2, 3, 4, 5, 6, 7], "c": [7, 6, 5, 4, 3, 2, 1]}
+            {"b": [1, 2, 3, 4, 5, 6, 7], "c": [7, 6, 5, 4, 3, 2, 1]},
         )
 
         mocker.patch(
@@ -397,7 +423,9 @@ class TestTransform:
         df = d.create_df_3()
 
         x = ScalingTransformer(
-            columns=columns, scaler_type=scaler_type, scaler_kwargs={"copy": True}
+            columns=columns,
+            scaler_type=scaler_type,
+            scaler_kwargs={"copy": True},
         )
 
         x.fit(df)

@@ -56,7 +56,13 @@ class LogTransformer(BaseTransformer):
     """
 
     def __init__(
-        self, columns, base=None, add_1=False, drop=True, suffix="log", **kwargs
+        self,
+        columns,
+        base=None,
+        add_1=False,
+        drop=True,
+        suffix="log",
+        **kwargs,
     ):
         super().__init__(columns=columns, **kwargs)
 
@@ -94,12 +100,13 @@ class LogTransformer(BaseTransformer):
         X = super().transform(X)
 
         numeric_column_types = X[self.columns].apply(
-            pd.api.types.is_numeric_dtype, axis=0
+            pd.api.types.is_numeric_dtype,
+            axis=0,
         )
 
         if not numeric_column_types.all():
             non_numeric_columns = list(
-                numeric_column_types.loc[~numeric_column_types].index
+                numeric_column_types.loc[~numeric_column_types].index,
             )
 
             msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
@@ -308,7 +315,8 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
             raise TypeError(msg)
 
         X[self.new_column_name] = getattr(X[[self.column1_name]], self.pd_method_name)(
-            X[self.column2_name], **self.pd_method_kwargs
+            X[self.column2_name],
+            **self.pd_method_kwargs,
         )
 
         return X
@@ -380,12 +388,13 @@ class ScalingTransformer(BaseTransformer):
 
         """
         numeric_column_types = X[self.columns].apply(
-            pd.api.types.is_numeric_dtype, axis=0
+            pd.api.types.is_numeric_dtype,
+            axis=0,
         )
 
         if not numeric_column_types.all():
             non_numeric_columns = list(
-                numeric_column_types.loc[~numeric_column_types].index
+                numeric_column_types.loc[~numeric_column_types].index,
             )
 
             msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
@@ -734,12 +743,13 @@ class PCATransformer(BaseTransformer):
 
         """
         numeric_column_types = X[self.columns].apply(
-            pd.api.types.is_numeric_dtype, axis=0
+            pd.api.types.is_numeric_dtype,
+            axis=0,
         )
 
         if not numeric_column_types.all():
             non_numeric_columns = list(
-                numeric_column_types.loc[~numeric_column_types].index
+                numeric_column_types.loc[~numeric_column_types].index,
             )
 
             msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"

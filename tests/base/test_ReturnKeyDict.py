@@ -15,7 +15,9 @@ def test_has___missing___method():
     x = ReturnKeyDict()
 
     ta.classes.test_object_method(
-        x, "__missing__", "ReturnKeyDict does not have __missing__ method"
+        x,
+        "__missing__",
+        "ReturnKeyDict does not have __missing__ method",
     )
 
 

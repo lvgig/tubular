@@ -36,7 +36,7 @@ def create_numeric_df_1():
             "c": [17.06, 12.25, 19.15, 29.73, 1.98, 8.23, 15.22, 20.59, 3.82, 39.73],
             "d": [25.94, 70.22, 72.94, 64.55, 0.41, 13.62, 30.22, 4.6, 67.13, 10.38],
             "e": [94.3, 4.18, 51.7, 16.63, 2.6, 16.57, 3.51, 30.79, 66.19, 25.44],
-        }
+        },
     )
     return df
 
@@ -62,7 +62,7 @@ def create_df_2():
             "a": [1, 2, 3, 4, 5, 6, np.NaN],
             "b": ["a", "b", "c", "d", "e", "f", np.NaN],
             "c": ["a", "b", "c", "d", "e", "f", np.NaN],
-        }
+        },
     )
 
     df["c"] = df["c"].astype("category")
@@ -77,7 +77,7 @@ def create_df_4():
             "a": [1, 2, 3, 4, 5, 6, 7, np.NaN],
             "b": ["a", "b", "c", "d", "e", "f", "g", np.NaN],
             "c": ["a", "b", "c", "d", "e", "f", "g", np.NaN],
-        }
+        },
     )
 
     df["c"] = df["c"].astype("category")
@@ -92,7 +92,7 @@ def create_df_3():
             "a": [1, 2, 3, 4, 5, 6, np.NaN],
             "b": [1, 2, 3, np.NaN, 7, 8, 9],
             "c": [np.NaN, 1, 2, 3, -4, -5, -6],
-        }
+        },
     )
 
     return df
@@ -105,7 +105,7 @@ def create_df_5():
             "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.NaN],
             "b": ["a", "a", "a", "d", "e", "f", "g", np.NaN, np.NaN, np.NaN],
             "c": ["a", "a", "c", "c", "e", "e", "f", "g", "h", np.NaN],
-        }
+        },
     )
 
     df["c"] = df["c"].astype("category")
@@ -120,7 +120,7 @@ def create_df_6():
             "a": [2, 2, 2, 2, np.NaN, 2, 2, 2, 3, 3],
             "b": ["a", "a", "a", "d", "e", "f", "g", np.NaN, np.NaN, np.NaN],
             "c": ["a", "b", "c", "d", "f", "f", "f", "g", "g", np.NaN],
-        }
+        },
     )
 
     df["c"] = df["c"].astype("category")
@@ -135,7 +135,7 @@ def create_df_7():
             "a": [4, 2, 2, 1, 3],
             "b": ["x", "z", "y", "x", "x"],
             "c": ["c", "a", "a", "c", "b"],
-        }
+        },
     )
 
     df["c"] = df["c"].astype("category")
@@ -166,7 +166,7 @@ def create_df_9():
             "a": [1, 2, np.nan, 4, np.nan, 6],
             "b": [np.nan, 5, 4, 3, 2, 1],
             "c": [3, 2, 1, 4, 5, 6],
-        }
+        },
     )
 
     return df
@@ -179,7 +179,7 @@ def create_df_10():
             "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.NaN],
             "b": ["a", "a", "a", "d", "e", "f", "g", np.NaN, np.NaN, np.NaN],
             "c": [1, 1, 3, 4, 5, 6, 5, 8, 9, 50],
-        }
+        },
     )
 
     return df
@@ -191,7 +191,7 @@ def create_df_11():
         {
             "a": [1, 2, 3],
             "b": [4, 5, 6],
-        }
+        },
     )
 
     return df
@@ -261,7 +261,7 @@ def create_weighted_imputers_test_df():
             "d": [1.0, 5.0, 3.0, np.nan, np.nan, 1.0],
             "response": [0, 1, 0, 1, 1, 1],
             "weight": [0.1, 0.1, 0.8, 0.5, 0.9, 0.8],
-        }
+        },
     )
 
     return df
@@ -290,7 +290,7 @@ def create_MeanResponseTransformer_test_df():
                 "green",
                 "green",
             ],
-        }
+        },
     )
 
     df["c"] = df["c"].astype("category")
@@ -323,7 +323,7 @@ def create_MeanResponseTransformer_test_df_unseen_levels():
                 "yellow",
                 "blue",
             ],
-        }
+        },
     )
 
     df["c"] = df["c"].astype("category")
@@ -346,7 +346,7 @@ def create_OrdinalEncoderTransformer_test_df():
             "d": [1, 2, 3, 4, 5, 6],
             "e": [3, 4, 5, 6, 7, 8.0],
             "f": [False, False, False, True, True, True],
-        }
+        },
     )
 
     df["c"] = df["c"].astype("category")
@@ -365,7 +365,7 @@ def create_NearestMeanResponseImputer_test_df():
             "a": [1, 1, 2, 3, 3, np.nan],
             "b": [np.nan, np.nan, 1, 3, 3, 4],
             "c": [2, 3, 2, 1, 4, 1],
-        }
+        },
     )
 
     return df
@@ -407,7 +407,7 @@ def create_date_test_df():
                 datetime.date(2015, 11, 10),
                 datetime.date(2015, 7, 23),
             ],
-        }
+        },
     )
 
     return df
@@ -454,7 +454,7 @@ def create_datediff_test_df():
                 datetime.datetime(2015, 11, 10, 12, 59, 59),
                 datetime.datetime(2015, 7, 23, 11, 59, 59),
             ],
-        }
+        },
     )
 
     return df
@@ -482,7 +482,7 @@ def create_datediff_test_nulls_df():
 def create_to_datetime_test_df():
     """Create DataFrame to be used in the ToDatetimeTransformer tests."""
     df = pd.DataFrame(
-        {"a": [1950, 1960, 2000, 2001, np.NaN, 2010], "b": [1, 2, 3, 4, 5, np.NaN]}
+        {"a": [1950, 1960, 2000, 2001, np.NaN, 2010], "b": [1, 2, 3, 4, 5, np.NaN]},
     )
 
     return df
@@ -495,7 +495,7 @@ def create_is_between_dates_df_1():
             "a": pd.date_range(start="1/1/2016", end="27/02/2017", periods=2),
             "b": pd.date_range(start="1/2/2016", end="27/09/2017", periods=2),
             "c": pd.date_range(start="1/3/2016", end="27/04/2017", periods=2),
-        }
+        },
     )
 
     return df
@@ -529,7 +529,7 @@ def create_is_between_dates_df_2():
                 datetime.datetime(1990, 3, 1),
                 datetime.datetime(1990, 3, 1),
             ],
-        }
+        },
     )
 
     return df
@@ -542,7 +542,7 @@ def create_downcast_df():
         {
             "a": [1, 2, 3, 4, 5],
             "b": [1.0, 2.0, 3.0, 4.0, 5.0],
-        }
+        },
     )
 
     return df

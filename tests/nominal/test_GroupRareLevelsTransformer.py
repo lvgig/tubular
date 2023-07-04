@@ -33,7 +33,9 @@ class TestInit:
         ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
@@ -45,11 +47,14 @@ class TestInit:
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
-            0: {"args": (), "kwargs": {"columns": None, "verbose": True, "copy": True}}
+            0: {"args": (), "kwargs": {"columns": None, "verbose": True, "copy": True}},
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             GroupRareLevelsTransformer(columns=None, verbose=True, copy=True)
 
@@ -134,7 +139,10 @@ class TestFit:
         expected_call_args = {0: {"args": (d.create_df_5(), None), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "fit", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "fit",
+            expected_call_args,
         ):
             x.fit(df)
 
@@ -145,7 +153,8 @@ class TestFit:
         x = GroupRareLevelsTransformer(columns=["b", "c"], weight="aaaa")
 
         with pytest.raises(
-            ValueError, match="GroupRareLevelsTransformer: weight aaaa not in X"
+            ValueError,
+            match="GroupRareLevelsTransformer: weight aaaa not in X",
         ):
             x.fit(df)
 
@@ -186,7 +195,7 @@ class TestFit:
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
-                "mapping_": {"b": ["a", np.NaN], "c": ["a", "c", "e"]}
+                "mapping_": {"b": ["a", np.NaN], "c": ["a", "c", "e"]},
             },
             msg="mapping_ attribute",
         )
@@ -248,13 +257,14 @@ class TestTransform:
         df = pd.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.NaN]})
 
         df["b"] = pd.Series(
-            ["a", "a", "a", "rare", "rare", "rare", "rare", np.NaN, np.NaN, np.NaN]
+            ["a", "a", "a", "rare", "rare", "rare", "rare", np.NaN, np.NaN, np.NaN],
         )
 
         df["c"] = pd.Series(
             ["a", "a", "c", "c", "e", "e", "rare", "rare", "rare", "rare"],
             dtype=pd.CategoricalDtype(
-                categories=["a", "c", "e", "f", "g", "h", "rare"], ordered=False
+                categories=["a", "c", "e", "f", "g", "h", "rare"],
+                ordered=False,
             ),
         )
 
@@ -267,13 +277,13 @@ class TestTransform:
                 "a": [2, 2, 2, 2, np.NaN, 2, 2, 2, 3, 3],
                 "b": ["a", "a", "a", "d", "e", "f", "g", np.NaN, np.NaN, np.NaN],
                 "c": ["a", "b", "c", "d", "f", "f", "f", "g", "g", np.NaN],
-            }
+            },
         )
 
         df["c"] = df["c"].astype("category")
 
         df["b"] = pd.Series(
-            ["a", "a", "a", "rare", "rare", "rare", "rare", np.NaN, np.NaN, np.NaN]
+            ["a", "a", "a", "rare", "rare", "rare", "rare", np.NaN, np.NaN, np.NaN],
         )
 
         return df
@@ -281,7 +291,8 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
         ta.functions.test_function_arguments(
-            func=GroupRareLevelsTransformer.transform, expected_arguments=["self", "X"]
+            func=GroupRareLevelsTransformer.transform,
+            expected_arguments=["self", "X"],
         )
 
     def test_check_is_fitted_called(self, mocker):
@@ -295,7 +306,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (["mapping_"],), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "check_is_fitted",
+            expected_call_args,
         ):
             x.transform(df)
 
@@ -314,7 +328,7 @@ class TestTransform:
                     d.create_df_5(),
                 ),
                 "kwargs": {},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(

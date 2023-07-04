@@ -60,11 +60,14 @@ class TestExtractDatetimeInfoInit:
             0: {
                 "args": (),
                 "kwargs": {"columns": ["a"]},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             DatetimeInfoExtractor(columns=["a"])
 
@@ -82,7 +85,7 @@ class TestExtractDatetimeInfoInit:
                 "columns": ["a"],
                 "include": ["timeofmonth", "timeofday"],
                 "datetime_mappings": {
-                    "timeofday": {"am": range(0, 12), "pm": range(12, 24)}
+                    "timeofday": {"am": range(0, 12), "pm": range(12, 24)},
                 },
             },
             msg="Attributes for ExtractDatetimeInfo set in init",
@@ -93,10 +96,14 @@ class TestExtractDatetimeInfoInit:
         x = DatetimeInfoExtractor(columns=["a"])
 
         ta.classes.test_object_method(
-            obj=x, expected_method="_map_values", msg="_map_values"
+            obj=x,
+            expected_method="_map_values",
+            msg="_map_values",
         )
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     @pytest.mark.parametrize("incorrect_type_include", [2, 3.0, "invalid", "dayofweek"])
@@ -115,14 +122,17 @@ class TestExtractDatetimeInfoInit:
             match=r'elements in include should be in \["timeofday", "timeofmonth", "timeofyear", "dayofweek"\]',
         ):
             DatetimeInfoExtractor(
-                columns=["a"], include=["timeofday", "timeofmonth", "invalid_option"]
+                columns=["a"],
+                include=["timeofday", "timeofmonth", "invalid_option"],
             )
 
     @pytest.mark.parametrize(
-        "incorrect_type_datetime_mappings", [2, 3.0, ["a", "b"], "dayofweek"]
+        "incorrect_type_datetime_mappings",
+        [2, 3.0, ["a", "b"], "dayofweek"],
     )
     def test_error_when_datetime_mappings_not_dict(
-        self, incorrect_type_datetime_mappings
+        self,
+        incorrect_type_datetime_mappings,
     ):
         """Test that an exception is raised when datetime_mappings is not a dict."""
         with pytest.raises(
@@ -130,14 +140,17 @@ class TestExtractDatetimeInfoInit:
             match="datetime_mappings should be Dict",
         ):
             DatetimeInfoExtractor(
-                columns=["a"], datetime_mappings=incorrect_type_datetime_mappings
+                columns=["a"],
+                datetime_mappings=incorrect_type_datetime_mappings,
             )
 
     @pytest.mark.parametrize(
-        "incorrect_type_datetime_mappings_values", [{"timeofday": 2}]
+        "incorrect_type_datetime_mappings_values",
+        [{"timeofday": 2}],
     )
     def test_error_when_datetime_mapping_value_not_dict(
-        self, incorrect_type_datetime_mappings_values
+        self,
+        incorrect_type_datetime_mappings_values,
     ):
         """Test that an exception is raised when values in datetime_mappings are not dict."""
         with pytest.raises(
@@ -145,7 +158,8 @@ class TestExtractDatetimeInfoInit:
             match="values in datetime_mappings should be dict",
         ):
             DatetimeInfoExtractor(
-                columns=["a"], datetime_mappings=incorrect_type_datetime_mappings_values
+                columns=["a"],
+                datetime_mappings=incorrect_type_datetime_mappings_values,
             )
 
     @pytest.mark.parametrize(
@@ -160,7 +174,9 @@ class TestExtractDatetimeInfoInit:
         ],
     )
     def test_error_when_datetime_mapping_key_not_in_include(
-        self, include, incorrect_datetime_mappings_keys
+        self,
+        include,
+        incorrect_datetime_mappings_keys,
     ):
         """Test that an exception is raised when keys in datetime_mappings are not in include."""
         with pytest.raises(
@@ -179,31 +195,33 @@ class TestExtractDatetimeInfoInit:
             (
                 {"timeofday": {"mapped": range(23)}},
                 re.escape(
-                    "timeofday mapping dictionary should contain mapping for all hours between 0-23. {23} are missing"
+                    "timeofday mapping dictionary should contain mapping for all hours between 0-23. {23} are missing",
                 ),
             ),
             (
                 {"timeofmonth": {"mapped": range(1, 31)}},
                 re.escape(
-                    "timeofmonth mapping dictionary should contain mapping for all days between 1-31. {31} are missing"
+                    "timeofmonth mapping dictionary should contain mapping for all days between 1-31. {31} are missing",
                 ),
             ),
             (
                 {"timeofyear": {"mapped": range(1, 12)}},
                 re.escape(
-                    "timeofyear mapping dictionary should contain mapping for all months between 1-12. {12} are missing"
+                    "timeofyear mapping dictionary should contain mapping for all months between 1-12. {12} are missing",
                 ),
             ),
             (
                 {"dayofweek": {"mapped": range(6)}},
                 re.escape(
-                    "dayofweek mapping dictionary should contain mapping for all days between 0-6. {6} are missing"
+                    "dayofweek mapping dictionary should contain mapping for all days between 0-6. {6} are missing",
                 ),
             ),
         ],
     )
     def test_error_when_incomplete_mappings_passed(
-        self, incomplete_mappings, expected_exception
+        self,
+        incomplete_mappings,
+        expected_exception,
     ):
         """Test that error is raised when incomplete mappings are passed."""
         with pytest.raises(ValueError, match=expected_exception):
@@ -224,13 +242,16 @@ class TestMapValues:
     def test_incorrect_type_input(self, incorrect_type_input, timeofday_extractor):
         """Test that an error is raised if input is the wrong type."""
         with pytest.raises(
-            TypeError, match="DatetimeInfoExtractor: value should be float or int"
+            TypeError,
+            match="DatetimeInfoExtractor: value should be float or int",
         ):
             timeofday_extractor._map_values(incorrect_type_input, "timeofday")
 
     @pytest.mark.parametrize("incorrect_size_input", [-2, 30, 5.6, 11.2])
     def test_out_of_bounds_or_fractional_input(
-        self, incorrect_size_input, timeofday_extractor
+        self,
+        incorrect_size_input,
+        timeofday_extractor,
     ):
         """Test that an error is raised when value is outside of 0-23 range."""
         with pytest.raises(
@@ -253,13 +274,17 @@ class TestMapValues:
         ],
     )
     def test_valid_inputs_timeofday(
-        self, valid_hour, hour_time_of_day, timeofday_extractor
+        self,
+        valid_hour,
+        hour_time_of_day,
+        timeofday_extractor,
     ):
         """Trial test to check all in one go."""
         output = timeofday_extractor._map_values(valid_hour, "timeofday")
 
         assert output == hour_time_of_day, "expected {}, output {}".format(
-            hour_time_of_day, output
+            hour_time_of_day,
+            output,
         )
 
     @pytest.mark.parametrize(
@@ -277,12 +302,16 @@ class TestMapValues:
         ],
     )
     def test_valid_inputs_timeofmonth(
-        self, valid_day, day_time_of_month, timeofmonth_extractor
+        self,
+        valid_day,
+        day_time_of_month,
+        timeofmonth_extractor,
     ):
         """Test that correct values are return with valid inputs."""
         output = timeofmonth_extractor._map_values(valid_day, "timeofmonth")
         assert output == day_time_of_month, "expected {}, output {}".format(
-            day_time_of_month, output
+            day_time_of_month,
+            output,
         )
 
     @pytest.mark.parametrize(
@@ -299,12 +328,16 @@ class TestMapValues:
         ],
     )
     def test_valid_inputs_timeofyear(
-        self, valid_month, month_time_of_year, timeofyear_extractor
+        self,
+        valid_month,
+        month_time_of_year,
+        timeofyear_extractor,
     ):
         """Test that correct values are return with valid inputs."""
         output = timeofyear_extractor._map_values(valid_month, "timeofyear")
         assert output == month_time_of_year, "expected {}, output {}".format(
-            month_time_of_year, output
+            month_time_of_year,
+            output,
         )
 
     @pytest.mark.parametrize(
@@ -326,7 +359,7 @@ class TestMapValues:
         output = timeofday_extractor._map_values(np.nan, "timeofday")
         print(output)
         assert np.isnan(
-            output
+            output,
         ), f"passing np.nan should result in np.nan, instead received {output}"
 
 
@@ -348,7 +381,7 @@ class TestTransform:
             0: {
                 "args": (df,),
                 "kwargs": {},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
@@ -369,9 +402,10 @@ class TestTransform:
         x = DatetimeInfoExtractor(columns=["a"], include=["dayofweek"])
 
         with pytest.raises(
-            TypeError, match="values in {} should be datetime".format("a")
+            TypeError,
+            match="values in {} should be datetime".format("a"),
         ):
-            x.transform(df),
+            x.transform(df)
 
     def test_correct_col_returned(self):
         """Test that the added column is correct."""
@@ -450,5 +484,7 @@ class TestTransform:
         ]
 
         ta.equality.assert_frame_equal_msg(
-            transformed, expected, "incorrect dataframe returned"
+            transformed,
+            expected,
+            "incorrect dataframe returned",
         )

@@ -32,7 +32,9 @@ class TestInit:
 
         ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
@@ -85,7 +87,11 @@ class TestInit:
         mocker.patch("sklearn.preprocessing.OneHotEncoder.__init__")
 
         x = OneHotEncodingTransformer(
-            columns=None, verbose=True, copy=True, separator="x", drop_original=True
+            columns=None,
+            verbose=True,
+            copy=True,
+            separator="x",
+            drop_original=True,
         )
 
         assert (
@@ -113,7 +119,11 @@ class TestInit:
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that the values passed in init are saved in an attribute of the same name."""
         x = OneHotEncodingTransformer(
-            columns=None, verbose=True, copy=True, separator="x", drop_original=True
+            columns=None,
+            verbose=True,
+            copy=True,
+            separator="x",
+            drop_original=True,
         )
 
         ta.classes.test_object_attributes(
@@ -280,7 +290,7 @@ class TestTransform:
                 "a": [4, 2, 2, 1, 3],
                 "b": ["x", "z", "y", "x", "x"],
                 "c": ["c", "a", "a", "c", "b"],
-            }
+            },
         )
 
         df["c"] = df["c"].astype("category")
@@ -320,7 +330,8 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
         ta.functions.test_function_arguments(
-            func=OneHotEncodingTransformer.transform, expected_arguments=["self", "X"]
+            func=OneHotEncodingTransformer.transform,
+            expected_arguments=["self", "X"],
         )
 
     def test_columns_check_call(self, mocker):
@@ -334,7 +345,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "columns_check", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "columns_check",
+            expected_call_args,
         ):
             x.transform(df)
 
@@ -352,7 +366,10 @@ class TestTransform:
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "check_is_fitted",
+            expected_call_args,
         ):
             x.transform(df)
 
@@ -509,7 +526,9 @@ class TestTransform:
         df = df[["b", "c"]]
 
         x = OneHotEncodingTransformer(
-            columns=["b", "c"], separator="|", drop_original=True
+            columns=["b", "c"],
+            separator="|",
+            drop_original=True,
         )
 
         x.fit(df)

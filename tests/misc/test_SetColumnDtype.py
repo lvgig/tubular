@@ -35,10 +35,13 @@ class TestSetColumnDtypeInit:
             0: {
                 "args": (["a"],),
                 "kwargs": {"copy": True},
-            }
+            },
         }
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             SetColumnDtype(columns=["a"], dtype=float)
 
@@ -49,7 +52,8 @@ class TestSetColumnDtypeInit:
         assert x.dtype == str, "unexpected value set to dtype atttribute"
 
     @pytest.mark.parametrize(
-        "invalid_dtype", ["STRING", "misc_invalid", "np.int", int()]
+        "invalid_dtype",
+        ["STRING", "misc_invalid", "np.int", int()],
     )
     def test_invalid_dtype_error(self, invalid_dtype):
         msg = f"SetColumnDtype: data type '{invalid_dtype}' not understood as a valid dtype"
@@ -69,7 +73,9 @@ class TestSetColumnDtypeTransform:
         x = SetColumnDtype(columns=["a"], dtype=float)
 
         ta.classes.test_object_method(
-            obj=x, expected_method=method_name, msg=method_name
+            obj=x,
+            expected_method=method_name,
+            msg=method_name,
         )
 
     def test_transform_arguments(self):
@@ -107,7 +113,7 @@ class TestSetColumnDtypeTransform:
                 "b": [1.0, 2.0, 3.0, np.NaN, 7.0, 8.0, 9.0],
                 "c": [1.0, 1.0, 2.0, 3.0, -4.0, -5.0, -6.0],
                 "d": [1, 1, 2, 3, -4, -5, -6],
-            }
+            },
         )
 
         return df
@@ -120,7 +126,7 @@ class TestSetColumnDtypeTransform:
                 "b": [1.0, 2.0, 3.0, np.NaN, 7.0, 8.0, 9.0],
                 "c": [1.0, 1.0, 2.0, 3.0, -4.0, -5.0, -6.0],
                 "d": [1.0, 1.0, 2.0, 3.0, -4.0, -5.0, -6.0],
-            }
+            },
         )
 
         return df

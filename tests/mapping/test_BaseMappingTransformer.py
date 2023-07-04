@@ -22,7 +22,9 @@ class TestInit:
         x = BaseMappingTransformer(mappings={"a": {"a": 1}})
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
@@ -34,18 +36,25 @@ class TestInit:
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
-            0: {"args": (), "kwargs": {"columns": ["a"], "verbose": True, "copy": True}}
+            0: {
+                "args": (),
+                "kwargs": {"columns": ["a"], "verbose": True, "copy": True},
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             BaseMappingTransformer(mappings={"a": {"a": 1}}, verbose=True, copy=True)
 
     def test_no_keys_dict_error(self):
         """Test that an exception is raised if mappings is a dict but with no keys."""
         with pytest.raises(
-            ValueError, match="BaseMappingTransformer: mappings has no values"
+            ValueError,
+            match="BaseMappingTransformer: mappings has no values",
         ):
             BaseMappingTransformer(mappings={})
 
@@ -60,7 +69,8 @@ class TestInit:
     def test_mappings_not_dict_error(self):
         """Test that an exception is raised if mappings is not a dict."""
         with pytest.raises(
-            ValueError, match="BaseMappingTransformer: mappings must be a dictionary"
+            ValueError,
+            match="BaseMappingTransformer: mappings must be a dictionary",
         ):
             BaseMappingTransformer(mappings=())
 
@@ -102,7 +112,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (["mappings"],), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "check_is_fitted",
+            expected_call_args,
         ):
             x.transform(df)
 
@@ -120,7 +133,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "transform", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "transform",
+            expected_call_args,
         ):
             x.transform(df)
 

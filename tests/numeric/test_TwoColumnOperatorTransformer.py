@@ -24,13 +24,16 @@ class TestTwoColumnOperatorTransformerInit:
     def test_inheritance(self, example_transformer):
         """Test that TwoColumnOperatorTransformer inherits from BaseTransformer."""
         ta.classes.assert_inheritance(
-            example_transformer, tubular.base.DataFrameMethodTransformer
+            example_transformer,
+            tubular.base.DataFrameMethodTransformer,
         )
 
     def test_class_methods(self, example_transformer):
         """Test that TwoColumnOperatorTransformer has transform method."""
         ta.classes.test_object_method(
-            obj=example_transformer, expected_method="transform", msg="transform"
+            obj=example_transformer,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_arguments(self):
@@ -59,7 +62,10 @@ class TestTwoColumnOperatorTransformerInit:
         """Checks that an error is raised if no axis element present in pd_method_kwargs dict."""
         with pytest.raises(ValueError, match="pd_method_kwargs 'axis' must be 0 or 1"):
             TwoColumnOperatorTransformer(
-                "mul", ["a", "b"], "c", pd_method_kwargs={"axis": 2}
+                "mul",
+                ["a", "b"],
+                "c",
+                pd_method_kwargs={"axis": 2},
             )
 
     def test_attributes(self, example_transformer):
@@ -87,7 +93,7 @@ class TestTwoColumnOperatorTransformerInit:
                     "columns": ["a", "b"],
                     "pd_method_kwargs": {"axis": 0},
                 },
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
@@ -116,7 +122,10 @@ class TestTwoColumnOperatorTransformerTransform:
         expected_call_args = {0: {"args": (test_data,), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "transform", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "transform",
+            expected_call_args,
         ):
             example_transformer.transform(test_data)
 

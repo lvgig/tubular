@@ -229,7 +229,7 @@ class DateDifferenceTransformer(BaseTransformer):
             raise ValueError(msg)
         if units in ["Y", "M"]:
             warnings.warn(
-                f"{self.classname()}: Y/M units will be changed or deprecated in a future version, consider using DateDiffLeapYearTransformer or D units instead"
+                f"{self.classname()}: Y/M units will be changed or deprecated in a future version, consider using DateDiffLeapYearTransformer or D units instead",
             )
 
         self.units = units
@@ -330,7 +330,8 @@ class ToDatetimeTransformer(BaseTransformer):
         X = super().transform(X)
 
         X[self.new_column_name] = pd.to_datetime(
-            X[self.columns[0]], **self.to_datetime_kwargs
+            X[self.columns[0]],
+            **self.to_datetime_kwargs,
         )
 
         return X
@@ -391,7 +392,12 @@ class SeriesDtMethodTransformer(BaseTransformer):
     """
 
     def __init__(
-        self, new_column_name, pd_method_name, column, pd_method_kwargs={}, **kwargs
+        self,
+        new_column_name,
+        pd_method_name,
+        column,
+        pd_method_kwargs={},
+        **kwargs,
     ):
         if type(column) is not str:
             msg = f"{self.classname()}: column should be a str but got {type(column)}"
@@ -462,12 +468,14 @@ class SeriesDtMethodTransformer(BaseTransformer):
 
         if self._callable:
             X[self.new_column_name] = getattr(
-                X[self.columns[0]].dt, self.pd_method_name
+                X[self.columns[0]].dt,
+                self.pd_method_name,
             )(**self.pd_method_kwargs)
 
         else:
             X[self.new_column_name] = getattr(
-                X[self.columns[0]].dt, self.pd_method_name
+                X[self.columns[0]].dt,
+                self.pd_method_name,
             )
 
         return X
@@ -606,7 +614,7 @@ class BetweenDatesTransformer(BaseTransformer):
 
         if not (X[self.columns[0]] <= X[self.columns[2]]).all():
             warnings.warn(
-                f"{self.classname()}: not all {self.columns[2]} are greater than or equal to {self.columns[0]}"
+                f"{self.classname()}: not all {self.columns[2]} are greater than or equal to {self.columns[0]}",
             )
 
         if self.lower_inclusive:
@@ -905,22 +913,26 @@ class DatetimeInfoExtractor(BaseTransformer):
         for col in self.columns:
             if "timeofday" in self.include:
                 X[col + "_timeofday"] = X[col].dt.hour.apply(
-                    self._map_values, interval="timeofday"
+                    self._map_values,
+                    interval="timeofday",
                 )
 
             if "timeofmonth" in self.include:
                 X[col + "_timeofmonth"] = X[col].dt.day.apply(
-                    self._map_values, interval="timeofmonth"
+                    self._map_values,
+                    interval="timeofmonth",
                 )
 
             if "timeofyear" in self.include:
                 X[col + "_timeofyear"] = X[col].dt.month.apply(
-                    self._map_values, interval="timeofyear"
+                    self._map_values,
+                    interval="timeofyear",
                 )
 
             if "dayofweek" in self.include:
                 X[col + "_dayofweek"] = X[col].dt.weekday.apply(
-                    self._map_values, interval="dayofweek"
+                    self._map_values,
+                    interval="dayofweek",
                 )
 
         return X
@@ -977,13 +989,15 @@ class DatetimeSinusoidCalculator(BaseTransformer):
 
         if not isinstance(method, str) and not isinstance(method, list):
             msg = "{}: method must be a string or list but got {}".format(
-                self.classname(), type(method)
+                self.classname(),
+                type(method),
             )
             raise TypeError(msg)
 
         if not isinstance(units, str) and not isinstance(units, dict):
             msg = "{}: units must be a string or dict but got {}".format(
-                self.classname(), type(units)
+                self.classname(),
+                type(units),
             )
             raise TypeError(msg)
 
@@ -994,7 +1008,8 @@ class DatetimeSinusoidCalculator(BaseTransformer):
             or (isinstance(period, bool))
         ):
             msg = "{}: period must be an int, float or dict but got {}".format(
-                self.classname(), type(period)
+                self.classname(),
+                type(period),
             )
             raise TypeError(msg)
 
@@ -1037,7 +1052,8 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         for method in method_list:
             if method not in valid_method_list:
                 msg = '{}: Invalid method {} supplied, should be "sin", "cos" or a list containing both'.format(
-                    self.classname(), method
+                    self.classname(),
+                    method,
                 )
                 raise ValueError(msg)
 
@@ -1054,12 +1070,15 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         if isinstance(units, dict):
             if not set(list(units.values())).issubset(valid_unit_list):
                 msg = "{}: units dictionary values must be one of 'year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond' but got {}".format(
-                    self.classname(), set(units.values())
+                    self.classname(),
+                    set(units.values()),
                 )
                 raise ValueError(msg)
         elif units not in valid_unit_list:
             msg = "{}: Invalid units {} supplied, should be in {}".format(
-                self.classname(), units, valid_unit_list
+                self.classname(),
+                units,
+                valid_unit_list,
             )
             raise ValueError(msg)
 
@@ -1070,14 +1089,16 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         if isinstance(units, dict):
             if not sorted(list(units.keys())) == sorted(list(self.columns)):
                 msg = "{}: unit dictionary keys must be the same as columns but got {}".format(
-                    self.classname(), set(units.keys())
+                    self.classname(),
+                    set(units.keys()),
                 )
                 raise ValueError(msg)
 
         if isinstance(period, dict):
             if not sorted(list(period.keys())) == sorted(list(self.columns)):
                 msg = "{}: period dictionary keys must be the same as columns but got {}".format(
-                    self.classname(), set(period.keys())
+                    self.classname(),
+                    set(period.keys()),
                 )
                 raise ValueError(msg)
 
@@ -1117,7 +1138,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
                 new_column_name = f"{method}_{desired_period}_{desired_units}_{column}"
 
                 X[new_column_name] = getattr(np, method)(
-                    column_in_desired_unit * (2.0 * np.pi / desired_period)
+                    column_in_desired_unit * (2.0 * np.pi / desired_period),
                 )
 
         return X

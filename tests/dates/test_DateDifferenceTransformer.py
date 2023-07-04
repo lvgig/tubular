@@ -37,7 +37,9 @@ class TestInit:
         )
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
@@ -56,11 +58,14 @@ class TestInit:
                     "copy": True,
                     "verbose": False,
                 },
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             DateDifferenceTransformer(
                 column_lower="dummy_1",
@@ -72,7 +77,8 @@ class TestInit:
     def test_column_lower_type_error(self):
         """Test that an exception is raised if column_lower is not a str."""
         with pytest.raises(
-            TypeError, match="DateDifferenceTransformer: column_lower must be a str"
+            TypeError,
+            match="DateDifferenceTransformer: column_lower must be a str",
         ):
             DateDifferenceTransformer(
                 column_lower=123,
@@ -86,7 +92,8 @@ class TestInit:
     def test_column_2_type_error(self):
         """Test that an exception is raised if column_upper is not a str."""
         with pytest.raises(
-            TypeError, match="DateDifferenceTransformer: column_upper must be a str"
+            TypeError,
+            match="DateDifferenceTransformer: column_upper must be a str",
         ):
             DateDifferenceTransformer(
                 column_lower="dummy_1",
@@ -100,7 +107,8 @@ class TestInit:
     def test_new_column_name_type_error(self):
         """Test that an exception is raised if new_column_name is not a str."""
         with pytest.raises(
-            TypeError, match="DateDifferenceTransformer: new_column_name must be a str"
+            TypeError,
+            match="DateDifferenceTransformer: new_column_name must be a str",
         ):
             DateDifferenceTransformer(
                 column_lower="dummy_1",
@@ -114,7 +122,8 @@ class TestInit:
     def test_units_type_error(self):
         """Test that an exception is raised if new_column_name is not a str."""
         with pytest.raises(
-            TypeError, match="DateDifferenceTransformer: units must be a str"
+            TypeError,
+            match="DateDifferenceTransformer: units must be a str",
         ):
             DateDifferenceTransformer(
                 column_lower="dummy_1",
@@ -241,7 +250,7 @@ class TestTransform:
                     -3.082769210410435,
                     29.999247075573077,
                 ],
-            }
+            },
         )
         return df
 
@@ -279,7 +288,7 @@ class TestTransform:
                     -36.993230524925224,
                     359.9909649068769,
                 ],
-            }
+            },
         )
         return df
 
@@ -317,7 +326,7 @@ class TestTransform:
                     -1125.9583333333333,
                     10957.0,
                 ],
-            }
+            },
         )
         return df
 
@@ -355,7 +364,7 @@ class TestTransform:
                     -27023.0,
                     262968.0,
                 ],
-            }
+            },
         )
         return df
 
@@ -393,7 +402,7 @@ class TestTransform:
                     -1621380.0,
                     15778080.0,
                 ],
-            }
+            },
         )
         return df
 
@@ -431,7 +440,7 @@ class TestTransform:
                     -97282800.0,
                     946684800.0,
                 ],
-            }
+            },
         )
         return df
 
@@ -460,7 +469,8 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
         ta.functions.test_function_arguments(
-            func=DateDifferenceTransformer.transform, expected_arguments=["self", "X"]
+            func=DateDifferenceTransformer.transform,
+            expected_arguments=["self", "X"],
         )
 
     def test_super_transform_called(self, mocker):
@@ -490,7 +500,8 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_datediff_test_df(), expected_df_1()
+            d.create_datediff_test_df(),
+            expected_df_1(),
         ),
     )
     def test_expected_output_units_Y(self, df, expected):
@@ -519,7 +530,8 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_datediff_test_df(), expected_df_2()
+            d.create_datediff_test_df(),
+            expected_df_2(),
         ),
     )
     def test_expected_output_units_M(self, df, expected):
@@ -548,7 +560,8 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_datediff_test_df(), expected_df_3()
+            d.create_datediff_test_df(),
+            expected_df_3(),
         ),
     )
     def test_expected_output_units_D(self, df, expected):
@@ -577,7 +590,8 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_datediff_test_df(), expected_df_4()
+            d.create_datediff_test_df(),
+            expected_df_4(),
         ),
     )
     def test_expected_output_units_h(self, df, expected):
@@ -606,7 +620,8 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_datediff_test_df(), expected_df_5()
+            d.create_datediff_test_df(),
+            expected_df_5(),
         ),
     )
     def test_expected_output_units_m(self, df, expected):
@@ -635,7 +650,8 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_datediff_test_df(), expected_df_6()
+            d.create_datediff_test_df(),
+            expected_df_6(),
         ),
     )
     def test_expected_output_units_s(self, df, expected):
@@ -664,7 +680,8 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_datediff_test_nulls_df(), expected_df_7()
+            d.create_datediff_test_nulls_df(),
+            expected_df_7(),
         ),
     )
     def test_expected_output_nulls(self, df, expected):

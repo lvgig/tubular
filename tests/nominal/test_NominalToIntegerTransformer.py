@@ -25,11 +25,15 @@ class TestInit:
         ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
         ta.classes.test_object_method(
-            obj=x, expected_method="inverse_transform", msg="inverse_transform"
+            obj=x,
+            expected_method="inverse_transform",
+            msg="inverse_transform",
         )
 
     def test_inheritance(self):
@@ -122,7 +126,7 @@ class TestFit:
         expected_pos_args = (x, d.create_df_1(), None)
 
         assert len(expected_pos_args) == len(
-            call_pos_args
+            call_pos_args,
         ), "unexpected # positional args in BaseTransformer.fit call"
 
         assert (
@@ -149,7 +153,7 @@ class TestFit:
                 "mappings": {
                     "a": {k: i for i, k in enumerate(df["a"].unique(), 1)},
                     "b": {k: i for i, k in enumerate(df["b"].unique(), 1)},
-                }
+                },
             },
             msg="mappings attribute",
         )
@@ -187,7 +191,7 @@ class TestTransform:
     def expected_df_1():
         """Expected output for test_expected_output."""
         df = pd.DataFrame(
-            {"a": [1, 2, 3, 4, 5, 6], "b": ["a", "b", "c", "d", "e", "f"]}
+            {"a": [1, 2, 3, 4, 5, 6], "b": ["a", "b", "c", "d", "e", "f"]},
         )
 
         df["a"] = df["a"].replace({k: i for i, k in enumerate(df["a"].unique())})
@@ -199,7 +203,8 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
         ta.functions.test_function_arguments(
-            func=NominalToIntegerTransformer.transform, expected_arguments=["self", "X"]
+            func=NominalToIntegerTransformer.transform,
+            expected_arguments=["self", "X"],
         )
 
     def test_check_is_fitted_called(self, mocker):
@@ -213,7 +218,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (["mappings"],), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "check_is_fitted",
+            expected_call_args,
         ):
             x.transform(df)
 
@@ -316,7 +324,10 @@ class TestInverseTransform:
         expected_call_args = {0: {"args": (["mappings"],), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "check_is_fitted",
+            expected_call_args,
         ):
             x.inverse_transform(df_transformed)
 

@@ -31,17 +31,23 @@ class TestInit:
     def test_class_methods(self):
         """Test that DataFrameMethodTransformer has transform method."""
         x = DataFrameMethodTransformer(
-            new_column_name="a", pd_method_name="sum", columns=["b", "c"]
+            new_column_name="a",
+            pd_method_name="sum",
+            columns=["b", "c"],
         )
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
         """Test that DataFrameMethodTransformer inherits from BaseTransformer."""
         x = DataFrameMethodTransformer(
-            new_column_name="a", pd_method_name="sum", columns=["b", "c"]
+            new_column_name="a",
+            pd_method_name="sum",
+            columns=["b", "c"],
         )
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
@@ -52,11 +58,14 @@ class TestInit:
             0: {
                 "args": (),
                 "kwargs": {"columns": ["b", "c"], "verbose": True, "copy": False},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             DataFrameMethodTransformer(
                 new_column_name="a",
@@ -73,7 +82,9 @@ class TestInit:
             match=r"DataFrameMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_name, expecting str",
         ):
             DataFrameMethodTransformer(
-                new_column_name="a", pd_method_name=1, columns=["b", "c"]
+                new_column_name="a",
+                pd_method_name=1,
+                columns=["b", "c"],
             )
 
         with pytest.raises(
@@ -81,7 +92,9 @@ class TestInit:
             match=r"DataFrameMethodTransformer: unexpected type \(\<class 'float'\>\) for new_column_name, must be str or list of strings",
         ):
             DataFrameMethodTransformer(
-                new_column_name=1.0, pd_method_name="sum", columns=["b", "c"]
+                new_column_name=1.0,
+                pd_method_name="sum",
+                columns=["b", "c"],
             )
 
         with pytest.raises(
@@ -89,7 +102,9 @@ class TestInit:
             match=r"DataFrameMethodTransformer: if new_column_name is a list, all elements must be strings but got \<class 'float'\> in position 1",
         ):
             DataFrameMethodTransformer(
-                new_column_name=["a", 1.0], pd_method_name="sum", columns=["b", "c"]
+                new_column_name=["a", 1.0],
+                pd_method_name="sum",
+                columns=["b", "c"],
             )
 
         with pytest.raises(
@@ -132,7 +147,9 @@ class TestInit:
             match="""DataFrameMethodTransformer: error accessing "b" method on pd.DataFrame object - pd_method_name should be a pd.DataFrame method""",
         ):
             DataFrameMethodTransformer(
-                new_column_name="a", pd_method_name="b", columns=["b", "c"]
+                new_column_name="a",
+                pd_method_name="b",
+                columns=["b", "c"],
             )
 
     def test_attributes_set(self):
@@ -158,7 +175,7 @@ class TestInit:
         with pytest.raises(
             TypeError,
             match=re.escape(
-                "__init__() got an unexpected keyword argument 'unexpected_kwarg'"
+                "__init__() got an unexpected keyword argument 'unexpected_kwarg'",
             ),
         ):
             DataFrameMethodTransformer(
@@ -181,7 +198,7 @@ class TestTransform:
                 "b": [1, 2, 3, np.NaN, 7, 8, 9],
                 "c": [np.NaN, 1, 2, 3, -4, -5, -6],
                 "d": [1.0, 3.0, 5.0, 3.0, 3.0, 3.0, 3.0],
-            }
+            },
         )
 
         return df
@@ -195,7 +212,7 @@ class TestTransform:
                 "c": [np.NaN, 1, 2, 3, -4, -5, -6],
                 "d": [0.5, 1.0, 1.5, np.NaN, 3.5, 4.0, 4.5],
                 "e": [np.NaN, 0.5, 1.0, 1.5, -2.0, -2.5, -3.0],
-            }
+            },
         )
 
         return df
@@ -203,7 +220,8 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
         ta.functions.test_function_arguments(
-            func=DataFrameMethodTransformer.transform, expected_arguments=["self", "X"]
+            func=DataFrameMethodTransformer.transform,
+            expected_arguments=["self", "X"],
         )
 
     def test_super_transform_called(self, mocker):
@@ -211,13 +229,18 @@ class TestTransform:
         df = d.create_df_3()
 
         x = DataFrameMethodTransformer(
-            new_column_name="d", pd_method_name="sum", columns=["b", "c"]
+            new_column_name="d",
+            pd_method_name="sum",
+            columns=["b", "c"],
         )
 
         expected_call_args = {0: {"args": (df.copy(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "transform", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "transform",
+            expected_call_args,
         ):
             x.transform(df)
 
@@ -275,7 +298,13 @@ class TestTransform:
         ],
     )
     def test_pandas_method_called(
-        self, mocker, df, new_column_name, pd_method_name, columns, pd_method_kwargs
+        self,
+        mocker,
+        df,
+        new_column_name,
+        pd_method_name,
+        columns,
+        pd_method_kwargs,
     ):
         """Test that the pandas method is called as expected (with kwargs passed) during transform."""
         spy = mocker.spy(pd.DataFrame, pd_method_name)

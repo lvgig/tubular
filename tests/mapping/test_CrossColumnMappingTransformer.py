@@ -25,7 +25,9 @@ class TestInit:
         x = CrossColumnMappingTransformer(mappings={"a": {"a": 1}}, adjust_column="b")
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
@@ -40,7 +42,7 @@ class TestInit:
             0: {
                 "args": (),
                 "kwargs": {"mappings": {"a": {"a": 1}}, "verbose": True, "copy": True},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
@@ -50,7 +52,10 @@ class TestInit:
             expected_call_args,
         ):
             CrossColumnMappingTransformer(
-                mappings={"a": {"a": 1}}, adjust_column="b", verbose=True, copy=True
+                mappings={"a": {"a": 1}},
+                adjust_column="b",
+                verbose=True,
+                copy=True,
             )
 
     def test_adjust_columns_non_string_error(self):
@@ -68,7 +73,8 @@ class TestInit:
             match="CrossColumnMappingTransformer: mappings should be an ordered dict for 'replace' mappings using multiple columns",
         ):
             CrossColumnMappingTransformer(
-                mappings={"a": {"a": 1}, "b": {"b": 2}}, adjust_column="c"
+                mappings={"a": {"a": 1}, "b": {"b": 2}},
+                adjust_column="c",
             )
 
     def test_adjust_column_set_to_attribute(self):
@@ -90,7 +96,7 @@ class TestTransform:
     def expected_df_1():
         """Expected output for test_expected_output."""
         df = pd.DataFrame(
-            {"a": [1, 2, 3, 4, 5, 6], "b": ["aa", "bb", "cc", "dd", "ee", "ff"]}
+            {"a": [1, 2, 3, 4, 5, 6], "b": ["aa", "bb", "cc", "dd", "ee", "ff"]},
         )
 
         return df
@@ -98,7 +104,7 @@ class TestTransform:
     def expected_df_2():
         """Expected output for test_non_specified_values_unchanged."""
         df = pd.DataFrame(
-            {"a": [1, 2, 3, 4, 5, 6], "b": ["aa", "bb", "cc", "d", "e", "f"]}
+            {"a": [1, 2, 3, 4, 5, 6], "b": ["aa", "bb", "cc", "d", "e", "f"]},
         )
 
         return df
@@ -110,7 +116,7 @@ class TestTransform:
                 "a": [4, 2, 2, 1, 3],
                 "b": ["x", "z", "y", "x", "x"],
                 "c": ["cc", "dd", "bb", "cc", "cc"],
-            }
+            },
         )
 
         return df
@@ -134,7 +140,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (["adjust_column"],), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "check_is_fitted",
+            expected_call_args,
         ):
             x.transform(df)
 
@@ -166,7 +175,8 @@ class TestTransform:
         x = CrossColumnMappingTransformer(mappings=mapping, adjust_column="c")
 
         with pytest.raises(
-            ValueError, match="CrossColumnMappingTransformer: variable c is not in X"
+            ValueError,
+            match="CrossColumnMappingTransformer: variable c is not in X",
         ):
             x.transform(df)
 

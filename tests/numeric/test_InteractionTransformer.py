@@ -31,7 +31,9 @@ class TestInit:
         x = InteractionTransformer(columns=["a", "b"])
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
@@ -46,11 +48,14 @@ class TestInit:
             0: {
                 "args": (),
                 "kwargs": {"columns": ["b", "c"], "verbose": True, "copy": False},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             try:
                 InteractionTransformer(
@@ -68,7 +73,7 @@ class TestInit:
         with pytest.raises(
             TypeError,
             match=re.escape(
-                "InteractionTransformer: columns must be a string or list with the columns to be pre-processed (if specified)"
+                "InteractionTransformer: columns must be a string or list with the columns to be pre-processed (if specified)",
             ),
         ):
             InteractionTransformer(
@@ -80,7 +85,7 @@ class TestInit:
         with pytest.raises(
             TypeError,
             match=re.escape(
-                "InteractionTransformer: each element of columns should be a single (string) column name"
+                "InteractionTransformer: each element of columns should be a single (string) column name",
             ),
         ):
             InteractionTransformer(
@@ -196,7 +201,7 @@ class TestTransform:
                     5: -40.0,
                     6: -54.0,
                 },
-            }
+            },
         )
 
         return df
@@ -209,7 +214,7 @@ class TestTransform:
                 "b": {0: 1.0, 1: 2.0, 2: 3.0, 3: np.NaN, 4: 7.0, 5: 8.0, 6: 9.0},
                 "c": {0: np.NaN, 1: 1.0, 2: 2.0, 3: 3.0, 4: -4.0, 5: -5.0, 6: -6.0},
                 "a b": {0: 1.0, 1: 4.0, 2: 9.0, 3: np.NaN, 4: 35.0, 5: 48.0, 6: np.NaN},
-            }
+            },
         )
 
         return df
@@ -217,7 +222,8 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
         ta.functions.test_function_arguments(
-            func=InteractionTransformer.transform, expected_arguments=["self", "X"]
+            func=InteractionTransformer.transform,
+            expected_arguments=["self", "X"],
         )
 
     def test_super_transform_called(self, mocker):
@@ -229,7 +235,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (df.copy(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "transform", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "transform",
+            expected_call_args,
         ):
             x.transform(df)
 

@@ -24,7 +24,9 @@ class TestInit:
         x = CrossColumnAddTransformer(mappings={"a": {"a": 1}}, adjust_column="b")
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
@@ -39,7 +41,7 @@ class TestInit:
             0: {
                 "args": (),
                 "kwargs": {"mappings": {"a": {"a": 1}}, "verbose": True, "copy": True},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
@@ -49,7 +51,10 @@ class TestInit:
             expected_call_args,
         ):
             CrossColumnAddTransformer(
-                mappings={"a": {"a": 1}}, adjust_column="b", verbose=True, copy=True
+                mappings={"a": {"a": 1}},
+                adjust_column="b",
+                verbose=True,
+                copy=True,
             )
 
     def test_adjust_columns_non_string_error(self):
@@ -63,7 +68,8 @@ class TestInit:
     def test_mapping_values_not_numeric_error(self):
         """Test that an exception is raised if mappings values are not numeric."""
         with pytest.raises(
-            TypeError, match="CrossColumnAddTransformer: mapping values must be numeric"
+            TypeError,
+            match="CrossColumnAddTransformer: mapping values must be numeric",
         ):
             CrossColumnAddTransformer(mappings={"a": {"a": "b"}}, adjust_column="b")
 
@@ -86,7 +92,7 @@ class TestTransform:
     def expected_df_1():
         """Expected output from test_expected_output."""
         df = pd.DataFrame(
-            {"a": [2.1, 3.2, 4.3, 5.4, 6.5, 7.6], "b": ["a", "b", "c", "d", "e", "f"]}
+            {"a": [2.1, 3.2, 4.3, 5.4, 6.5, 7.6], "b": ["a", "b", "c", "d", "e", "f"]},
         )
 
         return df
@@ -94,7 +100,7 @@ class TestTransform:
     def expected_df_2():
         """Expected output from test_non_specified_values_unchanged."""
         df = pd.DataFrame(
-            {"a": [2.1, 3.2, 3, 4, 5, 6], "b": ["a", "b", "c", "d", "e", "f"]}
+            {"a": [2.1, 3.2, 3, 4, 5, 6], "b": ["a", "b", "c", "d", "e", "f"]},
         )
 
         return df
@@ -106,7 +112,7 @@ class TestTransform:
                 "a": [4.1, 5.1, 4.1, 4, 8, 10.2, 7, 8, 9, np.NaN],
                 "b": ["a", "a", "a", "d", "e", "f", "g", np.NaN, np.NaN, np.NaN],
                 "c": ["a", "a", "c", "c", "e", "e", "f", "g", "h", np.NaN],
-            }
+            },
         )
 
         df["c"] = df["c"].astype("category")
@@ -132,7 +138,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (["adjust_column"],), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "check_is_fitted",
+            expected_call_args,
         ):
             x.transform(df)
 
@@ -164,7 +173,8 @@ class TestTransform:
         x = CrossColumnAddTransformer(mappings=mapping, adjust_column="c")
 
         with pytest.raises(
-            ValueError, match="CrossColumnAddTransformer: variable c is not in X"
+            ValueError,
+            match="CrossColumnAddTransformer: variable c is not in X",
         ):
             x.transform(df)
 

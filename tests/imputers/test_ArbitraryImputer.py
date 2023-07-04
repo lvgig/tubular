@@ -22,7 +22,9 @@ class TestInit:
         x = ArbitraryImputer(impute_value=1, columns="a")
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
@@ -34,11 +36,14 @@ class TestInit:
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
-            0: {"args": (), "kwargs": {"columns": "a", "verbose": True, "copy": True}}
+            0: {"args": (), "kwargs": {"columns": "a", "verbose": True, "copy": True}},
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             ArbitraryImputer(impute_value=1, columns="a", verbose=True, copy=True)
 
@@ -77,7 +82,8 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
         ta.functions.test_function_arguments(
-            func=ArbitraryImputer.transform, expected_arguments=["self", "X"]
+            func=ArbitraryImputer.transform,
+            expected_arguments=["self", "X"],
         )
 
     def test_check_is_fitted_called(self, mocker):
@@ -89,7 +95,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (["impute_value"],), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "check_is_fitted",
+            expected_call_args,
         ):
             x.transform(df)
 
@@ -102,7 +111,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.imputers.BaseImputer, "transform", expected_call_args
+            mocker,
+            tubular.imputers.BaseImputer,
+            "transform",
+            expected_call_args,
         ):
             x.transform(df)
 
@@ -114,7 +126,9 @@ class TestTransform:
 
         # mock BaseImputer.transform so it does not run
         mocker.patch.object(
-            tubular.imputers.BaseImputer, "transform", return_value=1234
+            tubular.imputers.BaseImputer,
+            "transform",
+            return_value=1234,
         )
 
         x.transform(df)
@@ -150,7 +164,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "columns_check", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "columns_check",
+            expected_call_args,
         ):
             x.transform(df)
 

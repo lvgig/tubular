@@ -189,12 +189,12 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
 
             if len(values_to_be_mapped.intersection(values_in_df)) == 0:
                 warnings.warn(
-                    f"{self.classname()}: No values from mapping for {col} exist in dataframe."
+                    f"{self.classname()}: No values from mapping for {col} exist in dataframe.",
                 )
 
             if len(values_to_be_mapped.difference(values_in_df)) > 0:
                 warnings.warn(
-                    f"{self.classname()}: There are values in the mapping for {col} that are not present in the dataframe"
+                    f"{self.classname()}: There are values in the mapping for {col} that are not present in the dataframe",
                 )
 
         X = BaseMappingTransformMixin.transform(self, X)
@@ -215,7 +215,7 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
                         and is_categorical_dtype(mapped_dtypes[col])
                     ):
                         warnings.warn(
-                            f"{self.classname()}: This mapping changes {col} dtype from {original_dtypes[col]} to {mapped_dtypes[col]}. This is often caused by having multiple dtypes in one column, or by not mapping all values."
+                            f"{self.classname()}: This mapping changes {col} dtype from {original_dtypes[col]} to {mapped_dtypes[col]}. This is often caused by having multiple dtypes in one column, or by not mapping all values.",
                         )
 
         return X
@@ -292,7 +292,9 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
         for i in self.columns:
             for j in self.mappings[i].keys():
                 X[self.adjust_column] = np.where(
-                    (X[i] == j), self.mappings[i][j], X[self.adjust_column]
+                    (X[i] == j),
+                    self.mappings[i][j],
+                    X[self.adjust_column],
                 )
 
         return X
@@ -449,14 +451,14 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
 
         if self.adjust_column not in X.columns.values:
             raise ValueError(
-                f"{self.classname()}: variable " + self.adjust_column + " is not in X"
+                f"{self.classname()}: variable " + self.adjust_column + " is not in X",
             )
 
         if not pd.api.types.is_numeric_dtype(X[self.adjust_column]):
             raise TypeError(
                 f"{self.classname()}: variable "
                 + self.adjust_column
-                + " must have numeric dtype."
+                + " must have numeric dtype.",
             )
 
         for i in self.columns:

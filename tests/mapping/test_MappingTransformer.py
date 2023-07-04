@@ -23,7 +23,9 @@ class TestInit:
         x = MappingTransformer(mappings={"a": {"a": 1}})
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
@@ -102,7 +104,7 @@ class TestTransform:
     def expected_df_1():
         """Expected output for test_expected_output."""
         df = pd.DataFrame(
-            {"a": ["a", "b", "c", "d", "e", "f"], "b": [1, 2, 3, 4, 5, 6]}
+            {"a": ["a", "b", "c", "d", "e", "f"], "b": [1, 2, 3, 4, 5, 6]},
         )
 
         return df
@@ -110,7 +112,7 @@ class TestTransform:
     def expected_df_2():
         """Expected output for test_non_specified_values_unchanged."""
         df = pd.DataFrame(
-            {"a": [5, 6, 7, 4, 5, 6], "b": ["z", "y", "x", "d", "e", "f"]}
+            {"a": [5, 6, 7, 4, 5, 6], "b": ["z", "y", "x", "d", "e", "f"]},
         )
 
         return df
@@ -242,7 +244,10 @@ class TestTransform:
         ],
     )
     def test_expected_dtype_conversions(
-        self, mapping, input_col_name, output_col_type_check
+        self,
+        mapping,
+        input_col_name,
+        output_col_type_check,
     ):
         df = d.create_df_1()
         x = MappingTransformer(mappings=mapping)
@@ -257,7 +262,10 @@ class TestTransform:
         ],
     )
     def test_unexpected_dtype_change_warning_raised(
-        self, mapping, input_col_name, input_col_type
+        self,
+        mapping,
+        input_col_name,
+        input_col_type,
     ):
         df = d.create_df_1()
         print(df["a"])
@@ -277,7 +285,10 @@ class TestTransform:
         ],
     )
     def test_unexpected_dtype_change_warning_suppressed(
-        self, mapping, input_col_name, input_col_type
+        self,
+        mapping,
+        input_col_name,
+        input_col_type,
     ):
         df = d.create_df_1()
 

@@ -16,7 +16,9 @@ class TestInit:
         x = BaseImputer()
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
@@ -36,7 +38,7 @@ class TestTransform:
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
                 "b": ["a", "b", "c", "d", "e", "f", np.NaN],
                 "c": ["a", "b", "c", "d", "e", "f", np.NaN],
-            }
+            },
         )
 
         df["c"] = df["c"].astype("category")
@@ -50,7 +52,7 @@ class TestTransform:
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],
                 "b": ["a", "b", "c", "d", "e", "f", "g"],
                 "c": ["a", "b", "c", "d", "e", "f", np.NaN],
-            }
+            },
         )
 
         df2["c"] = df2["c"].astype("category")
@@ -64,7 +66,7 @@ class TestTransform:
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],
                 "b": ["a", "b", "c", "d", "e", "f", "g"],
                 "c": ["a", "b", "c", "d", "e", "f", "f"],
-            }
+            },
         )
 
         df3["c"] = df3["c"].astype("category")
@@ -74,7 +76,8 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
         ta.functions.test_function_arguments(
-            func=BaseImputer.transform, expected_arguments=["self", "X"]
+            func=BaseImputer.transform,
+            expected_arguments=["self", "X"],
         )
 
     @pytest.mark.parametrize(
@@ -141,7 +144,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (["impute_values_"],), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "check_is_fitted",
+            expected_call_args,
         ):
             x.transform(df)
 
@@ -156,6 +162,9 @@ class TestTransform:
         expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "transform", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "transform",
+            expected_call_args,
         ):
             x.transform(df)

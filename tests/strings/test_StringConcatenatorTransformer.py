@@ -27,8 +27,7 @@ class TestStringConcatenator:
 
     def test_assert_inheritance(self, concatenate_str):
         """Test StringConcatenator inherits from BaseTransformer."""
-        ta.classes.assert_inheritance(concatenate_str, tubular.base.BaseTransformer),
-        "StringConcatenator is not instance of tubular.base.BaseTransformer"
+        ta.classes.assert_inheritance(concatenate_str, tubular.base.BaseTransformer)
 
     def test_super_init_call(self, mocker):
         """Test that BaseTransformer.init us called as expected."""
@@ -36,11 +35,14 @@ class TestStringConcatenator:
             0: {
                 "args": (),
                 "kwargs": {"columns": ["a", "b"], "copy": True},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             StringConcatenator(columns=["a", "b"], new_column="merged_column")
 
@@ -68,10 +70,13 @@ class TestStringConcatenator:
         df = d.create_df_1()
 
         with pytest.raises(
-            TypeError, match="StringConcatenator: The separator should be a str"
+            TypeError,
+            match="StringConcatenator: The separator should be a str",
         ):
             x = StringConcatenator(
-                columns=["a", "b"], new_column="new_column", separator=separator
+                columns=["a", "b"],
+                new_column="new_column",
+                separator=separator,
             )
             x.transform(df)
 
@@ -94,7 +99,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (d.create_df_7(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "transform", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "transform",
+            expected_call_args,
         ):
             concatenate_str.transform(df)
 
@@ -118,7 +126,9 @@ class TestTransform:
         df = d.create_df_1()
 
         x = StringConcatenator(
-            columns=["a", "b"], new_column="merged_values", separator=":"
+            columns=["a", "b"],
+            new_column="merged_values",
+            separator=":",
         )
         df_transformed = x.transform(df)
 

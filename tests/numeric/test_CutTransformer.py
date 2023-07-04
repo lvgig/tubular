@@ -26,7 +26,9 @@ class TestInit:
         x = CutTransformer(column="a", new_column_name="b")
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
@@ -41,11 +43,14 @@ class TestInit:
             0: {
                 "args": (),
                 "kwargs": {"columns": ["a"], "copy": True, "verbose": False},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             CutTransformer(column="a", new_column_name="b", verbose=False, copy=True)
 
@@ -54,7 +59,7 @@ class TestInit:
         with pytest.raises(
             TypeError,
             match=re.escape(
-                "CutTransformer: column arg (name of column) should be a single str giving the column to discretise"
+                "CutTransformer: column arg (name of column) should be a single str giving the column to discretise",
             ),
         ):
             CutTransformer(
@@ -65,7 +70,8 @@ class TestInit:
     def test_new_column_name_type_error(self):
         """Test that an exception is raised if new_column_name is not a str."""
         with pytest.raises(
-            TypeError, match="CutTransformer: new_column_name must be a str"
+            TypeError,
+            match="CutTransformer: new_column_name must be a str",
         ):
             CutTransformer(column="b", new_column_name=1)
 
@@ -127,7 +133,8 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
         ta.functions.test_function_arguments(
-            func=CutTransformer.transform, expected_arguments=["self", "X"]
+            func=CutTransformer.transform,
+            expected_arguments=["self", "X"],
         )
 
     def test_super_transform_call(self, mocker):
@@ -161,11 +168,15 @@ class TestTransform:
             0: {
                 "args": (d.create_df_9()["a"],),
                 "kwargs": {"bins": 3, "right": False, "precision": 2},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, pandas, "cut", expected_call_args, return_value=[1, 2, 3, 4, 5, 6]
+            mocker,
+            pandas,
+            "cut",
+            expected_call_args,
+            return_value=[1, 2, 3, 4, 5, 6],
         ):
             x.transform(df)
 

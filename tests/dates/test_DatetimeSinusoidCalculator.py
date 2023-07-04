@@ -26,11 +26,14 @@ class TestDatetimeSinusoidCalculatorInit:
                 "kwargs": {
                     "copy": True,
                 },
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             DatetimeSinusoidCalculator(
                 "a",
@@ -45,7 +48,7 @@ class TestDatetimeSinusoidCalculatorInit:
         with pytest.raises(
             TypeError,
             match="method must be a string or list but got {}".format(
-                type(incorrect_type_method)
+                type(incorrect_type_method),
             ),
         ):
             DatetimeSinusoidCalculator(
@@ -61,7 +64,7 @@ class TestDatetimeSinusoidCalculatorInit:
         with pytest.raises(
             TypeError,
             match="units must be a string or dict but got {}".format(
-                type(incorrect_type_units)
+                type(incorrect_type_units),
             ),
         ):
             DatetimeSinusoidCalculator(
@@ -77,7 +80,7 @@ class TestDatetimeSinusoidCalculatorInit:
         with pytest.raises(
             TypeError,
             match="period must be an int, float or dict but got {}".format(
-                type(incorrect_type_period)
+                type(incorrect_type_period),
             ),
         ):
             DatetimeSinusoidCalculator(
@@ -140,7 +143,7 @@ class TestDatetimeSinusoidCalculatorInit:
         with pytest.raises(
             ValueError,
             match="units dictionary values must be one of 'year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond' but got {}".format(
-                set(incorrect_dict_units.values())
+                set(incorrect_dict_units.values()),
             ),
         ):
             DatetimeSinusoidCalculator(
@@ -195,7 +198,7 @@ class TestDatetimeSinusoidCalculatorInit:
         with pytest.raises(
             ValueError,
             match='Invalid method {} supplied, should be "sin", "cos" or a list containing both'.format(
-                method
+                method,
             ),
         ):
             DatetimeSinusoidCalculator(
@@ -222,8 +225,9 @@ class TestDatetimeSinusoidCalculatorInit:
             ValueError,
             match=re.escape(
                 "Invalid units {} supplied, should be in {}".format(
-                    units, valid_unit_list
-                )
+                    units,
+                    valid_unit_list,
+                ),
             ),
         ):
             DatetimeSinusoidCalculator(
@@ -260,7 +264,7 @@ class TestDatetimeSinusoidCalculatorTransform:
         not_datetime = pd.DataFrame({"a": [1, 2, 3]})
         column = "a"
         message = re.escape(
-            f"{column} should be datetime64[ns] type but got {not_datetime[column].dtype}"
+            f"{column} should be datetime64[ns] type but got {not_datetime[column].dtype}",
         )
         with pytest.raises(TypeError, match=message):
             x = DatetimeSinusoidCalculator(

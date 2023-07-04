@@ -191,7 +191,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
             if (X.shape[0] - mappable_rows) > 0:
                 raise ValueError(
                     f"{self.classname()}: nulls introduced from levels not present in mapping for column: "
-                    + c
+                    + c,
                 )
 
         return X
@@ -338,7 +338,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                 col_percents = X[c].value_counts(dropna=False) / X.shape[0]
 
                 self.mapping_[c] = list(
-                    col_percents.loc[col_percents >= self.cut_off_percent].index.values
+                    col_percents.loc[col_percents >= self.cut_off_percent].index.values,
                 )
 
                 self.mapping_[c] = sorted(self.mapping_[c], key=str)
@@ -347,11 +347,12 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                     self.rare_levels_record_[c] = list(
                         col_percents.loc[
                             col_percents < self.cut_off_percent
-                        ].index.values
+                        ].index.values,
                     )
 
                     self.rare_levels_record_[c] = sorted(
-                        self.rare_levels_record_[c], key=str
+                        self.rare_levels_record_[c],
+                        key=str,
                     )
 
         else:
@@ -368,7 +369,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                 self.mapping_[c] = list(
                     cols_w_percents.loc[
                         cols_w_percents >= self.cut_off_percent
-                    ].index.values
+                    ].index.values,
                 )
 
                 self.mapping_[c] = sorted(self.mapping_[c], key=str)
@@ -377,11 +378,12 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                     self.rare_levels_record_[c] = list(
                         cols_w_percents.loc[
                             cols_w_percents < self.cut_off_percent
-                        ].index.values
+                        ].index.values,
                     )
 
                     self.rare_levels_record_[c] = sorted(
-                        self.rare_levels_record_[c], key=str
+                        self.rare_levels_record_[c],
+                        key=str,
                     )
 
         return self
@@ -415,7 +417,9 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
                 X[c] = pd.Series(
                     data=np.where(
-                        X[c].isin(self.mapping_[c]), X[c], self.rare_level_name
+                        X[c].isin(self.mapping_[c]),
+                        X[c],
+                        self.rare_level_name,
                     ),
                     index=X.index,
                 ).astype(dtype_before)
@@ -616,7 +620,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         else:
             X_y["weighted_response"] = X_y[response_column].multiply(
-                X_y[self.weights_column]
+                X_y[self.weights_column],
             )
 
             self.global_mean = (
@@ -630,7 +634,8 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                 group_counts = X_y.groupby(c)[response_column].size()
 
                 self.mappings[c] = self._prior_regularisation(
-                    group_means, group_counts
+                    group_means,
+                    group_counts,
                 ).to_dict()
 
             else:
@@ -643,7 +648,8 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                 group_means = groupby_sum["weighted_response"] / group_weight
 
                 self.mappings[c] = self._prior_regularisation(
-                    group_means, group_weight
+                    group_means,
+                    group_weight,
                 ).to_dict()
 
     def fit(self, X, y):
@@ -700,7 +706,9 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                 y_temp = y.apply(lambda x: x == level if not pd.isnull(x) else np.nan)
 
                 self.transformer_dict[level] = self._fit_binary_response(
-                    X_temp, y_temp, mapping_columns_for_this_level
+                    X_temp,
+                    y_temp,
+                    mapping_columns_for_this_level,
                 )
 
                 mapped_columns += mapping_columns_for_this_level
@@ -877,7 +885,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
                     X_y.groupby([c])[response_column]
                     .mean()
                     .sort_values(ascending=True, kind="mergesort")
-                    .index
+                    .index,
                 )
 
                 # create a dictionary whose keys are the levels of the categorical variable
@@ -898,7 +906,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
                 _idx_target_mean = list(
                     (groupby_sum[response_column] / groupby_sum[self.weights_column])
                     .sort_values(ascending=True, kind="mergesort")
-                    .index
+                    .index,
                 )
 
                 # create a dictionary whose keys are the levels of the categorical variable
@@ -984,7 +992,10 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         **kwargs,
     ):
         BaseNominalTransformer.__init__(
-            self, columns=columns, copy=copy, verbose=verbose
+            self,
+            columns=columns,
+            copy=copy,
+            verbose=verbose,
         )
 
         # Set attributes for scikit-learn'S OneHotEncoder
@@ -1014,7 +1025,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
             if X[c].isnull().sum() > 0:
                 raise ValueError(
                     f"{self.classname()}: column %s has nulls - replace before proceeding"
-                    % c
+                    % c,
                 )
 
         # Check each field has less than 100 categories/levels
@@ -1024,7 +1035,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
             if len(levels) > 100:
                 raise ValueError(
                     f"{self.classname()}: column %s has over 100 unique values - consider another type of encoding"
-                    % c
+                    % c,
                 )
 
         OneHotEncoder.fit(self, X=X[self.columns], y=y)
@@ -1047,12 +1058,14 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         """
         if hasattr(self, "get_feature_names"):
             input_columns = self.get_feature_names(
-                input_features=input_features, **kwargs
+                input_features=input_features,
+                **kwargs,
             )
 
         elif hasattr(self, "get_feature_names_out"):
             input_columns = self.get_feature_names_out(
-                input_features=input_features, **kwargs
+                input_features=input_features,
+                **kwargs,
             )
 
         else:
@@ -1087,7 +1100,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
             if X[c].isnull().sum() > 0:
                 raise ValueError(
                     f"{self.classname()}: column %s has nulls - replace before proceeding"
-                    % c
+                    % c,
                 )
 
         X = BaseNominalTransformer.transform(self, X)
@@ -1098,7 +1111,9 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         input_columns = self._get_feature_names(input_features=self.columns)
 
         X_transformed = pd.DataFrame(
-            X_transformed, columns=input_columns, index=X.index
+            X_transformed,
+            columns=input_columns,
+            index=X.index,
         )
 
         # Rename dummy fields if separator is specified
@@ -1115,7 +1130,8 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
             ]
 
             X_transformed.rename(
-                columns={i: j for i, j in zip(old_names, new_names)}, inplace=True
+                columns={i: j for i, j in zip(old_names, new_names)},
+                inplace=True,
             )
 
         # Print warning for unseen levels
@@ -1126,7 +1142,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
                 if len(unseen_levels) > 0:
                     warnings.warn(
                         f"{self.classname()}: column %s has unseen categories: %s"
-                        % (c, unseen_levels)
+                        % (c, unseen_levels),
                     )
 
         # Drop original columns

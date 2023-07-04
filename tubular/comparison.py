@@ -23,7 +23,11 @@ class EqualityChecker(BaseTransformer):
     """
 
     def __init__(
-        self, columns: list, new_col_name: str, drop_original: bool = False, **kwargs
+        self,
+        columns: list,
+        new_col_name: str,
+        drop_original: bool = False,
+        **kwargs,
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 

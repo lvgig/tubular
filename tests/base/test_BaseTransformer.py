@@ -74,15 +74,21 @@ class TestInit:
         ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
         ta.classes.test_object_method(
-            obj=x, expected_method="columns_set_or_check", msg="columns_set_or_check"
+            obj=x,
+            expected_method="columns_set_or_check",
+            msg="columns_set_or_check",
         )
 
         ta.classes.test_object_method(
-            obj=x, expected_method="columns_check", msg="columns_check"
+            obj=x,
+            expected_method="columns_check",
+            msg="columns_check",
         )
 
     def test_verbose_non_bool_error(self):
@@ -105,7 +111,7 @@ class TestInit:
         with pytest.raises(
             TypeError,
             match=re.escape(
-                "BaseTransformer: each element of columns should be a single (string) column name"
+                "BaseTransformer: each element of columns should be a single (string) column name",
             ),
         ):
             BaseTransformer(columns=[[], "a"])
@@ -115,7 +121,7 @@ class TestInit:
         with pytest.raises(
             TypeError,
             match=re.escape(
-                "BaseTransformer: columns must be a string or list with the columns to be pre-processed (if specified)"
+                "BaseTransformer: columns must be a string or list with the columns to be pre-processed (if specified)",
             ),
         ):
             BaseTransformer(columns=1)
@@ -147,7 +153,8 @@ class TestFit:
         x = BaseTransformer(columns="a")
 
         with pytest.raises(
-            TypeError, match="BaseTransformer: X should be a pd.DataFrame"
+            TypeError,
+            match="BaseTransformer: X should be a pd.DataFrame",
         ):
             x.fit("a")
 
@@ -186,7 +193,8 @@ class TestFit:
         df = pd.DataFrame(columns=["a"])
 
         with pytest.raises(
-            ValueError, match=re.escape("BaseTransformer: X has no rows; (0, 1)")
+            ValueError,
+            match=re.escape("BaseTransformer: X has no rows; (0, 1)"),
         ):
             x.fit(X=df)
 
@@ -197,7 +205,8 @@ class TestFit:
         df = pd.DataFrame({"a": 1}, index=[0])
 
         with pytest.raises(
-            ValueError, match=re.escape("BaseTransformer: y is empty; (0,)")
+            ValueError,
+            match=re.escape("BaseTransformer: y is empty; (0,)"),
         ):
             x.fit(X=df, y=pd.Series(name="b", dtype=object))
 
@@ -205,7 +214,7 @@ class TestFit:
         with pytest.raises(
             TypeError,
             match=re.escape(
-                "__init__() got an unexpected keyword argument 'unexpected_kwarg'"
+                "__init__() got an unexpected keyword argument 'unexpected_kwarg'",
             ),
         ):
             BaseTransformer(columns="a", unexpected_kwarg="spanish inquisition")
@@ -217,7 +226,8 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
         ta.functions.test_function_arguments(
-            func=BaseTransformer.transform, expected_arguments=["self", "X"]
+            func=BaseTransformer.transform,
+            expected_arguments=["self", "X"],
         )
 
     def test_columns_check_called(self, mocker):
@@ -229,7 +239,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (df,), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "columns_check", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "columns_check",
+            expected_call_args,
         ):
             x.transform(X=df)
 
@@ -238,7 +251,8 @@ class TestTransform:
         x = BaseTransformer(columns="a")
 
         with pytest.raises(
-            TypeError, match="BaseTransformer: X should be a pd.DataFrame"
+            TypeError,
+            match="BaseTransformer: X should be a pd.DataFrame",
         ):
             x.transform(X=[1, 2, 3, 4, 5, 6])
 
@@ -251,7 +265,11 @@ class TestTransform:
         expected_call_args = {0: {"args": (), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, pd.DataFrame, "copy", expected_call_args, return_value=df
+            mocker,
+            pd.DataFrame,
+            "copy",
+            expected_call_args,
+            return_value=df,
         ):
             x.transform(X=df)
 
@@ -262,7 +280,8 @@ class TestTransform:
         df = pd.DataFrame(columns=["a"])
 
         with pytest.raises(
-            ValueError, match=re.escape("BaseTransformer: X has no rows; (0, 1)")
+            ValueError,
+            match=re.escape("BaseTransformer: X has no rows; (0, 1)"),
         ):
             x.transform(df)
 
@@ -289,7 +308,8 @@ class TestColumnsCheck:
     def test_arguments(self):
         """Test that columns_check has expected arguments."""
         ta.functions.test_function_arguments(
-            func=BaseTransformer.columns_check, expected_arguments=["self", "X"]
+            func=BaseTransformer.columns_check,
+            expected_arguments=["self", "X"],
         )
 
     def test_non_pd_df_error(self):
@@ -297,7 +317,8 @@ class TestColumnsCheck:
         x = BaseTransformer(columns="a")
 
         with pytest.raises(
-            TypeError, match="BaseTransformer: X should be a pd.DataFrame"
+            TypeError,
+            match="BaseTransformer: X should be a pd.DataFrame",
         ):
             x.columns_check(X=[1, 2, 3, 4, 5, 6])
 
@@ -321,7 +342,8 @@ class TestColumnsCheck:
         x.columns = "a"
 
         with pytest.raises(
-            TypeError, match="BaseTransformer: self.columns should be a list"
+            TypeError,
+            match="BaseTransformer: self.columns should be a list",
         ):
             x.columns_check(X=df)
 
@@ -341,7 +363,8 @@ class TestColumnsSetOrCheck:
     def test_arguments(self):
         """Test that columns_set_or_check has expected arguments."""
         ta.functions.test_function_arguments(
-            func=BaseTransformer.columns_set_or_check, expected_arguments=["self", "X"]
+            func=BaseTransformer.columns_set_or_check,
+            expected_arguments=["self", "X"],
         )
 
     def test_non_pd_df_error(self):
@@ -349,7 +372,8 @@ class TestColumnsSetOrCheck:
         x = BaseTransformer(columns="a")
 
         with pytest.raises(
-            TypeError, match="BaseTransformer: X should be a pd.DataFrame"
+            TypeError,
+            match="BaseTransformer: X should be a pd.DataFrame",
         ):
             x.columns_set_or_check(X=[1, 2, 3, 4, 5, 6])
 
@@ -413,7 +437,8 @@ class TestCombineXy:
     def test_arguments(self):
         """Test that columns_check has expected arguments."""
         ta.functions.test_function_arguments(
-            func=BaseTransformer._combine_X_y, expected_arguments=["self", "X", "y"]
+            func=BaseTransformer._combine_X_y,
+            expected_arguments=["self", "X", "y"],
         )
 
     def test_X_not_DataFrame_error(self):
@@ -421,7 +446,8 @@ class TestCombineXy:
         x = BaseTransformer(columns=["a"])
 
         with pytest.raises(
-            TypeError, match="BaseTransformer: X should be a pd.DataFrame"
+            TypeError,
+            match="BaseTransformer: X should be a pd.DataFrame",
         ):
             x._combine_X_y(X=1, y=pd.Series([1, 2]))
 
@@ -439,7 +465,7 @@ class TestCombineXy:
         with pytest.raises(
             ValueError,
             match=re.escape(
-                "BaseTransformer: X and y have different numbers of rows (2 vs 1)"
+                "BaseTransformer: X and y have different numbers of rows (2 vs 1)",
             ),
         ):
             x._combine_X_y(X=pd.DataFrame({"a": [1, 2]}), y=pd.Series([2]))
@@ -449,14 +475,17 @@ class TestCombineXy:
         x = BaseTransformer(columns=["a"])
 
         with pytest.warns(
-            UserWarning, match="BaseTransformer: X and y do not have equal indexes"
+            UserWarning,
+            match="BaseTransformer: X and y do not have equal indexes",
         ):
             result = x._combine_X_y(
-                X=pd.DataFrame({"a": [1, 2]}, index=[1, 2]), y=pd.Series([2, 4])
+                X=pd.DataFrame({"a": [1, 2]}, index=[1, 2]),
+                y=pd.Series([2, 4]),
             )
 
         expected_output = pd.DataFrame(
-            {"a": [1, 2], "_temporary_response": [2, 4]}, index=[1, 2]
+            {"a": [1, 2], "_temporary_response": [2, 4]},
+            index=[1, 2],
         )
 
         pd.testing.assert_frame_equal(result, expected_output)
@@ -471,7 +500,8 @@ class TestCombineXy:
         )
 
         expected_output = pd.DataFrame(
-            {"a": [1, 2], "_temporary_response": [2, 4]}, index=[1, 2]
+            {"a": [1, 2], "_temporary_response": [2, 4]},
+            index=[1, 2],
         )
 
         pd.testing.assert_frame_equal(result, expected_output)
@@ -492,7 +522,8 @@ class TestCheckWeightsColumn:
         X = pd.DataFrame({"a": [1, 2], "b": [3, 4]})
 
         with pytest.raises(
-            ValueError, match=r"weight col \(c\) is not present in columns of data"
+            ValueError,
+            match=r"weight col \(c\) is not present in columns of data",
         ):
             BaseTransformer.check_weights_column(X, "c")
 

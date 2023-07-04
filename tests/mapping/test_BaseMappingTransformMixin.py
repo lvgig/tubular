@@ -14,7 +14,9 @@ class TestInit:
         x = BaseMappingTransformMixin()
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform method"
+            obj=x,
+            expected_method="transform",
+            msg="transform method",
         )
 
     def test_inheritance(self):
@@ -43,7 +45,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (["mappings"],), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "check_is_fitted", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "check_is_fitted",
+            expected_call_args,
         ):
             x.transform(df)
 
@@ -63,7 +68,10 @@ class TestTransform:
         expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "transform", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "transform",
+            expected_call_args,
         ):
             x.transform(df)
 

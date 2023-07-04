@@ -50,7 +50,12 @@ class SeriesStrMethodTransformer(BaseTransformer):
     """
 
     def __init__(
-        self, new_column_name, pd_method_name, columns, pd_method_kwargs={}, **kwargs
+        self,
+        new_column_name,
+        pd_method_name,
+        columns,
+        pd_method_kwargs={},
+        **kwargs,
     ):
         if type(columns) is list:
             if len(columns) > 1:
@@ -111,7 +116,7 @@ class SeriesStrMethodTransformer(BaseTransformer):
         X = super().transform(X)
 
         X[self.new_column_name] = getattr(X[self.columns[0]].str, self.pd_method_name)(
-            **self.pd_method_kwargs
+            **self.pd_method_kwargs,
         )
 
         return X

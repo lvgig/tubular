@@ -27,7 +27,8 @@ class TestInit:
     def test_inheritance(self, example_transformer):
         """Test EqualityChecker inherits from BaseTransformer."""
         assert isinstance(
-            example_transformer, tubular.base.BaseTransformer
+            example_transformer,
+            tubular.base.BaseTransformer,
         ), "EqualityChecker is not instance of tubular.base.BaseTransformer"
 
     def test_super_init_call(self, mocker):
@@ -36,21 +37,29 @@ class TestInit:
             0: {
                 "args": (),
                 "kwargs": {"columns": ["a", "b"], "verbose": False, "copy": False},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             EqualityChecker(
-                columns=["a", "b"], new_col_name="d", verbose=False, copy=False
+                columns=["a", "b"],
+                new_col_name="d",
+                verbose=False,
+                copy=False,
             )
 
     def test_class_methods(self, example_transformer):
         """Test that EqualityChecker has transform method."""
         msg = "no transformation method in class"
         ta.classes.test_object_method(
-            obj=example_transformer, expected_method="transform", msg=msg
+            obj=example_transformer,
+            expected_method="transform",
+            msg=msg,
         )
 
     def test_value_new_col_name(self, example_transformer):
@@ -124,12 +133,16 @@ class TestTransform:
         expected_call_args = {0: {"args": (d.create_df_7(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "transform", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "transform",
+            expected_call_args,
         ):
             example_transformer.transform(df)
 
     @pytest.mark.parametrize(
-        "test_dataframe", [d.create_df_5(), d.create_df_2(), d.create_df_9()]
+        "test_dataframe",
+        [d.create_df_5(), d.create_df_2(), d.create_df_9()],
     )
     def test_expected_output(self, test_dataframe):
         """Tests that the output given by EqualityChecker tranformer is as you would expect
@@ -139,7 +152,8 @@ class TestTransform:
         expected["bool_logic"] = expected["b"] == expected["c"]
 
         example_transformer = EqualityChecker(
-            columns=["b", "c"], new_col_name="bool_logic"
+            columns=["b", "c"],
+            new_col_name="bool_logic",
         )
         actual = example_transformer.transform(test_dataframe)
 
@@ -151,7 +165,8 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        "test_dataframe", [d.create_df_5(), d.create_df_2(), d.create_df_9()]
+        "test_dataframe",
+        [d.create_df_5(), d.create_df_2(), d.create_df_9()],
     )
     def test_expected_output_dropped(self, test_dataframe):
         """Tests that the output given by EqualityChecker tranformer is as you would expect
@@ -162,7 +177,9 @@ class TestTransform:
         expected = expected.drop(["b", "c"], axis=1)
 
         example_transformer = EqualityChecker(
-            columns=["b", "c"], new_col_name="bool_logic", drop_original=True
+            columns=["b", "c"],
+            new_col_name="bool_logic",
+            drop_original=True,
         )
         actual = example_transformer.transform(test_dataframe)
 

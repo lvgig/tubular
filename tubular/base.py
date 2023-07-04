@@ -439,7 +439,7 @@ class DataFrameMethodTransformer(BaseTransformer):
         X = super().transform(X)
 
         X[self.new_column_name] = getattr(X[self.columns], self.pd_method_name)(
-            **self.pd_method_kwargs
+            **self.pd_method_kwargs,
         )
 
         if self.drop_original:

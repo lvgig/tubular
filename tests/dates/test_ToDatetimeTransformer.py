@@ -32,7 +32,9 @@ class TestInit:
         to_dt = ToDatetimeTransformer(column="a", new_column_name="b")
 
         ta.classes.test_object_method(
-            obj=to_dt, expected_method="transform", msg="transform"
+            obj=to_dt,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
@@ -51,14 +53,20 @@ class TestInit:
                     "copy": True,
                     "verbose": False,
                 },
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             ToDatetimeTransformer(
-                column="a", new_column_name="b", verbose=False, copy=True
+                column="a",
+                new_column_name="b",
+                verbose=False,
+                copy=True,
             )
 
     def test_column_type_error(self):
@@ -75,7 +83,8 @@ class TestInit:
     def test_new_column_name_type_error(self):
         """Test that an exception is raised if new_column_name is not a str."""
         with pytest.raises(
-            TypeError, match="ToDatetimeTransformer: new_column_name must be a str"
+            TypeError,
+            match="ToDatetimeTransformer: new_column_name must be a str",
         ):
             ToDatetimeTransformer(column="b", new_column_name=1)
 
@@ -144,7 +153,7 @@ class TestTransform:
                     datetime.datetime(1900, 5, 1),
                     pd.NaT,
                 ],
-            }
+            },
         )
 
         return df
@@ -152,7 +161,8 @@ class TestTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
         ta.functions.test_function_arguments(
-            func=ToDatetimeTransformer.transform, expected_arguments=["self", "X"]
+            func=ToDatetimeTransformer.transform,
+            expected_arguments=["self", "X"],
         )
 
     def test_super_transform_call(self, mocker):
@@ -177,14 +187,16 @@ class TestTransform:
         df = d.create_to_datetime_test_df()
 
         to_dt = ToDatetimeTransformer(
-            column="a", new_column_name="a_Y", to_datetime_kwargs={"format": "%Y"}
+            column="a",
+            new_column_name="a_Y",
+            to_datetime_kwargs={"format": "%Y"},
         )
 
         expected_call_args = {
             0: {
                 "args": (d.create_to_datetime_test_df()["a"],),
                 "kwargs": {"format": "%Y"},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
@@ -201,7 +213,9 @@ class TestTransform:
         df = d.create_to_datetime_test_df()
 
         to_dt = ToDatetimeTransformer(
-            column="a", new_column_name="a_new", to_datetime_kwargs={"format": "%Y"}
+            column="a",
+            new_column_name="a_new",
+            to_datetime_kwargs={"format": "%Y"},
         )
 
         to_datetime_output = [1, 2, 3, 4, 5, 6]
@@ -217,17 +231,22 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_to_datetime_test_df(), expected_df_1()
+            d.create_to_datetime_test_df(),
+            expected_df_1(),
         ),
     )
     def test_expected_output(self, df, expected):
         """Test input data is transformed as expected."""
         to_dt_1 = ToDatetimeTransformer(
-            column="a", new_column_name="a_Y", to_datetime_kwargs={"format": "%Y"}
+            column="a",
+            new_column_name="a_Y",
+            to_datetime_kwargs={"format": "%Y"},
         )
 
         to_dt_2 = ToDatetimeTransformer(
-            column="b", new_column_name="b_m", to_datetime_kwargs={"format": "%m"}
+            column="b",
+            new_column_name="b_m",
+            to_datetime_kwargs={"format": "%m"},
         )
 
         df_transformed = to_dt_1.transform(df)
