@@ -95,31 +95,25 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output for test_expected_output."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {"a": [1, 2, 3, 4, 5, 6], "b": ["aa", "bb", "cc", "dd", "ee", "ff"]},
         )
 
-        return df
-
     def expected_df_2():
         """Expected output for test_non_specified_values_unchanged."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {"a": [1, 2, 3, 4, 5, 6], "b": ["aa", "bb", "cc", "d", "e", "f"]},
         )
 
-        return df
-
     def expected_df_3():
         """Expected output for test_multiple_mappings_ordered_dict."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "a": [4, 2, 2, 1, 3],
                 "b": ["x", "z", "y", "x", "x"],
                 "c": ["cc", "dd", "bb", "cc", "cc"],
             },
         )
-
-        return df
 
     def test_arguments(self):
         """Test that transform has expected arguments."""

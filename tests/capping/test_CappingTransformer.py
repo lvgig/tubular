@@ -590,15 +590,13 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output from test_expected_output_min_and_max."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "a": [2, 2, 3, 4, 5, 5, np.NaN],
                 "b": [1, 2, 3, np.NaN, 7, 7, 7],
                 "c": [np.NaN, 1, 2, 3, 0, 0, 0],
             },
         )
-
-        return df
 
     def expected_df_2():
         """Expected output from test_expected_output_max."""

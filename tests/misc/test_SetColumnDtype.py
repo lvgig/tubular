@@ -107,7 +107,7 @@ class TestSetColumnDtypeTransform:
 
     def base_df():
         """Input dataframe from test_expected_output."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],
                 "b": [1.0, 2.0, 3.0, np.NaN, 7.0, 8.0, 9.0],
@@ -116,11 +116,9 @@ class TestSetColumnDtypeTransform:
             },
         )
 
-        return df
-
     def expected_df():
         """Expected output from test_expected_output."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],
                 "b": [1.0, 2.0, 3.0, np.NaN, 7.0, 8.0, 9.0],
@@ -128,8 +126,6 @@ class TestSetColumnDtypeTransform:
                 "d": [1.0, 1.0, 2.0, 3.0, -4.0, -5.0, -6.0],
             },
         )
-
-        return df
 
     @pytest.mark.parametrize(
         ("df", "expected"),

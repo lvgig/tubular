@@ -103,19 +103,15 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output for test_expected_output."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {"a": ["a", "b", "c", "d", "e", "f"], "b": [1, 2, 3, 4, 5, 6]},
         )
 
-        return df
-
     def expected_df_2():
         """Expected output for test_non_specified_values_unchanged."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {"a": [5, 6, 7, 4, 5, 6], "b": ["z", "y", "x", "d", "e", "f"]},
         )
-
-        return df
 
     def test_super_transform_call(self, mocker):
         """Test the call to BaseMappingTransformMixin.transform."""

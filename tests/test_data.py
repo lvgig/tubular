@@ -8,28 +8,22 @@ import pandas as pd
 
 def create_series_1(n=6):
     """Create simple series of [0:n-1]."""
-    df = pd.Series(np.arange(n))
-
-    return df
+    return pd.Series(np.arange(n))
 
 
 def create_1_int_column_df(n=6):
     """Create single column DataFrame of [0:n-1]."""
-    df = pd.DataFrame({"a": np.arange(n)})
-
-    return df
+    return pd.DataFrame({"a": np.arange(n)})
 
 
 def create_zeros_array(shape=(10, 3)):
     """Create simple 2d numpy array of zeros of given shape."""
-    arr = np.zeros(shape)
-
-    return arr
+    return np.zeros(shape)
 
 
 def create_numeric_df_1():
     """Example with numeric dataframe."""
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {
             "a": [34.48, 21.71, 32.83, 1.08, 32.93, 4.74, 2.76, 75.7, 14.08, 61.31],
             "b": [12.03, 20.32, 24.12, 24.18, 68.99, 0.0, 0.0, 59.46, 11.02, 60.68],
@@ -38,7 +32,6 @@ def create_numeric_df_1():
             "e": [94.3, 4.18, 51.7, 16.63, 2.6, 16.57, 3.51, 30.79, 66.19, 25.44],
         },
     )
-    return df
 
 
 def create_df_1():
@@ -50,9 +43,7 @@ def create_df_1():
     - b object a:f
     no nulls
     """
-    df = pd.DataFrame({"a": [1, 2, 3, 4, 5, 6], "b": ["a", "b", "c", "d", "e", "f"]})
-
-    return df
+    return pd.DataFrame({"a": [1, 2, 3, 4, 5, 6], "b": ["a", "b", "c", "d", "e", "f"]})
 
 
 def create_df_2():
@@ -87,15 +78,13 @@ def create_df_4():
 
 def create_df_3():
     """Create simple DataFrame to use in other tests."""
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {
             "a": [1, 2, 3, 4, 5, 6, np.NaN],
             "b": [1, 2, 3, np.NaN, 7, 8, 9],
             "c": [np.NaN, 1, 2, 3, -4, -5, -6],
         },
     )
-
-    return df
 
 
 def create_df_5():
@@ -161,7 +150,7 @@ def create_df_8():
 
 def create_df_9():
     """Create simple DataFrame to use in other tests."""
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {
             "a": [1, 2, np.nan, 4, np.nan, 6],
             "b": [np.nan, 5, 4, 3, 2, 1],
@@ -169,12 +158,10 @@ def create_df_9():
         },
     )
 
-    return df
-
 
 def create_df_10():
     """Create simple DataFrame to use in other tests."""
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {
             "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.NaN],
             "b": ["a", "a", "a", "d", "e", "f", "g", np.NaN, np.NaN, np.NaN],
@@ -182,19 +169,15 @@ def create_df_10():
         },
     )
 
-    return df
-
 
 def create_df_11():
     """Create simple DataFrame to use in other tests."""
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {
             "a": [1, 2, 3],
             "b": [4, 5, 6],
         },
     )
-
-    return df
 
 
 def create_large_null_df(n_col=1000):
@@ -216,9 +199,7 @@ def create_large_null_df(n_col=1000):
     for i in range(n_col):
         data_dict["col_" + str(i)] = np.NaN
 
-    data_df = pd.DataFrame(data_dict, index=[0])
-
-    return data_df
+    return pd.DataFrame(data_dict, index=[0])
 
 
 def create_large_half_null_df(n_col=1000):
@@ -243,9 +224,7 @@ def create_large_half_null_df(n_col=1000):
     for i in range(n_col):
         data_dict["col_" + str(i)] = col_values
 
-    data_df = pd.DataFrame(data_dict, index=[0, 1])
-
-    return data_df
+    return pd.DataFrame(data_dict, index=[0, 1])
 
 
 def create_weighted_imputers_test_df():
@@ -253,7 +232,7 @@ def create_weighted_imputers_test_df():
 
     weight column contains the weights between 0 and 1
     """
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {
             "a": [1.0, 1.0, 1.0, 3.0, 5.0, 5.0],
             "b": ["a", "a", "a", "d", "e", "e"],
@@ -263,8 +242,6 @@ def create_weighted_imputers_test_df():
             "weight": [0.1, 0.1, 0.8, 0.5, 0.9, 0.8],
         },
     )
-
-    return df
 
 
 def create_MeanResponseTransformer_test_df():
@@ -360,15 +337,13 @@ def create_NearestMeanResponseImputer_test_df():
     DataFrame column c is the response, the other columns are numerical columns containing null entries.
 
     """
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {
             "a": [1, 1, 2, 3, 3, np.nan],
             "b": [np.nan, np.nan, 1, 3, 3, 4],
             "c": [2, 3, 2, 1, 4, 1],
         },
     )
-
-    return df
 
 
 def create_values_map(df):
@@ -385,7 +360,7 @@ def create_values_map(df):
 
 def create_date_test_df():
     """Create DataFrame for DateDiffLeapYearTransformer tests."""
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {
             "a": [
                 datetime.date(1993, 9, 27),
@@ -410,12 +385,10 @@ def create_date_test_df():
         },
     )
 
-    return df
-
 
 def create_date_test_nulls_df():
     """Create DataFrame with nulls only for DateDiffLeapYearTransformer, DateDifferenceTransformer tests."""
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {
             "a": [
                 np.NaN,
@@ -427,12 +400,10 @@ def create_date_test_nulls_df():
         index=[0],
     )
 
-    return df
-
 
 def create_datediff_test_df():
     """Create DataFrame for DateDifferenceTransformer tests."""
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {
             "a": [
                 datetime.datetime(1993, 9, 27, 11, 58, 58),
@@ -457,12 +428,10 @@ def create_datediff_test_df():
         },
     )
 
-    return df
-
 
 def create_datediff_test_nulls_df():
     """Create DataFrame with nulls only for DateDifferenceTransformer tests."""
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {
             "a": [
                 datetime.datetime(1993, 9, 27, 11, 58, 58),
@@ -476,21 +445,17 @@ def create_datediff_test_nulls_df():
         index=[0, 1],
     )
 
-    return df
-
 
 def create_to_datetime_test_df():
     """Create DataFrame to be used in the ToDatetimeTransformer tests."""
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {"a": [1950, 1960, 2000, 2001, np.NaN, 2010], "b": [1, 2, 3, 4, 5, np.NaN]},
     )
-
-    return df
 
 
 def create_is_between_dates_df_1():
     """Create df to use in IsBetweenDates tests. Contains 3 columns of 2 datatime values."""
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {
             "a": pd.date_range(start="1/1/2016", end="27/02/2017", periods=2),
             "b": pd.date_range(start="1/2/2016", end="27/09/2017", periods=2),
@@ -498,12 +463,10 @@ def create_is_between_dates_df_1():
         },
     )
 
-    return df
-
 
 def create_is_between_dates_df_2():
     """Create df to use in IsBetweenDates tests. Contains 3 columns of 5 datatime values, covers edge cases."""
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {
             "a": [
                 datetime.datetime(1990, 2, 1),
@@ -532,17 +495,13 @@ def create_is_between_dates_df_2():
         },
     )
 
-    return df
-
 
 # Example DataFrame for downcasting dtypes tests
 def create_downcast_df():
     """Create a dataframe with mixed dtypes to use in downcasting tests."""
-    df = pd.DataFrame(
+    return pd.DataFrame(
         {
             "a": [1, 2, 3, 4, 5],
             "b": [1.0, 2.0, 3.0, 4.0, 5.0],
         },
     )
-
-    return df

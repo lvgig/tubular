@@ -177,7 +177,7 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output of test_expected_output_default_assignment."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "a": {0: 1.0, 1: 2.0, 2: 3.0, 3: 4.0, 4: 5.0, 5: 6.0, 6: np.NaN},
                 "b": {0: 1.0, 1: 2.0, 2: 3.0, 3: np.NaN, 4: 7.0, 5: 8.0, 6: 9.0},
@@ -204,11 +204,9 @@ class TestTransform:
             },
         )
 
-        return df
-
     def expected_df_2():
         """Expected output of test_expected_output_multiple_columns_assignment."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "a": {0: 1.0, 1: 2.0, 2: 3.0, 3: 4.0, 4: 5.0, 5: 6.0, 6: np.NaN},
                 "b": {0: 1.0, 1: 2.0, 2: 3.0, 3: np.NaN, 4: 7.0, 5: 8.0, 6: 9.0},
@@ -216,8 +214,6 @@ class TestTransform:
                 "a b": {0: 1.0, 1: 4.0, 2: 9.0, 3: np.NaN, 4: 35.0, 5: 48.0, 6: np.NaN},
             },
         )
-
-        return df
 
     def test_arguments(self):
         """Test that transform has expected arguments."""

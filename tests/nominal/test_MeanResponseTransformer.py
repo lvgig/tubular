@@ -11,68 +11,62 @@ from tubular.nominal import MeanResponseTransformer
 
 @pytest.fixture()
 def learnt_mapping_dict():
-    learnt_mapping_dict = {
+    return {
         "b": {"a": 1.0, "b": 2.0, "c": 3.0, "d": 4.0, "e": 5.0, "f": 6.0},
         "b_blue": {"a": 1.0, "b": 1.0, "c": 0.0, "d": 0.0, "e": 0.0, "f": 0.0},
         "b_yellow": {"a": 0.0, "b": 0.0, "c": 1.0, "d": 1.0, "e": 0.0, "f": 0.0},
         "b_green": {"a": 0.0, "b": 0.0, "c": 0.0, "d": 0.0, "e": 1.0, "f": 1.0},
     }
-    return learnt_mapping_dict
 
 
 @pytest.fixture()
 def learnt_unseen_levels_encoding_dict_mean():
-    learnt_unseen_levels_encoding_dict_mean = {
+    return {
         "b": (1.0 + 2.0 + 3.0 + 4.0 + 5.0 + 6.0) / 6,
         "b_blue": (1.0 + 1.0 + 0.0 + 0.0 + 0.0 + 0.0) / 6,
         "b_yellow": (0.0 + 0.0 + 1.0 + 1.0 + 0.0 + 0.0) / 6,
         "b_green": (0.0 + 0.0 + 0.0 + 0.0 + 1.0 + 1.0) / 6,
     }
-    return learnt_unseen_levels_encoding_dict_mean
 
 
 @pytest.fixture()
 def learnt_unseen_levels_encoding_dict_median():
-    learnt_unseen_levels_encoding_dict_median = {
+    return {
         "b": (3.0 + 4.0) / 2,
         "b_blue": (0.0 + 0.0) / 2,
         "b_yellow": (0.0 + 0.0) / 2,
         "b_green": (0.0 + 0.0) / 2,
     }
-    return learnt_unseen_levels_encoding_dict_median
 
 
 @pytest.fixture()
 def learnt_unseen_levels_encoding_dict_highest():
-    learnt_unseen_levels_encoding_dict_highest = {
+    return {
         "b": 6.0,
         "b_blue": 1.0,
         "b_yellow": 1.0,
         "b_green": 1.0,
     }
-    return learnt_unseen_levels_encoding_dict_highest
 
 
 @pytest.fixture()
 def learnt_unseen_levels_encoding_dict_lowest():
-    learnt_unseen_levels_encoding_dict_lowest = {
+    return {
         "b": 1.0,
         "b_blue": 0.0,
         "b_yellow": 0.0,
         "b_green": 0.0,
     }
-    return learnt_unseen_levels_encoding_dict_lowest
 
 
 @pytest.fixture()
 def learnt_unseen_levels_encoding_dict_arbitrary():
-    learnt_unseen_levels_encoding_dict_arbitrary = {
+    return {
         "b": 22.0,
         "b_blue": 22.0,
         "b_yellow": 22.0,
         "b_green": 22.0,
     }
-    return learnt_unseen_levels_encoding_dict_arbitrary
 
 
 class TestInit:

@@ -120,31 +120,30 @@ class DateDiffLeapYearTransformer(BaseTransformer):
         if (pd.isnull(row[self.columns[0]])) or (pd.isnull(row[self.columns[1]])):
             return self.missing_replacement
 
-        else:
-            if type(row[self.columns[1]]) not in [datetime.date, datetime.datetime]:
-                msg = f"{self.classname()}: upper column values should be datetime.datetime or datetime.date objects"
-                raise TypeError(msg)
+        if type(row[self.columns[1]]) not in [datetime.date, datetime.datetime]:
+            msg = f"{self.classname()}: upper column values should be datetime.datetime or datetime.date objects"
+            raise TypeError(msg)
 
-            if type(row[self.columns[0]]) not in [datetime.date, datetime.datetime]:
-                msg = f"{self.classname()}: lower column values should be datetime.datetime or datetime.date objects"
-                raise TypeError(msg)
+        if type(row[self.columns[0]]) not in [datetime.date, datetime.datetime]:
+            msg = f"{self.classname()}: lower column values should be datetime.datetime or datetime.date objects"
+            raise TypeError(msg)
 
-            age = row[self.columns[1]].year - row[self.columns[0]].year
+        age = row[self.columns[1]].year - row[self.columns[0]].year
 
-            if age > 0:
-                if (row[self.columns[1]].month, row[self.columns[1]].day) < (
-                    row[self.columns[0]].month,
-                    row[self.columns[0]].day,
-                ):
-                    age += -1
-            elif age < 0:
-                if (row[self.columns[1]].month, row[self.columns[1]].day) > (
-                    row[self.columns[0]].month,
-                    row[self.columns[0]].day,
-                ):
-                    age += 1
+        if age > 0:
+            if (row[self.columns[1]].month, row[self.columns[1]].day) < (
+                row[self.columns[0]].month,
+                row[self.columns[0]].day,
+            ):
+                age += -1
+        elif age < 0:
+            if (row[self.columns[1]].month, row[self.columns[1]].day) > (
+                row[self.columns[0]].month,
+                row[self.columns[0]].day,
+            ):
+                age += 1
 
-            return age
+        return age
 
     def transform(self, X):
         """Calculate year gap between the two provided columns.
@@ -303,11 +302,10 @@ class ToDatetimeTransformer(BaseTransformer):
             msg = f"{self.classname()}: to_datetime_kwargs should be a dict but got type {type(to_datetime_kwargs)}"
             raise TypeError(msg)
 
-        else:
-            for i, k in enumerate(to_datetime_kwargs.keys()):
-                if type(k) is not str:
-                    msg = f"{self.classname()}: unexpected type ({type(k)}) for to_datetime_kwargs key in position {i}, must be str"
-                    raise TypeError(msg)
+        for i, k in enumerate(to_datetime_kwargs.keys()):
+            if type(k) is not str:
+                msg = f"{self.classname()}: unexpected type ({type(k)}) for to_datetime_kwargs key in position {i}, must be str"
+                raise TypeError(msg)
 
         self.to_datetime_kwargs = to_datetime_kwargs
         self.new_column_name = new_column_name
@@ -417,11 +415,10 @@ class SeriesDtMethodTransformer(BaseTransformer):
             msg = f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
             raise TypeError(msg)
 
-        else:
-            for i, k in enumerate(pd_method_kwargs.keys()):
-                if type(k) is not str:
-                    msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
-                    raise TypeError(msg)
+        for i, k in enumerate(pd_method_kwargs.keys()):
+            if type(k) is not str:
+                msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
+                raise TypeError(msg)
 
         self.new_column_name = new_column_name
         self.pd_method_name = pd_method_name
@@ -882,8 +879,8 @@ class DatetimeInfoExtractor(BaseTransformer):
 
         if np.isnan(value):
             return np.nan
-        else:
-            return mappings[interval][value]
+
+        return mappings[interval][value]
 
     def transform(self, X):
         """Transform - Extracts new features from datetime variables.

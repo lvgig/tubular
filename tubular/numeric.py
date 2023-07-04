@@ -177,11 +177,10 @@ class CutTransformer(BaseTransformer):
             msg = f"{self.classname()}: cut_kwargs should be a dict but got type {type(cut_kwargs)}"
             raise TypeError(msg)
 
-        else:
-            for i, k in enumerate(cut_kwargs.keys()):
-                if type(k) is not str:
-                    msg = f"{self.classname()}: unexpected type ({type(k)}) for cut_kwargs key in position {i}, must be str"
-                    raise TypeError(msg)
+        for i, k in enumerate(cut_kwargs.keys()):
+            if type(k) is not str:
+                msg = f"{self.classname()}: unexpected type ({type(k)}) for cut_kwargs key in position {i}, must be str"
+                raise TypeError(msg)
 
         self.cut_kwargs = cut_kwargs
         self.new_column_name = new_column_name
@@ -350,11 +349,10 @@ class ScalingTransformer(BaseTransformer):
             msg = f"{self.classname()}: scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
             raise TypeError(msg)
 
-        else:
-            for i, k in enumerate(scaler_kwargs.keys()):
-                if type(k) is not str:
-                    msg = f"{self.classname()}: unexpected type ({type(k)}) for scaler_kwargs key in position {i}, must be str"
-                    raise TypeError(msg)
+        for i, k in enumerate(scaler_kwargs.keys()):
+            if type(k) is not str:
+                msg = f"{self.classname()}: unexpected type ({type(k)}) for scaler_kwargs key in position {i}, must be str"
+                raise TypeError(msg)
 
         allowed_scaler_values = ["min_max", "max_abs", "standard"]
 
@@ -501,8 +499,7 @@ class InteractionTransformer(BaseTransformer):
             if min_degree < 2:
                 msg = f"{self.classname()}: min_degree must be equal or greater than 2, got {str(min_degree)}"
                 raise ValueError(msg)
-            else:
-                self.min_degree = min_degree
+            self.min_degree = min_degree
         else:
             msg = f"{self.classname()}: unexpected type ({type(min_degree)}) for min_degree, must be int"
             raise TypeError(msg)
@@ -510,18 +507,15 @@ class InteractionTransformer(BaseTransformer):
             if min_degree > max_degree:
                 msg = f"{self.classname()}: max_degree must be equal or greater than min_degree"
                 raise ValueError(msg)
-            else:
-                self.max_degree = max_degree
+            self.max_degree = max_degree
             if max_degree > len(columns):
                 msg = f"{self.classname()}: max_degree must be equal or lower than number of columns"
                 raise ValueError(msg)
-            else:
-                self.max_degree = max_degree
+            self.max_degree = max_degree
             if max_degree > len(columns):
                 msg = f"{self.classname()}: max_degree must be equal or lower than number of columns"
                 raise ValueError(msg)
-            else:
-                self.max_degree = max_degree
+            self.max_degree = max_degree
         else:
             msg = f"{self.classname()}: unexpected type ({type(max_degree)}) for max_degree, must be int"
             raise TypeError(msg)
@@ -675,8 +669,7 @@ class PCATransformer(BaseTransformer):
             if n_components < 1:
                 msg = f"{self.classname()}:n_components must be strictly positive got {str(n_components)}"
                 raise ValueError(msg)
-            else:
-                self.n_components = n_components
+            self.n_components = n_components
         elif type(n_components) is float:
             if 0 < n_components < 1:
                 self.n_components = n_components
@@ -695,8 +688,7 @@ class PCATransformer(BaseTransformer):
             if svd_solver not in ["auto", "full", "arpack", "randomized"]:
                 msg = f"{self.classname()}:svd_solver {svd_solver} is unknown. Please select among 'auto', 'full', 'arpack', 'randomized'."
                 raise ValueError(msg)
-            else:
-                self.svd_solver = svd_solver
+            self.svd_solver = svd_solver
         else:
             msg = f"{self.classname()}:unexpected type {type(svd_solver)} for svd_solver, must be str"
             raise TypeError(msg)

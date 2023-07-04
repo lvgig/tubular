@@ -8,9 +8,7 @@ from tubular.comparison import EqualityChecker
 
 @pytest.fixture(scope="module", autouse=True)
 def example_transformer():
-    example_transformer = EqualityChecker(columns=["a", "b"], new_col_name="d")
-
-    return example_transformer
+    return EqualityChecker(columns=["a", "b"], new_col_name="d")
 
 
 class TestInit:

@@ -70,9 +70,7 @@ class BaseMappingTransformer(BaseTransformer):
         """
         self.check_is_fitted(["mappings"])
 
-        X = super().transform(X)
-
-        return X
+        return super().transform(X)
 
 
 class BaseMappingTransformMixin(BaseTransformer):

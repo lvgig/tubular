@@ -133,7 +133,7 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output for test_expected_output."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "a": [1950, 1960, 2000, 2001, np.NaN, 2010],
                 "b": [1, 2, 3, 4, 5, np.NaN],
@@ -155,8 +155,6 @@ class TestTransform:
                 ],
             },
         )
-
-        return df
 
     def test_arguments(self):
         """Test that transform has expected arguments."""

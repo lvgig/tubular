@@ -115,9 +115,7 @@ class ArbitraryImputer(BaseImputer):
                 c
             ] = self.impute_value  # updating impute_values_ attribute
 
-        X = super().transform(X)  # impute the values
-
-        return X
+        return super().transform(X)  # impute the values
 
 
 class MedianImputer(BaseImputer):
@@ -393,23 +391,22 @@ class NearestMeanResponseImputer(BaseImputer):
                 msg = f"{self.classname()}: Column {c} has no missing values, cannot use this transformer."
                 raise ValueError(msg)
 
-            else:
-                mean_response_by_levels = pd.DataFrame(
-                    X_y.loc[~c_nulls].groupby(c)[response_column].mean(),
-                ).reset_index()
+            mean_response_by_levels = pd.DataFrame(
+                X_y.loc[~c_nulls].groupby(c)[response_column].mean(),
+            ).reset_index()
 
-                mean_response_nulls = X_y.loc[c_nulls, response_column].mean()
+            mean_response_nulls = X_y.loc[c_nulls, response_column].mean()
 
-                mean_response_by_levels["abs_diff_response"] = np.abs(
-                    mean_response_by_levels[response_column] - mean_response_nulls,
-                )
+            mean_response_by_levels["abs_diff_response"] = np.abs(
+                mean_response_by_levels[response_column] - mean_response_nulls,
+            )
 
-                # take first value having the minimum difference in terms of average response
-                self.impute_values_[c] = mean_response_by_levels.loc[
-                    mean_response_by_levels["abs_diff_response"]
-                    == mean_response_by_levels["abs_diff_response"].min(),
-                    c,
-                ].values[0]
+            # take first value having the minimum difference in terms of average response
+            self.impute_values_[c] = mean_response_by_levels.loc[
+                mean_response_by_levels["abs_diff_response"]
+                == mean_response_by_levels["abs_diff_response"].min(),
+                c,
+            ].values[0]
 
         return self
 

@@ -19,7 +19,7 @@ class TestInit:
 
     def ListOfTransformers():
         """List of transformers in tubular to be used in subsequent tests."""
-        list_of_transformers = [
+        return [
             base.BaseTransformer(columns=["a"]),
             base.DataFrameMethodTransformer(
                 new_column_name="a",
@@ -106,7 +106,6 @@ class TestInit:
             ),
             strings.StringConcatenator(columns=["a", "b"], new_column="c"),
         ]
-        return list_of_transformers
 
     @pytest.mark.parametrize("transformer", ListOfTransformers())
     def test_print(self, transformer):

@@ -251,7 +251,7 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output for test_expected_output_drop_cols_true."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "c": [
                     26,
@@ -266,11 +266,9 @@ class TestTransform:
             },
         )
 
-        return df
-
     def expected_df_2():
         """Expected output for test_expected_output_drop_cols_false."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "a": [
                     datetime.date(1993, 9, 27),  # day/month greater than
@@ -309,11 +307,9 @@ class TestTransform:
             },
         )
 
-        return df
-
     def expected_df_3():
         """Expected output for test_expected_output_nulls."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "a": [
                     np.NaN,
@@ -324,8 +320,6 @@ class TestTransform:
                 "c": [None],
             },
         )
-
-        return df
 
     def test_arguments(self):
         """Test that transform has expected arguments."""

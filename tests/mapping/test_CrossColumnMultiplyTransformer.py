@@ -97,19 +97,15 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output for test_expected_output."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {"a": [1.1, 2.4, 3.9, 5.6, 7.5, 9.6], "b": ["a", "b", "c", "d", "e", "f"]},
         )
 
-        return df
-
     def expected_df_2():
         """Expected output for test_non_specified_values_unchanged."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {"a": [1.1, 2.4, 3, 4, 5, 6], "b": ["a", "b", "c", "d", "e", "f"]},
         )
-
-        return df
 
     def expected_df_3():
         """Expected output for test_multiple_mappings_ordered_dict."""

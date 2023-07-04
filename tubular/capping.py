@@ -323,9 +323,7 @@ class CappingTransformer(BaseTransformer):
         weighted_quantiles = np.cumsum(sample_weight)
         weighted_quantiles = weighted_quantiles / np.sum(sample_weight)
 
-        interp_quantiles = list(np.interp(quantiles, weighted_quantiles, values))
-
-        return interp_quantiles
+        return list(np.interp(quantiles, weighted_quantiles, values))
 
     def transform(self, X):
         """Apply capping to columns in X.

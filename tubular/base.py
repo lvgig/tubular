@@ -57,8 +57,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             msg = f"{self.classname()}: verbose must be a bool"
             raise TypeError(msg)
 
-        else:
-            self.verbose = verbose
+        self.verbose = verbose
 
         if self.verbose:
             print("BaseTransformer.__init__() called")
@@ -91,8 +90,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             msg = f"{self.classname()}: copy must be a bool"
             raise TypeError(msg)
 
-        else:
-            self.copy = copy
+        self.copy = copy
 
     def fit(self, X, y=None):
         """Base transformer fit method, checks X and y types. Currently only pandas DataFrames are allowed for X
@@ -278,18 +276,18 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
             # check weight is numeric
 
-            elif not pd.api.types.is_numeric_dtype(X[weights_column]):
+            if not pd.api.types.is_numeric_dtype(X[weights_column]):
                 msg = "weight column must be numeric."
                 raise ValueError(msg)
 
             # check weight is positive
 
-            elif not (X[weights_column] < 0).sum() == 0:
+            if not (X[weights_column] < 0).sum() == 0:
                 msg = "weight column must be positive"
                 raise ValueError(msg)
 
             # check weight non-null
-            elif not (X[weights_column].isnull()).sum() == 0:
+            if not (X[weights_column].isnull()).sum() == 0:
                 msg = "weight column must be non-null"
                 raise ValueError(msg)
 
@@ -395,11 +393,10 @@ class DataFrameMethodTransformer(BaseTransformer):
             msg = f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
             raise TypeError(msg)
 
-        else:
-            for i, k in enumerate(pd_method_kwargs.keys()):
-                if type(k) is not str:
-                    msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
-                    raise TypeError(msg)
+        for i, k in enumerate(pd_method_kwargs.keys()):
+            if type(k) is not str:
+                msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
+                raise TypeError(msg)
 
         if type(drop_original) is not bool:
             msg = f"{self.classname()}: unexpected type ({type(drop_original)}) for drop_original, expecting bool"

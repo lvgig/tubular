@@ -197,8 +197,7 @@ class TestFit:
         )
 
     def expected_df_nan():
-        df = pd.DataFrame({"a": ["NaN", "NaN", "NaN"], "b": [None, None, None]})
-        return df
+        return pd.DataFrame({"a": ["NaN", "NaN", "NaN"], "b": [None, None, None]})
 
     @pytest.mark.parametrize(
         ("df", "expected"),

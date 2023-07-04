@@ -218,7 +218,7 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output for test_expected_output_units_Y."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "a": [
                     datetime.datetime(1993, 9, 27, 11, 58, 58),
@@ -252,11 +252,10 @@ class TestTransform:
                 ],
             },
         )
-        return df
 
     def expected_df_2():
         """Expected output for test_expected_output_units_M."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "a": [
                     datetime.datetime(1993, 9, 27, 11, 58, 58),
@@ -290,11 +289,10 @@ class TestTransform:
                 ],
             },
         )
-        return df
 
     def expected_df_3():
         """Expected output for test_expected_output_units_D."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "a": [
                     datetime.datetime(1993, 9, 27, 11, 58, 58),
@@ -328,11 +326,10 @@ class TestTransform:
                 ],
             },
         )
-        return df
 
     def expected_df_4():
         """Expected output for test_expected_output_units_h."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "a": [
                     datetime.datetime(1993, 9, 27, 11, 58, 58),
@@ -366,11 +363,10 @@ class TestTransform:
                 ],
             },
         )
-        return df
 
     def expected_df_5():
         """Expected output for test_expected_output_units_m."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "a": [
                     datetime.datetime(1993, 9, 27, 11, 58, 58),
@@ -404,11 +400,10 @@ class TestTransform:
                 ],
             },
         )
-        return df
 
     def expected_df_6():
         """Expected output for test_expected_output_units_s."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "a": [
                     datetime.datetime(1993, 9, 27, 11, 58, 58),
@@ -442,11 +437,10 @@ class TestTransform:
                 ],
             },
         )
-        return df
 
     def expected_df_7():
         """Expected output for test_expected_output_nulls."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "a": [
                     datetime.datetime(1993, 9, 27, 11, 58, 58),
@@ -463,8 +457,6 @@ class TestTransform:
             },
             index=[0, 1],
         )
-
-        return df
 
     def test_arguments(self):
         """Test that transform has expected arguments."""

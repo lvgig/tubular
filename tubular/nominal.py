@@ -154,9 +154,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         """
         self.check_mappable_rows(X)
 
-        X = BaseMappingTransformMixin.transform(self, X)
-
-        return X
+        return BaseMappingTransformMixin.transform(self, X)
 
     def inverse_transform(self, X):
         """Converts integer values back to categorical / nominal values. Does the inverse of the transform method.
@@ -575,12 +573,10 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         """
         self.check_is_fitted(["global_mean"])
 
-        regularised = (
+        return (
             target_means.multiply(cat_freq, axis="index")
             + self.global_mean * self.prior
         ).divide(cat_freq + self.prior, axis="index")
-
-        return regularised
 
     def _fit_binary_response(self, X, y, columns):
         """Function to learn the MRE mappings for a given binary or continuous response.
@@ -941,9 +937,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
         """
         self.check_mappable_rows(X)
 
-        X = BaseMappingTransformMixin.transform(self, X)
-
-        return X
+        return BaseMappingTransformMixin.transform(self, X)
 
 
 class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
@@ -1150,6 +1144,4 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
             X.drop(self.columns, axis=1, inplace=True)
 
         # Concatenate original and new dummy fields
-        X_transformed = pd.concat((X, X_transformed), axis=1)
-
-        return X_transformed
+        return pd.concat((X, X_transformed), axis=1)

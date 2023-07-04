@@ -55,7 +55,7 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output for test_null_indicator_columns_correct."""
-        df = pd.DataFrame(
+        return pd.DataFrame(
             {
                 "a": [1, 2, np.nan, 4, np.nan, 6],
                 "b": [np.nan, 5, 4, 3, 2, 1],
@@ -64,8 +64,6 @@ class TestTransform:
                 "c_nulls": [0, 0, 0, 0, 0, 0],
             },
         )
-
-        return df
 
     def test_arguments(self):
         """Test that transform has expected arguments."""

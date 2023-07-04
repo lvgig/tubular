@@ -9,13 +9,11 @@ from tubular.numeric import TwoColumnOperatorTransformer
 
 @pytest.fixture(scope="module", autouse=True)
 def example_transformer():
-    example_transformer = TwoColumnOperatorTransformer(
+    return TwoColumnOperatorTransformer(
         "mul",
         ["a", "b"],
         "c",
     )
-
-    return example_transformer
 
 
 class TestTwoColumnOperatorTransformerInit:
