@@ -32,7 +32,10 @@ exclude = [
     "node_modules",
     "venv",
 ]
-per-file-ignores = {}
+
+# Ignore `E402` (import violations) in all `__init__.py` file.
+[per-file-ignores]
+"__init__.py" = ["E402"]
 
 # Same as Black.
 line-length = 88
