@@ -18,7 +18,7 @@ def example_transformer():
     return example_transformer
 
 
-class TestTwoColumnOperatorTransformerInit(object):
+class TestTwoColumnOperatorTransformerInit:
     """
     Tests for TwoColumnMethodTransformer.__init__()
     """
@@ -107,7 +107,7 @@ class TestTwoColumnOperatorTransformerInit(object):
             TwoColumnOperatorTransformer("mul", ["a", "b"], "c")
 
 
-class TestTwoColumnOperatorTransformerTransform(object):
+class TestTwoColumnOperatorTransformerTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
 

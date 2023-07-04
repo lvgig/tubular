@@ -14,7 +14,7 @@ import tubular.numeric as numeric
 import tubular.strings as strings
 
 
-class TestInit(object):
+class TestInit:
     """Tests for transformer.init()."""
 
     def ListOfTransformers():

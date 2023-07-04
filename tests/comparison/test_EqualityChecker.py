@@ -115,7 +115,7 @@ class TestInit:
             )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for the EqualityChecker.transform method."""
 
     def test_arguments(self):

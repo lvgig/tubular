@@ -15,7 +15,7 @@ from tubular.base import ReturnKeyDict
 from tubular.mapping import MappingTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for MappingTransformer.init()."""
 
     def test_class_methods(self):
@@ -96,12 +96,12 @@ class TestInit(object):
 
         with pytest.raises(
             TypeError,
-            match=f"MappingTransformer: each item in mappings should be a dict but got type {type(1)} for key c",
+            match=f"MappingTransformer: each item in mappings should be a dict but got type {int} for key c",
         ):
             MappingTransformer(mappings=mappings)
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for the transform method on MappingTransformer."""
 
     def expected_df_1():

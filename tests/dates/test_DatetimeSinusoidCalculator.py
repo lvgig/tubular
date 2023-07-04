@@ -15,7 +15,7 @@ def example_transformer():
     return DatetimeSinusoidCalculator("a", "cos", "hour", 24)
 
 
-class TestDatetimeSinusoidCalculatorInit(object):
+class TestDatetimeSinusoidCalculatorInit:
     """Tests for DateDifferenceTransformer.init()."""
 
     def test_super_init_called(self, mocker):
@@ -256,7 +256,7 @@ class TestDatetimeSinusoidCalculatorInit(object):
         )
 
 
-class TestDatetimeSinusoidCalculatorTransform(object):
+class TestDatetimeSinusoidCalculatorTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
 

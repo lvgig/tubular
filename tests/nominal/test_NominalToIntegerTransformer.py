@@ -7,7 +7,7 @@ import tubular
 from tubular.nominal import NominalToIntegerTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for NominalToIntegerTransformer.init()."""
 
     def test_arguments(self):
@@ -92,7 +92,7 @@ class TestInit(object):
         )
 
 
-class TestFit(object):
+class TestFit:
     """Tests for NominalToIntegerTransformer.fit()"""
 
     def test_arguments(self):
@@ -192,7 +192,7 @@ class TestFit(object):
         )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for NominalToIntegerTransformer.transform()."""
 
     def expected_df_1():
@@ -311,7 +311,7 @@ class TestTransform(object):
         )
 
 
-class TestInverseTransform(object):
+class TestInverseTransform:
     """Tests for NominalToIntegerTransformer.inverse_transform()."""
 
     def test_arguments(self):

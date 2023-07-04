@@ -7,7 +7,7 @@ from tubular.base import BaseTransformer
 from tubular.nominal import BaseNominalTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Test for BaseNominalTransformer object."""
 
     def test_class_methods(self):
@@ -31,7 +31,7 @@ class TestInit(object):
         ta.classes.assert_inheritance(x, BaseTransformer)
 
 
-class TestNominalColumnSetOrCheck(object):
+class TestNominalColumnSetOrCheck:
     """Tests for BaseNominalTransformer.columns_set_or_check method."""
 
     def test_columns_none_get_cat_columns(self):

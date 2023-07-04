@@ -7,7 +7,7 @@ import tubular
 from tubular.nominal import OrdinalEncoderTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for OrdinalEncoderTransformer.init()."""
 
     def test_arguments(self):
@@ -89,7 +89,7 @@ class TestInit(object):
         )
 
 
-class TestFit(object):
+class TestFit:
     """Tests for OrdinalEncoderTransformer.fit()"""
 
     def test_arguments(self):
@@ -235,7 +235,7 @@ class TestFit(object):
             x.fit(df, df["a"])
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for OrdinalEncoderTransformer.transform()."""
 
     def expected_df_1():

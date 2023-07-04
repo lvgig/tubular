@@ -8,7 +8,7 @@ import tubular
 from tubular.mapping import CrossColumnMultiplyTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for CrossColumnMultiplyTransformer.init()."""
 
     def test_arguments(self):
@@ -92,7 +92,7 @@ class TestInit(object):
         )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for the transform method on CrossColumnMultiplyTransformer."""
 
     def expected_df_1():

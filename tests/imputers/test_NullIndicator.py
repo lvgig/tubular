@@ -8,7 +8,7 @@ import tubular
 from tubular.imputers import NullIndicator
 
 
-class TestInit(object):
+class TestInit:
     """Tests for NullIndicator.init()"""
 
     def test_arguments(self):
@@ -49,7 +49,7 @@ class TestInit(object):
             NullIndicator(columns=None, verbose=True, copy=True)
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for NullIndicator.transform()"""
 
     def expected_df_1():

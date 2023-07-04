@@ -7,7 +7,7 @@ import tubular
 from tubular.capping import OutOfRangeNullTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for OutOfRangeNullTransformer.init()."""
 
     def test_arguments(self):
@@ -107,7 +107,7 @@ class TestInit(object):
             )
 
 
-class TestFit(object):
+class TestFit:
     """Tests for OutOfRangeNullTransformer.fit()."""
 
     def test_arguments(self):
@@ -187,7 +187,7 @@ class TestFit(object):
         ), "Returned value from OutOfRangeNullTransformer.fit not as expected."
 
 
-class TestSetReplacementValues(object):
+class TestSetReplacementValues:
     """Test for the OutOfRangeNullTransformer.set_replacement_values() method."""
 
     def test_arguments(self):

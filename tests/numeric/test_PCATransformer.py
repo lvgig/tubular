@@ -7,7 +7,7 @@ import tubular
 from tubular.numeric import PCATransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for PCATransformer.init()."""
 
     def test_arguments(self):
@@ -128,7 +128,7 @@ class TestInit(object):
             PCATransformer(columns=["a", "b"], n_components=1, copy=True, verbose=False)
 
 
-class TestCheckNumericColumns(object):
+class TestCheckNumericColumns:
     """Tests for the check_numeric_columns method."""
 
     def test_arguments(self):
@@ -169,7 +169,7 @@ class TestCheckNumericColumns(object):
         )
 
 
-class TestFit(object):
+class TestFit:
     """Tests for PCATransformer.fit()."""
 
     def test_arguments(self):
@@ -348,7 +348,7 @@ def create_svd_sovler_output():
     return svd_sovler_output
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for PCATransformer.transform()."""
 
     def test_arguments(self):

@@ -8,7 +8,7 @@ import tubular
 from tubular.capping import CappingTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for CappingTransformer.init()."""
 
     def test_arguments(self):
@@ -191,7 +191,7 @@ class TestInit(object):
         )
 
 
-class TestCheckCappingValuesDict(object):
+class TestCheckCappingValuesDict:
     """Tests for the CappingTransformer.check_capping_values_dict() method."""
 
     def test_arguments(self):
@@ -308,7 +308,7 @@ class TestCheckCappingValuesDict(object):
             )
 
 
-class TestFit(object):
+class TestFit:
     """Tests for CappingTransformer.fit()."""
 
     def test_arguments(self):
@@ -465,7 +465,7 @@ class TestFit(object):
             )
 
 
-class TestPrepareQuantiles(object):
+class TestPrepareQuantiles:
     """Tests for the CappingTransformer.prepare_quantiles method."""
 
     def test_arguments(self):
@@ -577,7 +577,7 @@ class TestPrepareQuantiles(object):
         ), f"unexpected value returned from prepare_quantiles, expecting {results} but got {expected_results}"
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for CappingTransformer.transform()."""
 
     def expected_df_1():
@@ -784,7 +784,7 @@ class TestTransform(object):
         assert x.quantiles == x2.quantiles, "quantiles attribute modified in transform"
 
 
-class TestWeightedQuantile(object):
+class TestWeightedQuantile:
     """Tests for the CappingTransformer.weighted_quantile method."""
 
     def test_arguments(self):

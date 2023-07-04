@@ -8,7 +8,7 @@ import tubular
 from tubular.numeric import ScalingTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for ScalingTransformer.init()."""
 
     def test_arguments(self):
@@ -132,7 +132,7 @@ class TestInit(object):
             )
 
 
-class TestCheckNumericColumns(object):
+class TestCheckNumericColumns:
     """Tests for the check_numeric_columns method."""
 
     def test_arguments(self):
@@ -173,7 +173,7 @@ class TestCheckNumericColumns(object):
         )
 
 
-class TestFit(object):
+class TestFit:
     """Tests for ScalingTransformer.fit()."""
 
     def test_arguments(self):
@@ -270,7 +270,7 @@ class TestFit(object):
         ), "return value from ScalingTransformer.fit not as expected (self)."
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for ScalingTransformer.transform()."""
 
     def test_arguments(self):

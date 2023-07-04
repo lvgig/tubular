@@ -8,7 +8,7 @@ import tubular
 from tubular.nominal import OneHotEncodingTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for OneHotEncodingTransformer.init()."""
 
     def test_arguments(self):
@@ -129,7 +129,7 @@ class TestInit(object):
         )
 
 
-class TestFit(object):
+class TestFit:
     """Tests for OneHotEncodingTransformer.fit()"""
 
     def test_arguments(self):
@@ -284,7 +284,7 @@ class TestFit(object):
         )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for OneHotEncodingTransformer.transform()."""
 
     def expected_df_1():

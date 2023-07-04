@@ -10,7 +10,7 @@ import tubular
 from tubular.dates import DateDiffLeapYearTransformer
 
 
-class TestCalculateAge(object):
+class TestCalculateAge:
     """Tests for the calculate_age function in dates.py."""
 
     def test_row_type_error(self):
@@ -71,7 +71,7 @@ class TestCalculateAge(object):
             date_transformer.calculate_age(row=row)
 
 
-class TestInit(object):
+class TestInit:
     """Tests for DateDiffLeapYearTransformer.init()."""
 
     def test_arguments(self):
@@ -240,7 +240,7 @@ class TestInit(object):
         )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for DateDiffLeapYearTransformer.transform()."""
 
     def expected_df_1():

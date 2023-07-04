@@ -6,7 +6,7 @@ import tubular
 from tubular.imputers import ArbitraryImputer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for ArbitraryImputer.init()."""
 
     def test_arguments(self):
@@ -78,7 +78,7 @@ class TestInit(object):
         )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for ArbitraryImputer.transform()."""
 
     def test_arguments(self):

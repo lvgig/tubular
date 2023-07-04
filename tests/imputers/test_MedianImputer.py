@@ -8,7 +8,7 @@ import tubular
 from tubular.imputers import MedianImputer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for MedianImputer.init()."""
 
     def test_arguments(self):
@@ -61,7 +61,7 @@ class TestInit(object):
             MedianImputer(columns=None, weight=weight)
 
 
-class TestFit(object):
+class TestFit:
     """Tests for MedianImputer.fit()"""
 
     def test_arguments(self):
@@ -204,7 +204,7 @@ class TestFit(object):
         )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for MedianImputer.transform()."""
 
     def expected_df_1():

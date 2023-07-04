@@ -11,7 +11,7 @@ import tubular
 from tubular.base import BaseTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for BaseTransformer.__init__()."""
 
     def test_arguments(self):
@@ -131,7 +131,7 @@ class TestInit(object):
             BaseTransformer(columns=1)
 
 
-class TestFit(object):
+class TestFit:
     """Tests for BaseTransformer.fit()."""
 
     def test_arguments(self):
@@ -228,7 +228,7 @@ class TestFit(object):
             BaseTransformer(columns="a", unexpected_kwarg="spanish inquisition")
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for BaseTransformer.transform()."""
 
     def test_arguments(self):
@@ -306,7 +306,7 @@ class TestTransform(object):
         )
 
 
-class TestColumnsCheck(object):
+class TestColumnsCheck:
     """Tests for columns_check method."""
 
     def test_arguments(self):
@@ -363,7 +363,7 @@ class TestColumnsCheck(object):
             x.columns_check(X=df)
 
 
-class TestColumnsSetOrCheck(object):
+class TestColumnsSetOrCheck:
     """Tests for columns_set_or_check method."""
 
     def test_arguments(self):
@@ -399,7 +399,7 @@ class TestColumnsSetOrCheck(object):
         )
 
 
-class TestCheckIsFitted(object):
+class TestCheckIsFitted:
     """Tests for the check_is_fitted method."""
 
     def test_check_is_fitted_call(self):

@@ -10,7 +10,7 @@ from tubular.base import BaseTransformer
 from tubular.dates import BetweenDatesTransformer
 
 
-class TestInit(object):
+class TestInit:
     "tests for BetweenDatesTransformer.__init__"
 
     def test_arguments(self):
@@ -179,7 +179,7 @@ class TestInit(object):
         )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for BetweenDatesTransformer.transform"""
 
     def expected_df_1():

@@ -8,7 +8,7 @@ import tubular
 from tubular.misc import SetColumnDtype
 
 
-class TestSetColumnDtypeInit(object):
+class TestSetColumnDtypeInit:
     """Tests for SetColumnDtype custom transformer."""
 
     def test_init_arguments(self):
@@ -60,7 +60,7 @@ class TestSetColumnDtypeInit(object):
             SetColumnDtype(columns=["a"], dtype=invalid_dtype)
 
 
-class TestSetColumnDtypeTransform(object):
+class TestSetColumnDtypeTransform:
     @pytest.mark.parametrize(
         "method_name",
         [

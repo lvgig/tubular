@@ -8,7 +8,7 @@ import tubular
 from tubular.imputers import ModeImputer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for ModeImputer.init()."""
 
     def test_arguments(self):
@@ -64,7 +64,7 @@ class TestInit(object):
             ModeImputer(columns=None, weight=weight)
 
 
-class TestFit(object):
+class TestFit:
     """Tests for ModeImputer.fit()"""
 
     def test_arguments(self):
@@ -229,7 +229,7 @@ class TestFit(object):
             x.fit(df)
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for ModeImputer.transform()."""
 
     def expected_df_1():

@@ -8,7 +8,7 @@ import tubular
 from tubular.imputers import NearestMeanResponseImputer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for NearestMeanResponseImputer.__init__"""
 
     def test_arguments(self):
@@ -51,7 +51,7 @@ class TestInit(object):
             NearestMeanResponseImputer(columns=None, verbose=True, copy=True)
 
 
-class TestFit(object):
+class TestFit:
     """Tests for NearestMeanResponseImputer.fit"""
 
     def test_arguments(self):
@@ -181,7 +181,7 @@ class TestFit(object):
         )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for NearestMeanResponseImputer.transform"""
 
     def expected_df_1():

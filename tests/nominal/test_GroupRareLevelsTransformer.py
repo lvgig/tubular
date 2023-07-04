@@ -8,7 +8,7 @@ import tubular
 from tubular.nominal import GroupRareLevelsTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for GroupRareLevelsTransformer.init()."""
 
     def test_arguments(self):
@@ -124,7 +124,7 @@ class TestInit(object):
         )
 
 
-class TestFit(object):
+class TestFit:
     """Tests for GroupRareLevelsTransformer.fit()"""
 
     def test_arguments(self):
@@ -259,7 +259,7 @@ class TestFit(object):
             x.fit(df)
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for GroupRareLevelsTransformer.transform()."""
 
     def expected_df_1():

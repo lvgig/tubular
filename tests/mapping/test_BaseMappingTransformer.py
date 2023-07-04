@@ -6,7 +6,7 @@ import tubular
 from tubular.mapping import BaseMappingTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for BaseMappingTransformer.init()."""
 
     def test_arguments(self):
@@ -85,7 +85,7 @@ class TestInit(object):
         )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for the transform method on MappingTransformer."""
 
     def test_arguments(self):

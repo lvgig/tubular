@@ -6,7 +6,7 @@ import tubular
 from tubular.dates import SeriesDtMethodTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for SeriesDtMethodTransformer.init()."""
 
     def test_arguments(self):
@@ -161,7 +161,7 @@ class TestInit(object):
         )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for SeriesDtMethodTransformer.transform()."""
 
     def expected_df_1():

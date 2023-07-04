@@ -10,7 +10,7 @@ import tubular
 from tubular.numeric import InteractionTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for InteractionTransformer.init()."""
 
     def test_arguments(self):
@@ -172,7 +172,7 @@ class TestInit(object):
         )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for InteractionTransformer.transform()."""
 
     def expected_df_1():

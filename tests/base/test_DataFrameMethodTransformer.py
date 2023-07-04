@@ -10,7 +10,7 @@ import tubular
 from tubular.base import DataFrameMethodTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for DataFrameMethodTransformer.init()."""
 
     def test_arguments(self):
@@ -177,7 +177,7 @@ class TestInit(object):
             )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for DataFrameMethodTransformer.transform()."""
 
     def expected_df_1():

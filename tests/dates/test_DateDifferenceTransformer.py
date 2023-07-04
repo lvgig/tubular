@@ -10,7 +10,7 @@ import tubular
 from tubular.dates import DateDifferenceTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for DateDifferenceTransformer.init()."""
 
     def test_arguments(self):
@@ -216,7 +216,7 @@ class TestInit(object):
         )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for DateDifferenceTransformer.transform()."""
 
     def expected_df_1():

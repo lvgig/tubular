@@ -10,7 +10,7 @@ import tubular
 from tubular.numeric import LogTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for LogTransformer.init()."""
 
     def test_arguments(self):
@@ -106,7 +106,7 @@ class TestInit(object):
         )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for LogTransformer.transform()."""
 
     def expected_df_1():

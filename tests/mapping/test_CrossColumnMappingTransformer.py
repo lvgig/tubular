@@ -9,7 +9,7 @@ import tubular
 from tubular.mapping import CrossColumnMappingTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for CrossColumnMappingTransformer.init()."""
 
     def test_arguments(self):
@@ -91,7 +91,7 @@ class TestInit(object):
         )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for the transform method on CrossColumnMappingTransformer."""
 
     def expected_df_1():

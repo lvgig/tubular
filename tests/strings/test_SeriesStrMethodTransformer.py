@@ -7,7 +7,7 @@ import tubular
 from tubular.strings import SeriesStrMethodTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for SeriesStrMethodTransformer.init()."""
 
     def test_arguments(self):
@@ -147,7 +147,7 @@ class TestInit(object):
         )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for SeriesStrMethodTransformer.transform()."""
 
     def expected_df_1():

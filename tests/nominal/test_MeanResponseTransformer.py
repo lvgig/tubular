@@ -75,7 +75,7 @@ def learnt_unseen_levels_encoding_dict_arbitrary():
     return learnt_unseen_levels_encoding_dict_arbitrary
 
 
-class TestInit(object):
+class TestInit:
     """Tests for MeanResponseTransformer.init()."""
 
     def test_super_init_called(self, mocker):
@@ -165,7 +165,7 @@ class TestInit(object):
         )
 
 
-class Test_prior_regularisation(object):
+class Test_prior_regularisation:
     "tests for _prior_regularisation method"
 
     def test_check_is_fitted_called(self, mocker):
@@ -462,7 +462,7 @@ class TestFit:
                     assert actual == expected
 
 
-class TestFitBinaryResponse(object):
+class TestFitBinaryResponse:
     """Tests for MeanResponseTransformer.fit()"""
 
     def test_learnt_values(self):
@@ -706,7 +706,7 @@ class TestFitBinaryResponse(object):
             x._fit_binary_response(df, df["a"], x.columns)
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for MeanResponseTransformer.transform()."""
 
     def expected_df_1():

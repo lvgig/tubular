@@ -8,7 +8,7 @@ import tubular
 from tubular.imputers import MeanImputer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for MeanImputer.init()."""
 
     def test_arguments(self):
@@ -61,7 +61,7 @@ class TestInit(object):
             MeanImputer(columns=None, weight=weight)
 
 
-class TestFit(object):
+class TestFit:
     """Tests for MeanImputer.fit()"""
 
     def test_arguments(self):
@@ -198,7 +198,7 @@ class TestFit(object):
         )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for MeanImputer.transform()."""
 
     def expected_df_1():

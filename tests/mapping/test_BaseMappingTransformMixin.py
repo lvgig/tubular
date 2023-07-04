@@ -6,7 +6,7 @@ import tubular
 from tubular.mapping import BaseMappingTransformMixin
 
 
-class TestInit(object):
+class TestInit:
     """Tests for BaseMappingTransformMixin.init()."""
 
     def test_class_methods(self):
@@ -26,7 +26,7 @@ class TestInit(object):
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for BaseMappingTransformMixin.transform()."""
 
     def test_check_is_fitted_call(self, mocker):

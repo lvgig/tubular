@@ -30,7 +30,7 @@ def dayofweek_extractor():
     return DatetimeInfoExtractor(columns=["a"], include=["dayofweek"])
 
 
-class TestExtractDatetimeInfoInit(object):
+class TestExtractDatetimeInfoInit:
     def test_assert_inheritance(self):
         """Test that ExtractDatetimeInfo inherits from BaseTransformer."""
 
@@ -221,7 +221,7 @@ class TestExtractDatetimeInfoInit(object):
             DatetimeInfoExtractor(columns=["a"], datetime_mappings=incomplete_mappings)
 
 
-class TestMapValues(object):
+class TestMapValues:
     def test_arguments(self):
         """Test that identify_timeofday has the expected arguments"""
 
@@ -333,7 +333,7 @@ class TestMapValues(object):
     def test_valid_inputs_dayofweek(self, valid_day, dayofweek, dayofweek_extractor):
         """Test that correct values are return with valid inputs"""
         output = dayofweek_extractor._map_values(valid_day, "dayofweek")
-        assert output == dayofweek, "expected {}, output {}".format(dayofweek, output)
+        assert output == dayofweek, f"expected {dayofweek}, output {output}"
 
     def test_valid_nan_output(self, timeofday_extractor):
         """Test that correct values are return with valid inputs"""
@@ -344,7 +344,7 @@ class TestMapValues(object):
         ), f"passing np.nan should result in np.nan, instead received {output}"
 
 
-class TestTransform(object):
+class TestTransform:
     def test_arguments(self):
         """Test that init has the expected arguments"""
 
