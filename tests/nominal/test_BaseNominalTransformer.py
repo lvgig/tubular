@@ -72,8 +72,6 @@ class TestNominalColumnSetOrCheck:
             from BaseTransformer is called.
             """
 
-            pass
-
         df = d.create_df_1()
 
         x = JointInheritanceClass()
