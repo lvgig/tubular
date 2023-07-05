@@ -692,14 +692,11 @@ class PCATransformer(BaseTransformer):
             msg = f"{self.classname()}:unexpected type {type(svd_solver)} for svd_solver, must be str"
             raise TypeError(msg)
 
-        if type(random_state) is int:
+        if type(random_state) is int or random_state is None:
             self.random_state = random_state
         else:
-            if random_state is None:
-                self.random_state = random_state
-            else:
-                msg = f"{self.classname()}:unexpected type {type(random_state)} for random_state, must be int or None."
-                raise TypeError(msg)
+            msg = f"{self.classname()}:unexpected type {type(random_state)} for random_state, must be int or None."
+            raise TypeError(msg)
 
         if (svd_solver == "arpack") and (n_components == "mle"):
             msg = f"{self.classname()}: n_components='mle' cannot be a string with svd_solver='arpack'"
