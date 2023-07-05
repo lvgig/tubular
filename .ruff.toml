@@ -1,8 +1,11 @@
 # Enable the pycodestyle (`E`) and Pyflakes (`F`) rules by default.
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
 # McCabe complexity (`C901`) by default.
-select = ["E", "F", "I", "EM", "UP", "COM", "RET", "SIM", "C4"]
-ignore = ["E501"]
+select = ["E", "F", "I", "EM", "UP", "COM", "RET", "SIM", "C4", "PD"]
+
+# ignore E501 - linelength limit (covered by black except in docstrings) 
+# and PD901 - use of df variable name
+ignore = ["E501", "PD901"]
 
 # Allow autofix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
