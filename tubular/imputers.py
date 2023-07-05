@@ -178,7 +178,7 @@ class MedianImputer(BaseImputer):
                 filtered = temp[temp[c].notnull()]
 
                 # first sort df by column to be imputed (order of weight column shouldn't matter for median)
-                filtered.sort_values(c, inplace=True)
+                filtered = filtered.sort_values(c)
 
                 # next calculate cumulative weight sums
                 cumsum = filtered[self.weight].cumsum()

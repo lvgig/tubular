@@ -440,6 +440,6 @@ class DataFrameMethodTransformer(BaseTransformer):
         )
 
         if self.drop_original:
-            X.drop(self.columns, axis=1, inplace=True)
+            X = X.drop(self.columns, axis=1)
 
         return X

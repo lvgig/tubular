@@ -114,9 +114,7 @@ class TestTransform:
         df["a_new_col"] = np.log(df["a"])
         df["b_new_col"] = np.log(df["b"])
 
-        df.drop(columns=["a", "b"], inplace=True)
-
-        return df
+        return df.drop(columns=["a", "b"])
 
     def expected_df_2():
         """Expected output of test_expected_output_2."""
@@ -125,9 +123,7 @@ class TestTransform:
         df["a_new_col"] = np.log(df["a"] + 1)
         df["b_new_col"] = np.log(df["b"] + 1)
 
-        df.drop(columns=["a", "b"], inplace=True)
-
-        return df
+        return df.drop(columns=["a", "b"])
 
     def expected_df_3():
         """Expected output of test_expected_output_3."""
@@ -161,9 +157,7 @@ class TestTransform:
 
         df["a_new_col"] = np.log(df["a"]) / np.log(7)
 
-        df.drop("a", axis=1, inplace=True)
-
-        return df
+        return df.drop("a", axis=1)
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
