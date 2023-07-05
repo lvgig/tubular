@@ -58,7 +58,7 @@ class BaseNominalTransformer(BaseTransformer):
         self.check_is_fitted(["mappings"])
 
         for c in self.columns:
-            mappable_rows = X[c].isin([k for k in self.mappings[c].keys()]).sum()
+            mappable_rows = X[c].isin([k for k in self.mappings[c]]).sum()
 
             if mappable_rows < X.shape[0]:
                 msg = f"{self.classname()}: nulls would be introduced into column {c} from levels not present in mapping"
@@ -280,10 +280,9 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
         self.cut_off_percent = cut_off_percent
 
-        if weight is not None:
-            if not isinstance(weight, str):
-                msg = f"{self.classname()}: weight should be a single column (str)"
-                raise ValueError(msg)
+        if weight is not None and not isinstance(weight, str):
+            msg = f"{self.classname()}: weight should be a single column (str)"
+            raise ValueError(msg)
 
         self.weight = weight
 
@@ -321,10 +320,9 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                     msg = f"{self.classname()}: rare_level_name must be of the same type of the columns"
                     raise ValueError(msg)
 
-        if self.weight is not None:
-            if self.weight not in X.columns.values:
-                msg = f"{self.classname()}: weight {self.weight} not in X"
-                raise ValueError(msg)
+        if self.weight is not None and self.weight not in X.columns.values:
+            msg = f"{self.classname()}: weight {self.weight} not in X"
+            raise ValueError(msg)
 
         self.mapping_ = {}
 
@@ -524,10 +522,9 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         unseen_level_handling=None,
         **kwargs,
     ):
-        if weights_column is not None:
-            if type(weights_column) is not str:
-                msg = f"{self.classname()}: weights_column should be a str"
-                raise TypeError(msg)
+        if weights_column is not None and type(weights_column) is not str:
+            msg = f"{self.classname()}: weights_column should be a str"
+            raise TypeError(msg)
 
         if type(prior) is not int:
             msg = f"{self.classname()}: prior should be a int"
@@ -829,10 +826,9 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
     """
 
     def __init__(self, columns=None, weights_column=None, **kwargs):
-        if weights_column is not None:
-            if type(weights_column) is not str:
-                msg = f"{self.classname()}: weights_column should be a str"
-                raise TypeError(msg)
+        if weights_column is not None and type(weights_column) is not str:
+            msg = f"{self.classname()}: weights_column should be a str"
+            raise TypeError(msg)
 
         self.weights_column = weights_column
 

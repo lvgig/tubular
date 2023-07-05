@@ -288,7 +288,7 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
             raise ValueError(msg)
 
         for i in self.columns:
-            for j in self.mappings[i].keys():
+            for j in self.mappings[i]:
                 X[self.adjust_column] = np.where(
                     (X[i] == j),
                     self.mappings[i][j],
@@ -372,7 +372,7 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
             raise TypeError(msg)
 
         for i in self.columns:
-            for j in self.mappings[i].keys():
+            for j in self.mappings[i]:
                 X[self.adjust_column] = np.where(
                     (X[i] == j),
                     X[self.adjust_column] * self.mappings[i][j],
@@ -460,7 +460,7 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
             )
 
         for i in self.columns:
-            for j in self.mappings[i].keys():
+            for j in self.mappings[i]:
                 X[self.adjust_column] = np.where(
                     (X[i] == j),
                     X[self.adjust_column] + self.mappings[i][j],

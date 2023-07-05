@@ -282,12 +282,12 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
             # check weight is positive
 
-            if not (X[weights_column] < 0).sum() == 0:
+            if (X[weights_column] < 0).sum() != 0:
                 msg = "weight column must be positive"
                 raise ValueError(msg)
 
             # check weight non-null
-            if not (X[weights_column].isnull()).sum() == 0:
+            if X[weights_column].isnull().sum() != 0:
                 msg = "weight column must be non-null"
                 raise ValueError(msg)
 

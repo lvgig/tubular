@@ -99,7 +99,7 @@ class TestDatetimeSinusoidCalculatorInit:
         with pytest.raises(
             TypeError,
             match="period dictionary key value pair must be str:int or str:float but got keys: {} and values: {}".format(
-                set(type(k) for k in incorrect_dict_types_period.keys()),
+                set(type(k) for k in incorrect_dict_types_period),
                 set(type(v) for v in incorrect_dict_types_period.values()),
             ),
         ):
@@ -126,7 +126,7 @@ class TestDatetimeSinusoidCalculatorInit:
         with pytest.raises(
             TypeError,
             match="units dictionary key value pair must be strings but got keys: {} and values: {}".format(
-                set(type(k) for k in incorrect_dict_types_units.keys()),
+                set(type(k) for k in incorrect_dict_types_units),
                 set(type(v) for v in incorrect_dict_types_units.values()),
             ),
         ):

@@ -1,3 +1,4 @@
+import contextlib
 import re
 
 import numpy as np
@@ -56,17 +57,14 @@ class TestInit:
             tubular.base.BaseTransformer,
             "__init__",
             expected_call_args,
-        ):
-            try:
-                InteractionTransformer(
-                    columns=["b", "c"],
-                    min_degree=2,
-                    max_degree=2,
-                    copy=False,
-                    verbose=True,
-                )
-            except AttributeError:
-                pass
+        ), contextlib.suppress(AttributeError):
+            InteractionTransformer(
+                columns=["b", "c"],
+                min_degree=2,
+                max_degree=2,
+                copy=False,
+                verbose=True,
+            )
 
     def test_invalid_input_type_errors(self):
         """Test that an exceptions are raised for invalid input types."""

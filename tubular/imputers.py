@@ -144,10 +144,9 @@ class MedianImputer(BaseImputer):
     def __init__(self, columns=None, weight=None, **kwargs):
         super().__init__(columns=columns, **kwargs)
 
-        if not isinstance(weight, str):
-            if weight is not None:
-                msg = "weight should be str or None"
-                raise TypeError(msg)
+        if not isinstance(weight, str) and weight is not None:
+            msg = "weight should be str or None"
+            raise TypeError(msg)
 
         self.weight = weight
 
@@ -223,10 +222,9 @@ class MeanImputer(BaseImputer):
     def __init__(self, columns=None, weight=None, **kwargs):
         super().__init__(columns=columns, **kwargs)
 
-        if not isinstance(weight, str):
-            if weight is not None:
-                msg = "weight should be str or None"
-                raise TypeError(msg)
+        if not isinstance(weight, str) and weight is not None:
+            msg = "weight should be str or None"
+            raise TypeError(msg)
 
         self.weight = weight
 
@@ -298,10 +296,9 @@ class ModeImputer(BaseImputer):
     def __init__(self, columns=None, weight=None, **kwargs):
         super().__init__(columns=columns, **kwargs)
 
-        if weight is not None:
-            if not isinstance(weight, str):
-                msg = "ModeImputer: weight should be a string or None"
-                raise ValueError(msg)
+        if weight is not None and not isinstance(weight, str):
+            msg = "ModeImputer: weight should be a string or None"
+            raise ValueError(msg)
 
         self.weight = weight
 

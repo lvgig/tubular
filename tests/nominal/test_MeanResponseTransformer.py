@@ -428,7 +428,7 @@ class TestFit:
                     ["b_blue", "b_yellow"],
                 ), "Stored unseen_levels_encoding_dict keys are not as expected"
 
-            for column in x.unseen_levels_encoding_dict.keys():
+            for column in x.unseen_levels_encoding_dict:
                 actual = x.unseen_levels_encoding_dict[column]
                 expected = learnt_unseen_levels_encoding_dict_mean[column]
                 assert actual == expected
@@ -439,31 +439,31 @@ class TestFit:
             ), "Stored unseen_levels_encoding_dict key is not as expected"
 
             if unseen_level_handling == "Mean":
-                for column in x.unseen_levels_encoding_dict.keys():
+                for column in x.unseen_levels_encoding_dict:
                     actual = x.unseen_levels_encoding_dict[column]
                     expected = learnt_unseen_levels_encoding_dict_mean[column]
                     assert actual == expected
 
             if unseen_level_handling == "Median":
-                for column in x.unseen_levels_encoding_dict.keys():
+                for column in x.unseen_levels_encoding_dict:
                     actual = x.unseen_levels_encoding_dict[column]
                     expected = learnt_unseen_levels_encoding_dict_median[column]
                     assert actual == expected
 
             if unseen_level_handling == "Lowest":
-                for column in x.unseen_levels_encoding_dict.keys():
+                for column in x.unseen_levels_encoding_dict:
                     actual = x.unseen_levels_encoding_dict[column]
                     expected = learnt_unseen_levels_encoding_dict_lowest[column]
                     assert actual == expected
 
             if unseen_level_handling == "Highest":
-                for column in x.unseen_levels_encoding_dict.keys():
+                for column in x.unseen_levels_encoding_dict:
                     actual = x.unseen_levels_encoding_dict[column]
                     expected = learnt_unseen_levels_encoding_dict_highest[column]
                     assert actual == expected
 
             if unseen_level_handling == "Abitrary":
-                for column in x.unseen_levels_encoding_dict.keys():
+                for column in x.unseen_levels_encoding_dict:
                     actual = x.unseen_levels_encoding_dict[column]
                     expected = learnt_unseen_levels_encoding_dict_arbitrary[column]
                     assert actual == expected

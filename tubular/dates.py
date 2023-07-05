@@ -136,12 +136,11 @@ class DateDiffLeapYearTransformer(BaseTransformer):
                 row[self.columns[0]].day,
             ):
                 age += -1
-        elif age < 0:
-            if (row[self.columns[1]].month, row[self.columns[1]].day) > (
-                row[self.columns[0]].month,
-                row[self.columns[0]].day,
-            ):
-                age += 1
+        elif age < 0 and (row[self.columns[1]].month, row[self.columns[1]].day) > (
+            row[self.columns[0]].month,
+            row[self.columns[0]].day,
+        ):
+            age += 1
 
         return age
 
@@ -848,10 +847,9 @@ class DatetimeInfoExtractor(BaseTransformer):
         str : str
             Mapped value
         """
-        if type(value) is not float:
-            if type(value) is not int:
-                msg = f"{self.classname()}: value should be float or int"
-                raise TypeError(msg)
+        if type(value) is not float and type(value) is not int:
+            msg = f"{self.classname()}: value should be float or int"
+            raise TypeError(msg)
 
         errors = {
             "timeofday": "0-23",
@@ -898,7 +896,7 @@ class DatetimeInfoExtractor(BaseTransformer):
         X = super().transform(X)
 
         for col in self.columns:
-            if not X[col].dtype.name == "datetime64[ns]":
+            if X[col].dtype.name != "datetime64[ns]":
                 try:
                     X[col] = X[col].dt.tz_localize(None)
                 except AttributeError:
@@ -1016,7 +1014,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
             ):
                 msg = "{}: units dictionary key value pair must be strings but got keys: {} and values: {}".format(
                     self.classname(),
-                    set(type(k) for k in units.keys()),
+                    set(type(k) for k in units),
                     set(type(v) for v in units.values()),
                 )
                 raise TypeError(msg)
@@ -1034,17 +1032,14 @@ class DatetimeSinusoidCalculator(BaseTransformer):
             ):
                 msg = "{}: period dictionary key value pair must be str:int or str:float but got keys: {} and values: {}".format(
                     self.classname(),
-                    set(type(k) for k in period.keys()),
+                    set(type(k) for k in period),
                     set(type(v) for v in period.values()),
                 )
                 raise TypeError(msg)
 
         valid_method_list = ["sin", "cos"]
 
-        if isinstance(method, str):
-            method_list = [method]
-        else:
-            method_list = method
+        method_list = [method] if isinstance(method, str) else method
 
         for method in method_list:
             if method not in valid_method_list:
@@ -1084,7 +1079,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         self.period = period
 
         if isinstance(units, dict):
-            if not sorted(list(units.keys())) == sorted(list(self.columns)):
+            if sorted(list(units.keys())) != sorted(list(self.columns)):
                 msg = "{}: unit dictionary keys must be the same as columns but got {}".format(
                     self.classname(),
                     set(units.keys()),
@@ -1092,7 +1087,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
                 raise ValueError(msg)
 
         if isinstance(period, dict):
-            if not sorted(list(period.keys())) == sorted(list(self.columns)):
+            if sorted(list(period.keys())) != sorted(list(self.columns)):
                 msg = "{}: period dictionary keys must be the same as columns but got {}".format(
                     self.classname(),
                     set(period.keys()),
