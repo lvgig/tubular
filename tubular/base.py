@@ -50,7 +50,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         """Method that returns the name of the current class when called."""
         return type(self).__name__
 
-    def __init__(self, columns=None, copy=True, verbose=False):
+    def __init__(self, columns=None, copy=True, verbose=False) -> None:
         self.version_ = __version__
 
         if not isinstance(verbose, bool):
@@ -372,7 +372,7 @@ class DataFrameMethodTransformer(BaseTransformer):
         pd_method_kwargs={},
         drop_original=False,
         **kwargs,
-    ):
+    ) -> None:
         super().__init__(columns=columns, **kwargs)
 
         if type(new_column_name) is list:

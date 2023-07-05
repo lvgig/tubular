@@ -63,7 +63,7 @@ class LogTransformer(BaseTransformer):
         drop=True,
         suffix="log",
         **kwargs,
-    ):
+    ) -> None:
         super().__init__(columns=columns, **kwargs)
 
         if base is not None:
@@ -164,7 +164,7 @@ class CutTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, column, new_column_name, cut_kwargs={}, **kwargs):
+    def __init__(self, column, new_column_name, cut_kwargs={}, **kwargs) -> None:
         if type(column) is not str:
             msg = f"{self.classname()}: column arg (name of column) should be a single str giving the column to discretise"
             raise TypeError(msg)
@@ -265,7 +265,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         new_column_name,
         pd_method_kwargs={"axis": 0},
         **kwargs,
-    ):
+    ) -> None:
         """Performs input checks not done in either DataFrameMethodTransformer.__init__ or BaseTransformer.__init__."""
         if "axis" not in pd_method_kwargs.keys():
             msg = f'{self.classname()}: pd_method_kwargs must contain an entry "axis" set to 0 or 1'
@@ -343,7 +343,7 @@ class ScalingTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, columns, scaler_type, scaler_kwargs={}, **kwargs):
+    def __init__(self, columns, scaler_type, scaler_kwargs={}, **kwargs) -> None:
         if type(scaler_kwargs) is not dict:
             msg = f"{self.classname()}: scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
             raise TypeError(msg)
@@ -487,7 +487,7 @@ class InteractionTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, columns, min_degree=2, max_degree=2, **kwargs):
+    def __init__(self, columns, min_degree=2, max_degree=2, **kwargs) -> None:
         super().__init__(columns=columns, **kwargs)
 
         if len(columns) < 2:
@@ -661,7 +661,7 @@ class PCATransformer(BaseTransformer):
         random_state=None,
         pca_column_prefix="pca_",
         **kwargs,
-    ):
+    ) -> None:
         super().__init__(columns=columns, **kwargs)
 
         if type(n_components) is int:

@@ -63,7 +63,7 @@ class DateDiffLeapYearTransformer(BaseTransformer):
         drop_cols,
         missing_replacement=None,
         **kwargs,
-    ):
+    ) -> None:
         if not isinstance(column_lower, str):
             msg = f"{self.classname()}: column_lower should be a str"
             raise TypeError(msg)
@@ -199,7 +199,7 @@ class DateDifferenceTransformer(BaseTransformer):
         units="D",
         copy=True,
         verbose=False,
-    ):
+    ) -> None:
         if type(column_lower) is not str:
             msg = f"{self.classname()}: column_lower must be a str"
             raise TypeError(msg)
@@ -289,7 +289,13 @@ class ToDatetimeTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, column, new_column_name, to_datetime_kwargs={}, **kwargs):
+    def __init__(
+        self,
+        column,
+        new_column_name,
+        to_datetime_kwargs={},
+        **kwargs,
+    ) -> None:
         if type(column) is not str:
             msg = f"{self.classname()}: column should be a single str giving the column to transform to datetime"
             raise TypeError(msg)
@@ -396,7 +402,7 @@ class SeriesDtMethodTransformer(BaseTransformer):
         column,
         pd_method_kwargs={},
         **kwargs,
-    ):
+    ) -> None:
         if type(column) is not str:
             msg = f"{self.classname()}: column should be a str but got {type(column)}"
             raise TypeError(msg)
@@ -547,7 +553,7 @@ class BetweenDatesTransformer(BaseTransformer):
         lower_inclusive=True,
         upper_inclusive=True,
         **kwargs,
-    ):
+    ) -> None:
         if type(column_lower) is not str:
             msg = f"{self.classname()}: column_lower should be str"
             raise TypeError(msg)
@@ -706,7 +712,7 @@ class DatetimeInfoExtractor(BaseTransformer):
         include=["timeofday", "timeofmonth", "timeofyear", "dayofweek"],
         datetime_mappings={},
         **kwargs,
-    ):
+    ) -> None:
         if type(include) is not list:
             msg = f"{self.classname()}: include should be List"
             raise TypeError(msg)
@@ -979,7 +985,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         method: Union[str, List[str]],
         units: Union[str, dict],
         period: Union[int, float, dict, dict] = 2 * np.pi,
-    ):
+    ) -> None:
         super().__init__(columns, copy=True)
 
         if not isinstance(method, str) and not isinstance(method, list):

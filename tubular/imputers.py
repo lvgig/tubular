@@ -58,7 +58,7 @@ class ArbitraryImputer(BaseImputer):
         Value to impute nulls with.
     """
 
-    def __init__(self, impute_value, columns, **kwargs):
+    def __init__(self, impute_value, columns, **kwargs) -> None:
         if columns is None:
             msg = f"{self.classname()}: columns must be specified in init for ArbitraryImputer"
             raise ValueError(msg)
@@ -143,7 +143,7 @@ class MedianImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns=None, weight=None, **kwargs):
+    def __init__(self, columns=None, weight=None, **kwargs) -> None:
         super().__init__(columns=columns, **kwargs)
 
         if not isinstance(weight, str) and weight is not None:
@@ -221,7 +221,7 @@ class MeanImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns=None, weight=None, **kwargs):
+    def __init__(self, columns=None, weight=None, **kwargs) -> None:
         super().__init__(columns=columns, **kwargs)
 
         if not isinstance(weight, str) and weight is not None:
@@ -295,7 +295,7 @@ class ModeImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns=None, weight=None, **kwargs):
+    def __init__(self, columns=None, weight=None, **kwargs) -> None:
         super().__init__(columns=columns, **kwargs)
 
         if weight is not None and not isinstance(weight, str):
@@ -353,7 +353,7 @@ class NearestMeanResponseImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns=None, **kwds):
+    def __init__(self, columns=None, **kwds) -> None:
         super().__init__(columns=columns, **kwds)
 
     def fit(self, X, y):
@@ -421,7 +421,7 @@ class NullIndicator(BaseTransformer):
 
     """
 
-    def __init__(self, columns=None, **kwds):
+    def __init__(self, columns=None, **kwds) -> None:
         super().__init__(columns=columns, **kwds)
 
     def transform(self, X):

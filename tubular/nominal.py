@@ -99,7 +99,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
 
     """
 
-    def __init__(self, columns=None, start_encoding=0, **kwargs):
+    def __init__(self, columns=None, start_encoding=0, **kwargs) -> None:
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
 
         if not isinstance(start_encoding, int):
@@ -267,7 +267,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         rare_level_name="rare",
         record_rare_levels=True,
         **kwargs,
-    ):
+    ) -> None:
         super().__init__(columns=columns, **kwargs)
 
         if not isinstance(cut_off_percent, float):
@@ -522,7 +522,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         level=None,
         unseen_level_handling=None,
         **kwargs,
-    ):
+    ) -> None:
         if weights_column is not None and type(weights_column) is not str:
             msg = f"{self.classname()}: weights_column should be a str"
             raise TypeError(msg)
@@ -827,7 +827,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
 
     """
 
-    def __init__(self, columns=None, weights_column=None, **kwargs):
+    def __init__(self, columns=None, weights_column=None, **kwargs) -> None:
         if weights_column is not None and type(weights_column) is not str:
             msg = f"{self.classname()}: weights_column should be a str"
             raise TypeError(msg)
@@ -982,7 +982,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         copy=True,
         verbose=False,
         **kwargs,
-    ):
+    ) -> None:
         BaseNominalTransformer.__init__(
             self,
             columns=columns,
