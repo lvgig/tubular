@@ -287,7 +287,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
                 raise ValueError(msg)
 
             # check weight non-null
-            if X[weights_column].isnull().sum() != 0:
+            if X[weights_column].isna().sum() != 0:
                 msg = "weight column must be non-null"
                 raise ValueError(msg)
 

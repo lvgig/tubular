@@ -175,7 +175,7 @@ class MedianImputer(BaseImputer):
 
             for c in self.columns:
                 # filter out null rows so their weight doesn't influence calc
-                filtered = temp[temp[c].notnull()]
+                filtered = temp[temp[c].notna()]
 
                 # first sort df by column to be imputed (order of weight column shouldn't matter for median)
                 filtered = filtered.sort_values(c)
@@ -251,7 +251,7 @@ class MeanImputer(BaseImputer):
 
             for c in self.columns:
                 # filter out null rows so they don't count towards total weight
-                filtered = X[X[c].notnull()]
+                filtered = X[X[c].notna()]
 
                 # calculate total weight and total of weighted col
                 total_weight = filtered[self.weight].sum()
@@ -372,7 +372,7 @@ class NearestMeanResponseImputer(BaseImputer):
         """
         super().fit(X, y)
 
-        n_nulls = y.isnull().sum()
+        n_nulls = y.isna().sum()
 
         if n_nulls > 0:
             msg = f"{self.classname()}: y has {n_nulls} null values"
@@ -384,7 +384,7 @@ class NearestMeanResponseImputer(BaseImputer):
         response_column = "_temporary_response"
 
         for c in self.columns:
-            c_nulls = X[c].isnull()
+            c_nulls = X[c].isna()
 
             if c_nulls.sum() == 0:
                 msg = f"{self.classname()}: Column {c} has no missing values, cannot use this transformer."
@@ -436,6 +436,6 @@ class NullIndicator(BaseTransformer):
         X = super().transform(X)
 
         for c in self.columns:
-            X[f"{c}_nulls"] = X[c].isnull().astype(int)
+            X[f"{c}_nulls"] = X[c].isna().astype(int)
 
         return X

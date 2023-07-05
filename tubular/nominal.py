@@ -359,7 +359,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                 # nulls are excluded from pandas groupby; https://github.com/pandas-dev/pandas/issues/3729
                 # so add them back in
                 if cols_w_percents.sum() < X[self.weight].sum():
-                    cols_w_percents[np.NaN] = X.loc[X[c].isnull(), self.weight].sum()
+                    cols_w_percents[np.NaN] = X.loc[X[c].isna(), self.weight].sum()
 
                 cols_w_percents = cols_w_percents / X[self.weight].sum()
 
@@ -601,7 +601,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             msg = f"{self.classname()}: weights column {self.weights_column} not in X"
             raise ValueError(msg)
 
-        response_null_count = y.isnull().sum()
+        response_null_count = y.isna().sum()
 
         if response_null_count > 0:
             msg = f"{self.classname()}: y has {response_null_count} null values"
@@ -698,7 +698,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                     X_temp[column + "_" + level] = X[column].copy()
 
                 # keep nans to preserve null check functionality of binary response MRE transformer
-                y_temp = y.apply(lambda x: x == level if not pd.isnull(x) else np.nan)
+                y_temp = y.apply(lambda x: x == level if not pd.isna(x) else np.nan)
 
                 self.transformer_dict[level] = self._fit_binary_response(
                     X_temp,
@@ -863,7 +863,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
             msg = f"{self.classname()}: weights column {self.weights_column} not in X"
             raise ValueError(msg)
 
-        response_null_count = y.isnull().sum()
+        response_null_count = y.isna().sum()
 
         if response_null_count > 0:
             msg = f"{self.classname()}: y has {response_null_count} null values"
@@ -1014,7 +1014,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         # Check for nulls
         for c in self.columns:
-            if X[c].isnull().sum() > 0:
+            if X[c].isna().sum() > 0:
                 raise ValueError(
                     f"{self.classname()}: column %s has nulls - replace before proceeding"
                     % c,
@@ -1089,7 +1089,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         # Check for nulls
         for c in self.columns:
-            if X[c].isnull().sum() > 0:
+            if X[c].isna().sum() > 0:
                 raise ValueError(
                     f"{self.classname()}: column %s has nulls - replace before proceeding"
                     % c,

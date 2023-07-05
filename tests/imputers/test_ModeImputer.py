@@ -235,7 +235,7 @@ class TestTransform:
         )
 
         for col in ["a", "b", "c"]:
-            df[col].loc[df[col].isnull()] = df[col].mode()[0]
+            df[col].loc[df[col].isna()] = df[col].mode()[0]
 
         return df
 
@@ -250,7 +250,7 @@ class TestTransform:
         )
 
         for col in ["a"]:
-            df[col].loc[df[col].isnull()] = df[col].mode()[0]
+            df[col].loc[df[col].isna()] = df[col].mode()[0]
 
         return df
 
@@ -259,7 +259,7 @@ class TestTransform:
         df = d.create_df_9()
 
         for col in ["a"]:
-            df[col].loc[df[col].isnull()] = 6
+            df[col].loc[df[col].isna()] = 6
 
         return df
 

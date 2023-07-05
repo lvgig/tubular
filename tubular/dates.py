@@ -118,7 +118,7 @@ class DateDiffLeapYearTransformer(BaseTransformer):
             msg = f"{self.classname()}: row should be a pd.Series"
             raise TypeError(msg)
 
-        if (pd.isnull(row[self.columns[0]])) or (pd.isnull(row[self.columns[1]])):
+        if (pd.isna(row[self.columns[0]])) or (pd.isna(row[self.columns[1]])):
             return self.missing_replacement
 
         if type(row[self.columns[1]]) not in [datetime.date, datetime.datetime]:
