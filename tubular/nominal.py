@@ -12,10 +12,10 @@ from tubular.mapping import BaseMappingTransformMixin
 
 
 class BaseNominalTransformer(BaseTransformer):
-    """Base nominal transformer designed inherrited from for nominal transformers.
+    """Base Transformer extension for nominal transformers.
 
     Contains columns_set_or_check method which overrides the columns_set_or_check method in BaseTransformer if given
-    primacy in inheritance. The difference being that NominalColumnSetOrCheckMixin's columns_set_or_check only selects
+    primacy in inheritance. The difference being that BaseNominalTransformer's columns_set_or_check only selects
     object and categorical columns from X, if the columns attribute is not set by the user.
     """
 
@@ -436,7 +436,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
         """
 
-        X = super().transform(X)
+        X = BaseNominalTransformer.transform(self, X)
 
         self.check_is_fitted(["mapping_"])
 
