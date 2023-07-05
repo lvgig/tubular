@@ -86,10 +86,11 @@ class CappingTransformer(BaseTransformer):
 
             for k, quantile_values in quantiles.items():
                 for quantile_value in quantile_values:
-                    if quantile_value is not None:
-                        if quantile_value < 0 or quantile_value > 1:
-                            msg = f"{self.classname()}: quantile values must be in the range [0, 1] but got {quantile_value} for key {k}"
-                            raise ValueError(msg)
+                    if (quantile_value is not None) and (
+                        quantile_value < 0 or quantile_value > 1
+                    ):
+                        msg = f"{self.classname()}: quantile values must be in the range [0, 1] but got {quantile_value} for key {k}"
+                        raise ValueError(msg)
 
             self.capping_values = {}
 
@@ -128,10 +129,11 @@ class CappingTransformer(BaseTransformer):
                         msg = f"{self.classname()}: item in {dict_name} lists contains numpy NaN or Inf values"
                         raise ValueError(msg)
 
-            if all([cap_value is not None for cap_value in cap_values]):
-                if cap_values[0] >= cap_values[1]:
-                    msg = f"{self.classname()}: lower value is greater than or equal to upper value for key {k}"
-                    raise ValueError(msg)
+            if all([cap_value is not None for cap_value in cap_values]) and (
+                cap_values[0] >= cap_values[1]
+            ):
+                msg = f"{self.classname()}: lower value is greater than or equal to upper value for key {k}"
+                raise ValueError(msg)
 
             if all([cap_value is None for cap_value in cap_values]):
                 msg = f"{self.classname()}: both values are None for key {k}"

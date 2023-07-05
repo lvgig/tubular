@@ -57,10 +57,9 @@ class SeriesStrMethodTransformer(BaseTransformer):
         pd_method_kwargs={},
         **kwargs,
     ):
-        if type(columns) is list:
-            if len(columns) > 1:
-                msg = f"{self.classname()}: columns arg should contain only 1 column name but got {len(columns)}"
-                raise ValueError(msg)
+        if type(columns) is list and len(columns) > 1:
+            msg = f"{self.classname()}: columns arg should contain only 1 column name but got {len(columns)}"
+            raise ValueError(msg)
 
         super().__init__(columns=columns, **kwargs)
 

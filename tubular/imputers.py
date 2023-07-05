@@ -99,11 +99,13 @@ class ArbitraryImputer(BaseImputer):
         self.columns_check(X)
 
         for c in self.columns:
-            if "category" in X[c].dtype.name:
-                if self.impute_value not in X[c].cat.categories:
-                    X[c] = X[c].cat.add_categories(
-                        self.impute_value,
-                    )  # add new category
+            if (
+                "category" in X[c].dtype.name
+                and self.impute_value not in X[c].cat.categories
+            ):
+                X[c] = X[c].cat.add_categories(
+                    self.impute_value,
+                )  # add new category
 
             dtype = X[c].dtype  # get the dtype of column
 

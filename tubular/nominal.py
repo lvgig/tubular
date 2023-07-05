@@ -315,10 +315,11 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         super().fit(X, y)
 
         for c in self.columns:
-            if X[c].dtype.name != "category":
-                if pd.Series(self.rare_level_name).dtype != X[c].dtypes:
-                    msg = f"{self.classname()}: rare_level_name must be of the same type of the columns"
-                    raise ValueError(msg)
+            if (X[c].dtype.name != "category") and (
+                pd.Series(self.rare_level_name).dtype != X[c].dtypes
+            ):
+                msg = f"{self.classname()}: rare_level_name must be of the same type of the columns"
+                raise ValueError(msg)
 
         if self.weight is not None and self.weight not in X.columns.values:
             msg = f"{self.classname()}: weight {self.weight} not in X"
@@ -534,15 +535,16 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             msg = f"{self.classname()}: prior should be positive int"
             raise ValueError(msg)
 
-        if level:
-            if not isinstance(level, str) and not isinstance(level, list):
-                msg = f"{self.classname()}: Level should be a NoneType, list or str but got {type(level)}"
-                raise TypeError(msg)
-        if unseen_level_handling:
-            if unseen_level_handling not in ["Mean", "Median", "Lowest", "Highest"]:
-                if not isinstance(unseen_level_handling, (int, float)):
-                    msg = f"{self.classname()}: unseen_level_handling should be the option: Mean, Median, Lowest, Highest or an arbitrary int/float value"
-                    raise ValueError(msg)
+        if level and not isinstance(level, str) and not isinstance(level, list):
+            msg = f"{self.classname()}: Level should be a NoneType, list or str but got {type(level)}"
+            raise TypeError(msg)
+        if (
+            unseen_level_handling
+            and (unseen_level_handling not in ["Mean", "Median", "Lowest", "Highest"])
+            and not (isinstance(unseen_level_handling, (int, float)))
+        ):
+            msg = f"{self.classname()}: unseen_level_handling should be the option: Mean, Median, Lowest, Highest or an arbitrary int/float value"
+            raise ValueError(msg)
 
         self.weights_column = weights_column
         self.prior = prior
@@ -592,12 +594,12 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             {column_in_original_data}_{response_level}, where response_level is the level
             being encoded against in this call of _fit_binary_response.
         """
-        if self.weights_column is not None:
-            if self.weights_column not in X.columns.values:
-                msg = (
-                    f"{self.classname()}: weights column {self.weights_column} not in X"
-                )
-                raise ValueError(msg)
+        if (
+            self.weights_column is not None
+            and self.weights_column not in X.columns.values
+        ):
+            msg = f"{self.classname()}: weights column {self.weights_column} not in X"
+            raise ValueError(msg)
 
         response_null_count = y.isnull().sum()
 
@@ -854,12 +856,12 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
 
         self.mappings = {}
 
-        if self.weights_column is not None:
-            if self.weights_column not in X.columns.values:
-                msg = (
-                    f"{self.classname()}: weights column {self.weights_column} not in X"
-                )
-                raise ValueError(msg)
+        if (
+            self.weights_column is not None
+            and self.weights_column not in X.columns.values
+        ):
+            msg = f"{self.classname()}: weights column {self.weights_column} not in X"
+            raise ValueError(msg)
 
         response_null_count = y.isnull().sum()
 

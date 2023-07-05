@@ -204,17 +204,18 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
                 col_mappings = pd.Series(self.mappings[col])
                 mapping_dtype = col_mappings.dtype
 
-                if (mapped_dtypes[col] != mapping_dtype) and (
-                    mapped_dtypes[col] != original_dtypes[col]
-                ):
-                    # Confirm the initial and end dtypes are not categories
-                    if not (
+                if (
+                    (mapped_dtypes[col] != mapping_dtype)
+                    and (mapped_dtypes[col] != original_dtypes[col])
+                    and not (
                         is_categorical_dtype(original_dtypes[col])
                         and is_categorical_dtype(mapped_dtypes[col])
-                    ):
-                        warnings.warn(
-                            f"{self.classname()}: This mapping changes {col} dtype from {original_dtypes[col]} to {mapped_dtypes[col]}. This is often caused by having multiple dtypes in one column, or by not mapping all values.",
-                        )
+                    )
+                ):
+                    # Confirm the initial and end dtypes are not categories
+                    warnings.warn(
+                        f"{self.classname()}: This mapping changes {col} dtype from {original_dtypes[col]} to {mapped_dtypes[col]}. This is often caused by having multiple dtypes in one column, or by not mapping all values.",
+                    )
 
         return X
 
@@ -258,10 +259,9 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
             msg = f"{self.classname()}: adjust_column should be a string"
             raise TypeError(msg)
 
-        if len(mappings) > 1:
-            if not isinstance(mappings, OrderedDict):
-                msg = f"{self.classname()}: mappings should be an ordered dict for 'replace' mappings using multiple columns"
-                raise TypeError(msg)
+        if len(mappings) > 1 and not isinstance(mappings, OrderedDict):
+            msg = f"{self.classname()}: mappings should be an ordered dict for 'replace' mappings using multiple columns"
+            raise TypeError(msg)
 
         self.adjust_column = adjust_column
 
