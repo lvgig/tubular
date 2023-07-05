@@ -164,7 +164,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         X_y = X.copy()
 
-        X_y["_temporary_response"] = y.values
+        X_y["_temporary_response"] = y.to_numpy()
 
         return X_y
 
@@ -234,7 +234,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             raise TypeError(msg)
 
         for c in self.columns:
-            if c not in X.columns.values:
+            if c not in X.columns.to_numpy():
                 raise ValueError(f"{self.classname()}: variable " + c + " is not in X")
 
     def columns_set_or_check(self, X):

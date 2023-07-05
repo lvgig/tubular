@@ -32,7 +32,7 @@ class BaseMappingTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, mappings, **kwargs) -> None:
+    def __init__(self, mappings, **kwargs):
         if isinstance(mappings, dict):
             if not len(mappings) > 0:
                 msg = f"{self.classname()}: mappings has no values"
@@ -137,7 +137,7 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
 
     """
 
-    def __init__(self, mappings, **kwargs) -> None:
+    def __init__(self, mappings, **kwargs):
         for k, v in mappings.items():
             if isinstance(v, dict):
                 mappings[k] = ReturnKeyDict(v)
@@ -252,7 +252,7 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
 
     """
 
-    def __init__(self, adjust_column, mappings, **kwargs) -> None:
+    def __init__(self, adjust_column, mappings, **kwargs):
         super().__init__(mappings=mappings, **kwargs)
 
         if not isinstance(adjust_column, str):
@@ -283,7 +283,7 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
 
         X = super().transform(X)
 
-        if self.adjust_column not in X.columns.values:
+        if self.adjust_column not in X.columns.to_numpy():
             msg = f"{self.classname()}: variable {self.adjust_column} is not in X"
             raise ValueError(msg)
 
@@ -330,7 +330,7 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
 
     """
 
-    def __init__(self, adjust_column, mappings, **kwargs) -> None:
+    def __init__(self, adjust_column, mappings, **kwargs):
         super().__init__(mappings=mappings, **kwargs)
 
         if not isinstance(adjust_column, str):
@@ -363,7 +363,7 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
 
         X = super().transform(X)
 
-        if self.adjust_column not in X.columns.values:
+        if self.adjust_column not in X.columns.to_numpy():
             msg = f"{self.classname()}: variable {self.adjust_column} is not in X"
             raise ValueError(msg)
 
@@ -414,7 +414,7 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
 
     """
 
-    def __init__(self, adjust_column, mappings, **kwargs) -> None:
+    def __init__(self, adjust_column, mappings, **kwargs):
         super().__init__(mappings=mappings, **kwargs)
 
         if not isinstance(adjust_column, str):
@@ -447,7 +447,7 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
 
         X = super().transform(X)
 
-        if self.adjust_column not in X.columns.values:
+        if self.adjust_column not in X.columns.to_numpy():
             raise ValueError(
                 f"{self.classname()}: variable " + self.adjust_column + " is not in X",
             )

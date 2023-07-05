@@ -585,7 +585,9 @@ class TestTransform:
         ta.equality.assert_equal_dispatch(
             expected=["a", "b", "c"],
             actual=[
-                x for x in df.columns.values if x not in df_transformed.columns.values
+                x
+                for x in df.columns.to_numpy()
+                if x not in df_transformed.columns.to_numpy()
             ],
             msg="original columns not dropped",
         )

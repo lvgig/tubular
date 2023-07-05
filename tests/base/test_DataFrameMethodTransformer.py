@@ -348,8 +348,8 @@ class TestTransform:
 
         df_transformed = x.transform(df)
 
-        assert ("a" not in df_transformed.columns.values) and (
-            "b" not in df_transformed.columns.values
+        assert ("a" not in df_transformed.columns.to_numpy()) and (
+            "b" not in df_transformed.columns.to_numpy()
         ), "original columns not dropped"
 
     def test_original_columns_kept_when_specified(self):
@@ -367,6 +367,6 @@ class TestTransform:
 
         df_transformed = x.transform(df)
 
-        assert ("a" in df_transformed.columns.values) and (
-            "b" in df_transformed.columns.values
+        assert ("a" in df_transformed.columns.to_numpy()) and (
+            "b" in df_transformed.columns.to_numpy()
         ), "original columns not kept"

@@ -99,7 +99,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
 
     """
 
-    def __init__(self, columns=None, start_encoding=0, **kwargs) -> None:
+    def __init__(self, columns=None, start_encoding=0, **kwargs):
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
 
         if not isinstance(start_encoding, int):
@@ -267,7 +267,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         rare_level_name="rare",
         record_rare_levels=True,
         **kwargs,
-    ) -> None:
+    ):
         super().__init__(columns=columns, **kwargs)
 
         if not isinstance(cut_off_percent, float):
@@ -321,7 +321,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                 msg = f"{self.classname()}: rare_level_name must be of the same type of the columns"
                 raise ValueError(msg)
 
-        if self.weight is not None and self.weight not in X.columns.values:
+        if self.weight is not None and self.weight not in X.columns.to_numpy():
             msg = f"{self.classname()}: weight {self.weight} not in X"
             raise ValueError(msg)
 
@@ -522,7 +522,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         level=None,
         unseen_level_handling=None,
         **kwargs,
-    ) -> None:
+    ):
         if weights_column is not None and type(weights_column) is not str:
             msg = f"{self.classname()}: weights_column should be a str"
             raise TypeError(msg)
@@ -596,7 +596,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         """
         if (
             self.weights_column is not None
-            and self.weights_column not in X.columns.values
+            and self.weights_column not in X.columns.to_numpy()
         ):
             msg = f"{self.classname()}: weights column {self.weights_column} not in X"
             raise ValueError(msg)
@@ -791,7 +791,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         if self.level:
             # Setting self.columns back so that the transformer object is unchanged after transform is called
             self.columns = temp_columns
-            X = X.drop(columns=self.columns)
+            X.drop(columns=self.columns, inplace=True)
 
         return X
 
@@ -827,7 +827,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
 
     """
 
-    def __init__(self, columns=None, weights_column=None, **kwargs) -> None:
+    def __init__(self, columns=None, weights_column=None, **kwargs):
         if weights_column is not None and type(weights_column) is not str:
             msg = f"{self.classname()}: weights_column should be a str"
             raise TypeError(msg)
@@ -858,7 +858,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
 
         if (
             self.weights_column is not None
-            and self.weights_column not in X.columns.values
+            and self.weights_column not in X.columns.to_numpy()
         ):
             msg = f"{self.classname()}: weights column {self.weights_column} not in X"
             raise ValueError(msg)
@@ -982,7 +982,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         copy=True,
         verbose=False,
         **kwargs,
-    ) -> None:
+    ):
         BaseNominalTransformer.__init__(
             self,
             columns=columns,
@@ -1121,8 +1121,9 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
                 for lvl in self.categories_[i]
             ]
 
-            X_transformed = X_transformed.rename(
+            X_transformed.rename(
                 columns=dict(zip(old_names, new_names)),
+                inplace=True,
             )
 
         # Print warning for unseen levels
@@ -1138,7 +1139,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         # Drop original columns
         if self.drop_original:
-            X = X.drop(self.columns, axis=1)
+            X.drop(self.columns, axis=1, inplace=True)
 
         # Concatenate original and new dummy fields
         return pd.concat((X, X_transformed), axis=1)

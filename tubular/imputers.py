@@ -405,7 +405,7 @@ class NearestMeanResponseImputer(BaseImputer):
                 mean_response_by_levels["abs_diff_response"]
                 == mean_response_by_levels["abs_diff_response"].min(),
                 c,
-            ].values[0]
+            ].to_numpy()[0]
 
         return self
 
