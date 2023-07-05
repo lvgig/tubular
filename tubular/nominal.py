@@ -791,7 +791,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         if self.level:
             # Setting self.columns back so that the transformer object is unchanged after transform is called
             self.columns = temp_columns
-            X.drop(columns=self.columns, inplace=True)
+            X = X.drop(columns=self.columns)
 
         return X
 
@@ -1121,9 +1121,8 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
                 for lvl in self.categories_[i]
             ]
 
-            X_transformed.rename(
+            X_transformed = X_transformed.rename(
                 columns=dict(zip(old_names, new_names)),
-                inplace=True,
             )
 
         # Print warning for unseen levels
@@ -1139,7 +1138,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         # Drop original columns
         if self.drop_original:
-            X.drop(self.columns, axis=1, inplace=True)
+            X = X.drop(self.columns, axis=1)
 
         # Concatenate original and new dummy fields
         return pd.concat((X, X_transformed), axis=1)
