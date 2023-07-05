@@ -232,7 +232,7 @@ class TestFit:
 
 
 def create_svd_sovler_output():
-    svd_sovler_output = dict()
+    svd_sovler_output = {}
     svd_sovler_output["full"] = pd.DataFrame(
         {
             "a": [34.48, 21.71, 32.83, 1.08, 32.93, 4.74, 2.76, 75.7, 14.08, 61.31],

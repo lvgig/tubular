@@ -129,13 +129,13 @@ class CappingTransformer(BaseTransformer):
                         msg = f"{self.classname()}: item in {dict_name} lists contains numpy NaN or Inf values"
                         raise ValueError(msg)
 
-            if all([cap_value is not None for cap_value in cap_values]) and (
+            if all(cap_value is not None for cap_value in cap_values) and (
                 cap_values[0] >= cap_values[1]
             ):
                 msg = f"{self.classname()}: lower value is greater than or equal to upper value for key {k}"
                 raise ValueError(msg)
 
-            if all([cap_value is None for cap_value in cap_values]):
+            if all(cap_value is None for cap_value in cap_values):
                 msg = f"{self.classname()}: both values are None for key {k}"
                 raise ValueError(msg)
 

@@ -363,14 +363,17 @@ class TestFit:
 
         if level:
             if level == "all":
-                assert set(x.mapped_columns) == set(
-                    ["b_blue", "b_yellow", "b_green"],
-                ), "Stored mapped columns are not as expected"
+                assert set(x.mapped_columns) == {
+                    "b_blue",
+                    "b_yellow",
+                    "b_green",
+                }, "Stored mapped columns are not as expected"
 
             else:
-                assert set(x.mapped_columns) == set(
-                    ["b_blue", "b_yellow"],
-                ), "Stored mapped columns are not as expected"
+                assert set(x.mapped_columns) == {
+                    "b_blue",
+                    "b_yellow",
+                }, "Stored mapped columns are not as expected"
 
             for column in x.mapped_columns:
                 actual = x.mappings[column]
@@ -419,14 +422,17 @@ class TestFit:
 
         if level:
             if level == "all":
-                assert set(x.unseen_levels_encoding_dict.keys()) == set(
-                    ["b_blue", "b_yellow", "b_green"],
-                ), "Stored unseen_levels_encoding_dict keys are not as expected"
+                assert set(x.unseen_levels_encoding_dict.keys()) == {
+                    "b_blue",
+                    "b_yellow",
+                    "b_green",
+                }, "Stored unseen_levels_encoding_dict keys are not as expected"
 
             else:
-                assert set(x.unseen_levels_encoding_dict.keys()) == set(
-                    ["b_blue", "b_yellow"],
-                ), "Stored unseen_levels_encoding_dict keys are not as expected"
+                assert set(x.unseen_levels_encoding_dict.keys()) == {
+                    "b_blue",
+                    "b_yellow",
+                }, "Stored unseen_levels_encoding_dict keys are not as expected"
 
             for column in x.unseen_levels_encoding_dict:
                 actual = x.unseen_levels_encoding_dict[column]
@@ -434,9 +440,9 @@ class TestFit:
                 assert actual == expected
 
         else:
-            assert x.unseen_levels_encoding_dict.keys() == set(
-                ["b"],
-            ), "Stored unseen_levels_encoding_dict key is not as expected"
+            assert x.unseen_levels_encoding_dict.keys() == {
+                "b",
+            }, "Stored unseen_levels_encoding_dict key is not as expected"
 
             if unseen_level_handling == "Mean":
                 for column in x.unseen_levels_encoding_dict:

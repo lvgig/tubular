@@ -242,7 +242,7 @@ class TestFit:
 
     def test_fields_with_over_100_levels_error(self):
         """Test that OneHotEncodingTransformer.fit on fields with more than 100 levels raises error."""
-        df = pd.DataFrame({"b": [i for i in range(101)]})
+        df = pd.DataFrame({"b": list(range(101))})
         df["a"] = 1
 
         x = OneHotEncodingTransformer(columns=["a", "b"])
@@ -602,6 +602,6 @@ class TestTransform:
 
         ta.equality.assert_equal_dispatch(
             expected=list(set()),
-            actual=list(set(["a", "b", "c"]) - set(df_transformed.columns)),
+            actual=list({"a", "b", "c"} - set(df_transformed.columns)),
             msg="original columns not kept",
         )

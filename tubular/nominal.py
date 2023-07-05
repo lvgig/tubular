@@ -58,7 +58,7 @@ class BaseNominalTransformer(BaseTransformer):
         self.check_is_fitted(["mappings"])
 
         for c in self.columns:
-            mappable_rows = X[c].isin([k for k in self.mappings[c]]).sum()
+            mappable_rows = X[c].isin(list(self.mappings[c])).sum()
 
             if mappable_rows < X.shape[0]:
                 msg = f"{self.classname()}: nulls would be introduced into column {c} from levels not present in mapping"
@@ -680,7 +680,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                 if isinstance(self.level, str):
                     self.level = [self.level]
 
-                if any([level not in list(y.unique()) for level in self.level]):
+                if any(level not in list(y.unique()) for level in self.level):
                     msg = "Levels contains a level to encode against that is not present in the response."
                     raise ValueError(msg)
 
@@ -1122,7 +1122,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
             ]
 
             X_transformed.rename(
-                columns={i: j for i, j in zip(old_names, new_names)},
+                columns=dict(zip(old_names, new_names)),
                 inplace=True,
             )
 

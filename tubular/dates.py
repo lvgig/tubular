@@ -1020,8 +1020,8 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         ):
             msg = "{}: units dictionary key value pair must be strings but got keys: {} and values: {}".format(
                 self.classname(),
-                set(type(k) for k in units),
-                set(type(v) for v in units.values()),
+                {type(k) for k in units},
+                {type(v) for v in units.values()},
             )
             raise TypeError(msg)
 
@@ -1035,8 +1035,8 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         ):
             msg = "{}: period dictionary key value pair must be str:int or str:float but got keys: {} and values: {}".format(
                 self.classname(),
-                set(type(k) for k in period),
-                set(type(v) for v in period.values()),
+                {type(k) for k in period},
+                {type(v) for v in period.values()},
             )
             raise TypeError(msg)
 
@@ -1063,7 +1063,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         ]
 
         if isinstance(units, dict):
-            if not set(list(units.values())).issubset(valid_unit_list):
+            if not set(units.values()).issubset(valid_unit_list):
                 msg = "{}: units dictionary values must be one of 'year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond' but got {}".format(
                     self.classname(),
                     set(units.values()),
@@ -1081,18 +1081,14 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         self.units = units
         self.period = period
 
-        if isinstance(units, dict) and sorted(list(units.keys())) != sorted(
-            list(self.columns),
-        ):
+        if isinstance(units, dict) and sorted(units.keys()) != sorted(self.columns):
             msg = "{}: unit dictionary keys must be the same as columns but got {}".format(
                 self.classname(),
                 set(units.keys()),
             )
             raise ValueError(msg)
 
-        if isinstance(period, dict) and sorted(list(period.keys())) != sorted(
-            list(self.columns),
-        ):
+        if isinstance(period, dict) and sorted(period.keys()) != sorted(self.columns):
             msg = "{}: period dictionary keys must be the same as columns but got {}".format(
                 self.classname(),
                 set(period.keys()),
