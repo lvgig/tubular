@@ -8,14 +8,14 @@ with open("README.md") as fh:
 # get version from _version.py file, from below
 # https://stackoverflow.com/questions/458550/standard-way-to-embed-version-into-python-package
 VERSION_FILE = "tubular/_version.py"
-version_file_str = open(VERSION_FILE).read()
 VERSION_STR_RE = r"^__version__ = ['\"]([^'\"]*)['\"]"
-mo = re.search(VERSION_STR_RE, version_file_str, re.M)
-if mo:
-    version = mo.group(1)
-else:
-    msg = f"Unable to find version string in {VERSION_FILE}."
-    raise RuntimeError(msg)
+with open(VERSION_FILE).read() as version_file_str:
+    mo = re.search(VERSION_STR_RE, version_file_str, re.M)
+    if mo:
+        version = mo.group(1)
+    else:
+        msg = f"Unable to find version string in {VERSION_FILE}."
+        raise RuntimeError(msg)
 
 
 def list_reqs(fname="requirements.txt"):
