@@ -2,7 +2,7 @@
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
 # McCabe complexity (`C901`) by default.
 select = ["E", "F", "W", "I", "UP", "YTT", "A", "COM", "C4", "T10", "EM", 
-"ISC", "PIE", "PYI", "Q", "RSE", "RET", "SLOT", "SIM", "TID", "TCH", "PD",]
+"ISC", "PIE", "PYI", "Q", "RSE", "RET", "SLOT", "SIM", "TID", "TCH", "INT", "PD",]
 
 # ignore E501 - linelength limit (covered by black except in docstrings) 
 # and PD901 - use of df variable name
