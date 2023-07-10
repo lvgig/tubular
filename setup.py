@@ -9,7 +9,8 @@ with open("README.md") as fh:
 # https://stackoverflow.com/questions/458550/standard-way-to-embed-version-into-python-package
 VERSION_FILE = "tubular/_version.py"
 VERSION_STR_RE = r"^__version__ = ['\"]([^'\"]*)['\"]"
-with open(VERSION_FILE).read() as version_file_str:
+with open(VERSION_FILE) as version_file:
+    version_file_str = version_file.read()
     mo = re.search(VERSION_STR_RE, version_file_str, re.M)
     if mo:
         version = mo.group(1)
