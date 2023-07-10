@@ -29,7 +29,7 @@ Then install tubular and dependencies for development;
 
      pip install . -r requirements-dev.txt
 
-We use `pre-commit <https://pre-commit.com/>`_ for this project which is configured to check that code is formatted with `black <https://black.readthedocs.io/en/stable/>`_ and passes `flake8 <https://flake8.pycqa.org/en/latest/>`_ checks.
+We use `pre-commit <https://pre-commit.com/>`_ for this project which is configured to check that code is formatted with `black <https://black.readthedocs.io/en/stable/>`_ and passes `ruff <https://beta.ruff.rs/docs/>`_ checks.  For a list of ruff rules follwed by this project check .ruff.toml.
 
 To configure ``pre-commit`` for your local repository run the following;
 
