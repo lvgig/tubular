@@ -1,18 +1,17 @@
+import pandas as pd
 import pytest
 import test_aide as ta
-import tests.test_data as d
-import pandas as pd
 
+import tests.test_data as d
 import tubular
 from tubular.numeric import PCATransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for PCATransformer.init()."""
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=PCATransformer.__init__,
             expected_arguments=[
@@ -28,14 +27,12 @@ class TestInit(object):
 
     def test_inheritance(self):
         """Test that PCATransformer inherits from BaseTransformer."""
-
         x = PCATransformer(columns=["a"])
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_to_random_state_type_error(self):
         """Test that an exception is raised if random_state is not a int or None."""
-
         with pytest.raises(
             TypeError,
             match=r"""PCATransformer:unexpected type <class 'str'> for random_state, must be int or None.""",
@@ -44,7 +41,6 @@ class TestInit(object):
 
     def test_to_svd_solver_type_error(self):
         """Test that an exception is raised if svd_solver is not a str."""
-
         with pytest.raises(
             TypeError,
             match=r"""PCATransformer:unexpected type <class 'int'> for svd_solver, must be str""",
@@ -53,7 +49,6 @@ class TestInit(object):
 
     def test_to_n_components_type_error(self):
         """Test that an exception is raised if n_components is not a int or 'mle'."""
-
         with pytest.raises(
             TypeError,
             match=r"""PCATransformer:unexpected type <class 'str'> for n_components, must be int, float \(0-1\) or equal to 'mle'.""",
@@ -62,7 +57,6 @@ class TestInit(object):
 
     def test_to_pca_prefix_type_error(self):
         """Test that an exception is raised if pca_column_prefix is not str."""
-
         with pytest.raises(
             TypeError,
             match=r"""PCATransformer:unexpected type <class 'int'> for pca_column_prefix, must be str""",
@@ -71,7 +65,6 @@ class TestInit(object):
 
     def test_to_svd_solver_value_error(self):
         """Test that an exception is raised if svd_solver is not one of the allowed values."""
-
         with pytest.raises(
             ValueError,
             match=r"""PCATransformer:svd_solver zzz is unknown. Please select among 'auto', 'full', 'arpack', 'randomized'.""",
@@ -80,7 +73,6 @@ class TestInit(object):
 
     def test_to_n_components_value_error(self):
         """Test that an exception is raised if n_components is not one of the allowed values."""
-
         with pytest.raises(
             ValueError,
             match=r"""PCATransformer:n_components must be strictly positive got -1""",
@@ -89,7 +81,6 @@ class TestInit(object):
 
     def test_to_n_components_float_value_error(self):
         """Test that an exception is raised if n_components is not one of the allowed float values."""
-
         with pytest.raises(
             ValueError,
             match=r"""PCATransformer:n_components must be strictly positive and must be of type int when greater than or equal to 1. Got 1.4""",
@@ -114,26 +105,27 @@ class TestInit(object):
 
     def test_super_init_called(self, mocker):
         """Test that super.__init__ called."""
-
         expected_call_args = {
             0: {
                 "args": (),
                 "kwargs": {"columns": ["a", "b"], "copy": True, "verbose": False},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
             PCATransformer(columns=["a", "b"], n_components=1, copy=True, verbose=False)
 
 
-class TestCheckNumericColumns(object):
+class TestCheckNumericColumns:
     """Tests for the check_numeric_columns method."""
 
     def test_arguments(self):
         """Test that check_numeric_columns has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=PCATransformer.check_numeric_columns,
             expected_arguments=["self", "X"],
@@ -142,7 +134,6 @@ class TestCheckNumericColumns(object):
 
     def test_exception_raised(self):
         """Test an exception is raised if non numeric columns are passed in X."""
-
         df = d.create_df_2()
 
         x = PCATransformer(columns=["a", "b", "c"], n_components=2)
@@ -155,7 +146,6 @@ class TestCheckNumericColumns(object):
 
     def test_X_returned(self):
         """Test that the input X is returned from the method."""
-
         df = d.create_df_2()
 
         x = PCATransformer(columns=["a"], n_components=2)
@@ -169,12 +159,11 @@ class TestCheckNumericColumns(object):
         )
 
 
-class TestFit(object):
+class TestFit:
     """Tests for PCATransformer.fit()."""
 
     def test_arguments(self):
         """Test that fit has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=PCATransformer.fit,
             expected_arguments=["self", "X", "y"],
@@ -183,23 +172,24 @@ class TestFit(object):
 
     def test_super_fit_call(self, mocker):
         """Test the call to BaseTransformer.fit."""
-
         df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=["a", "b"], n_components=1)
 
         expected_call_args = {
-            0: {"args": (d.create_numeric_df_1(), None), "kwargs": {}}
+            0: {"args": (d.create_numeric_df_1(), None), "kwargs": {}},
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "fit", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "fit",
+            expected_call_args,
         ):
             x.fit(df)
 
     def test_check_numeric_columns_call(self, mocker):
         """Test the call to PCATransformer.check_numeric_columns."""
-
         df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=["a", "b"], n_components=1)
@@ -230,7 +220,6 @@ class TestFit(object):
 
     def test_return_self(self):
         """Test that fit returns self."""
-
         df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=["a", "b"])
@@ -243,7 +232,7 @@ class TestFit(object):
 
 
 def create_svd_sovler_output():
-    svd_sovler_output = dict()
+    svd_sovler_output = {}
     svd_sovler_output["full"] = pd.DataFrame(
         {
             "a": [34.48, 21.71, 32.83, 1.08, 32.93, 4.74, 2.76, 75.7, 14.08, 61.31],
@@ -275,7 +264,7 @@ def create_svd_sovler_output():
                 2.6606364975891146,
                 -8.124090398439629,
             ],
-        }
+        },
     )
 
     svd_sovler_output["randomized"] = pd.DataFrame(
@@ -309,7 +298,7 @@ def create_svd_sovler_output():
                 2.660636497589127,
                 -8.12409039843965,
             ],
-        }
+        },
     )
 
     svd_sovler_output["arpack"] = pd.DataFrame(
@@ -343,17 +332,16 @@ def create_svd_sovler_output():
                 2.660636497589114,
                 -8.124090398439632,
             ],
-        }
+        },
     )
     return svd_sovler_output
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for PCATransformer.transform()."""
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=PCATransformer.transform,
             expected_arguments=["self", "X"],
@@ -362,7 +350,6 @@ class TestTransform(object):
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
-
         df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=["a", "b"])
@@ -378,12 +365,10 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_numeric_df_1(),
         ):
-
             x.transform(df)
 
     def test_check_numeric_columns_call(self, mocker):
         """Test the call to PCATransformer.check_numeric_columns."""
-
         df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=["a", "b"], copy=True)
@@ -399,18 +384,19 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_numeric_df_1(),
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(
-        "svd_solver, svd_solver_output_str",
+        ("svd_solver", "svd_solver_output_str"),
         [("full", "full"), ("arpack", "arpack"), ("randomized", "randomized")],
     )
     def test_output_from_pca_transform_set_to_columns(
-        self, mocker, svd_solver, svd_solver_output_str
+        self,
+        mocker,
+        svd_solver,
+        svd_solver_output_str,
     ):
         """Test that the call to the pca.transform method returns expected outputs."""
-
         df = d.create_numeric_df_1()
 
         x = PCATransformer(
@@ -438,7 +424,6 @@ class TestTransform(object):
     @pytest.mark.parametrize("columns", [("b"), ("c"), (["b", "c"])])
     def test_return_type(self, columns):
         """Test that transform returns a pd.DataFrame."""
-
         df = d.create_numeric_df_1()
 
         x = PCATransformer(columns=columns, n_components=1)

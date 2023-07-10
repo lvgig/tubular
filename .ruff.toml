@@ -1,0 +1,36 @@
+# Enable the pycodestyle (`E`) and Pyflakes (`F`) rules by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+select = ["E", "F", "W", "I", "UP", "ASYNC", "YTT", "A", "COM", "C4", "T10", "EM", 
+"FA", "ISC", "PIE", "PYI", "Q", "RSE", "RET", "SLOT", "SIM", "TID", "TCH", "INT", 
+"PD", "PGH", "PLC", "PLE", "PLW", "FLY", "NPY", "PERF"]
+
+# ignore E501 - linelength limit (covered by black except in docstrings) 
+# and PD901 - use of df variable name
+ignore = ["E501", "PD901"]
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    "source",
+]
+
+# Same as Black.
+line-length = 88
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Assume Python 3.8.
+target-version = "py38"
+
+# Ignore `E402` (import violations) in all `__init__.py` file.
+[per-file-ignores]
+"__init__.py" = ["E402", "F401"]

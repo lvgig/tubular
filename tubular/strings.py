@@ -1,6 +1,4 @@
-"""
-This module contains transformers that apply string functions.
-"""
+"""This module contains transformers that apply string functions."""
 
 import pandas as pd
 
@@ -52,61 +50,47 @@ class SeriesStrMethodTransformer(BaseTransformer):
     """
 
     def __init__(
-        self, new_column_name, pd_method_name, columns, pd_method_kwargs={}, **kwargs
-    ):
-
-        if type(columns) is list:
-
-            if len(columns) > 1:
-
-                raise ValueError(
-                    f"{self.classname()}: columns arg should contain only 1 column name but got {len(columns)}"
-                )
+        self,
+        new_column_name,
+        pd_method_name,
+        columns,
+        pd_method_kwargs={},
+        **kwargs,
+    ) -> None:
+        if type(columns) is list and len(columns) > 1:
+            msg = f"{self.classname()}: columns arg should contain only 1 column name but got {len(columns)}"
+            raise ValueError(msg)
 
         super().__init__(columns=columns, **kwargs)
 
         if type(new_column_name) is not str:
-
-            raise TypeError(
-                f"{self.classname()}: unexpected type ({type(new_column_name)}) for new_column_name, must be str"
-            )
+            msg = f"{self.classname()}: unexpected type ({type(new_column_name)}) for new_column_name, must be str"
+            raise TypeError(msg)
 
         if type(pd_method_name) is not str:
-
-            raise TypeError(
-                f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
-            )
+            msg = f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
+            raise TypeError(msg)
 
         if type(pd_method_kwargs) is not dict:
+            msg = f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
+            raise TypeError(msg)
 
-            raise TypeError(
-                f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
-            )
-
-        else:
-
-            for i, k in enumerate(pd_method_kwargs.keys()):
-
-                if not type(k) is str:
-
-                    raise TypeError(
-                        f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
-                    )
+        for i, k in enumerate(pd_method_kwargs.keys()):
+            if type(k) is not str:
+                msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
+                raise TypeError(msg)
 
         self.new_column_name = new_column_name
         self.pd_method_name = pd_method_name
         self.pd_method_kwargs = pd_method_kwargs
 
         try:
-
             ser = pd.Series(["a"])
             getattr(ser.str, pd_method_name)
 
         except Exception as err:
-
-            raise AttributeError(
-                f"""{self.classname()}: error accessing "str.{pd_method_name}" method on pd.Series object - pd_method_name should be a pd.Series.str method"""
-            ) from err
+            msg = f'{self.classname()}: error accessing "str.{pd_method_name}" method on pd.Series object - pd_method_name should be a pd.Series.str method'
+            raise AttributeError(msg) from err
 
     def transform(self, X):
         """Transform specific column on input pandas.DataFrame (X) using the given pandas.Series.str method and
@@ -127,19 +111,17 @@ class SeriesStrMethodTransformer(BaseTransformer):
             running the pd.Series.str method.
 
         """
-
         X = super().transform(X)
 
         X[self.new_column_name] = getattr(X[self.columns[0]].str, self.pd_method_name)(
-            **self.pd_method_kwargs
+            **self.pd_method_kwargs,
         )
 
         return X
 
 
 class StringConcatenator(BaseTransformer):
-    """
-    Transformer to combine data from specified columns, of mixed datatypes, into a new column containing one string.
+    """Transformer to combine data from specified columns, of mixed datatypes, into a new column containing one string.
 
     Parameters
     ----------
@@ -151,25 +133,25 @@ class StringConcatenator(BaseTransformer):
         Separator for the new string value
     """
 
-    def __init__(self, columns, new_column="new_column", separator=" "):
-
+    def __init__(self, columns, new_column="new_column", separator=" ") -> None:
         super().__init__(columns=columns, copy=True)
 
         if not isinstance(new_column, str):
-            raise TypeError(f"{self.classname()}: new_column should be a str")
+            msg = f"{self.classname()}: new_column should be a str"
+            raise TypeError(msg)
 
         self.new_column = new_column
 
         if not isinstance(separator, str):
-            raise TypeError(f"{self.classname()}: The separator should be a str")
+            msg = f"{self.classname()}: The separator should be a str"
+            raise TypeError(msg)
 
         self.separator = separator
 
     def transform(self, X):
-        """
-        Combine data from specified columns, of mixed datatypes, into a new column containing one string.
+        """Combine data from specified columns, of mixed datatypes, into a new column containing one string.
 
-         Parameters
+        Parameters
         ----------
         X : df
             Data to concatenate values on.
@@ -180,7 +162,6 @@ class StringConcatenator(BaseTransformer):
             Returns a dataframe with concatenated values.
 
         """
-
         X = super().transform(X)
 
         X[self.new_column] = (

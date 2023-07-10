@@ -1,18 +1,17 @@
+import pandas as pd
 import pytest
 import test_aide as ta
-import tests.test_data as d
-import pandas as pd
 
+import tests.test_data as d
 import tubular
 from tubular.strings import SeriesStrMethodTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for SeriesStrMethodTransformer.init()."""
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=SeriesStrMethodTransformer.__init__,
             expected_arguments=[
@@ -27,38 +26,43 @@ class TestInit(object):
 
     def test_class_methods(self):
         """Test that SeriesStrMethodTransformer has transform method."""
-
         x = SeriesStrMethodTransformer(
-            new_column_name="a", pd_method_name="find", columns=["b"]
+            new_column_name="a",
+            pd_method_name="find",
+            columns=["b"],
         )
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
         """Test that SeriesStrMethodTransformer inherits from BaseTransformer."""
-
         x = SeriesStrMethodTransformer(
-            new_column_name="a", pd_method_name="find", columns=["b"]
+            new_column_name="a",
+            pd_method_name="find",
+            columns=["b"],
         )
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
-
         expected_call_args = {
             0: {
                 "args": (),
                 "kwargs": {"columns": ["b"], "verbose": True, "copy": False},
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "__init__", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "__init__",
+            expected_call_args,
         ):
-
             SeriesStrMethodTransformer(
                 new_column_name="a",
                 pd_method_name="find",
@@ -69,39 +73,40 @@ class TestInit(object):
 
     def test_invalid_input_type_errors(self):
         """Test that an exceptions are raised for invalid input types."""
-
         with pytest.raises(
             ValueError,
             match="SeriesStrMethodTransformer: columns arg should contain only 1 column name but got 2",
         ):
-
             SeriesStrMethodTransformer(
-                new_column_name="a", pd_method_name=1, columns=["b", "c"]
+                new_column_name="a",
+                pd_method_name=1,
+                columns=["b", "c"],
             )
 
         with pytest.raises(
             TypeError,
             match=r"SeriesStrMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_name, expecting str",
         ):
-
             SeriesStrMethodTransformer(
-                new_column_name="a", pd_method_name=1, columns=["b"]
+                new_column_name="a",
+                pd_method_name=1,
+                columns=["b"],
             )
 
         with pytest.raises(
             TypeError,
             match=r"SeriesStrMethodTransformer: unexpected type \(\<class 'float'\>\) for new_column_name, must be str",
         ):
-
             SeriesStrMethodTransformer(
-                new_column_name=1.0, pd_method_name="find", columns=["b"]
+                new_column_name=1.0,
+                pd_method_name="find",
+                columns=["b"],
             )
 
         with pytest.raises(
             TypeError,
             match=r"""SeriesStrMethodTransformer: pd_method_kwargs should be a dict but got type \<class 'int'\>""",
         ):
-
             SeriesStrMethodTransformer(
                 new_column_name="a",
                 pd_method_name="find",
@@ -113,7 +118,6 @@ class TestInit(object):
             TypeError,
             match=r"""SeriesStrMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_kwargs key in position 1, must be str""",
         ):
-
             SeriesStrMethodTransformer(
                 new_column_name="a",
                 pd_method_name="find",
@@ -123,19 +127,18 @@ class TestInit(object):
 
     def test_exception_raised_non_pandas_method_passed(self):
         """Test and exception is raised if a non pd.Series.str method is passed for pd_method_name."""
-
         with pytest.raises(
             AttributeError,
             match="""SeriesStrMethodTransformer: error accessing "str.b" method on pd.Series object - pd_method_name should be a pd.Series.str method""",
         ):
-
             SeriesStrMethodTransformer(
-                new_column_name="a", pd_method_name="b", columns=["b"]
+                new_column_name="a",
+                pd_method_name="b",
+                columns=["b"],
             )
 
     def test_attributes_set(self):
         """Test that the values passed for new_column_name, pd_method_name are saved to attributes on the object."""
-
         x = SeriesStrMethodTransformer(
             new_column_name="a",
             pd_method_name="find",
@@ -154,12 +157,11 @@ class TestInit(object):
         )
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for SeriesStrMethodTransformer.transform()."""
 
     def expected_df_1():
         """Expected output of test_expected_output_no_overwrite."""
-
         df = d.create_df_7()
 
         df["b_new"] = df["b"].str.find(sub="a")
@@ -168,7 +170,6 @@ class TestTransform(object):
 
     def expected_df_2():
         """Expected output of test_expected_output_overwrite."""
-
         df = d.create_df_7()
 
         df["b"] = df["b"].str.pad(width=10)
@@ -177,35 +178,37 @@ class TestTransform(object):
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
-            func=SeriesStrMethodTransformer.transform, expected_arguments=["self", "X"]
+            func=SeriesStrMethodTransformer.transform,
+            expected_arguments=["self", "X"],
         )
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
-
         df = d.create_df_7()
 
         x = SeriesStrMethodTransformer(
-            new_column_name="cc", pd_method_name="find", columns=["c"]
+            new_column_name="cc",
+            pd_method_name="find",
+            columns=["c"],
         )
 
         expected_call_args = {0: {"args": (d.create_df_7(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "transform", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "transform",
+            expected_call_args,
         ):
-
             x.transform(df)
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_7(), expected_df_1()),
     )
     def test_expected_output_no_overwrite(self, df, expected):
         """Test a single column output from transform gives expected results, when not overwriting the original column."""
-
         x = SeriesStrMethodTransformer(
             new_column_name="b_new",
             pd_method_name="find",
@@ -222,12 +225,11 @@ class TestTransform(object):
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_7(), expected_df_2()),
     )
     def test_expected_output_overwrite(self, df, expected):
         """Test a single column output from transform gives expected results, when overwriting the original column."""
-
         x = SeriesStrMethodTransformer(
             new_column_name="b",
             pd_method_name="pad",
@@ -244,7 +246,7 @@ class TestTransform(object):
         )
 
     @pytest.mark.parametrize(
-        "df, new_column_name, pd_method_name, columns, pd_method_kwargs",
+        ("df", "new_column_name", "pd_method_name", "columns", "pd_method_kwargs"),
         [
             (d.create_df_7(), "b_new", "find", ["b"], {"sub": "a"}),
             (
@@ -258,10 +260,15 @@ class TestTransform(object):
         ],
     )
     def test_pandas_method_called(
-        self, mocker, df, new_column_name, pd_method_name, columns, pd_method_kwargs
+        self,
+        mocker,
+        df,
+        new_column_name,
+        pd_method_name,
+        columns,
+        pd_method_kwargs,
     ):
         """Test that the pandas.Series.str method is called as expected (with kwargs passed) during transform."""
-
         spy = mocker.spy(pd.Series.str, pd_method_name)
 
         x = SeriesStrMethodTransformer(
@@ -286,7 +293,6 @@ class TestTransform(object):
 
     def test_attributes_unchanged_by_transform(self):
         """Test that attributes set in init are unchanged by the transform method."""
-
         df = d.create_df_7()
 
         x = SeriesStrMethodTransformer(

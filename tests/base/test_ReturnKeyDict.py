@@ -5,7 +5,6 @@ from tubular.base import ReturnKeyDict
 
 def test_inheritance():
     """Test ReturnKeyDict inherits from dict."""
-
     x = ReturnKeyDict()
 
     ta.classes.assert_inheritance(x, dict)
@@ -13,17 +12,17 @@ def test_inheritance():
 
 def test_has___missing___method():
     """Test that ReturnKeyDict has a __missing__ method."""
-
     x = ReturnKeyDict()
 
     ta.classes.test_object_method(
-        x, "__missing__", "ReturnKeyDict does not have __missing__ method"
+        x,
+        "__missing__",
+        "ReturnKeyDict does not have __missing__ method",
     )
 
 
 def test___missing___returns_key():
     """Test that __missing__ returns the passed key."""
-
     x = ReturnKeyDict()
 
     k = "a"
@@ -35,7 +34,6 @@ def test___missing___returns_key():
 
 def test_keyerror_not_raised():
     """Test that a key error is not raised, instead key is returned, in attempt to access key not present in dict."""
-
     d = ReturnKeyDict({"a": 1})
 
     result = d["b"]

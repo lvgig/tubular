@@ -5,7 +5,6 @@ def one_way_summary_plot(df, column, response="y"):
     y axis) by the selected column (x axis).
 
     """
-
     agg = df.groupby(column).agg({column: ["count"], "y": ["mean"]})
 
     ax = agg.plot.bar(y=(column, "count"), ylabel="count", figsize=(8, 5))

@@ -1,9 +1,23 @@
 repos:
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.0.275
+    hooks:
+    - id: ruff
+      args: [--fix, --exit-non-zero-on-fix]
 -   repo: https://github.com/psf/black
     rev: 22.3.0
     hooks:
-    -   id: black
--   repo: https://github.com/PyCQA/flake8
-    rev: 3.9.2
-    hooks:
-    -   id: flake8
+    - id: black
+      language_version: python3
+    - id: black-jupyter
+      name: black-jupyter
+      description:
+        "Black: The uncompromising Python code formatter (with Jupyter Notebook support)"
+      entry: black
+      language: python
+      minimum_pre_commit_version: 2.9.2
+      require_serial: true
+      types_or: [python, pyi, jupyter]
+      additional_dependencies: [".[jupyter]"]
+

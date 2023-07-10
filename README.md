@@ -96,4 +96,4 @@ pytest
 
 `tubular` is under active development, we're super excited if you're interested in contributing! 
 
-See the [CONTRIBUTING](https://github.com/lvgig/tubular/blob/main/CONTRIBUTING.md) file for the full details of our working practices.
+See the [CONTRIBUTING](https://github.com/lvgig/tubular/blob/main/CONTRIBUTING.rst) file for the full details of our working practices.

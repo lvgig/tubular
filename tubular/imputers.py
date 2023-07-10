@@ -1,11 +1,9 @@
-"""
-This module contains transformers that deal with imputation of missing values.
-"""
+"""This module contains transformers that deal with imputation of missing values."""
 
-import pandas as pd
-import numpy as np
 import warnings
 
+import numpy as np
+import pandas as pd
 
 from tubular.base import BaseTransformer
 
@@ -31,13 +29,11 @@ class BaseImputer(BaseTransformer):
             Transformed input X with nulls imputed with the median value for the specified columns.
 
         """
-
         self.check_is_fitted(["impute_values_"])
 
         X = super().transform(X)
 
         for c in self.columns:
-
             X[c] = X[c].fillna(self.impute_values_[c])
 
         return X
@@ -45,6 +41,7 @@ class BaseImputer(BaseTransformer):
 
 class ArbitraryImputer(BaseImputer):
     """Transformer to impute null values with an arbitrary pre-defined value.
+
     Parameters
     ----------
     impute_value : int or float or str
@@ -54,19 +51,17 @@ class ArbitraryImputer(BaseImputer):
         when the transform method is called.
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
+
     Attributes
     ----------
     impute_value : int or float or str
         Value to impute nulls with.
     """
 
-    def __init__(self, impute_value, columns, **kwargs):
-
+    def __init__(self, impute_value, columns, **kwargs) -> None:
         if columns is None:
-
-            raise ValueError(
-                f"{self.classname()}: columns must be specified in init for ArbitraryImputer"
-            )
+            msg = f"{self.classname()}: columns must be specified in init for ArbitraryImputer"
+            raise ValueError(msg)
 
         super().__init__(columns=columns, **kwargs)
 
@@ -75,10 +70,8 @@ class ArbitraryImputer(BaseImputer):
             and not isinstance(impute_value, float)
             and not isinstance(impute_value, str)
         ):
-
-            raise ValueError(
-                f"{self.classname()}: impute_value should be a single value (int, float or str)"
-            )
+            msg = f"{self.classname()}: impute_value should be a single value (int, float or str)"
+            raise ValueError(msg)
 
         self.impute_values_ = {}
         self.impute_value = impute_value
@@ -86,10 +79,12 @@ class ArbitraryImputer(BaseImputer):
     def transform(self, X):
         """Impute missing values with the supplied impute_value.
         If columns is None all columns in X will be imputed.
+
         Parameters
         ----------
         X : pd.DataFrame
             Data containing columns to impute.
+
         Returns
         -------
         X : pd.DataFrame
@@ -100,19 +95,17 @@ class ArbitraryImputer(BaseImputer):
         * Preserving the datatypes of columns
         * Finding the target column dtype and cast imputer values as same dtype
         """
-
         self.check_is_fitted(["impute_value"])
         self.columns_check(X)
 
         for c in self.columns:
-
-            if "category" in X[c].dtype.name:
-
-                if self.impute_value not in X[c].cat.categories:
-
-                    X[c] = X[c].cat.add_categories(
-                        self.impute_value
-                    )  # add new category
+            if (
+                "category" in X[c].dtype.name
+                and self.impute_value not in X[c].cat.categories
+            ):
+                X[c] = X[c].cat.add_categories(
+                    self.impute_value,
+                )  # add new category
 
             dtype = X[c].dtype  # get the dtype of column
 
@@ -124,9 +117,7 @@ class ArbitraryImputer(BaseImputer):
                 c
             ] = self.impute_value  # updating impute_values_ attribute
 
-        X = super().transform(X)  # impute the values
-
-        return X
+        return super().transform(X)  # impute the values
 
 
 class MedianImputer(BaseImputer):
@@ -152,13 +143,12 @@ class MedianImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns=None, weight=None, **kwargs):
-
+    def __init__(self, columns=None, weight=None, **kwargs) -> None:
         super().__init__(columns=columns, **kwargs)
 
-        if not isinstance(weight, str):
-            if weight is not None:
-                raise TypeError("weight should be str or None")
+        if not isinstance(weight, str) and weight is not None:
+            msg = "weight should be str or None"
+            raise TypeError(msg)
 
         self.weight = weight
 
@@ -174,24 +164,21 @@ class MedianImputer(BaseImputer):
             Not required.
 
         """
-
         super().fit(X, y)
 
         self.impute_values_ = {}
 
         if self.weight is not None:
-
             super().check_weights_column(X, self.weight)
 
             temp = X.copy()
 
             for c in self.columns:
-
                 # filter out null rows so their weight doesn't influence calc
-                filtered = temp[temp[c].notnull()]
+                filtered = temp[temp[c].notna()]
 
                 # first sort df by column to be imputed (order of weight column shouldn't matter for median)
-                filtered.sort_values(c, inplace=True)
+                filtered = filtered.sort_values(c)
 
                 # next calculate cumulative weight sums
                 cumsum = filtered[self.weight].cumsum()
@@ -205,9 +192,7 @@ class MedianImputer(BaseImputer):
                 self.impute_values_[c] = median
 
         else:
-
             for c in self.columns:
-
                 self.impute_values_[c] = X[c].median()
 
         return self
@@ -236,13 +221,12 @@ class MeanImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns=None, weight=None, **kwargs):
-
+    def __init__(self, columns=None, weight=None, **kwargs) -> None:
         super().__init__(columns=columns, **kwargs)
 
-        if not isinstance(weight, str):
-            if weight is not None:
-                raise TypeError("weight should be str or None")
+        if not isinstance(weight, str) and weight is not None:
+            msg = "weight should be str or None"
+            raise TypeError(msg)
 
         self.weight = weight
 
@@ -258,19 +242,16 @@ class MeanImputer(BaseImputer):
             Not required.
 
         """
-
         super().fit(X, y)
 
         self.impute_values_ = {}
 
         if self.weight is not None:
-
             super().check_weights_column(X, self.weight)
 
             for c in self.columns:
-
                 # filter out null rows so they don't count towards total weight
-                filtered = X[X[c].notnull()]
+                filtered = X[X[c].notna()]
 
                 # calculate total weight and total of weighted col
                 total_weight = filtered[self.weight].sum()
@@ -282,9 +263,7 @@ class MeanImputer(BaseImputer):
                 self.impute_values_[c] = weighted_mean
 
         else:
-
             for c in self.columns:
-
                 self.impute_values_[c] = X[c].mean()
 
         return self
@@ -316,15 +295,12 @@ class ModeImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns=None, weight=None, **kwargs):
-
+    def __init__(self, columns=None, weight=None, **kwargs) -> None:
         super().__init__(columns=columns, **kwargs)
 
-        if weight is not None:
-
-            if not isinstance(weight, str):
-
-                raise ValueError("ModeImputer: weight should be a string or None")
+        if weight is not None and not isinstance(weight, str):
+            msg = "ModeImputer: weight should be a string or None"
+            raise ValueError(msg)
 
         self.weight = weight
 
@@ -340,33 +316,26 @@ class ModeImputer(BaseImputer):
             Not required.
 
         """
-
         super().fit(X, y)
 
         self.impute_values_ = {}
 
         if self.weight is None:
-
             for c in self.columns:
-
                 mode_value = X[c].mode(dropna=True)
 
                 if len(mode_value) == 0:
-
                     self.impute_values_[c] = np.nan
 
                     warnings.warn(f"ModeImputer: The Mode of column {c} is NaN.")
 
                 else:
-
                     self.impute_values_[c] = mode_value[0]
 
         else:
-
             super().check_weights_column(X, self.weight)
 
             for c in self.columns:
-
                 self.impute_values_[c] = X.groupby(c)[self.weight].sum().idxmax()
 
         return self
@@ -384,8 +353,7 @@ class NearestMeanResponseImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns=None, **kwds):
-
+    def __init__(self, columns=None, **kwds) -> None:
         super().__init__(columns=columns, **kwds)
 
     def fit(self, X, y):
@@ -402,14 +370,13 @@ class NearestMeanResponseImputer(BaseImputer):
             to the average response of the unknown levels is selected as the imputation value.
 
         """
-
         super().fit(X, y)
 
-        n_nulls = y.isnull().sum()
+        n_nulls = y.isna().sum()
 
         if n_nulls > 0:
-
-            raise ValueError(f"{self.classname()}: y has {n_nulls} null values")
+            msg = f"{self.classname()}: y has {n_nulls} null values"
+            raise ValueError(msg)
 
         self.impute_values_ = {}
 
@@ -417,33 +384,28 @@ class NearestMeanResponseImputer(BaseImputer):
         response_column = "_temporary_response"
 
         for c in self.columns:
-
-            c_nulls = X[c].isnull()
+            c_nulls = X[c].isna()
 
             if c_nulls.sum() == 0:
+                msg = f"{self.classname()}: Column {c} has no missing values, cannot use this transformer."
+                raise ValueError(msg)
 
-                raise ValueError(
-                    f"{self.classname()}: Column {c} has no missing values, cannot use this transformer."
-                )
+            mean_response_by_levels = pd.DataFrame(
+                X_y.loc[~c_nulls].groupby(c)[response_column].mean(),
+            ).reset_index()
 
-            else:
+            mean_response_nulls = X_y.loc[c_nulls, response_column].mean()
 
-                mean_response_by_levels = pd.DataFrame(
-                    X_y.loc[~c_nulls].groupby(c)[response_column].mean()
-                ).reset_index()
+            mean_response_by_levels["abs_diff_response"] = np.abs(
+                mean_response_by_levels[response_column] - mean_response_nulls,
+            )
 
-                mean_response_nulls = X_y.loc[c_nulls, response_column].mean()
-
-                mean_response_by_levels["abs_diff_response"] = np.abs(
-                    mean_response_by_levels[response_column] - mean_response_nulls
-                )
-
-                # take first value having the minimum difference in terms of average response
-                self.impute_values_[c] = mean_response_by_levels.loc[
-                    mean_response_by_levels["abs_diff_response"]
-                    == mean_response_by_levels["abs_diff_response"].min(),
-                    c,
-                ].values[0]
+            # take first value having the minimum difference in terms of average response
+            self.impute_values_[c] = mean_response_by_levels.loc[
+                mean_response_by_levels["abs_diff_response"]
+                == mean_response_by_levels["abs_diff_response"].min(),
+                c,
+            ].to_numpy()[0]
 
         return self
 
@@ -459,8 +421,7 @@ class NullIndicator(BaseTransformer):
 
     """
 
-    def __init__(self, columns=None, **kwds):
-
+    def __init__(self, columns=None, **kwds) -> None:
         super().__init__(columns=columns, **kwds)
 
     def transform(self, X):
@@ -472,11 +433,9 @@ class NullIndicator(BaseTransformer):
             Data to add indicators to.
 
         """
-
         X = super().transform(X)
 
         for c in self.columns:
-
-            X[f"{c}_nulls"] = X[c].isnull().astype(int)
+            X[f"{c}_nulls"] = X[c].isna().astype(int)
 
         return X

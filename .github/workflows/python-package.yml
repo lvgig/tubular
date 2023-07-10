@@ -24,10 +24,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements-dev.txt
 
-    - name: Lint with flake8
-      if: always()
-      run: |
-        flake8 .
+    - name: Lint with ruff
+      uses: chartboost/ruff-action@v1
 
     - name: Lint with black
       if: always()
