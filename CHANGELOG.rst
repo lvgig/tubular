@@ -16,6 +16,13 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+0.3.8 (2023-07-10)
+------------------
+
+Changed
+^^^^^^^
+- replaced flake8 with ruff linting `#92 <https://github.com/lvgig/tubular/pull/92>`_
+
 0.3.7 (2023-07-05)
 ------------------
 
