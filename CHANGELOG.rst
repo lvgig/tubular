@@ -21,7 +21,7 @@ Each individual change should have a link to the pull request after the descript
 
 Changed
 ^^^^^^^
-- replaced flake8 with ruff linting `#92 <https://github.com/lvgig/tubular/pull/92>`_
+- replaced flake8 with ruff linting.  For a lsit of rules implemented, code changes made for compliance and further rule sets planned for future see PR  `#92 <https://github.com/lvgig/tubular/pull/92>`_
 
 0.3.7 (2023-07-05)
 ------------------
