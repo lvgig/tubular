@@ -1,18 +1,17 @@
+import pandas as pd
 import pytest
 import test_aide as ta
-import tests.test_data as d
-import pandas as pd
 
+import tests.test_data as d
 import tubular
 from tubular.nominal import OrdinalEncoderTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for OrdinalEncoderTransformer.init()."""
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=OrdinalEncoderTransformer.__init__,
             expected_arguments=["self", "columns", "weights_column"],
@@ -21,18 +20,18 @@ class TestInit(object):
 
     def test_class_methods(self):
         """Test that OrdinalEncoderTransformer has fit and transform methods."""
-
         x = OrdinalEncoderTransformer()
 
         ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
         """Test that NominalToIntegerTransformer inherits from BaseNominalTransformer."""
-
         x = OrdinalEncoderTransformer()
 
         ta.classes.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
@@ -40,7 +39,6 @@ class TestInit(object):
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseNominalTransformer.__init__."""
-
         spy = mocker.spy(tubular.nominal.BaseNominalTransformer, "__init__")
 
         x = OrdinalEncoderTransformer(columns=None, verbose=True, copy=True)
@@ -71,16 +69,14 @@ class TestInit(object):
 
     def test_weights_column_not_str_error(self):
         """Test that an exception is raised if weights_column is not a str."""
-
         with pytest.raises(
-            TypeError, match="OrdinalEncoderTransformer: weights_column should be a str"
+            TypeError,
+            match="OrdinalEncoderTransformer: weights_column should be a str",
         ):
-
             OrdinalEncoderTransformer(weights_column=1)
 
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that the values passed in init are saved in an attribute of the same name."""
-
         x = OrdinalEncoderTransformer(weights_column="aaa")
 
         ta.classes.test_object_attributes(
@@ -90,12 +86,11 @@ class TestInit(object):
         )
 
 
-class TestFit(object):
-    """Tests for OrdinalEncoderTransformer.fit()"""
+class TestFit:
+    """Tests for OrdinalEncoderTransformer.fit()."""
 
     def test_arguments(self):
         """Test that init fit expected arguments."""
-
         ta.functions.test_function_arguments(
             func=OrdinalEncoderTransformer.fit,
             expected_arguments=["self", "X", "y"],
@@ -104,7 +99,6 @@ class TestFit(object):
 
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseNominalTransformer.fit."""
-
         df = d.create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns="b")
@@ -132,7 +126,7 @@ class TestFit(object):
         )
 
         assert len(expected_pos_args) == len(
-            call_pos_args
+            call_pos_args,
         ), "unexpected # positional args in BaseTransformer.fit call"
 
         ta.equality.assert_equal_dispatch(
@@ -142,8 +136,7 @@ class TestFit(object):
         )
 
     def test_fit_returns_self(self):
-        """Test fit returns self?"""
-
+        """Test fit returns self?."""
         df = d.create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns="b")
@@ -156,7 +149,6 @@ class TestFit(object):
 
     def test_fit_not_changing_data(self):
         """Test fit does not change X."""
-
         df = d.create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns="b")
@@ -171,7 +163,6 @@ class TestFit(object):
 
     def test_learnt_values(self):
         """Test that the ordinal encoder values learnt during fit are expected."""
-
         df = d.create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns=["b", "d", "f"])
@@ -185,14 +176,13 @@ class TestFit(object):
                     "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
                     "d": {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6},
                     "f": {False: 1, True: 2},
-                }
+                },
             },
             msg="mappings attribute",
         )
 
     def test_learnt_values_weight(self):
         """Test that the ordinal encoder values learnt during fit are expected if a weights column is specified."""
-
         df = d.create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(weights_column="e", columns=["b", "d", "f"])
@@ -206,44 +196,41 @@ class TestFit(object):
                     "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
                     "d": {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6},
                     "f": {False: 1, True: 2},
-                }
+                },
             },
             msg="mappings attribute",
         )
 
     def test_weights_column_missing_error(self):
         """Test that an exception is raised if weights_column is specified but not present in data for fit."""
-
         df = d.create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(weights_column="z", columns=["b", "d", "f"])
 
         with pytest.raises(
-            ValueError, match="OrdinalEncoderTransformer: weights column z not in X"
+            ValueError,
+            match="OrdinalEncoderTransformer: weights column z not in X",
         ):
-
             x.fit(df, df["a"])
 
     def test_response_column_nulls_error(self):
         """Test that an exception is raised if nulls are present in response_column."""
-
         df = d.create_df_4()
 
         x = OrdinalEncoderTransformer(columns=["b"])
 
         with pytest.raises(
-            ValueError, match="OrdinalEncoderTransformer: y has 1 null values"
+            ValueError,
+            match="OrdinalEncoderTransformer: y has 1 null values",
         ):
-
             x.fit(df, df["a"])
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for OrdinalEncoderTransformer.transform()."""
 
     def expected_df_1():
         """Expected output for ."""
-
         df = pd.DataFrame(
             {
                 "a": [1, 2, 3, 4, 5, 6],
@@ -252,7 +239,7 @@ class TestTransform(object):
                 "d": [1, 2, 3, 4, 5, 6],
                 "e": [3.0, 4.0, 5.0, 6.0, 7.0, 8.0],
                 "f": [1, 1, 1, 2, 2, 2],
-            }
+            },
         )
 
         df["c"] = df["c"].astype("category")
@@ -261,14 +248,13 @@ class TestTransform(object):
 
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
-            func=OrdinalEncoderTransformer.transform, expected_arguments=["self", "X"]
+            func=OrdinalEncoderTransformer.transform,
+            expected_arguments=["self", "X"],
         )
 
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_mappable_rows called."""
-
         df = d.create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns="b")
@@ -283,12 +269,10 @@ class TestTransform(object):
             "check_mappable_rows",
             expected_call_args,
         ):
-
             x.transform(df)
 
     def test_super_transform_called(self, mocker):
         """Test that BaseMappingTransformMixin.transform called."""
-
         df = d.create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns="b")
@@ -296,7 +280,10 @@ class TestTransform(object):
         x.fit(df, df["a"])
 
         expected_call_args = {
-            0: {"args": (x, d.create_OrdinalEncoderTransformer_test_df()), "kwargs": {}}
+            0: {
+                "args": (x, d.create_OrdinalEncoderTransformer_test_df()),
+                "kwargs": {},
+            },
         }
 
         with ta.functions.assert_function_call(
@@ -306,12 +293,10 @@ class TestTransform(object):
             expected_call_args,
             return_value=d.create_OrdinalEncoderTransformer_test_df(),
         ):
-
             x.transform(df)
 
     def test_learnt_values_not_modified(self):
         """Test that the mappings from fit are not changed in transform."""
-
         df = d.create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns="b")
@@ -331,14 +316,14 @@ class TestTransform(object):
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_OrdinalEncoderTransformer_test_df(), expected_df_1()
+            d.create_OrdinalEncoderTransformer_test_df(),
+            expected_df_1(),
         ),
     )
     def test_expected_output(self, df, expected):
         """Test that the output is expected from transform."""
-
         x = OrdinalEncoderTransformer(columns=["b", "d", "f"])
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
@@ -358,7 +343,6 @@ class TestTransform(object):
 
     def test_nulls_introduced_in_transform_error(self):
         """Test that transform will raise an error if nulls are introduced."""
-
         df = d.create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns=["b", "d", "f"])
@@ -371,5 +355,4 @@ class TestTransform(object):
             ValueError,
             match="OrdinalEncoderTransformer: nulls would be introduced into column b from levels not present in mapping",
         ):
-
             x.transform(df)

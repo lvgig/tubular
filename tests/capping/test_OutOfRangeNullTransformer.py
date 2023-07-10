@@ -1,18 +1,17 @@
+import numpy as np
 import pytest
 import test_aide as ta
-import tests.test_data as d
-import numpy as np
 
+import tests.test_data as d
 import tubular
 from tubular.capping import OutOfRangeNullTransformer
 
 
-class TestInit(object):
+class TestInit:
     """Tests for OutOfRangeNullTransformer.init()."""
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=OutOfRangeNullTransformer.__init__,
             expected_arguments=[
@@ -30,22 +29,22 @@ class TestInit(object):
     )
     def test_class_methods(self, method_name):
         """Test that OutOfRangeNullTransformer has transform fit and set_replacement_values methods."""
-
         x = OutOfRangeNullTransformer(capping_values={"a": [1, 3]})
 
         ta.classes.test_object_method(
-            obj=x, expected_method=method_name, msg=method_name
+            obj=x,
+            expected_method=method_name,
+            msg=method_name,
         )
 
     def test_inheritance(self):
         """Test that OutOfRangeNullTransformer inherits from CappingTransformer."""
-
         x = OutOfRangeNullTransformer(capping_values={"a": [1, 3]})
 
         ta.classes.assert_inheritance(x, tubular.capping.CappingTransformer)
 
     @pytest.mark.parametrize(
-        "capping_values, quantiles, weights_column, verbose, copy",
+        ("capping_values", "quantiles", "weights_column", "verbose", "copy"),
         [
             ({"a": [1, 3], "b": [None, -1]}, None, None, True, True),
             ({"a": [1, 3], "b": [None, -1]}, None, "aa", True, False),
@@ -53,10 +52,15 @@ class TestInit(object):
         ],
     )
     def test_super_init_called(
-        self, mocker, capping_values, quantiles, weights_column, verbose, copy
+        self,
+        mocker,
+        capping_values,
+        quantiles,
+        weights_column,
+        verbose,
+        copy,
     ):
         """Test that init calls CappingTransformer.init."""
-
         spy = mocker.spy(tubular.capping.CappingTransformer, "__init__")
 
         x = OutOfRangeNullTransformer(
@@ -93,7 +97,6 @@ class TestInit(object):
 
     def test_set_replacement_values_called(self, mocker):
         """Test that init calls OutOfRangeNullTransformer.set_replacement_values during init."""
-
         expected_call_args = {0: {"args": (), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
@@ -102,18 +105,18 @@ class TestInit(object):
             "set_replacement_values",
             expected_call_args,
         ):
-
             OutOfRangeNullTransformer(
-                quantiles={"c": [0, 0.99], "d": [None, 0.01]}, verbose=True, copy=True
+                quantiles={"c": [0, 0.99], "d": [None, 0.01]},
+                verbose=True,
+                copy=True,
             )
 
 
-class TestFit(object):
+class TestFit:
     """Tests for OutOfRangeNullTransformer.fit()."""
 
     def test_arguments(self):
         """Test that fit has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=OutOfRangeNullTransformer.fit,
             expected_arguments=["self", "X", "y"],
@@ -122,13 +125,13 @@ class TestFit(object):
 
     def test_super_fit_call(self, mocker):
         """Test the call to CappingTransformer.fit."""
-
         spy = mocker.spy(tubular.capping.CappingTransformer, "fit")
 
         df = d.create_df_9()
 
         x = OutOfRangeNullTransformer(
-            quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
+            quantiles={"a": [0.1, 1], "b": [0.5, None]},
+            weights_column="c",
         )
 
         x.fit(df)
@@ -155,11 +158,11 @@ class TestFit(object):
 
     def test_set_replacement_values_called(self, mocker):
         """Test that init calls OutOfRangeNullTransformer.set_replacement_values during fit."""
-
         df = d.create_df_9()
 
         x = OutOfRangeNullTransformer(
-            quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
+            quantiles={"a": [0.1, 1], "b": [0.5, None]},
+            weights_column="c",
         )
 
         expected_call_args = {0: {"args": (), "kwargs": {}}}
@@ -170,16 +173,15 @@ class TestFit(object):
             "set_replacement_values",
             expected_call_args,
         ):
-
             x.fit(df)
 
     def test_fit_returns_self(self):
-        """Test fit returns self?"""
-
+        """Test fit returns self?."""
         df = d.create_df_9()
 
         x = OutOfRangeNullTransformer(
-            quantiles={"a": [0.1, 1], "b": [0.5, None]}, weights_column="c"
+            quantiles={"a": [0.1, 1], "b": [0.5, None]},
+            weights_column="c",
         )
 
         x_fitted = x.fit(df)
@@ -189,12 +191,11 @@ class TestFit(object):
         ), "Returned value from OutOfRangeNullTransformer.fit not as expected."
 
 
-class TestSetReplacementValues(object):
+class TestSetReplacementValues:
     """Test for the OutOfRangeNullTransformer.set_replacement_values() method."""
 
     def test_arguments(self):
         """Test that set_replacement_values has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=OutOfRangeNullTransformer.set_replacement_values,
             expected_arguments=["self"],
@@ -202,7 +203,7 @@ class TestSetReplacementValues(object):
         )
 
     @pytest.mark.parametrize(
-        "value_to_set, expected_replacement_values",
+        ("value_to_set", "expected_replacement_values"),
         [
             (
                 {"a": [0, 1], "b": [None, 1], "c": [3, None]},
@@ -213,10 +214,11 @@ class TestSetReplacementValues(object):
         ],
     )
     def test_expected_replacement_values_set(
-        self, value_to_set, expected_replacement_values
+        self,
+        value_to_set,
+        expected_replacement_values,
     ):
         """Test the _replacement_values attribute is modified as expected given the prior values of the attribute."""
-
         x = OutOfRangeNullTransformer(capping_values={"a": [0, 1]})
 
         x._replacement_values = value_to_set

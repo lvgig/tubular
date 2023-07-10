@@ -109,3 +109,6 @@ venv.bak/
 
 # MacOS
 .DS_Store
+
+# ruff
+.ruff_cache

@@ -1,36 +1,35 @@
+import pandas as pd
 import pytest
 import test_aide as ta
-import tests.test_data as d
-import pandas as pd
-
-import tubular
-from tubular.mapping import MappingTransformer
-from tubular.base import ReturnKeyDict
-
 from pandas.api.types import (
-    is_categorical_dtype,
-    is_integer_dtype,
     is_bool_dtype,
+    is_categorical_dtype,
     is_float_dtype,
+    is_integer_dtype,
     is_object_dtype,
 )
 
+import tests.test_data as d
+import tubular
+from tubular.base import ReturnKeyDict
+from tubular.mapping import MappingTransformer
 
-class TestInit(object):
+
+class TestInit:
     """Tests for MappingTransformer.init()."""
 
     def test_class_methods(self):
         """Test that MappingTransformer has transform method."""
-
         x = MappingTransformer(mappings={"a": {"a": 1}})
 
         ta.classes.test_object_method(
-            obj=x, expected_method="transform", msg="transform"
+            obj=x,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_inheritance(self):
         """Test that MappingTransformer inherits from BaseMappingTransformer and BaseMappingTransformMixin."""
-
         x = MappingTransformer(mappings={"a": {"a": 1}})
 
         ta.classes.assert_inheritance(x, tubular.mapping.BaseMappingTransformer)
@@ -38,7 +37,6 @@ class TestInit(object):
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseMappingTransformer.init."""
-
         spy = mocker.spy(tubular.mapping.BaseMappingTransformer, "__init__")
 
         x = MappingTransformer(mappings={"a": {"a": 1}}, verbose=True, copy=True)
@@ -69,7 +67,6 @@ class TestInit(object):
 
     def test_mapping_arg_conversion(self):
         """Test that sub dict in mappings arg are converted into ReturnKeyDict objects."""
-
         mappings = {
             "a": {"a": 1, "b": 2},
             "b": {1: 4.5, 2: 3.1},
@@ -92,40 +89,32 @@ class TestInit(object):
 
     def test_mapping_non_dict_item_error(self):
         """Test an exception is raised if mappings contains non-dict values."""
-
         mappings = {"a": {"a": 1, "b": 2}, "b": {1: 4.5, 2: 3.1}, "c": 1}
 
         with pytest.raises(
             TypeError,
-            match=f"MappingTransformer: each item in mappings should be a dict but got type {type(1)} for key c",
+            match=f"MappingTransformer: each item in mappings should be a dict but got type {int} for key c",
         ):
             MappingTransformer(mappings=mappings)
 
 
-class TestTransform(object):
+class TestTransform:
     """Tests for the transform method on MappingTransformer."""
 
     def expected_df_1():
         """Expected output for test_expected_output."""
-
-        df = pd.DataFrame(
-            {"a": ["a", "b", "c", "d", "e", "f"], "b": [1, 2, 3, 4, 5, 6]}
+        return pd.DataFrame(
+            {"a": ["a", "b", "c", "d", "e", "f"], "b": [1, 2, 3, 4, 5, 6]},
         )
-
-        return df
 
     def expected_df_2():
         """Expected output for test_non_specified_values_unchanged."""
-
-        df = pd.DataFrame(
-            {"a": [5, 6, 7, 4, 5, 6], "b": ["z", "y", "x", "d", "e", "f"]}
+        return pd.DataFrame(
+            {"a": [5, 6, 7, 4, 5, 6], "b": ["z", "y", "x", "d", "e", "f"]},
         )
-
-        return df
 
     def test_super_transform_call(self, mocker):
         """Test the call to BaseMappingTransformMixin.transform."""
-
         df = d.create_df_1()
 
         mapping = {
@@ -166,12 +155,11 @@ class TestTransform(object):
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_1(), expected_df_1()),
     )
     def test_expected_output(self, df, expected):
         """Test that transform is giving the expected output."""
-
         mapping = {
             "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
             "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
@@ -188,12 +176,11 @@ class TestTransform(object):
         )
 
     @pytest.mark.parametrize(
-        "df, expected",
+        ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_1(), expected_df_2()),
     )
     def test_non_specified_values_unchanged(self, df, expected):
         """Test that values not specified in mappings are left unchanged in transform."""
-
         mapping = {"a": {1: 5, 2: 6, 3: 7}, "b": {"a": "z", "b": "y", "c": "x"}}
 
         x = MappingTransformer(mappings=mapping)
@@ -208,7 +195,6 @@ class TestTransform(object):
 
     def test_mappings_unchanged(self):
         """Test that mappings is unchanged in transform."""
-
         df = d.create_df_1()
 
         mapping = {
@@ -232,7 +218,7 @@ class TestTransform(object):
         )
 
     @pytest.mark.parametrize(
-        "mapping, input_col_name, output_col_type_check",
+        ("mapping", "input_col_name", "output_col_type_check"),
         [
             ({"a": {1: 1.1, 6: 6.6}}, "a", is_float_dtype),
             ({"a": {1: "one", 6: "six"}}, "a", is_object_dtype),
@@ -254,7 +240,10 @@ class TestTransform(object):
         ],
     )
     def test_expected_dtype_conversions(
-        self, mapping, input_col_name, output_col_type_check
+        self,
+        mapping,
+        input_col_name,
+        output_col_type_check,
     ):
         df = d.create_df_1()
         x = MappingTransformer(mappings=mapping)
@@ -263,13 +252,16 @@ class TestTransform(object):
         assert output_col_type_check(df[input_col_name])
 
     @pytest.mark.parametrize(
-        "mapping, input_col_name, input_col_type",
+        ("mapping", "input_col_name", "input_col_type"),
         [
             ({"a": {1: True, 6: False}}, "a", "int64"),
         ],
     )
     def test_unexpected_dtype_change_warning_raised(
-        self, mapping, input_col_name, input_col_type
+        self,
+        mapping,
+        input_col_name,
+        input_col_type,
     ):
         df = d.create_df_1()
         print(df["a"])
@@ -283,13 +275,16 @@ class TestTransform(object):
             x.transform(df)
 
     @pytest.mark.parametrize(
-        "mapping, input_col_name, input_col_type",
+        ("mapping", "input_col_name", "input_col_type"),
         [
             ({"a": {1: True, 6: False}}, "a", "int64"),
         ],
     )
     def test_unexpected_dtype_change_warning_suppressed(
-        self, mapping, input_col_name, input_col_type
+        self,
+        mapping,
+        input_col_name,
+        input_col_type,
     ):
         df = d.create_df_1()
 
@@ -301,11 +296,10 @@ class TestTransform(object):
             assert len(warnings_record) == 0
 
     def test_category_dtype_is_conserved(self):
-        """This is a separate test due to the behaviour of category dtypes
+        """This is a separate test due to the behaviour of category dtypes.
 
         See documentation of transform method
         """
-
         df = d.create_df_1()
         df["b"] = df["b"].astype("category")
 
@@ -317,7 +311,7 @@ class TestTransform(object):
         assert is_categorical_dtype(df["b"])
 
     @pytest.mark.parametrize(
-        "mapping, mapped_col",
+        ("mapping", "mapped_col"),
         [({"a": {99: "99", 98: "98"}}, "a"), ({"b": {"z": 99, "y": 98}}, "b")],
     )
     def test_no_applicable_mapping(self, mapping, mapped_col):
@@ -332,7 +326,7 @@ class TestTransform(object):
             x.transform(df)
 
     @pytest.mark.parametrize(
-        "mapping, mapped_col",
+        ("mapping", "mapped_col"),
         [({"a": {1: "1", 99: "99"}}, "a"), ({"b": {"a": 1, "z": 99}}, "b")],
     )
     def test_excess_mapping_values(self, mapping, mapped_col):

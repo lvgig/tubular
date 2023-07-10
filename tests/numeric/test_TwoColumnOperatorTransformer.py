@@ -1,45 +1,41 @@
-import pytest
 import pandas as pd
+import pytest
 import test_aide as ta
+
+import tests.test_data as d
 import tubular
 from tubular.numeric import TwoColumnOperatorTransformer
-import tests.test_data as d
 
 
 @pytest.fixture(scope="module", autouse=True)
 def example_transformer():
-
-    example_transformer = TwoColumnOperatorTransformer(
+    return TwoColumnOperatorTransformer(
         "mul",
         ["a", "b"],
         "c",
     )
 
-    return example_transformer
 
-
-class TestTwoColumnOperatorTransformerInit(object):
-    """
-    Tests for TwoColumnMethodTransformer.__init__()
-    """
+class TestTwoColumnOperatorTransformerInit:
+    """Tests for TwoColumnMethodTransformer.__init__()."""
 
     def test_inheritance(self, example_transformer):
         """Test that TwoColumnOperatorTransformer inherits from BaseTransformer."""
-
         ta.classes.assert_inheritance(
-            example_transformer, tubular.base.DataFrameMethodTransformer
+            example_transformer,
+            tubular.base.DataFrameMethodTransformer,
         )
 
     def test_class_methods(self, example_transformer):
         """Test that TwoColumnOperatorTransformer has transform method."""
-
         ta.classes.test_object_method(
-            obj=example_transformer, expected_method="transform", msg="transform"
+            obj=example_transformer,
+            expected_method="transform",
+            msg="transform",
         )
 
     def test_arguments(self):
         """Test that init has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=TwoColumnOperatorTransformer.__init__,
             expected_arguments=[
@@ -53,8 +49,7 @@ class TestTwoColumnOperatorTransformerInit(object):
         )
 
     def test_axis_not_present_error(self):
-        """Checks that an error is raised if no axis element present in pd_method_kwargs dict"""
-
+        """Checks that an error is raised if no axis element present in pd_method_kwargs dict."""
         with pytest.raises(
             ValueError,
             match='pd_method_kwargs must contain an entry "axis" set to 0 or 1',
@@ -62,15 +57,17 @@ class TestTwoColumnOperatorTransformerInit(object):
             TwoColumnOperatorTransformer("mul", ["a", "b"], "c", pd_method_kwargs={})
 
     def test_axis_not_valid_error(self):
-        """Checks that an error is raised if no axis element present in pd_method_kwargs dict"""
-
+        """Checks that an error is raised if no axis element present in pd_method_kwargs dict."""
         with pytest.raises(ValueError, match="pd_method_kwargs 'axis' must be 0 or 1"):
             TwoColumnOperatorTransformer(
-                "mul", ["a", "b"], "c", pd_method_kwargs={"axis": 2}
+                "mul",
+                ["a", "b"],
+                "c",
+                pd_method_kwargs={"axis": 2},
             )
 
     def test_attributes(self, example_transformer):
-        """Tests that the transformer has the expected attributes"""
+        """Tests that the transformer has the expected attributes."""
         expected_attributes = {
             "pd_method_name": "mul",
             # 'a' is given as a list here because that's how DataFrameMethodTransformer.__init__ stores the columns attribute
@@ -84,7 +81,7 @@ class TestTwoColumnOperatorTransformerInit(object):
         ta.classes.test_object_attributes(example_transformer, expected_attributes, msg)
 
     def test_DataFrameMethodTransformer_init_call(self, mocker):
-        """Tests that the .__init__ method is called from the parent DataFrameMethodTransformer class"""
+        """Tests that the .__init__ method is called from the parent DataFrameMethodTransformer class."""
         expected_call_args = {
             0: {
                 "args": (),
@@ -94,7 +91,7 @@ class TestTwoColumnOperatorTransformerInit(object):
                     "columns": ["a", "b"],
                     "pd_method_kwargs": {"axis": 0},
                 },
-            }
+            },
         }
 
         with ta.functions.assert_function_call(
@@ -104,14 +101,12 @@ class TestTwoColumnOperatorTransformerInit(object):
             expected_call_args,
             return_value=None,
         ):
-
             TwoColumnOperatorTransformer("mul", ["a", "b"], "c")
 
 
-class TestTwoColumnOperatorTransformerTransform(object):
+class TestTwoColumnOperatorTransformerTransform:
     def test_arguments(self):
         """Test that transform has expected arguments."""
-
         ta.functions.test_function_arguments(
             func=TwoColumnOperatorTransformer.transform,
             expected_arguments=["self", "X"],
@@ -119,15 +114,17 @@ class TestTwoColumnOperatorTransformerTransform(object):
         )
 
     def test_BaseTransformer_transform_called(self, example_transformer, mocker):
-        """Tests that the .transform method is called from the grandparent BaseTransformer class"""
+        """Tests that the .transform method is called from the grandparent BaseTransformer class."""
         test_data = d.create_df_11()
 
         expected_call_args = {0: {"args": (test_data,), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
-            mocker, tubular.base.BaseTransformer, "transform", expected_call_args
+            mocker,
+            tubular.base.BaseTransformer,
+            "transform",
+            expected_call_args,
         ):
-
             example_transformer.transform(test_data)
 
     @pytest.mark.parametrize(
@@ -174,7 +171,7 @@ class TestTwoColumnOperatorTransformerTransform(object):
         )
 
     @pytest.mark.parametrize(
-        "pd_method_name, output",
+        ("pd_method_name", "output"),
         [
             (
                 "mul",
@@ -185,7 +182,7 @@ class TestTwoColumnOperatorTransformerTransform(object):
         ],
     )
     def test_expected_output(self, pd_method_name, output):
-        """Tests that the output given by TwoColumnOperatorTransformer is as you would expect"""
+        """Tests that the output given by TwoColumnOperatorTransformer is as you would expect."""
         expected = d.create_df_11()
         expected["c"] = output
         x = TwoColumnOperatorTransformer(
