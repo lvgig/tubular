@@ -31,7 +31,8 @@ class TestInit:
         with pytest.raises(ValueError):
             EqualityChecker(columns=[], new_col_name="c")
 
-    def test_columns_list_element_error(self):
+    @pytest.mark.parametrize("test_input_col", [[[]], ["b", 3], ["a", []]])
+    def test_columns_list_element_error(self, test_input_col):
         """Test an error is raised if columns list contains non-string elements."""
         with pytest.raises(
             TypeError,
@@ -39,7 +40,7 @@ class TestInit:
                 "EqualityChecker: each element of columns should be a single (string) column name",
             ),
         ):
-            EqualityChecker(columns=[[]], new_col_name="c")
+            EqualityChecker(columns=test_input_col, new_col_name="c")
 
     def test_value_new_col_name(self, example_transformer):
         """Test that the value passed in the new column name arg is correct."""
