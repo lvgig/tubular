@@ -1,3 +1,5 @@
+import re
+
 import pytest
 import test_aide as ta
 
@@ -14,27 +16,30 @@ def example_transformer():
 class TestInit:
     """Tests for the EqualityChecker.__init__ method."""
 
-    def test_super_init_call(self, mocker):
-        """Test that BaseTransformer.init is called as expected."""
-        expected_call_args = {
-            0: {
-                "args": (),
-                "kwargs": {"columns": ["a", "b"], "verbose": False, "copy": False},
-            },
-        }
+    def test_verbose_non_bool_error(self):
+        """Test an error is raised if verbose is not specified as a bool."""
+        with pytest.raises(TypeError, match="EqualityChecker: verbose must be a bool"):
+            EqualityChecker(columns=["a", "b"], new_col_name="c", verbose=1)
 
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "__init__",
-            expected_call_args,
+    def test_copy_non_bool_error(self):
+        """Test an error is raised if copy is not specified as a bool."""
+        with pytest.raises(TypeError, match="EqualityChecker: copy must be a bool"):
+            EqualityChecker(columns=["a", "b"], new_col_name="c", copy=1)
+
+    def test_columns_empty_list_error(self):
+        """Test an error is raised if columns is specified as an empty list."""
+        with pytest.raises(ValueError):
+            EqualityChecker(columns=[], new_col_name="c")
+
+    def test_columns_list_element_error(self):
+        """Test an error is raised if columns list contains non-string elements."""
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                "EqualityChecker: each element of columns should be a single (string) column name",
+            ),
         ):
-            EqualityChecker(
-                columns=["a", "b"],
-                new_col_name="d",
-                verbose=False,
-                copy=False,
-            )
+            EqualityChecker(columns=[[]], new_col_name="c")
 
     def test_value_new_col_name(self, example_transformer):
         """Test that the value passed in the new column name arg is correct."""
