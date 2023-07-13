@@ -45,20 +45,20 @@ class TestInit:
         """Test that the value passed in the new column name arg is correct."""
         assert (
             example_transformer.new_col_name == "d"
-        ), "unexpected value set to new_col_name atttribute"
+        ), "EqualityChecker: unexpected value set to new_col_name atttribute"
 
     def test_value_drop_original(self, example_transformer):
         """Test that the value passed in the drop_original arg is correct."""
         assert (
             not example_transformer.drop_original
-        ), "unexpected value set to drop_original atttribute"
+        ), "EqualityChecker: unexpected value set to drop_original atttribute"
 
     @pytest.mark.parametrize("test_input_col_type", ["a", None])
     def test_type_error_for_columns(self, test_input_col_type):
         """Checks that an error is raised if wrong data type for argument:columns."""
         with pytest.raises(
             TypeError,
-            match="columns should be list",
+            match="EqualityChecker: columns should be list",
         ):
             EqualityChecker(columns=test_input_col_type, new_col_name="d")
 
@@ -67,7 +67,7 @@ class TestInit:
         """Checks that a value error is raised where 2 cols are not supplied."""
         with pytest.raises(
             ValueError,
-            match="This transformer works with two columns only",
+            match="EqualityChecker: This transformer works with two columns only",
         ):
             EqualityChecker(columns=test_input_col, new_col_name="d")
 
@@ -76,7 +76,7 @@ class TestInit:
         """Checks that an error is raised if wrong data type for argument:new_col_name."""
         with pytest.raises(
             TypeError,
-            match="new_col_name should be str",
+            match="EqualityChecker: new_col_name should be str",
         ):
             EqualityChecker(columns=["a", "b"], new_col_name=test_input_new_col)
 
@@ -85,7 +85,7 @@ class TestInit:
         """Checks that an error is raised if wrong data type for argument:drop_original."""
         with pytest.raises(
             TypeError,
-            match="drop_original should be bool",
+            match="EqualityChecker: drop_original should be bool",
         ):
             EqualityChecker(
                 columns=["a", "b"],
