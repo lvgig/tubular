@@ -1,14 +1,14 @@
 import re
 
+import pandas as pd
 import pytest
 import test_aide as ta
 
 import tests.test_data as d
-import tubular
 from tubular.comparison import EqualityChecker
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def example_transformer():
     return EqualityChecker(columns=["a", "b"], new_col_name="d")
 
@@ -98,19 +98,107 @@ class TestInit:
 class TestTransform:
     """Tests for the EqualityChecker.transform method."""
 
-    def test_super_transform_called(self, mocker, example_transformer):
-        """Test that BaseTransformer.transform called."""
-        df = d.create_df_7()
+    ## columns_check tests:
 
-        expected_call_args = {0: {"args": (d.create_df_7(),), "kwargs": {}}}
+    def test_non_pd_df_error(self, example_transformer):
+        """Test an error is raised if X is not passed as a pd.DataFrame."""
+
+        with pytest.raises(
+            TypeError,
+            match="EqualityChecker: X should be a pd.DataFrame",
+        ):
+            example_transformer.transform(X=[1, 2, 3, 4, 5, 6])
+
+    ## irrelevant as handled in init
+    # def test_columns_none_error(self):
+    #     """Test an error is raised if self.columns is None."""
+    #     df = d.create_df_1()
+
+    #     x = EqualityChecker(columns=None, new_col_name="d")
+
+    #     assert x.columns is None, f"self.columns should be None but got {x.columns}"
+
+    #     with pytest.raises(ValueError):
+    #         x.transform(df)
+
+    def test_columns_str_error(self, example_transformer):
+        """Test an error is raised if self.columns is not a list."""
+        df = d.create_df_1()
+
+        x = example_transformer
+
+        x.columns = "a"
+
+        with pytest.raises(
+            TypeError,
+            match="EqualityChecker: self.columns should be a list",
+        ):
+            x.transform(X=df)
+
+    def test_columns_not_in_X_error(self, example_transformer):
+        """Test an error is raised if self.columns contains a value not in X."""
+        df = d.create_df_1()
+
+        example_transformer.columns = ["a", "z"]
+        with pytest.raises(ValueError):
+            example_transformer.columns_check(X=df)
+
+    ##super transform tests:
+
+    def test_non_pd_type_error(self, example_transformer):
+        """Test an error is raised if y is not passed as a pd.DataFrame."""
+
+        with pytest.raises(
+            TypeError,
+            match="EqualityChecker: X should be a pd.DataFrame",
+        ):
+            example_transformer.transform(X=[1, 2, 3, 4, 5, 6])
+
+    def test_df_copy_called(self, mocker, example_transformer):
+        """Test pd.DataFrame.copy is called if copy is True."""
+        df = d.create_df_1()
+
+        x = example_transformer
+        x.copy = True
+
+        expected_call_args = {0: {"args": (), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
             mocker,
-            tubular.base.BaseTransformer,
-            "transform",
+            pd.DataFrame,
+            "copy",
             expected_call_args,
+            return_value=df,
         ):
+            x.transform(X=df)
+
+    def test_no_rows_error(self, example_transformer):
+        """Test an error is raised if X has no rows."""
+
+        df = pd.DataFrame(columns=["a", "b"])
+
+        with pytest.raises(
+            ValueError,
+            match=re.escape("EqualityChecker: X has no rows; (0, 2)"),
+        ):
+            print(example_transformer.columns)
             example_transformer.transform(df)
+
+    # not needed here, specific to BaseTransformer (we add a column!)
+    # @pytest.mark.parametrize(
+    #     ("df", "expected"),
+    #     ta.pandas.adjusted_dataframe_params(d.create_df_1(), d.create_df_1()),
+    # )
+    # def test_X_returned(self, df, expected, example_transformer):
+    #     """Test that X is returned from transform."""
+
+    #     df_transformed = example_transformer.transform(X=df)
+
+    #     ta.equality.assert_equal_dispatch(
+    #         expected=expected,
+    #         actual=df_transformed,
+    #         msg="Check X returned from transform",
+    #     )
 
     @pytest.mark.parametrize(
         "test_dataframe",
