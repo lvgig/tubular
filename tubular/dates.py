@@ -1018,11 +1018,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
             not all(isinstance(item, str) for item in list(units.keys()))
             or not all(isinstance(item, str) for item in list(units.values()))
         ):
-            msg = "{}: units dictionary key value pair must be strings but got keys: {} and values: {}".format(
-                self.classname(),
-                {type(k) for k in units},
-                {type(v) for v in units.values()},
-            )
+            msg = f"{self.classname()}: units dictionary key value pair must be strings but got keys: {[type(k) for k in units]} and values: {[type(v) for v in units.values()]}"
             raise TypeError(msg)
 
         if isinstance(period, dict) and (
@@ -1033,11 +1029,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
             )
             or any(isinstance(item, bool) for item in list(period.values()))
         ):
-            msg = "{}: period dictionary key value pair must be str:int or str:float but got keys: {} and values: {}".format(
-                self.classname(),
-                {type(k) for k in period},
-                {type(v) for v in period.values()},
-            )
+            msg = f"{self.classname()}: period dictionary key value pair must be str:int or str:float but got keys: {[type(k) for k in period]} and values: {[type(v) for v in period.values()]}"
             raise TypeError(msg)
 
         valid_method_list = ["sin", "cos"]

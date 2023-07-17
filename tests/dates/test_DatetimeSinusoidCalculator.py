@@ -47,9 +47,7 @@ class TestDatetimeSinusoidCalculatorInit:
         """Test that an exception is raised if method is not a str or a list."""
         with pytest.raises(
             TypeError,
-            match="method must be a string or list but got {}".format(
-                type(incorrect_type_method),
-            ),
+            match=f"method must be a string or list but got {type(incorrect_type_method)}",
         ):
             DatetimeSinusoidCalculator(
                 "a",
@@ -63,9 +61,7 @@ class TestDatetimeSinusoidCalculatorInit:
         """Test that an exception is raised if units is not a str or a dict."""
         with pytest.raises(
             TypeError,
-            match="units must be a string or dict but got {}".format(
-                type(incorrect_type_units),
-            ),
+            match=f"units must be a string or dict but got {type(incorrect_type_units)}",
         ):
             DatetimeSinusoidCalculator(
                 "a",
@@ -79,9 +75,7 @@ class TestDatetimeSinusoidCalculatorInit:
         """Test that an error is raised if period is not an int or a float or a dictionary."""
         with pytest.raises(
             TypeError,
-            match="period must be an int, float or dict but got {}".format(
-                type(incorrect_type_period),
-            ),
+            match=f"period must be an int, float or dict but got {type(incorrect_type_period)}",
         ):
             DatetimeSinusoidCalculator(
                 "a",
@@ -98,9 +92,8 @@ class TestDatetimeSinusoidCalculatorInit:
         """Test that an error is raised if period dict is not a str:int or str:float kv pair."""
         with pytest.raises(
             TypeError,
-            match="period dictionary key value pair must be str:int or str:float but got keys: {} and values: {}".format(
-                {type(k) for k in incorrect_dict_types_period},
-                {type(v) for v in incorrect_dict_types_period.values()},
+            match=re.escape(
+                f"DatetimeSinusoidCalculator: period dictionary key value pair must be str:int or str:float but got keys: {[type(k) for k in incorrect_dict_types_period]} and values: {[type(v) for v in incorrect_dict_types_period.values()]}",
             ),
         ):
             DatetimeSinusoidCalculator(
@@ -123,11 +116,11 @@ class TestDatetimeSinusoidCalculatorInit:
     )
     def test_units_dict_type_error(self, incorrect_dict_types_units):
         """Test that an error is raised if units dict is not a str:str kv pair."""
+
         with pytest.raises(
             TypeError,
-            match="units dictionary key value pair must be strings but got keys: {} and values: {}".format(
-                {type(k) for k in incorrect_dict_types_units},
-                {type(v) for v in incorrect_dict_types_units.values()},
+            match=re.escape(
+                f"DatetimeSinusoidCalculator: units dictionary key value pair must be strings but got keys: {[type(k) for k in incorrect_dict_types_units]} and values: {[type(v) for v in incorrect_dict_types_units.values()]}",
             ),
         ):
             DatetimeSinusoidCalculator(
@@ -142,9 +135,7 @@ class TestDatetimeSinusoidCalculatorInit:
         """Test that an error is raised if units dict value is not from the valid units list."""
         with pytest.raises(
             ValueError,
-            match="units dictionary values must be one of 'year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond' but got {}".format(
-                set(incorrect_dict_units.values()),
-            ),
+            match=f"units dictionary values must be one of 'year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond' but got {set(incorrect_dict_units.values())}",
         ):
             DatetimeSinusoidCalculator(
                 "a",
@@ -161,9 +152,7 @@ class TestDatetimeSinusoidCalculatorInit:
         """Test that an error is raised if period dict keys are not equal to columns."""
         with pytest.raises(
             ValueError,
-            match="period dictionary keys must be the same as columns but got {}".format(
-                set(incorrect_dict_columns_period.keys()),
-            ),
+            match=f"period dictionary keys must be the same as columns but got {set(incorrect_dict_columns_period.keys())}",
         ):
             DatetimeSinusoidCalculator(
                 ["vegan_sausages", "carrots", "peas"],
@@ -180,9 +169,7 @@ class TestDatetimeSinusoidCalculatorInit:
         """Test that an error is raised if unit dict keys is not equal to columns."""
         with pytest.raises(
             ValueError,
-            match="unit dictionary keys must be the same as columns but got {}".format(
-                set(incorrect_dict_columns_unit.keys()),
-            ),
+            match=f"unit dictionary keys must be the same as columns but got {set(incorrect_dict_columns_unit.keys())}",
         ):
             DatetimeSinusoidCalculator(
                 ["vegan_sausages", "carrots", "peas"],
@@ -197,9 +184,7 @@ class TestDatetimeSinusoidCalculatorInit:
 
         with pytest.raises(
             ValueError,
-            match='Invalid method {} supplied, should be "sin", "cos" or a list containing both'.format(
-                method,
-            ),
+            match=f'Invalid method {method} supplied, should be "sin", "cos" or a list containing both',
         ):
             DatetimeSinusoidCalculator(
                 "a",
@@ -224,10 +209,7 @@ class TestDatetimeSinusoidCalculatorInit:
         with pytest.raises(
             ValueError,
             match=re.escape(
-                "Invalid units {} supplied, should be in {}".format(
-                    units,
-                    valid_unit_list,
-                ),
+                f"Invalid units {units} supplied, should be in {valid_unit_list}",
             ),
         ):
             DatetimeSinusoidCalculator(
