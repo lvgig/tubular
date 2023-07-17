@@ -1,8 +1,8 @@
 """This module contains a transformer that applies capping to numeric columns."""
+from __future__ import annotations
 
 import datetime
 import warnings
-from typing import List, Union
 
 import numpy as np
 import pandas as pd
@@ -981,10 +981,10 @@ class DatetimeSinusoidCalculator(BaseTransformer):
 
     def __init__(
         self,
-        columns: Union[str, List[str]],
-        method: Union[str, List[str]],
-        units: Union[str, dict],
-        period: Union[int, float, dict, dict] = 2 * np.pi,
+        columns: str | list[str],
+        method: str | list[str],
+        units: str | dict,
+        period: int | float | dict = 2 * np.pi,
     ) -> None:
         super().__init__(columns, copy=True)
 
