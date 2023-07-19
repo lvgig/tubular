@@ -185,7 +185,7 @@ class DateDifferenceTransformer(BaseTransformer):
         Name given to calculated datediff column. If None then {column_upper}_{column_lower}_datediff_{units}
         will be used.
     units : str, default = 'D'
-        Numpy datetime units, accepted values are 'Y', 'M', 'D', 'h', 'm', 's'.  'Y' and 'M' units are not supported if using pandas>=2.00 and will produce inaccurate results.
+        Numpy datetime units, accepted values are 'Y', 'M', 'D', 'h', 'm', 's'
     copy : bool, default = True
         Should X be copied prior to transform?
     verbose: bool, default = False
