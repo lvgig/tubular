@@ -10,7 +10,7 @@ import tests.test_data as d
 import tubular
 from tubular.dates import DateDifferenceTransformer
 
-minversion = pytest.mark.skipif(
+skip_if_pandas2 = pytest.mark.skipif(
     version.parse(pd.__version__) >= version.parse("2.0.0"),
     reason="functionality not supported with pandas >= 2.0",
 )
@@ -495,7 +495,7 @@ class TestTransform:
         ):
             x.transform(df)
 
-    @minversion
+    @skip_if_pandas2
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
@@ -526,7 +526,7 @@ class TestTransform:
             msg="Unexpected values in DateDifferenceYearTransformer.transform",
         )
 
-    @minversion
+    @skip_if_pandas2
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
