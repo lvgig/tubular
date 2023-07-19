@@ -154,7 +154,7 @@ class TestInit:
         """Test that a warning is raised if M units passed to init."""
         with pytest.warns(
             Warning,
-            match="DateDifferenceTransformer: Y/M will be deprecated ina future version, use D instead. Y/M units are not supported when using pandas>=2.0.0 and will produce inaccurate results. For an accurate age in years use DateDiffLeapYearTransformer.  M units will produce number of days/31.",
+            match="DateDifferenceTransformer: Y/M units will be changed or deprecated in a future version, consider using DateDiffLeapYearTransformer or D units instead",
         ):
             DateDifferenceTransformer(
                 column_lower="dummy_1",
