@@ -16,6 +16,15 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+1.0.0 (unreleased)
+------------------
+
+Changed
+^^^^^^^
+- now compatible with pandas>=2.0.0 `#123 <https://github.com/lvgig/tubular/pull/123>`_
+- DateDifferenceTransformer no longer supports 'Y' or  'M' units `#123 <https://github.com/lvgig/tubular/pull/123>`_
+
+
 0.3.8 (2023-07-10)
 ------------------
 
