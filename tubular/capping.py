@@ -1,7 +1,10 @@
 """This module contains a transformer that applies capping to numeric columns."""
 
+from __future__ import annotations
+
 import copy
 import warnings
+from typing import Number
 
 import numpy as np
 import pandas as pd
@@ -61,9 +64,9 @@ class CappingTransformer(BaseTransformer):
 
     def __init__(
         self,
-        capping_values=None,
-        quantiles=None,
-        weights_column=None,
+        capping_values: dict[str, list[Number | None]] | None = None,
+        quantiles: dict[str, list[Number]] | None = None,
+        weights_column: str | None = None,
         **kwargs,
     ) -> None:
         if capping_values is None and quantiles is None:
@@ -100,7 +103,11 @@ class CappingTransformer(BaseTransformer):
         self.weights_column = weights_column
         self._replacement_values = copy.deepcopy(self.capping_values)
 
-    def check_capping_values_dict(self, capping_values_dict, dict_name):
+    def check_capping_values_dict(
+        self,
+        capping_values_dict: dict[str, list[Number]],
+        dict_name: str,
+    ):
         """Performs checks on a dictionary passed to ."""
         if type(capping_values_dict) is not dict:
             msg = f"{self.classname()}: {dict_name} should be dict of columns and capping values"
@@ -139,7 +146,7 @@ class CappingTransformer(BaseTransformer):
                 msg = f"{self.classname()}: both values are None for key {k}"
                 raise ValueError(msg)
 
-    def fit(self, X, y=None):
+    def fit(self, X: pd.DataFrame, y: None = None):
         """Learn capping values from input data X.
 
         Calculates the quantiles to cap at given the quantiles dictionary supplied
@@ -184,7 +191,12 @@ class CappingTransformer(BaseTransformer):
 
         return self
 
-    def prepare_quantiles(self, values, quantiles, sample_weight=None):
+    def prepare_quantiles(
+        self,
+        values: pd.Series | np.array,
+        quantiles: list[float],
+        sample_weight: pd.Series | np.array | None = None,
+    ):
         """Method to call the weighted_quantile method and prepare the outputs.
 
         If there are no None values in the supplied quantiles then the outputs from weighted_quantile
@@ -229,7 +241,12 @@ class CappingTransformer(BaseTransformer):
 
         return results
 
-    def weighted_quantile(self, values, quantiles, sample_weight=None):
+    def weighted_quantile(
+        self,
+        values: pd.Series | np.array,
+        quantiles: list[float],
+        sample_weight: pd.Series | np.array | None = None,
+    ):
         """Method to calculate weighted quantiles.
 
         This method is adapted from the "Completely vectorized numpy solution" answer from user
@@ -327,7 +344,7 @@ class CappingTransformer(BaseTransformer):
 
         return list(np.interp(quantiles, weighted_quantiles, values))
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame):
         """Apply capping to columns in X.
 
         If cap_value_max is set, any values above cap_value_max will be set to cap_value_max. If cap_value_min
@@ -439,9 +456,9 @@ class OutOfRangeNullTransformer(CappingTransformer):
 
     def __init__(
         self,
-        capping_values=None,
-        quantiles=None,
-        weights_column=None,
+        capping_values: dict[str, list[Number | None]] | None = None,
+        quantiles: dict[str, list[Number | None]] | None = None,
+        weights_column: str | None = None,
         **kwargs,
     ) -> None:
         super().__init__(
@@ -467,7 +484,7 @@ class OutOfRangeNullTransformer(CappingTransformer):
 
             self._replacement_values[k] = null_replacements_list
 
-    def fit(self, X, y=None):
+    def fit(self, X: pd.DataFrame, y: None = None):
         """Learn capping values from input data X.
 
         Calculates the quantiles to cap at given the quantiles dictionary supplied
