@@ -49,7 +49,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
     """
 
-    def classname(self):
+    def classname(self) -> str:
         """Method that returns the name of the current class when called."""
         return type(self).__name__
 
@@ -100,7 +100,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         self.copy = copy
 
-    def fit(self, X: pd.DataFrame, y: pd.Series | None = None):
+    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> BaseTransformer:
         """Base transformer fit method, checks X and y types. Currently only pandas DataFrames are allowed for X
         and DataFrames or Series for y.
 
@@ -138,7 +138,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         return self
 
-    def _combine_X_y(self, X: pd.DataFrame, y: pd.Series):
+    def _combine_X_y(self, X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
         """Combine X and y by adding a new column with the values of y to a copy of X.
 
         The new column response column will be called `_temporary_response`.
@@ -176,7 +176,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         return X_y
 
-    def transform(self, X: pd.DataFrame):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Base transformer transform method; checks X type (pandas DataFrame only) and copies data if requested.
 
         Transform calls the columns_check method which will check columns in columns attribute are in X.
@@ -206,7 +206,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         return X
 
-    def check_is_fitted(self, attribute: str):
+    def check_is_fitted(self, attribute: str) -> None:
         """Check if particular attributes are on the object. This is useful to do before running transform to avoid
         trying to transform data without first running the fit method.
 
@@ -220,7 +220,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         """
         check_is_fitted(self, attribute)
 
-    def columns_check(self, X: pd.DataFrame):
+    def columns_check(self, X: pd.DataFrame) -> None:
         """Method to check that the columns attribute is set and all values are present in X.
 
         Parameters
@@ -245,7 +245,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             if c not in X.columns.to_numpy():
                 raise ValueError(f"{self.classname()}: variable " + c + " is not in X")
 
-    def columns_set_or_check(self, X: pd.DataFrame):
+    def columns_set_or_check(self, X: pd.DataFrame) -> None:
         """Function to check or set columns attribute.
 
         If the columns attribute is None then set it to all columns in X. Otherwise run the columns_check method.
@@ -267,7 +267,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             self.columns_check(X)
 
     @staticmethod
-    def check_weights_column(X: pd.DataFrame, weights_column: str):
+    def check_weights_column(X: pd.DataFrame, weights_column: str) -> None:
         """Helper method for validating weights column in dataframe.
 
         Args:
@@ -308,7 +308,7 @@ class ReturnKeyDict(dict):
     introduce nulls if a key is not found (which is the behaviour if used with a standard dict).
     """
 
-    def __missing__(self, key):  # noqa: ANN001
+    def __missing__(self, key):  # noqa: ANN001, ANN204
         """Function to return passed key.
 
         Parameters
@@ -423,7 +423,7 @@ class DataFrameMethodTransformer(BaseTransformer):
             msg = f'{self.classname()}: error accessing "{pd_method_name}" method on pd.DataFrame object - pd_method_name should be a pd.DataFrame method'
             raise AttributeError(msg) from err
 
-    def transform(self, X: pd.DataFrame):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform input pandas DataFrame (X) using the given pandas.DataFrame method and assign the output
         back to column or columns in X.
 
