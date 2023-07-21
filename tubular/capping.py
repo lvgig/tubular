@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import copy
 import warnings
-from typing import Number
 
 import numpy as np
 import pandas as pd
@@ -64,8 +63,8 @@ class CappingTransformer(BaseTransformer):
 
     def __init__(
         self,
-        capping_values: dict[str, list[Number | None]] | None = None,
-        quantiles: dict[str, list[Number]] | None = None,
+        capping_values: dict[str, list[int | float | None]] | None = None,
+        quantiles: dict[str, list[int | float]] | None = None,
         weights_column: str | None = None,
         **kwargs,
     ) -> None:
@@ -105,7 +104,7 @@ class CappingTransformer(BaseTransformer):
 
     def check_capping_values_dict(
         self,
-        capping_values_dict: dict[str, list[Number]],
+        capping_values_dict: dict[str, list[int | float]],
         dict_name: str,
     ):
         """Performs checks on a dictionary passed to ."""
@@ -456,8 +455,8 @@ class OutOfRangeNullTransformer(CappingTransformer):
 
     def __init__(
         self,
-        capping_values: dict[str, list[Number | None]] | None = None,
-        quantiles: dict[str, list[Number | None]] | None = None,
+        capping_values: dict[str, list[int | float | None]] | None = None,
+        quantiles: dict[str, list[int | float | None]] | None = None,
         weights_column: str | None = None,
         **kwargs,
     ) -> None:
