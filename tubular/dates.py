@@ -185,7 +185,7 @@ class DateDifferenceTransformer(BaseTransformer):
         Name given to calculated datediff column. If None then {column_upper}_{column_lower}_datediff_{units}
         will be used.
     units : str, default = 'D'
-        Numpy datetime units, accepted values are 'Y', 'M', 'D', 'h', 'm', 's'
+        Numpy datetime units, accepted values are 'D', 'h', 'm', 's'
     copy : bool, default = True
         Should X be copied prior to transform?
     verbose: bool, default = False
@@ -211,8 +211,6 @@ class DateDifferenceTransformer(BaseTransformer):
         columns = [column_lower, column_upper]
 
         accepted_values_units = [
-            "Y",
-            "M",
             "D",
             "h",
             "m",
@@ -226,10 +224,6 @@ class DateDifferenceTransformer(BaseTransformer):
         if units not in accepted_values_units:
             msg = f"{self.classname()}: units must be one of {accepted_values_units}, got {units}"
             raise ValueError(msg)
-        if units in ["Y", "M"]:
-            warnings.warn(
-                f"{self.classname()}: Y/M units will be changed or deprecated in a future version, consider using DateDiffLeapYearTransformer or D units instead",
-            )
 
         self.units = units
 

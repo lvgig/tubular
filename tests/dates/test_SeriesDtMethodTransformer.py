@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 import test_aide as ta
 
@@ -176,7 +177,10 @@ class TestTransform:
         """Expected output of test_expected_output_no_overwrite."""
         df = d.create_datediff_test_df()
 
-        df["a_year"] = [1993, 2000, 2018, 2018, 2018, 2018, 2018, 1985]
+        df["a_year"] = np.array(
+            [1993, 2000, 2018, 2018, 2018, 2018, 2018, 1985],
+            dtype=np.int32,
+        )
 
         return df
 
@@ -184,7 +188,10 @@ class TestTransform:
         """Expected output of test_expected_output_overwrite."""
         df = d.create_datediff_test_df()
 
-        df["a"] = [1993, 2000, 2018, 2018, 2018, 2018, 2018, 1985]
+        df["a"] = np.array(
+            [1993, 2000, 2018, 2018, 2018, 2018, 2018, 1985],
+            dtype=np.int32,
+        )
 
         return df
 

@@ -71,7 +71,7 @@ class TestInit:
                 column_lower="dummy_1",
                 column_upper="dummy_2",
                 new_column_name="dummy_3",
-                units="Y",
+                units="D",
             )
 
     def test_column_lower_type_error(self):
@@ -84,7 +84,7 @@ class TestInit:
                 column_lower=123,
                 column_upper="dummy_2",
                 new_column_name="dummy_3",
-                units="Y",
+                units="D",
                 copy=True,
                 verbose=False,
             )
@@ -99,7 +99,7 @@ class TestInit:
                 column_lower="dummy_1",
                 column_upper=123,
                 new_column_name="dummy_3",
-                units="Y",
+                units="D",
                 copy=True,
                 verbose=False,
             )
@@ -114,7 +114,7 @@ class TestInit:
                 column_lower="dummy_1",
                 column_upper="dummy_2",
                 new_column_name=123,
-                units="Y",
+                units="D",
                 copy=True,
                 verbose=False,
             )
@@ -138,7 +138,7 @@ class TestInit:
         """Test that an exception is raised if the value of inits is not one of accepted_values_units."""
         with pytest.raises(
             ValueError,
-            match=r"DateDifferenceTransformer: units must be one of \['Y', 'M', 'D', 'h', 'm', 's'\], got y",
+            match=r"DateDifferenceTransformer: units must be one of \['D', 'h', 'm', 's'\], got y",
         ):
             DateDifferenceTransformer(
                 column_lower="dummy_1",
@@ -149,29 +149,13 @@ class TestInit:
                 verbose=False,
             )
 
-    @pytest.mark.parametrize("unit", ["M", "Y"])
-    def test_units_warning(self, unit):
-        """Test that a warning is raised if M units passed to init."""
-        with pytest.warns(
-            Warning,
-            match="DateDifferenceTransformer: Y/M units will be changed or deprecated in a future version, consider using DateDiffLeapYearTransformer or D units instead",
-        ):
-            DateDifferenceTransformer(
-                column_lower="dummy_1",
-                column_upper="dummy_2",
-                new_column_name="dummy_3",
-                units=unit,
-                copy=True,
-                verbose=False,
-            )
-
     def test_inputs_set_to_attribute(self):
         """Test that the value passed for new_column_name and units are saved in attributes of the same name."""
         x = DateDifferenceTransformer(
             column_lower="dummy_1",
             column_upper="dummy_2",
             new_column_name="value_1",
-            units="Y",
+            units="D",
             copy=True,
             verbose=False,
         )
@@ -181,7 +165,7 @@ class TestInit:
             expected_attributes={
                 "columns": ["dummy_1", "dummy_2"],
                 "new_column_name": "value_1",
-                "units": "Y",
+                "units": "D",
                 "copy": True,
                 "verbose": False,
             },
@@ -193,7 +177,7 @@ class TestInit:
         x = DateDifferenceTransformer(
             column_lower="dummy_1",
             column_upper="dummy_2",
-            units="Y",
+            units="D",
             copy=True,
             verbose=False,
         )
@@ -204,8 +188,8 @@ class TestInit:
                 "column_lower": "dummy_1",
                 "column_upper": "dummy_2",
                 "columns": ["dummy_1", "dummy_2"],
-                "new_column_name": "dummy_2_dummy_1_datediff_Y",
-                "units": "Y",
+                "new_column_name": "dummy_2_dummy_1_datediff_D",
+                "units": "D",
                 "copy": True,
                 "verbose": False,
             },
@@ -215,80 +199,6 @@ class TestInit:
 
 class TestTransform:
     """Tests for DateDifferenceTransformer.transform()."""
-
-    def expected_df_1():
-        """Expected output for test_expected_output_units_Y."""
-        return pd.DataFrame(
-            {
-                "a": [
-                    datetime.datetime(1993, 9, 27, 11, 58, 58),
-                    datetime.datetime(2000, 3, 19, 12, 59, 59),
-                    datetime.datetime(2018, 11, 10, 11, 59, 59),
-                    datetime.datetime(2018, 10, 10, 11, 59, 59),
-                    datetime.datetime(2018, 10, 10, 11, 59, 59),
-                    datetime.datetime(2018, 10, 10, 10, 59, 59),
-                    datetime.datetime(2018, 12, 10, 11, 59, 59),
-                    datetime.datetime(1985, 7, 23, 11, 59, 59),
-                ],
-                "b": [
-                    datetime.datetime(2020, 5, 1, 12, 59, 59),
-                    datetime.datetime(2019, 12, 25, 11, 58, 58),
-                    datetime.datetime(2018, 11, 10, 11, 59, 59),
-                    datetime.datetime(2018, 11, 10, 11, 59, 59),
-                    datetime.datetime(2018, 9, 10, 9, 59, 59),
-                    datetime.datetime(2015, 11, 10, 11, 59, 59),
-                    datetime.datetime(2015, 11, 10, 12, 59, 59),
-                    datetime.datetime(2015, 7, 23, 11, 59, 59),
-                ],
-                "Y": [
-                    26.59340677135105,
-                    19.76757257798535,
-                    0.0,
-                    0.08487511721664373,
-                    -0.08236536912690427,
-                    -2.915756882984136,
-                    -3.082769210410435,
-                    29.999247075573077,
-                ],
-            },
-        )
-
-    def expected_df_2():
-        """Expected output for test_expected_output_units_M."""
-        return pd.DataFrame(
-            {
-                "a": [
-                    datetime.datetime(1993, 9, 27, 11, 58, 58),
-                    datetime.datetime(2000, 3, 19, 12, 59, 59),
-                    datetime.datetime(2018, 11, 10, 11, 59, 59),
-                    datetime.datetime(2018, 10, 10, 11, 59, 59),
-                    datetime.datetime(2018, 10, 10, 11, 59, 59),
-                    datetime.datetime(2018, 10, 10, 10, 59, 59),
-                    datetime.datetime(2018, 12, 10, 11, 59, 59),
-                    datetime.datetime(1985, 7, 23, 11, 59, 59),
-                ],
-                "b": [
-                    datetime.datetime(2020, 5, 1, 12, 59, 59),
-                    datetime.datetime(2019, 12, 25, 11, 58, 58),
-                    datetime.datetime(2018, 11, 10, 11, 59, 59),
-                    datetime.datetime(2018, 11, 10, 11, 59, 59),
-                    datetime.datetime(2018, 9, 10, 9, 59, 59),
-                    datetime.datetime(2015, 11, 10, 11, 59, 59),
-                    datetime.datetime(2015, 11, 10, 12, 59, 59),
-                    datetime.datetime(2015, 7, 23, 11, 59, 59),
-                ],
-                "M": [
-                    319.12088125621256,
-                    237.21087093582423,
-                    0.0,
-                    1.0185014065997249,
-                    -0.9883844295228512,
-                    -34.989082595809634,
-                    -36.993230524925224,
-                    359.9909649068769,
-                ],
-            },
-        )
 
     def expected_df_3():
         """Expected output for test_expected_output_units_D."""
@@ -450,7 +360,7 @@ class TestTransform:
                     np.NaN,
                     datetime.datetime(2019, 12, 25, 11, 58, 58),
                 ],
-                "Y": [
+                "D": [
                     np.NaN,
                     np.NaN,
                 ],
@@ -472,8 +382,8 @@ class TestTransform:
         x = DateDifferenceTransformer(
             column_lower="a",
             column_upper="b",
-            new_column_name="Y",
-            units="Y",
+            new_column_name="D",
+            units="D",
             copy=True,
             verbose=False,
         )
@@ -488,66 +398,6 @@ class TestTransform:
             return_value=d.create_datediff_test_df(),
         ):
             x.transform(df)
-
-    @pytest.mark.parametrize(
-        ("df", "expected"),
-        ta.pandas.adjusted_dataframe_params(
-            d.create_datediff_test_df(),
-            expected_df_1(),
-        ),
-    )
-    def test_expected_output_units_Y(self, df, expected):
-        """Test that the output is expected from transform, when units is Y.
-
-        This tests positive year gaps and negative year gaps.
-
-        """
-        x = DateDifferenceTransformer(
-            column_lower="a",
-            column_upper="b",
-            new_column_name="Y",
-            units="Y",
-            copy=True,
-            verbose=False,
-        )
-
-        df_transformed = x.transform(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="Unexpected values in DateDifferenceYearTransformer.transform",
-        )
-
-    @pytest.mark.parametrize(
-        ("df", "expected"),
-        ta.pandas.adjusted_dataframe_params(
-            d.create_datediff_test_df(),
-            expected_df_2(),
-        ),
-    )
-    def test_expected_output_units_M(self, df, expected):
-        """Test that the output is expected from transform, when units is M.
-
-        This tests positive month gaps, negative month gaps, and missing values.
-
-        """
-        x = DateDifferenceTransformer(
-            column_lower="a",
-            column_upper="b",
-            new_column_name="M",
-            units="M",
-            copy=True,
-            verbose=False,
-        )
-
-        df_transformed = x.transform(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="Unexpected values in DateDifferenceYearTransformer.transform",
-        )
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -681,8 +531,8 @@ class TestTransform:
         x = DateDifferenceTransformer(
             column_lower="a",
             column_upper="b",
-            new_column_name="Y",
-            units="Y",
+            new_column_name="D",
+            units="D",
             copy=True,
             verbose=False,
         )
