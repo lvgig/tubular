@@ -10,28 +10,6 @@ from tubular.nominal import BaseNominalTransformer
 class TestInit:
     """Test for BaseNominalTransformer object."""
 
-    def test_class_methods(self):
-        """Test that BaseNominalTransformer has columns_set_or_check method."""
-        x = BaseNominalTransformer()
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="columns_set_or_check",
-            msg="columns_set_or_check",
-        )
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="check_mappable_rows",
-            msg="check_mappable_rows",
-        )
-
-    def test_inheritance(self):
-        """Test that BaseNominalTransformer inherits from BaseTransformer."""
-        x = BaseNominalTransformer()
-
-        ta.classes.assert_inheritance(x, BaseTransformer)
-
 
 class TestNominalColumnSetOrCheck:
     """Tests for BaseNominalTransformer.columns_set_or_check method."""

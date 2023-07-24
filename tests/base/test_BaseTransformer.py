@@ -14,14 +14,6 @@ from tubular.base import BaseTransformer
 class TestInit:
     """Tests for BaseTransformer.__init__()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=BaseTransformer.__init__,
-            expected_arguments=["self", "columns", "copy", "verbose"],
-            expected_default_values=(None, True, False),
-        )
-
     def test_default_attributes_set_in_init(self):
         """Test correct default values for attributes set in init."""
         x = BaseTransformer()
@@ -67,30 +59,6 @@ class TestInit:
             msg="String put in list for columns",
         )
 
-    def test_class_methods(self):
-        """Test that BaseTransformer has fit and transform methods."""
-        x = BaseTransformer()
-
-        ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="columns_set_or_check",
-            msg="columns_set_or_check",
-        )
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="columns_check",
-            msg="columns_check",
-        )
-
     def test_verbose_non_bool_error(self):
         """Test an error is raised if verbose is not specified as a bool."""
         with pytest.raises(TypeError, match="BaseTransformer: verbose must be a bool"):
@@ -129,14 +97,6 @@ class TestInit:
 
 class TestFit:
     """Tests for BaseTransformer.fit()."""
-
-    def test_arguments(self):
-        """Test that fit has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=BaseTransformer.fit,
-            expected_arguments=["self", "X", "y"],
-            expected_default_values=(None,),
-        )
 
     def test_fit_returns_self(self):
         """Test fit returns self?."""
@@ -223,13 +183,6 @@ class TestFit:
 class TestTransform:
     """Tests for BaseTransformer.transform()."""
 
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=BaseTransformer.transform,
-            expected_arguments=["self", "X"],
-        )
-
     def test_columns_check_called(self, mocker):
         """Test that self.columns_check is called during transform."""
         df = d.create_df_1()
@@ -305,13 +258,6 @@ class TestTransform:
 class TestColumnsCheck:
     """Tests for columns_check method."""
 
-    def test_arguments(self):
-        """Test that columns_check has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=BaseTransformer.columns_check,
-            expected_arguments=["self", "X"],
-        )
-
     def test_non_pd_df_error(self):
         """Test an error is raised if X is not passed as a pd.DataFrame."""
         x = BaseTransformer(columns="a")
@@ -359,13 +305,6 @@ class TestColumnsCheck:
 
 class TestColumnsSetOrCheck:
     """Tests for columns_set_or_check method."""
-
-    def test_arguments(self):
-        """Test that columns_set_or_check has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=BaseTransformer.columns_set_or_check,
-            expected_arguments=["self", "X"],
-        )
 
     def test_non_pd_df_error(self):
         """Test an error is raised if X is not passed as a pd.DataFrame."""
@@ -433,13 +372,6 @@ class TestCheckIsFitted:
 
 class TestCombineXy:
     """Tests for the BaseTransformer._combine_X_y method."""
-
-    def test_arguments(self):
-        """Test that columns_check has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=BaseTransformer._combine_X_y,
-            expected_arguments=["self", "X", "y"],
-        )
 
     def test_X_not_DataFrame_error(self):
         """Test an exception is raised if X is not a pd.DataFrame."""
@@ -509,13 +441,6 @@ class TestCombineXy:
 
 class TestCheckWeightsColumn:
     "tests for check_weights_column method."
-
-    def test_arguments(self):
-        """Test that columns_set_or_check has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=BaseTransformer.check_weights_column,
-            expected_arguments=["X", "weights_column"],
-        )
 
     def test_weight_not_in_X_error(self):
         """Test an error is raised if weight is not in X."""

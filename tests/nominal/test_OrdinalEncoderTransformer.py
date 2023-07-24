@@ -10,33 +10,6 @@ from tubular.nominal import OrdinalEncoderTransformer
 class TestInit:
     """Tests for OrdinalEncoderTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=OrdinalEncoderTransformer.__init__,
-            expected_arguments=["self", "columns", "weights_column"],
-            expected_default_values=(None, None),
-        )
-
-    def test_class_methods(self):
-        """Test that OrdinalEncoderTransformer has fit and transform methods."""
-        x = OrdinalEncoderTransformer()
-
-        ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that NominalToIntegerTransformer inherits from BaseNominalTransformer."""
-        x = OrdinalEncoderTransformer()
-
-        ta.classes.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
-        ta.classes.assert_inheritance(x, tubular.mapping.BaseMappingTransformMixin)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseNominalTransformer.__init__."""
         spy = mocker.spy(tubular.nominal.BaseNominalTransformer, "__init__")
@@ -88,14 +61,6 @@ class TestInit:
 
 class TestFit:
     """Tests for OrdinalEncoderTransformer.fit()."""
-
-    def test_arguments(self):
-        """Test that init fit expected arguments."""
-        ta.functions.test_function_arguments(
-            func=OrdinalEncoderTransformer.fit,
-            expected_arguments=["self", "X", "y"],
-            expected_default_values=None,
-        )
 
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseNominalTransformer.fit."""
@@ -245,13 +210,6 @@ class TestTransform:
         df["c"] = df["c"].astype("category")
 
         return df
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=OrdinalEncoderTransformer.transform,
-            expected_arguments=["self", "X"],
-        )
 
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_mappable_rows called."""

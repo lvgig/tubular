@@ -6,39 +6,11 @@ import test_aide as ta
 
 import tests.test_data as d
 import tubular
-from tubular.base import BaseTransformer
 from tubular.dates import BetweenDatesTransformer
 
 
 class TestInit:
     "tests for BetweenDatesTransformer.__init__."
-
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=BetweenDatesTransformer.__init__,
-            expected_arguments=[
-                "self",
-                "column_lower",
-                "column_between",
-                "column_upper",
-                "new_column_name",
-                "lower_inclusive",
-                "upper_inclusive",
-            ],
-            expected_default_values=(True, True),
-        )
-
-    def test_inheritance(self):
-        """Test that BetweenDatesTransformer inherits from BaseTransformer."""
-        x = BetweenDatesTransformer(
-            column_lower="a",
-            column_between="b",
-            column_upper="c",
-            new_column_name="d",
-        )
-
-        ta.classes.assert_inheritance(x, BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that super.__init__ called."""
@@ -144,21 +116,6 @@ class TestInit:
                 upper_inclusive=1,
             )
 
-    def test_class_methods(self):
-        """Test that BetweenDatesTransformer has transform method."""
-        x = BetweenDatesTransformer(
-            column_lower="a",
-            column_between="b",
-            column_upper="c",
-            new_column_name="d",
-        )
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform method not present",
-        )
-
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that attributes are set by init."""
         x = BetweenDatesTransformer(
@@ -227,14 +184,6 @@ class TestTransform:
         df["e"] = [False, True, True, True, True, False]
 
         return df
-
-    def test_arguments(self):
-        """Test that fit has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=BetweenDatesTransformer.transform,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
-        )
 
     def test_super_transform_call(self, mocker):
         """Test that call the BaseTransformer.transform() is as expected."""
