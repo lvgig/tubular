@@ -160,7 +160,10 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             raise ValueError(msg)
 
         if not (X.index == y.index).all():
-            warnings.warn(f"{self.classname()}: X and y do not have equal indexes")
+            warnings.warn(
+                f"{self.classname()}: X and y do not have equal indexes",
+                stacklevel=2,
+            )
 
         X_y = X.copy()
 

@@ -1134,6 +1134,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
                     warnings.warn(
                         f"{self.classname()}: column %s has unseen categories: %s"
                         % (c, unseen_levels),
+                        stacklevel=2,
                     )
 
         # Drop original columns

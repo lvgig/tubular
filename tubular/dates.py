@@ -612,6 +612,7 @@ class BetweenDatesTransformer(BaseTransformer):
         if not (X[self.columns[0]] <= X[self.columns[2]]).all():
             warnings.warn(
                 f"{self.classname()}: not all {self.columns[2]} are greater than or equal to {self.columns[0]}",
+                stacklevel=2,
             )
 
         if self.lower_inclusive:
