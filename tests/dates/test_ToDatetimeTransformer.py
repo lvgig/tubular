@@ -24,7 +24,7 @@ class TestInit:
                 "new_column_name",
                 "to_datetime_kwargs",
             ],
-            expected_default_values=({},),
+            expected_default_values=(None,),
         )
 
     def test_class_methods(self):

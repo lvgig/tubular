@@ -39,18 +39,12 @@ class TestExtractDatetimeInfoInit:
 
     def test_arguments(self):
         """Test that init has the expected arguments."""
-        default_include = [
-            "timeofday",
-            "timeofmonth",
-            "timeofyear",
-            "dayofweek",
-        ]
         ta.functions.test_function_arguments(
             func=DatetimeInfoExtractor.__init__,
             expected_arguments=["self", "columns", "include", "datetime_mappings"],
             expected_default_values=(
-                default_include,
-                {},
+                None,
+                None,
             ),
         )
 

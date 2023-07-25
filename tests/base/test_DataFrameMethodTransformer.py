@@ -25,7 +25,7 @@ class TestInit:
                 "pd_method_kwargs",
                 "drop_original",
             ],
-            expected_default_values=({}, False),
+            expected_default_values=(None, False),
         )
 
     def test_class_methods(self):

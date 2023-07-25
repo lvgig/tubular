@@ -21,7 +21,7 @@ class TestInit:
                 "columns",
                 "pd_method_kwargs",
             ],
-            expected_default_values=({},),
+            expected_default_values=(None,),
         )
 
     def test_class_methods(self):

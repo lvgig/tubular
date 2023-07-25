@@ -45,7 +45,7 @@ class TestTwoColumnOperatorTransformerInit:
                 "new_column_name",
                 "pd_method_kwargs",
             ],
-            expected_default_values=({"axis": 0},),
+            expected_default_values=(None,),
         )
 
     def test_axis_not_present_error(self):

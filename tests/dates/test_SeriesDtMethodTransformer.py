@@ -21,7 +21,7 @@ class TestInit:
                 "column",
                 "pd_method_kwargs",
             ],
-            expected_default_values=({},),
+            expected_default_values=(None,),
         )
 
     def test_class_methods(self):
@@ -243,7 +243,7 @@ class TestTransform:
             new_column_name="a_year",
             pd_method_name="year",
             column="a",
-            pd_method_kwargs={},
+            pd_method_kwargs=None,
         )
 
         df_transformed = x.transform(df)
@@ -267,7 +267,7 @@ class TestTransform:
             new_column_name="a",
             pd_method_name="year",
             column="a",
-            pd_method_kwargs={},
+            pd_method_kwargs=None,
         )
 
         df_transformed = x.transform(df)
