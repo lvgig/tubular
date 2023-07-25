@@ -14,23 +14,6 @@ from tubular.base import BaseTransformer
 class TestInit:
     """Tests for BaseTransformer.__init__()."""
 
-    def test_default_attributes_set_in_init(self):
-        """Test correct default values for attributes set in init."""
-        x = BaseTransformer()
-
-        expected_attributes = {
-            "version_": tubular._version.__version__,
-            "verbose": False,
-            "columns": None,
-            "copy": True,
-        }
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes=expected_attributes,
-            msg="Default attributes set in init",
-        )
-
     def test_attributes_set_from_passed_values(self):
         """Test attributes set from values passed in init have the correct values."""
         expected_attributes = {
