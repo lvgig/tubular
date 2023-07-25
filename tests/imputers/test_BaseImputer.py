@@ -9,7 +9,8 @@ from tubular.imputers import BaseImputer
 
 
 class TestInit:
-    """Tests for BaseImputer.init."""
+    """Tests for BaseImputer.init.
+    Currently nothing to test."""
 
 
 class TestTransform:

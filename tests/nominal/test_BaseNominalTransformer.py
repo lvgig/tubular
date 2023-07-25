@@ -8,7 +8,8 @@ from tubular.nominal import BaseNominalTransformer
 
 
 class TestInit:
-    """Test for BaseNominalTransformer object."""
+    """Test for BaseNominalTransformer object.
+    Currently nothing to test."""
 
 
 class TestNominalColumnSetOrCheck:

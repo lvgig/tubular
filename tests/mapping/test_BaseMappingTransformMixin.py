@@ -7,7 +7,8 @@ from tubular.mapping import BaseMappingTransformMixin
 
 
 class TestInit:
-    """Tests for BaseMappingTransformMixin.init()."""
+    """Tests for BaseMappingTransformMixin.init().
+    Currently nothing to test."""
 
 
 class TestTransform:
