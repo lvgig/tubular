@@ -698,7 +698,9 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
                     X_temp[column + "_" + level] = X[column].copy()
 
                 # keep nans to preserve null check functionality of binary response MRE transformer
-                y_temp = y.apply(lambda x: x == level if not pd.isna(x) else np.nan)
+                y_temp = y.apply(
+                    lambda x, level=level: x == level if not pd.isna(x) else np.nan,
+                )
 
                 self.transformer_dict[level] = self._fit_binary_response(
                     X_temp,
