@@ -916,7 +916,7 @@ class DatetimeInfoExtractor(BaseTransformer):
                     msg = (
                         f"{self.classname()}: values in {col} should be datetime64[ns]"
                     )
-                    raise TypeError(msg)
+                    raise TypeError(msg) from None
 
         for col in self.columns:
             if "timeofday" in self.include:
