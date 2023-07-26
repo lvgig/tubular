@@ -425,7 +425,9 @@ class SeriesDtMethodTransformer(BaseTransformer):
         self.pd_method_kwargs = pd_method_kwargs
 
         try:
-            ser = pd.Series([datetime.datetime(2020, 12, 21)])
+            ser = pd.Series(
+                [datetime.datetime(2020, 12, 21, tzinfo=datetime.timezone.utc)],
+            )
             getattr(ser.dt, pd_method_name)
 
         except Exception as err:
