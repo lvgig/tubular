@@ -279,7 +279,7 @@ class TestTransform:
 
         with pytest.raises(
             TypeError,
-            match=r"BetweenDatesTransformer: a should be datetime64\[ns\] type but got int64",
+            match=r"BetweenDatesTransformer: a should be datetime64\[ns\] or datetime64\[ns, UTC\] type but got int64",
         ):
             x.transform(df)
 

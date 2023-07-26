@@ -363,14 +363,14 @@ def create_date_test_df():
     return pd.DataFrame(
         {
             "a": [
-                datetime.date(1993, 9, 27, tzinfo=datetime.timezone.utc),
-                datetime.date(2000, 3, 19, tzinfo=datetime.timezone.utc),
-                datetime.date(2018, 11, 10, tzinfo=datetime.timezone.utc),
-                datetime.date(2018, 10, 10, tzinfo=datetime.timezone.utc),
-                datetime.date(2018, 10, 10, tzinfo=datetime.timezone.utc),
-                datetime.date(2018, 10, 10, tzinfo=datetime.timezone.utc),
-                datetime.date(2018, 12, 10, tzinfo=datetime.timezone.utc),
-                datetime.date(1985, 7, 23, tzinfo=datetime.timezone.utc),
+                datetime.date(1993, 9, 27),
+                datetime.date(2000, 3, 19),
+                datetime.date(2018, 11, 10),
+                datetime.date(2018, 10, 10),
+                datetime.date(2018, 10, 10),
+                datetime.date(2018, 10, 10),
+                datetime.date(2018, 12, 10),
+                datetime.date(1985, 7, 23),
             ],
             "b": [
                 datetime.date(2020, 5, 1),

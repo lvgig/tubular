@@ -607,8 +607,10 @@ class BetweenDatesTransformer(BaseTransformer):
         X = super().transform(X)
 
         for col in self.columns:
-            if not pd.api.types.is_datetime64_dtype(X[col]):
-                msg = f"{self.classname()}: {col} should be datetime64[ns] type but got {X[col].dtype}"
+            if (not pd.api.types.is_datetime64_dtype(X[col])) and (
+                not pd.api.types.is_datetime64tz_dtype(X[col])
+            ):
+                msg = f"{self.classname()}: {col} should be datetime64[ns] or datetime64[ns, UTC] type but got {X[col].dtype}"
                 raise TypeError(msg)
 
         if not (X[self.columns[0]] <= X[self.columns[2]]).all():
@@ -1109,8 +1111,10 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         X = super().transform(X)
 
         for column in self.columns:
-            if not pd.api.types.is_datetime64_dtype(X[column]):
-                msg = f"{self.classname()} : {column} should be datetime64[ns] type but got {X[column].dtype}"
+            if (not pd.api.types.is_datetime64_dtype(X[column])) and (
+                not pd.api.types.is_datetime64tz_dtype(X[column])
+            ):
+                msg = f"{self.classname()} : {column} should be datetime64[ns] or datetime64[ns, UTC] type but got {X[column].dtype}"
                 raise TypeError(msg)
             if not isinstance(self.units, dict):
                 column_in_desired_unit = getattr(X[column].dt, self.units)

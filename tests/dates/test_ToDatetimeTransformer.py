@@ -238,17 +238,20 @@ class TestTransform:
         to_dt_1 = ToDatetimeTransformer(
             column="a",
             new_column_name="a_Y",
-            to_datetime_kwargs={"format": "%Y"},
+            to_datetime_kwargs={"format": "%Y", "utc": datetime.timezone.utc},
         )
 
         to_dt_2 = ToDatetimeTransformer(
             column="b",
             new_column_name="b_m",
-            to_datetime_kwargs={"format": "%m"},
+            to_datetime_kwargs={"format": "%m", "utc": datetime.timezone.utc},
         )
 
         df_transformed = to_dt_1.transform(df)
         df_transformed = to_dt_2.transform(df_transformed)
+
+        print(df_transformed)
+        print(expected)
 
         ta.equality.assert_equal_dispatch(
             expected=expected,
