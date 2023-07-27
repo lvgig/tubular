@@ -98,7 +98,7 @@ class DateDiffLeapYearTransformer(BaseTransformer):
         self.column_lower = column_lower
         self.column_upper = column_upper
 
-    def calculate_age(self, row: pd.Series):
+    def calculate_age(self, row: pd.Series) -> int:
         """Function to calculate age from two date columns in a pd.DataFrame.
 
         This function, although slower than the np.timedelta64 solution (or something
@@ -146,7 +146,7 @@ class DateDiffLeapYearTransformer(BaseTransformer):
 
         return age
 
-    def transform(self, X: pd.DataFrame):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Calculate year gap between the two provided columns.
 
         New column is created under the 'new_column_name', and optionally removes the
@@ -245,7 +245,7 @@ class DateDifferenceTransformer(BaseTransformer):
         self.column_lower = column_lower
         self.column_upper = column_upper
 
-    def transform(self, X: pd.DataFrame):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Calculate the difference between the given fields in the specified units.
 
         Parameters
@@ -317,7 +317,7 @@ class ToDatetimeTransformer(BaseTransformer):
 
         super().__init__(columns=[column], **kwargs)
 
-    def transform(self, X: pd.DataFrame):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Convert specified column to datetime using pd.to_datetime.
 
         Parameters
@@ -443,7 +443,7 @@ class SeriesDtMethodTransformer(BaseTransformer):
         # Here only as a fix to allow string representation of transformer.
         self.column = column
 
-    def transform(self, X: pd.DataFrame):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform specific column on input pandas.DataFrame (X) using the given pandas.Series.dt method and
         assign the output back to column in X.
 
@@ -585,7 +585,7 @@ class BetweenDatesTransformer(BaseTransformer):
         self.column_upper = column_upper
         self.column_between = column_between
 
-    def transform(self, X: pd.DataFrame):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform - creates column indicating if middle date is between the other two.
 
         If not all column_lower values are less than or equal to column_upper when transform is run
@@ -884,7 +884,7 @@ class DatetimeInfoExtractor(BaseTransformer):
 
         return mappings[interval][value]
 
-    def transform(self, X: pd.DataFrame):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform - Extracts new features from datetime variables.
 
         Parameters
