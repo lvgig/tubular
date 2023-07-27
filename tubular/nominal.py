@@ -45,7 +45,9 @@ class BaseNominalTransformer(BaseTransformer):
             self.columns_check(X)
 
     def check_mappable_rows(self, X):
-        """Method to check that all the rows to apply the transformer to are able to be
+        """Check rows can be mapped.
+
+        Method to check that all the rows to apply the transformer to are able to be
         mapped according to the values in the mappings dict.
 
         Raises
@@ -134,7 +136,9 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         return self
 
     def transform(self, X):
-        """Transform method to apply integer encoding stored in the mappings attribute to
+        """Transform column(s) values to integer using mappings.
+
+        Transform method to apply integer encoding stored in the mappings attribute to
         each column in the columns attribute.
 
         This method calls the check_mappable_rows method from BaseNominalTransformer to check that
@@ -196,10 +200,9 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
 
 
 class GroupRareLevelsTransformer(BaseNominalTransformer):
-    """Transformer to group together rare levels of nominal variables into a new level,
-    labelled 'rare' (by default).
+    """Group together rare levels of nominal variables into a new level.
 
-    Rare levels are defined by a cut off percentage, which can either be based on the
+    Rare levels, which are labelled 'rare' (by default), are defined by a cut off percentage, which can either be based on the
     number of rows or sum of weights. Any levels below this cut off value will be
     grouped into the rare level.
 
@@ -430,8 +433,9 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
 
 class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin):
-    """Transformer to apply mean response encoding. This converts categorical variables to
-    numeric by mapping levels to the mean response for that level.
+    """Apply mean response encoding.
+
+    This converts categorical variables to numeric by mapping levels to the mean response for that level.
 
     For a continuous or binary response the categorical columns specified will have values
     replaced with the mean response for each category.
@@ -746,7 +750,9 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         return self
 
     def transform(self, X):
-        """Transform method to apply mean response encoding stored in the mappings attribute to
+        """Transform input pandas.DataFrame by appling mean response encoding.
+
+        Transform method uses mean response enconding stored in the mappings attribute to
         each column in the columns attribute.
 
         This method calls the check_mappable_rows method from BaseNominalTransformer to check that
@@ -797,8 +803,9 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
 
 class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixin):
-    """Transformer to encode categorical variables into ascending rank-ordered integer values variables by mapping
-    it's levels to the target-mean response for that level.
+    """Encode categorical variables into ascending rank-ordered integer values variables.
+
+    Transformer apply this encoding by mapping it's levels to the target-mean response for that level.
     Values will be sorted in ascending order only i.e. categorical level with lowest target mean response to
     be encoded as 1, the next highest value as 2 and so on.
 
@@ -915,8 +922,10 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
         return self
 
     def transform(self, X):
-        """Transform method to apply ordinal encoding stored in the mappings attribute to
-        each column in the columns attribute. This maps categorical levels to rank-ordered integer values by target-mean in ascending order.
+        """Transform inputs pandas.DataFrame by applying ordinal encoding.
+
+        Transfom method uses encoding stored in the mappings attribute to each column in the columns attribute.
+        This maps categorical levels to rank-ordered integer values by target-mean in ascending order.
 
         This method calls the check_mappable_rows method from BaseNominalTransformer to check that
         all rows can be mapped then transform from BaseMappingTransformMixin to apply the
@@ -998,7 +1007,9 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         self.drop_original = drop_original
 
     def fit(self, X, y=None):
-        """Gets list of levels for each column to be transformed. This defines which dummy columns
+        """Define dummy columns.
+
+        Gets list of levels for each column to be transformed. This defines which dummy columns
         will be created in transform.
 
         Parameters

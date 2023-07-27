@@ -9,7 +9,9 @@ from tubular.base import BaseTransformer
 
 
 class BaseImputer(BaseTransformer):
-    """Base imputer class containing standard transform method that will use pd.Series.fillna with the
+    """Impute per default using pd.Series.fillna.
+
+    Base imputer class containing standard transform method that will use pd.Series.fillna with the
     values in the impute_values_ attribute.
 
     Other imputers in this module should inherit from this class.
@@ -78,6 +80,7 @@ class ArbitraryImputer(BaseImputer):
 
     def transform(self, X):
         """Impute missing values with the supplied impute_value.
+
         If columns is None all columns in X will be imputed.
 
         Parameters
@@ -342,7 +345,9 @@ class ModeImputer(BaseImputer):
 
 
 class NearestMeanResponseImputer(BaseImputer):
-    """Class to impute missing values with; the value for which the average response is closest
+    """Impute with value from levels with closest average response.
+
+    Class to impute missing values with the value for which the average response is closest
     to the average response for the unknown levels.
 
     Parameters

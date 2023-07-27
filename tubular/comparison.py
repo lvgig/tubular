@@ -51,8 +51,7 @@ class EqualityChecker(BaseTransformer):
         self.drop_original = drop_original
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Create a column which is populated by the boolean
-        matching between two columns iterated over rows.
+        """Create a column of boolean matching between two columns iterated over rows.
 
         Parameters
         ----------

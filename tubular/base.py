@@ -1,4 +1,6 @@
-"""This module contains transformers that other transformers in the package inherit
+"""Provide BaseTransformer, ReturnKeyDict, DataFrameMehtodTransformer
+
+This module contains transformers that other transformers in the package inherit
 from. These transformers contain key checks to be applied in all cases.
 """
 
@@ -93,7 +95,9 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         self.copy = copy
 
     def fit(self, X, y=None):
-        """Base transformer fit method, checks X and y types. Currently only pandas DataFrames are allowed for X
+        """Fit method.
+
+        Base transformer fit method, checks X and y types. Currently only pandas DataFrames are allowed for X
         and DataFrames or Series for y.
 
         Fit calls the columns_set_or_check method which will set the columns attribute to all columns in X, if it
@@ -199,7 +203,9 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         return X
 
     def check_is_fitted(self, attribute):
-        """Check if particular attributes are on the object. This is useful to do before running transform to avoid
+        """Check if particular attributes are on the object.
+
+        This is useful to do before running transform to avoid
         trying to transform data without first running the fit method.
 
         Wrapper for utils.validation.check_is_fitted function.
@@ -293,7 +299,9 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
 
 class ReturnKeyDict(dict):
-    """Dict class that implements __missing__ method to return the key if it is not present in the dict
+    """Implement __missing__ method for pd.Series.map
+
+    Dict class that implements __missing__ method to return the key if it is not present in the dict
     when looked up.
 
     This is intended to be used in combination with the pd.Series.map function so that it does not
@@ -416,8 +424,9 @@ class DataFrameMethodTransformer(BaseTransformer):
             raise AttributeError(msg) from err
 
     def transform(self, X):
-        """Transform input pandas DataFrame (X) using the given pandas.DataFrame method and assign the output
-        back to column or columns in X.
+        """Transform input pandas DataFrame (X) using any given pd_method_kwargs.
+
+        It transforms using the given pandas.DataFrame method and assign the output back to column or columns in X.
 
         Any keyword arguments set in the pd_method_kwargs attribute are passed onto the pandas DataFrame method when calling it.
 

@@ -443,7 +443,8 @@ class ScalingTransformer(BaseTransformer):
 
 
 class InteractionTransformer(BaseTransformer):
-    """Transformer that generates interaction features.
+    """Generate interaction features.
+
     Transformer generates a new column  for all combinations from the selected columns up to the maximum degree
     provided. (For sklearn version higher than 1.0.0>, only interaction of a degree higher or equal to the minimum
     degree would be computed).
@@ -525,8 +526,10 @@ class InteractionTransformer(BaseTransformer):
         self.nb_feature_out = -1
 
     def transform(self, X):
-        """Generate from input pandas DataFrame (X) new interaction features using the "product" pandas.DataFrame method
-         and add this column or columns in X.
+        """Generate from input pandas DataFrame (X) new interaction features.
+
+        To generate the new interaction features, the transform method is using the "product" pandas.DataFrame method
+         and then adds this column or columns in X.
 
         Parameters
         ----------
@@ -585,7 +588,8 @@ class InteractionTransformer(BaseTransformer):
 
 
 class PCATransformer(BaseTransformer):
-    """Transformer that generates variables using Principal component analysis (PCA).
+    """Generates variables using Principal component analysis (PCA).
+
     Linear dimensionality reduction using Singular Value Decomposition of the
     data to project it to a lower dimensional space.
 

@@ -93,7 +93,9 @@ class SeriesStrMethodTransformer(BaseTransformer):
             raise AttributeError(msg) from err
 
     def transform(self, X):
-        """Transform specific column on input pandas.DataFrame (X) using the given pandas.Series.str method and
+        """Apply pandas.Series.str method.
+
+        It transforms specific column from input pandas.DataFrame (X) using the given pandas.Series.str method and
         assign the output back to column in X.
 
         Any keyword arguments set in the pd_method_kwargs attribute are passed onto the pd.Series.str method

@@ -443,7 +443,9 @@ class SeriesDtMethodTransformer(BaseTransformer):
         self.column = column
 
     def transform(self, X):
-        """Transform specific column on input pandas.DataFrame (X) using the given pandas.Series.dt method and
+        """Transform input pandas DataFrame (X) using pandas.Series.dt method.
+
+        It transforms specific column on input pandas.DataFrame (X) using the given pandas.Series.dt method and
         assign the output back to column in X.
 
         Any keyword arguments set in the pd_method_kwargs attribute are passed onto the pd.Series.dt method
@@ -831,7 +833,9 @@ class DatetimeInfoExtractor(BaseTransformer):
             self.dayofweek_mapping = {}
 
     def _map_values(self, value, interval: str):
-        """Method to apply mappings for a specified interval ("timeofday", "timeofmonth", "timeofyear" or "dayofweek")
+        """Map specific time interval.
+
+        Method to apply mappings for a specified interval ("timeofday", "timeofmonth", "timeofyear" or "dayofweek")
         from corresponding mapping attribute to a single value.
 
         Parameters
@@ -934,7 +938,9 @@ class DatetimeInfoExtractor(BaseTransformer):
 
 
 class DatetimeSinusoidCalculator(BaseTransformer):
-    """Transformer to derive a feature in a dataframe by calculating the
+    """Tansform a time feature into sine or cosine datetime column.
+
+    Transformer to derive a feature in a dataframe by calculating the
     sine or cosine of a datetime column in a given unit (e.g hour), with the option to scale
     period of the sine or cosine to match the natural period of the unit (e.g. 24).
 

@@ -54,7 +54,9 @@ class BaseMappingTransformer(BaseTransformer):
         super().__init__(columns=columns, **kwargs)
 
     def transform(self, X):
-        """Base mapping transformer transform method.  Checks that the mappings
+        """Tranform input (X) pandas.DataFrame after checking mappings is fitted.
+
+        Base mapping transformer transform method.  Checks that the mappings
         dict has been fitted and calls the BaseTransformer transform method.
 
         Parameters
@@ -82,8 +84,7 @@ class BaseMappingTransformMixin(BaseTransformer):
     """
 
     def transform(self, X):
-        """Applies the mapping defined in the mappings dict to each column in the columns
-        attribute.
+        """Apply the mapping defined in the mappings dict to each column in the columns attribute.
 
         Parameters
         ----------
