@@ -1,8 +1,9 @@
 """This module contains a transformer that applies capping to numeric columns."""
 
+from __future__ import annotations
+
 import datetime
 import warnings
-from typing import List, Union
 
 import numpy as np
 import pandas as pd
@@ -57,11 +58,11 @@ class DateDiffLeapYearTransformer(BaseTransformer):
 
     def __init__(
         self,
-        column_lower,
-        column_upper,
-        new_column_name,
-        drop_cols,
-        missing_replacement=None,
+        column_lower: str,
+        column_upper: str,
+        new_column_name: str,
+        drop_cols: bool,
+        missing_replacement: int | float | str | None = None,
         **kwargs,
     ) -> None:
         if not isinstance(column_lower, str):
@@ -97,7 +98,7 @@ class DateDiffLeapYearTransformer(BaseTransformer):
         self.column_lower = column_lower
         self.column_upper = column_upper
 
-    def calculate_age(self, row):
+    def calculate_age(self, row: pd.Series):
         """Function to calculate age from two date columns in a pd.DataFrame.
 
         This function, although slower than the np.timedelta64 solution (or something
@@ -145,7 +146,7 @@ class DateDiffLeapYearTransformer(BaseTransformer):
 
         return age
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame):
         """Calculate year gap between the two provided columns.
 
         New column is created under the 'new_column_name', and optionally removes the
@@ -193,12 +194,12 @@ class DateDifferenceTransformer(BaseTransformer):
 
     def __init__(
         self,
-        column_lower,
-        column_upper,
-        new_column_name=None,
-        units="D",
-        copy=True,
-        verbose=False,
+        column_lower: str,
+        column_upper: str,
+        new_column_name: str | None = None,
+        units: str = "D",
+        copy: bool = True,
+        verbose: bool = False,
     ) -> None:
         if type(column_lower) is not str:
             msg = f"{self.classname()}: column_lower must be a str"
@@ -244,7 +245,7 @@ class DateDifferenceTransformer(BaseTransformer):
         self.column_lower = column_lower
         self.column_upper = column_upper
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame):
         """Calculate the difference between the given fields in the specified units.
 
         Parameters
@@ -285,9 +286,9 @@ class ToDatetimeTransformer(BaseTransformer):
 
     def __init__(
         self,
-        column,
-        new_column_name,
-        to_datetime_kwargs={},
+        column: str,
+        new_column_name: str,
+        to_datetime_kwargs: dict = {},
         **kwargs,
     ) -> None:
         if type(column) is not str:
@@ -316,7 +317,7 @@ class ToDatetimeTransformer(BaseTransformer):
 
         super().__init__(columns=[column], **kwargs)
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame):
         """Convert specified column to datetime using pd.to_datetime.
 
         Parameters
@@ -391,10 +392,10 @@ class SeriesDtMethodTransformer(BaseTransformer):
 
     def __init__(
         self,
-        new_column_name,
-        pd_method_name,
-        column,
-        pd_method_kwargs={},
+        new_column_name: str,
+        pd_method_name: str,
+        column: str,
+        pd_method_kwargs: dict = {},
         **kwargs,
     ) -> None:
         if type(column) is not str:
@@ -442,7 +443,7 @@ class SeriesDtMethodTransformer(BaseTransformer):
         # Here only as a fix to allow string representation of transformer.
         self.column = column
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame):
         """Transform specific column on input pandas.DataFrame (X) using the given pandas.Series.dt method and
         assign the output back to column in X.
 
@@ -540,12 +541,12 @@ class BetweenDatesTransformer(BaseTransformer):
 
     def __init__(
         self,
-        column_lower,
-        column_between,
-        column_upper,
-        new_column_name,
-        lower_inclusive=True,
-        upper_inclusive=True,
+        column_lower: str,
+        column_between: str,
+        column_upper: str,
+        new_column_name: str,
+        lower_inclusive: bool = True,
+        upper_inclusive: bool = True,
         **kwargs,
     ) -> None:
         if type(column_lower) is not str:
@@ -584,7 +585,7 @@ class BetweenDatesTransformer(BaseTransformer):
         self.column_upper = column_upper
         self.column_between = column_between
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame):
         """Transform - creates column indicating if middle date is between the other two.
 
         If not all column_lower values are less than or equal to column_upper when transform is run
@@ -702,9 +703,12 @@ class DatetimeInfoExtractor(BaseTransformer):
 
     def __init__(
         self,
-        columns,
-        include=["timeofday", "timeofmonth", "timeofyear", "dayofweek"],
-        datetime_mappings={},
+        columns: str | list[str],
+        include: str
+        | list[str] = ["timeofday", "timeofmonth", "timeofyear", "dayofweek"],
+        datetime_mappings: dict[
+            str,
+        ] = {},
         **kwargs,
     ) -> None:
         if type(include) is not list:
@@ -830,7 +834,7 @@ class DatetimeInfoExtractor(BaseTransformer):
         else:
             self.dayofweek_mapping = {}
 
-    def _map_values(self, value, interval: str):
+    def _map_values(self, value: int | float, interval: str):
         """Method to apply mappings for a specified interval ("timeofday", "timeofmonth", "timeofyear" or "dayofweek")
         from corresponding mapping attribute to a single value.
 
@@ -880,7 +884,7 @@ class DatetimeInfoExtractor(BaseTransformer):
 
         return mappings[interval][value]
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame):
         """Transform - Extracts new features from datetime variables.
 
         Parameters
@@ -975,10 +979,10 @@ class DatetimeSinusoidCalculator(BaseTransformer):
 
     def __init__(
         self,
-        columns: Union[str, List[str]],
-        method: Union[str, List[str]],
-        units: Union[str, dict],
-        period: Union[int, float, dict, dict] = 2 * np.pi,
+        columns: str | list[str],
+        method: str | list[str],
+        units: str | dict,
+        period: int | float | dict | dict = 2 * np.pi,
     ) -> None:
         super().__init__(columns, copy=True)
 
