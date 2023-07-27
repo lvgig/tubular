@@ -803,7 +803,9 @@ class TestTransform:
         return df
 
     def expected_df_4():
-        """Expected output for transform on dataframe with single level response and unseen levels,
+        """Test Unit test.
+
+        Expected output for transform on dataframe with single level response and unseen levels,
         where unseen_level_handling = 'Mean'.
         """
         df = pd.DataFrame(
@@ -832,7 +834,9 @@ class TestTransform:
         return df
 
     def expected_df_5():
-        """Expected output for transform on dataframe with single level response and unseen levels,
+        """Test Unit test.
+
+        Expected output for transform on dataframe with single level response and unseen levels,
         where unseen_level_handling = 'Median'.
         """
         df = pd.DataFrame(
@@ -861,7 +865,9 @@ class TestTransform:
         return df
 
     def expected_df_6():
-        """Expected output for transform on dataframe with single level response and unseen levels,
+        """Test Unit test.
+
+        Expected output for transform on dataframe with single level response and unseen levels,
         where unseen_level_handling = 'Lowest'.
         """
         df = pd.DataFrame(
@@ -890,7 +896,9 @@ class TestTransform:
         return df
 
     def expected_df_7():
-        """Expected output for transform on dataframe with single level response and unseen levels,
+        """Test Unit test.
+
+        Expected output for transform on dataframe with single level response and unseen levels,
         where unseen_level_handling = 'Highest'.
         """
         df = pd.DataFrame(
@@ -919,7 +927,9 @@ class TestTransform:
         return df
 
     def expected_df_8():
-        """Expected output for transform on dataframe with single level response and unseen levels,
+        """Test Unit test.
+
+        Expected output for transform on dataframe with single level response and unseen levels,
         where unseen_level_handling set to arbitrary int/float value.
         """
         df = pd.DataFrame(
@@ -948,7 +958,9 @@ class TestTransform:
         return df
 
     def expected_df_9():
-        """Expected output for transform on dataframe with multi-level response with level = blue and unseen levels in data."""
+        """Test Unit test.
+
+        Expected output for transform on dataframe with multi-level response with level = blue and unseen levels in data."""
         df = pd.DataFrame(
             {
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 3.0],
@@ -975,7 +987,9 @@ class TestTransform:
         return df
 
     def expected_df_10():
-        """Expected output for transform on dataframe with multi-level response with level = "all" and unseen levels in data."""
+        """Test Unit test.
+
+        Expected output for transform on dataframe with multi-level response with level = "all" and unseen levels in data."""
         df = pd.DataFrame(
             {
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 3.0],
@@ -1125,7 +1139,9 @@ class TestTransform:
         ),
     )
     def test_expected_output_all_levels(self, df, expected):
-        """Test that the output is expected from transform for a multi-level response and all levels selected."""
+        """Test Unit test.
+
+        Test that the output is expected from transform for a multi-level response and all levels selected."""
         x = MeanResponseTransformer(columns=["b", "f"], level="all")
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
@@ -1153,7 +1169,9 @@ class TestTransform:
         )
 
     def test_expected_output_sigle_level_response_unseen_levels_default(self):
-        """Test that the output is expected from transform with a single level response with unseen levels in data with
+        """Test Unit test.
+
+        Test that the output is expected from transform with a single level response with unseen levels in data with
         unseen_level_handling set to 'None', i.e., default value.
         """
         initial_df = d.create_MeanResponseTransformer_test_df()
@@ -1178,7 +1196,9 @@ class TestTransform:
         df,
         expected,
     ):
-        """Test that the output is expected from transform with a single level response with unseen levels in data with
+        """Test Unit test.
+
+        Test that the output is expected from transform with a single level response with unseen levels in data with
         unseen_level_handling set to 'Mean'.
         """
         x = MeanResponseTransformer(
@@ -1208,7 +1228,9 @@ class TestTransform:
         df,
         expected,
     ):
-        """Test that the output is expected from transform with a single level response with unseen levels in data
+        """Test Unit test.
+
+        Test that the output is expected from transform with a single level response with unseen levels in data
         with unseen_level_handling set to 'Median'.
         """
         x = MeanResponseTransformer(
@@ -1238,7 +1260,9 @@ class TestTransform:
         df,
         expected,
     ):
-        """Test that the output is expected from transform with a single level response with unseen levels in data
+        """Test Unit test.
+
+        Test that the output is expected from transform with a single level response with unseen levels in data
         with unseen_level_handling set to 'Lowest'.
         """
         x = MeanResponseTransformer(
@@ -1268,7 +1292,9 @@ class TestTransform:
         df,
         expected,
     ):
-        """Test that the output is expected from transform with a single level response with unseen levels in data
+        """Test Unit test.
+
+        Test that the output is expected from transform with a single level response with unseen levels in data
         with unseen_level_handling set to 'Highest'.
         """
         x = MeanResponseTransformer(
@@ -1298,7 +1324,9 @@ class TestTransform:
         df,
         expected,
     ):
-        """Test that the output is expected from transform with a single level response with unseen levels in data
+        """Test Unit test.
+
+        Test that the output is expected from transform with a single level response with unseen levels in data
         with unseen_level_handling set to an arbitrary int/float value'.
         """
         x = MeanResponseTransformer(columns=["b", "d", "f"], unseen_level_handling=21.6)
@@ -1321,7 +1349,9 @@ class TestTransform:
         ),
     )
     def test_expected_output_one_multi_level_unseen_levels(self, df, expected):
-        """Test that the output is expected from transform with a multi-level response and unseen levels and one level selected."""
+        """Test Unit test.
+
+        Test that the output is expected from transform with a multi-level response and unseen levels and one level selected."""
         x = MeanResponseTransformer(
             columns=["b", "f"],
             level=["blue"],
@@ -1346,7 +1376,9 @@ class TestTransform:
         ),
     )
     def test_expected_output_all_multi_level_unseen_levels(self, df, expected):
-        """Test that the output is expected from transform with a multi-level response and unseen levels and all level selected."""
+        """Test Unit test.
+
+        Test that the output is expected from transform with a multi-level response and unseen levels and all level selected."""
         x = MeanResponseTransformer(
             columns=["b", "f"],
             level="all",

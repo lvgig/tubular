@@ -380,7 +380,9 @@ class TestTransform:
         )
 
     def test_expected_output_no_weight_single_row_na(self):
-        """Test output from a single row transform with np.NaN value remains the same,
+        """Test Unit test.
+
+        Test output from a single row transform with np.NaN value remains the same,
         the type is perserved if using existing dataframe, so need to create a new dataframe.
         """
         one_row_df = pd.DataFrame({"b": [np.nan], "c": [np.NaN]})
@@ -398,7 +400,9 @@ class TestTransform:
         )
 
     def test_expected_output_no_weight_single_row_na_category_column(self):
-        """Test output from a single row transform with np.NaN value remains the same, when column is type category,
+        """Test Unit test.
+
+        Test output from a single row transform with np.NaN value remains the same, when column is type category,
         the type is perserved if using existing dataframe, so need to create a new dataframe.
         """
         one_row_df = pd.DataFrame({"b": [np.nan], "c": [np.NaN]})

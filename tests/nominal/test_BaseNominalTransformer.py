@@ -67,7 +67,9 @@ class TestNominalColumnSetOrCheck:
         """Test call to tubular.base.BaseTransformer.columns_check."""
 
         class JointInheritanceClass(BaseNominalTransformer, BaseTransformer):
-            """Class to use in TestNominalColumnSetOrCheck.test_columns_check_called, which inherits from
+            """Join multi base class.
+
+            Class to use in TestNominalColumnSetOrCheck.test_columns_check_called, which inherits from
             BaseNominalTransformer and BaseTransformer in order to test that the columns_check method
             from BaseTransformer is called.
             """

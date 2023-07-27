@@ -279,7 +279,9 @@ class TestTransform:
         ta.pandas.adjusted_dataframe_params(d.create_df_4(), expected_df_5()),
     )
     def test_expected_output_5(self, df, expected):
-        """Test that transform is giving the expected output when adding one and not dropping
+        """Test Unit test.
+
+        Test that transform is giving the expected output when adding one and not dropping
         original columns and using base.
         """
         x1 = LogTransformer(
@@ -303,7 +305,9 @@ class TestTransform:
         ta.pandas.adjusted_dataframe_params(d.create_df_4(), expected_df_6()),
     )
     def test_expected_output_6(self, df, expected):
-        """Test that transform is giving the expected output when  not adding one and dropping
+        """Test Unit test.
+
+        Test that transform is giving the expected output when  not adding one and dropping
         original columns and using base.
         """
         x1 = LogTransformer(

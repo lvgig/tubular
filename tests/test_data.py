@@ -276,7 +276,9 @@ def create_MeanResponseTransformer_test_df():
 
 
 def create_MeanResponseTransformer_test_df_unseen_levels():
-    """Create DataFrame to use in MeanResponseTransformer tests that check correct values are
+    """Provide a data example for unseen levels for MeanResponseTransformer.
+
+    Create DataFrame to use in MeanResponseTransformer tests that check correct values are
     generated when using transform method on data with unseen levels.
     DataFrame column a is the response, the other columns are categorical columns
     of types; object, category, int, float, bool.

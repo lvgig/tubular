@@ -110,6 +110,7 @@ class TestInit:
     @pytest.mark.parametrize("transformer", ListOfTransformers())
     def test_print(self, transformer):
         """Test that transformer can be printed.
+
         If an error is raised in this test it will not prevent the transformer from working correctly,
         but will stop other unit tests passing.
         """

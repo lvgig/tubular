@@ -291,7 +291,9 @@ class TestDatetimeSinusoidCalculatorTransform:
             example_transformer.transform(test_data)
 
     def test_cos_called_with_correct_args(self, mocker):
-        """Tests that the correct numpy method is called on the correct column - also implicitly checks that the column has been transformed
+        """Test Unit test.
+
+        Tests that the correct numpy method is called on the correct column - also implicitly checks that the column has been transformed
         into the correct units through the value of the argument.
         """
         method = "cos"
