@@ -106,7 +106,7 @@ class CappingTransformer(BaseTransformer):
         self,
         capping_values_dict: dict[str, list[int | float]],
         dict_name: str,
-    ):
+    ) -> None:
         """Performs checks on a dictionary passed to ."""
         if type(capping_values_dict) is not dict:
             msg = f"{self.classname()}: {dict_name} should be dict of columns and capping values"
@@ -145,7 +145,7 @@ class CappingTransformer(BaseTransformer):
                 msg = f"{self.classname()}: both values are None for key {k}"
                 raise ValueError(msg)
 
-    def fit(self, X: pd.DataFrame, y: None = None):
+    def fit(self, X: pd.DataFrame, y: None = None) -> CappingTransformer:
         """Learn capping values from input data X.
 
         Calculates the quantiles to cap at given the quantiles dictionary supplied
@@ -195,7 +195,7 @@ class CappingTransformer(BaseTransformer):
         values: pd.Series | np.array,
         quantiles: list[float],
         sample_weight: pd.Series | np.array | None = None,
-    ):
+    ) -> list[int | float]:
         """Method to call the weighted_quantile method and prepare the outputs.
 
         If there are no None values in the supplied quantiles then the outputs from weighted_quantile
@@ -245,7 +245,7 @@ class CappingTransformer(BaseTransformer):
         values: pd.Series | np.array,
         quantiles: list[float],
         sample_weight: pd.Series | np.array | None = None,
-    ):
+    ) -> list[int | float]:
         """Method to calculate weighted quantiles.
 
         This method is adapted from the "Completely vectorized numpy solution" answer from user
@@ -343,7 +343,7 @@ class CappingTransformer(BaseTransformer):
 
         return list(np.interp(quantiles, weighted_quantiles, values))
 
-    def transform(self, X: pd.DataFrame):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Apply capping to columns in X.
 
         If cap_value_max is set, any values above cap_value_max will be set to cap_value_max. If cap_value_min
@@ -469,7 +469,7 @@ class OutOfRangeNullTransformer(CappingTransformer):
 
         self.set_replacement_values()
 
-    def set_replacement_values(self):
+    def set_replacement_values(self) -> None:
         """Method to set the _replacement_values to have all null values.
 
         Keeps the existing keys in the _replacement_values dict and sets all values (except None) in the lists to np.NaN. Any None
@@ -483,7 +483,7 @@ class OutOfRangeNullTransformer(CappingTransformer):
 
             self._replacement_values[k] = null_replacements_list
 
-    def fit(self, X: pd.DataFrame, y: None = None):
+    def fit(self, X: pd.DataFrame, y: None = None) -> OutOfRangeNullTransformer:
         """Learn capping values from input data X.
 
         Calculates the quantiles to cap at given the quantiles dictionary supplied
