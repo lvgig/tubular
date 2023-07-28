@@ -66,6 +66,7 @@ class CappingTransformer(BaseTransformer):
         weights_column=None,
         **kwargs,
     ) -> None:
+        """Initializes the instance with quantiles to set capping limit and the value to apply when cap is reached."""
         if capping_values is None and quantiles is None:
             msg = f"{self.classname()}: both capping_values and quantiles are None, either supply capping values in the capping_values argument or supply quantiles that can be learnt in the fit method"
             raise ValueError(msg)
@@ -444,6 +445,7 @@ class OutOfRangeNullTransformer(CappingTransformer):
         weights_column=None,
         **kwargs,
     ) -> None:
+        """Initializes the instance with quantiles to set capping limit."""
         super().__init__(
             capping_values=capping_values,
             quantiles=quantiles,

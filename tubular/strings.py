@@ -57,6 +57,7 @@ class SeriesStrMethodTransformer(BaseTransformer):
         pd_method_kwargs={},
         **kwargs,
     ) -> None:
+        """Initializes the instance with columns, target column name and the pd.Series.str method to use for the transformation."""
         if type(columns) is list and len(columns) > 1:
             msg = f"{self.classname()}: columns arg should contain only 1 column name but got {len(columns)}"
             raise ValueError(msg)
@@ -136,6 +137,7 @@ class StringConcatenator(BaseTransformer):
     """
 
     def __init__(self, columns, new_column="new_column", separator=" ") -> None:
+        """Initializes the instance with columns to concatenate, separartor between valuesa and name of the new column."""
         super().__init__(columns=columns, copy=True)
 
         if not isinstance(new_column, str):

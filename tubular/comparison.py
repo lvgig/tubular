@@ -29,6 +29,7 @@ class EqualityChecker(BaseTransformer):
         drop_original: bool = False,
         **kwargs,
     ) -> None:
+        """Initializes the instance with the two columns to compare and the name of the result of the comparison."""
         super().__init__(columns=columns, **kwargs)
 
         if not (isinstance(columns, list)):

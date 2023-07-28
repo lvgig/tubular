@@ -53,6 +53,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         return type(self).__name__
 
     def __init__(self, columns=None, copy=True, verbose=False) -> None:
+        """Initializes instance with columns and whether to make a copy or not from inputs."""
         self.version_ = __version__
 
         if not isinstance(verbose, bool):
@@ -381,6 +382,7 @@ class DataFrameMethodTransformer(BaseTransformer):
         drop_original=False,
         **kwargs,
     ) -> None:
+        """Initializes instance with which column(s) to transform with which pandas.DataFrame method and how transformed column should be named."""
         super().__init__(columns=columns, **kwargs)
 
         if type(new_column_name) is list:

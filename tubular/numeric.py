@@ -64,6 +64,7 @@ class LogTransformer(BaseTransformer):
         suffix="log",
         **kwargs,
     ) -> None:
+        """Initializes the instance with column to apply logarthimic function and the desired log base."""
         super().__init__(columns=columns, **kwargs)
 
         if base is not None:
@@ -165,6 +166,7 @@ class CutTransformer(BaseTransformer):
     """
 
     def __init__(self, column, new_column_name, cut_kwargs={}, **kwargs) -> None:
+        """Initializes the instance with columns to be cut and cut values and/or method"""
         if type(column) is not str:
             msg = f"{self.classname()}: column arg (name of column) should be a single str giving the column to discretise"
             raise TypeError(msg)
@@ -344,6 +346,7 @@ class ScalingTransformer(BaseTransformer):
     """
 
     def __init__(self, columns, scaler_type, scaler_kwargs={}, **kwargs) -> None:
+        """Initializes the instance with columns and scaling method."""
         if type(scaler_kwargs) is not dict:
             msg = f"{self.classname()}: scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
             raise TypeError(msg)
@@ -489,6 +492,7 @@ class InteractionTransformer(BaseTransformer):
     """
 
     def __init__(self, columns, min_degree=2, max_degree=2, **kwargs) -> None:
+        """Initializes the instance with columns whom interaction needs to be computed and the degrees of interaction."""
         super().__init__(columns=columns, **kwargs)
 
         if len(columns) < 2:
@@ -666,6 +670,8 @@ class PCATransformer(BaseTransformer):
         pca_column_prefix="pca_",
         **kwargs,
     ) -> None:
+        """Initializes the instance with columns to use to compute PCA ,the solver and the number of components targeted."""
+
         super().__init__(columns=columns, **kwargs)
 
         if type(n_components) is int:
