@@ -284,7 +284,7 @@ class TestTransform:
     """Tests for OneHotEncodingTransformer.transform()."""
 
     def expected_df_1():
-        """Expected output for test_expected_output."""
+        """Define expected output for test_expected_output."""
         df = pd.DataFrame(
             {
                 "a": [4, 2, 2, 1, 3],
@@ -302,7 +302,7 @@ class TestTransform:
         return df
 
     def expected_df_2():
-        """Expected output for test_unseen_categories_encoded_as_all_zeroes."""
+        """Define expected output for test_unseen_categories_encoded_as_all_zeroes."""
         df = pd.DataFrame(
             {
                 "a": [1, 5, 2, 3, 3],

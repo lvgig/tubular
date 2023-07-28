@@ -22,7 +22,7 @@ def create_zeros_array(shape=(10, 3)):
 
 
 def create_numeric_df_1():
-    """Example with numeric dataframe."""
+    """Create an example with numeric dataframe."""
     return pd.DataFrame(
         {
             "a": [34.48, 21.71, 32.83, 1.08, 32.93, 4.74, 2.76, 75.7, 14.08, 61.31],

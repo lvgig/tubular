@@ -225,7 +225,7 @@ class TestTransform:
     """Tests for ModeImputer.transform()."""
 
     def expected_df_1():
-        """Expected output for test_nulls_imputed_correctly."""
+        """Define expected output for test_nulls_imputed_correctly."""
         df = pd.DataFrame(
             {
                 "a": [1, 2, 3, 4, 5, 6, np.NaN],
@@ -240,7 +240,7 @@ class TestTransform:
         return df
 
     def expected_df_2():
-        """Expected output for test_nulls_imputed_correctly_2."""
+        """Define expected output for test_nulls_imputed_correctly_2."""
         df = pd.DataFrame(
             {
                 "a": [1, 2, 3, 4, 5, 6, np.NaN],
@@ -255,7 +255,7 @@ class TestTransform:
         return df
 
     def expected_df_3():
-        """Expected output for test_nulls_imputed_correctly_3."""
+        """Define expected output for test_nulls_imputed_correctly_3."""
         df = d.create_df_9()
 
         for col in ["a"]:

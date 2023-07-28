@@ -132,7 +132,7 @@ class TestTransform:
     """Tests for ToDatetimeTransformer.transform()."""
 
     def expected_df_1():
-        """Expected output for test_expected_output."""
+        """Define expected output for test_expected_output."""
         return pd.DataFrame(
             {
                 "a": [1950, 1960, 2000, 2001, np.NaN, 2010],

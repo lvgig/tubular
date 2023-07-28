@@ -724,7 +724,7 @@ class TestTransform:
     """Tests for MeanResponseTransformer.transform()."""
 
     def expected_df_1():
-        """Expected output for single level response."""
+        """Define expected output for single level response."""
         df = pd.DataFrame(
             {
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
@@ -749,7 +749,7 @@ class TestTransform:
         return df
 
     def expected_df_2():
-        """Expected output for response with level = blue."""
+        """Define expected output for response with level = blue."""
         df = pd.DataFrame(
             {
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
@@ -774,7 +774,7 @@ class TestTransform:
         return df
 
     def expected_df_3():
-        """Expected output for response with level = 'all'."""
+        """Define expected output for response with level = 'all'."""
         df = pd.DataFrame(
             {
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],

@@ -201,7 +201,7 @@ class TestTransform:
     """Tests for DateDifferenceTransformer.transform()."""
 
     def expected_df_3():
-        """Expected output for test_expected_output_units_D."""
+        """Define expected output for test_expected_output_units_D."""
         return pd.DataFrame(
             {
                 "a": [
@@ -238,7 +238,7 @@ class TestTransform:
         )
 
     def expected_df_4():
-        """Expected output for test_expected_output_units_h."""
+        """Define expected output for test_expected_output_units_h."""
         return pd.DataFrame(
             {
                 "a": [
@@ -275,7 +275,7 @@ class TestTransform:
         )
 
     def expected_df_5():
-        """Expected output for test_expected_output_units_m."""
+        """Define expected output for test_expected_output_units_m."""
         return pd.DataFrame(
             {
                 "a": [
@@ -312,7 +312,7 @@ class TestTransform:
         )
 
     def expected_df_6():
-        """Expected output for test_expected_output_units_s."""
+        """Define expected output for test_expected_output_units_s."""
         return pd.DataFrame(
             {
                 "a": [
@@ -349,7 +349,7 @@ class TestTransform:
         )
 
     def expected_df_7():
-        """Expected output for test_expected_output_nulls."""
+        """Define expected output for test_expected_output_nulls."""
         return pd.DataFrame(
             {
                 "a": [

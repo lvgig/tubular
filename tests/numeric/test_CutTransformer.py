@@ -119,7 +119,7 @@ class TestTransform:
     """Tests for CutTransformer.transform()."""
 
     def expected_df_1():
-        """Expected output for test_expected_output."""
+        """Define expected output for test_expected_output."""
         df = d.create_df_9()
 
         df["d"] = pd.Categorical(

@@ -589,7 +589,7 @@ class TestTransform:
     """Tests for CappingTransformer.transform()."""
 
     def expected_df_1():
-        """Expected output from test_expected_output_min_and_max."""
+        """Define expected output from test_expected_output_min_and_max."""
         return pd.DataFrame(
             {
                 "a": [2, 2, 3, 4, 5, 5, np.NaN],
@@ -599,7 +599,7 @@ class TestTransform:
         )
 
     def expected_df_2():
-        """Expected output from test_expected_output_max."""
+        """Define expected output from test_expected_output_max."""
         df = pd.DataFrame(
             {
                 "a": [2, 2, 3, 4, 5, 6, 7, np.NaN],

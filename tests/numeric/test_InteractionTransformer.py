@@ -174,7 +174,7 @@ class TestTransform:
     """Tests for InteractionTransformer.transform()."""
 
     def expected_df_1():
-        """Expected output of test_expected_output_default_assignment."""
+        """Define expected output of test_expected_output_default_assignment."""
         return pd.DataFrame(
             {
                 "a": {0: 1.0, 1: 2.0, 2: 3.0, 3: 4.0, 4: 5.0, 5: 6.0, 6: np.NaN},
@@ -203,7 +203,7 @@ class TestTransform:
         )
 
     def expected_df_2():
-        """Expected output of test_expected_output_multiple_columns_assignment."""
+        """Define expected output of test_expected_output_multiple_columns_assignment."""
         return pd.DataFrame(
             {
                 "a": {0: 1.0, 1: 2.0, 2: 3.0, 3: 4.0, 4: 5.0, 5: 6.0, 6: np.NaN},

@@ -22,7 +22,7 @@ class SetValueTransformer(BaseTransformer):
     """
 
     def __init__(self, columns, value, **kwargs) -> None:
-        """Initializes the instance with column and the value to apply on the column."""
+        """Initialize the instance with column and the value to apply on the column."""
         self.value = value
 
         super().__init__(columns=columns, **kwargs)
@@ -62,7 +62,7 @@ class SetColumnDtype(BaseTransformer):
     """
 
     def __init__(self, columns, dtype) -> None:
-        """Initializes the instance with column(s) and the type to apply to it(them)."""
+        """Initialize the instance with column(s) and the type to apply to it(them)."""
         super().__init__(columns, copy=True)
 
         self.__validate_dtype(dtype)

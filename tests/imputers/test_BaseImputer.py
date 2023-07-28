@@ -32,7 +32,7 @@ class TestTransform:
     """Tests for BaseImputer.transform."""
 
     def expected_df_1():
-        """Expected output of test_expected_output_1."""
+        """Define expected output of test_expected_output_1."""
         df = pd.DataFrame(
             {
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
@@ -46,7 +46,7 @@ class TestTransform:
         return df
 
     def expected_df_2():
-        """Expected output of test_expected_output_2."""
+        """Define expected output of test_expected_output_2."""
         df2 = pd.DataFrame(
             {
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],
@@ -60,7 +60,7 @@ class TestTransform:
         return df2
 
     def expected_df_3():
-        """Expected output of test_expected_output_3."""
+        """Define expected output of test_expected_output_3."""
         df3 = pd.DataFrame(
             {
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],

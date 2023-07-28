@@ -33,7 +33,7 @@ class BaseMappingTransformer(BaseTransformer):
     """
 
     def __init__(self, mappings, **kwargs):
-        """Initializes the instance with mappings information to apply."""
+        """Initialize the instance with mappings information to apply."""
         if isinstance(mappings, dict):
             if not len(mappings) > 0:
                 msg = f"{self.classname()}: mappings has no values"
@@ -140,7 +140,7 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
     """
 
     def __init__(self, mappings, **kwargs):
-        """Initializes the instance with mappings information to apply."""
+        """Initialize the instance with mappings information to apply."""
         for k, v in mappings.items():
             if isinstance(v, dict):
                 mappings[k] = ReturnKeyDict(v)
@@ -256,7 +256,7 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
     """
 
     def __init__(self, adjust_column, mappings, **kwargs):
-        """Initializes the instance with column to adjsut and mappings of values to replace with when keys are identified in the base column."""
+        """Initialize the instance with column to adjsut and mappings of values to replace with when keys are identified in the base column."""
         super().__init__(mappings=mappings, **kwargs)
 
         if not isinstance(adjust_column, str):
@@ -270,7 +270,7 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
         self.adjust_column = adjust_column
 
     def transform(self, X):
-        """Transforms values in given column using the values provided in the adjustments dictionary.
+        """Transform values in given column using the values provided in the adjustments dictionary.
 
         Parameters
         ----------
@@ -335,7 +335,7 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
     """
 
     def __init__(self, adjust_column, mappings, **kwargs):
-        """Initializes the instance with factor mappings for each column to be multiplied to column to adjust."""
+        """Initialize the instance with factor mappings for each column to be multiplied to column to adjust."""
         super().__init__(mappings=mappings, **kwargs)
 
         if not isinstance(adjust_column, str):
@@ -351,7 +351,7 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
         self.adjust_column = adjust_column
 
     def transform(self, X):
-        """Transforms values in given column using the values provided in the adjustments dictionary.
+        """Transform values in given column using the values provided in the adjustments dictionary.
 
         Parameters
         ----------
@@ -420,7 +420,7 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
     """
 
     def __init__(self, adjust_column, mappings, **kwargs):
-        """Initializes the instance with mappings information to apply."""
+        """Initialize the instance with mappings information to apply."""
         super().__init__(mappings=mappings, **kwargs)
 
         if not isinstance(adjust_column, str):
@@ -436,7 +436,7 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
         self.adjust_column = adjust_column
 
     def transform(self, X):
-        """Transforms values in given column using the values provided in the adjustments dictionary.
+        """Transform values in given column using the values provided in the adjustments dictionary.
 
         Parameters
         ----------

@@ -189,7 +189,7 @@ class TestTransform:
     """Tests for NominalToIntegerTransformer.transform()."""
 
     def expected_df_1():
-        """Expected output for test_expected_output."""
+        """Define expected output for test_expected_output."""
         df = pd.DataFrame(
             {"a": [1, 2, 3, 4, 5, 6], "b": ["a", "b", "c", "d", "e", "f"]},
         )

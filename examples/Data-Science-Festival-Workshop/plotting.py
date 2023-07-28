@@ -1,5 +1,5 @@
 def one_way_summary_plot(df, column, response="y"):
-    """Function to produce a rough one-way summary plot of a specific column.
+    """Produce a rough one-way summary plot of a specific column.
 
     Specifically plot averge response (right y axis) and number of records (left
     y axis) by the selected column (x axis).

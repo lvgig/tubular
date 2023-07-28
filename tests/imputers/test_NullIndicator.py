@@ -54,7 +54,7 @@ class TestTransform:
     """Tests for NullIndicator.transform()."""
 
     def expected_df_1():
-        """Expected output for test_null_indicator_columns_correct."""
+        """Define expected output for test_null_indicator_columns_correct."""
         return pd.DataFrame(
             {
                 "a": [1, 2, np.nan, 4, np.nan, 6],

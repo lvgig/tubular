@@ -182,7 +182,7 @@ class TestTransform:
     """Tests for NearestMeanResponseImputer.transform."""
 
     def expected_df_1():
-        """Expected output for ."""
+        """Define expected output for ."""
         df = pd.DataFrame(
             {"a": [1, 1, 2, 3, 3, 2], "b": [3, 3, 1, 3, 3, 4], "c": [2, 3, 2, 1, 4, 1]},
         )
@@ -192,7 +192,7 @@ class TestTransform:
         return df
 
     def expected_df_2():
-        """Expected output for ."""
+        """Define expected output for ."""
         df = pd.DataFrame(
             {
                 "a": [1, 1, 2, 3, 3, 2],
@@ -206,7 +206,7 @@ class TestTransform:
         return df
 
     def expected_df_3():
-        """Expected output for ."""
+        """Define expected output for ."""
         df = pd.DataFrame({"a": [2, 3, 4, 1, 4, 2]})
 
         df["a"] = df["a"].astype("float64")

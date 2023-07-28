@@ -102,13 +102,13 @@ class TestTransform:
     """Tests for the transform method on MappingTransformer."""
 
     def expected_df_1():
-        """Expected output for test_expected_output."""
+        """Define expected output for test_expected_output."""
         return pd.DataFrame(
             {"a": ["a", "b", "c", "d", "e", "f"], "b": [1, 2, 3, 4, 5, 6]},
         )
 
     def expected_df_2():
-        """Expected output for test_non_specified_values_unchanged."""
+        """Define expected output for test_non_specified_values_unchanged."""
         return pd.DataFrame(
             {"a": [5, 6, 7, 4, 5, 6], "b": ["z", "y", "x", "d", "e", "f"]},
         )

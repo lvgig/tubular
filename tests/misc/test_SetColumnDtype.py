@@ -117,7 +117,7 @@ class TestSetColumnDtypeTransform:
         )
 
     def expected_df():
-        """Expected output from test_expected_output."""
+        """Define expected output from test_expected_output."""
         return pd.DataFrame(
             {
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],

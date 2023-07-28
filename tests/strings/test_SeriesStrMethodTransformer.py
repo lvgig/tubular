@@ -161,7 +161,7 @@ class TestTransform:
     """Tests for SeriesStrMethodTransformer.transform()."""
 
     def expected_df_1():
-        """Expected output of test_expected_output_no_overwrite."""
+        """Define expected output of test_expected_output_no_overwrite."""
         df = d.create_df_7()
 
         df["b_new"] = df["b"].str.find(sub="a")
@@ -169,7 +169,7 @@ class TestTransform:
         return df
 
     def expected_df_2():
-        """Expected output of test_expected_output_overwrite."""
+        """Define expected output of test_expected_output_overwrite."""
         df = d.create_df_7()
 
         df["b"] = df["b"].str.pad(width=10)

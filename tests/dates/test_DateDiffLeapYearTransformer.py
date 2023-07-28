@@ -250,7 +250,7 @@ class TestTransform:
     """Tests for DateDiffLeapYearTransformer.transform()."""
 
     def expected_df_1():
-        """Expected output for test_expected_output_drop_cols_true."""
+        """Define expected output for test_expected_output_drop_cols_true."""
         return pd.DataFrame(
             {
                 "c": [
@@ -267,7 +267,7 @@ class TestTransform:
         )
 
     def expected_df_2():
-        """Expected output for test_expected_output_drop_cols_false."""
+        """Define expected output for test_expected_output_drop_cols_false."""
         return pd.DataFrame(
             {
                 "a": [
@@ -308,7 +308,7 @@ class TestTransform:
         )
 
     def expected_df_3():
-        """Expected output for test_expected_output_nulls."""
+        """Define expected output for test_expected_output_nulls."""
         return pd.DataFrame(
             {
                 "a": [

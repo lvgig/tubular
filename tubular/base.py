@@ -49,11 +49,11 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
     """
 
     def classname(self):
-        """Method that returns the name of the current class when called."""
+        """Return the name of the current class when called."""
         return type(self).__name__
 
     def __init__(self, columns=None, copy=True, verbose=False) -> None:
-        """Initializes instance with columns and whether to make a copy or not from inputs."""
+        """Initialize instance with columns and whether to make a copy or not from inputs."""
         self.version_ = __version__
 
         if not isinstance(verbose, bool):
@@ -174,7 +174,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         return X_y
 
     def transform(self, X):
-        """Base transformer transform method; checks X type (pandas DataFrame only) and copies data if requested.
+        """Check X type (pandas DataFrame only) and copies data if requested.Base transformer transform method;
 
         Transform calls the columns_check method which will check columns in columns attribute are in X.
 
@@ -220,7 +220,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         check_is_fitted(self, attribute)
 
     def columns_check(self, X):
-        """Method to check that the columns attribute is set and all values are present in X.
+        """Check that the columns attribute is set and all values are present in X.
 
         Parameters
         ----------
@@ -245,7 +245,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
                 raise ValueError(f"{self.classname()}: variable " + c + " is not in X")
 
     def columns_set_or_check(self, X):
-        """Function to check or set columns attribute.
+        """Check or set columns attribute.
 
         If the columns attribute is None then set it to all columns in X. Otherwise run the columns_check method.
 
@@ -267,7 +267,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
     @staticmethod
     def check_weights_column(X, weights_column):
-        """Helper method for validating weights column in dataframe.
+        """Validate weights column in dataframe.
 
         Args:
         ----
@@ -310,7 +310,7 @@ class ReturnKeyDict(dict):
     """
 
     def __missing__(self, key):
-        """Function to return passed key.
+        """Return passed key.
 
         Parameters
         ----------
@@ -382,7 +382,7 @@ class DataFrameMethodTransformer(BaseTransformer):
         drop_original=False,
         **kwargs,
     ) -> None:
-        """Initializes instance with which column(s) to transform with which pandas.DataFrame method and how transformed column should be named."""
+        """Initialize instance with which column(s) to transform with which pandas.DataFrame method and how transformed column should be named."""
         super().__init__(columns=columns, **kwargs)
 
         if type(new_column_name) is list:

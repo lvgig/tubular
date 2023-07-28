@@ -189,7 +189,7 @@ class TestTransform:
     """Tests for BetweenDatesTransformer.transform."""
 
     def expected_df_1():
-        """Expected output from transform in test_output."""
+        """Define expected output from transform in test_output."""
         df = d.create_is_between_dates_df_1()
 
         df["d"] = [True, False]
@@ -197,7 +197,7 @@ class TestTransform:
         return df
 
     def expected_df_2():
-        """Expected output from transform in test_output_both_exclusive."""
+        """Define expected output from transform in test_output_both_exclusive."""
         df = d.create_is_between_dates_df_2()
 
         df["e"] = [False, False, True, True, False, False]
@@ -205,7 +205,7 @@ class TestTransform:
         return df
 
     def expected_df_3():
-        """Expected output from transform in test_output_lower_exclusive."""
+        """Define expected output from transform in test_output_lower_exclusive."""
         df = d.create_is_between_dates_df_2()
 
         df["e"] = [False, False, True, True, True, False]
@@ -213,7 +213,7 @@ class TestTransform:
         return df
 
     def expected_df_4():
-        """Expected output from transform in test_output_upper_exclusive."""
+        """Define expected output from transform in test_output_upper_exclusive."""
         df = d.create_is_between_dates_df_2()
 
         df["e"] = [False, True, True, True, False, False]
@@ -221,7 +221,7 @@ class TestTransform:
         return df
 
     def expected_df_5():
-        """Expected output from transform in test_output_both_inclusive."""
+        """Define expected output from transform in test_output_both_inclusive."""
         df = d.create_is_between_dates_df_2()
 
         df["e"] = [False, True, True, True, True, False]

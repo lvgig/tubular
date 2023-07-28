@@ -64,7 +64,7 @@ class DateDiffLeapYearTransformer(BaseTransformer):
         missing_replacement=None,
         **kwargs,
     ) -> None:
-        """Initializes the instance with the two date columns name and the new column name resulting from their time difference."""
+        """Initialize the instance with the two date columns name and the new column name resulting from their time difference."""
         if not isinstance(column_lower, str):
             msg = f"{self.classname()}: column_lower should be a str"
             raise TypeError(msg)
@@ -99,7 +99,7 @@ class DateDiffLeapYearTransformer(BaseTransformer):
         self.column_upper = column_upper
 
     def calculate_age(self, row):
-        """Function to calculate age from two date columns in a pd.DataFrame.
+        """Calculate age from two date columns in a pd.DataFrame.
 
         This function, although slower than the np.timedelta64 solution (or something
         similar), accounts for leap years to accurately calculate age for all values.
@@ -201,7 +201,7 @@ class DateDifferenceTransformer(BaseTransformer):
         copy=True,
         verbose=False,
     ) -> None:
-        """Initializes the instance with the two date columns name, interval unit and the new column name resulting from their time difference."""
+        """Initialize the instance with the two date columns name, interval unit and the new column name resulting from their time difference."""
         if type(column_lower) is not str:
             msg = f"{self.classname()}: column_lower must be a str"
             raise TypeError(msg)
@@ -292,7 +292,7 @@ class ToDatetimeTransformer(BaseTransformer):
         to_datetime_kwargs={},
         **kwargs,
     ) -> None:
-        """Initializes the instance with pandas to_datetime method, the column to transform in date format and its new name."""
+        """Initialize the instance with pandas to_datetime method, the column to transform in date format and its new name."""
         if type(column) is not str:
             msg = f"{self.classname()}: column should be a single str giving the column to transform to datetime"
             raise TypeError(msg)
@@ -400,7 +400,7 @@ class SeriesDtMethodTransformer(BaseTransformer):
         pd_method_kwargs={},
         **kwargs,
     ) -> None:
-        """Initializes the instance with pandas datetime method, the date column to transform and its new name."""
+        """Initialize the instance with pandas datetime method, the date column to transform and its new name."""
         if type(column) is not str:
             msg = f"{self.classname()}: column should be a str but got {type(column)}"
             raise TypeError(msg)
@@ -554,7 +554,7 @@ class BetweenDatesTransformer(BaseTransformer):
         upper_inclusive=True,
         **kwargs,
     ) -> None:
-        """Initializes the instance with date column names of the lower, upper and in-between values and resulting name of column that makes the comparison."""
+        """Initialize the instance with date column names of the lower, upper and in-between values and resulting name of column that makes the comparison."""
         if type(column_lower) is not str:
             msg = f"{self.classname()}: column_lower should be str"
             raise TypeError(msg)
@@ -592,7 +592,7 @@ class BetweenDatesTransformer(BaseTransformer):
         self.column_between = column_between
 
     def transform(self, X):
-        """Transform - creates column indicating if middle date is between the other two.
+        """Transform - create column indicating if middle date is between the other two.
 
         If not all column_lower values are less than or equal to column_upper when transform is run
         then a warning will be raised.
@@ -714,7 +714,7 @@ class DatetimeInfoExtractor(BaseTransformer):
         datetime_mappings={},
         **kwargs,
     ) -> None:
-        """Initializes the instance with time info type to extract and from which columns."""
+        """Initialize the instance with time info type to extract and from which columns."""
         if type(include) is not list:
             msg = f"{self.classname()}: include should be List"
             raise TypeError(msg)
@@ -891,7 +891,7 @@ class DatetimeInfoExtractor(BaseTransformer):
         return mappings[interval][value]
 
     def transform(self, X):
-        """Transform - Extracts new features from datetime variables.
+        """Transform - Extract new features from datetime variables.
 
         Parameters
         ----------
@@ -992,7 +992,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         units: Union[str, dict],
         period: Union[int, float, dict, dict] = 2 * np.pi,
     ) -> None:
-        """Initializes the instance with function selected (sin,cos,sin &cos), period and period units to apply to which date column."""
+        """Initialize the instance with function selected (sin,cos,sin &cos), period and period units to apply to which date column."""
         super().__init__(columns, copy=True)
 
         if not isinstance(method, str) and not isinstance(method, list):
@@ -1103,7 +1103,7 @@ class DatetimeSinusoidCalculator(BaseTransformer):
             raise ValueError(msg)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Transform - creates column containing sine or cosine of another datetime column.
+        """Transform - create column containing sine or cosine of another datetime column.
 
         Which function is used is stored in the self.method attribute.
 

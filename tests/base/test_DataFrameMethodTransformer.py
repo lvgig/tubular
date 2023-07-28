@@ -191,7 +191,7 @@ class TestTransform:
     """Tests for DataFrameMethodTransformer.transform()."""
 
     def expected_df_1():
-        """Expected output of test_expected_output_single_columns_assignment."""
+        """Define expected output of test_expected_output_single_columns_assignment."""
         return pd.DataFrame(
             {
                 "a": [1, 2, 3, 4, 5, 6, np.NaN],
@@ -202,7 +202,7 @@ class TestTransform:
         )
 
     def expected_df_2():
-        """Expected output of test_expected_output_multi_columns_assignment."""
+        """Define expected output of test_expected_output_multi_columns_assignment."""
         return pd.DataFrame(
             {
                 "a": [1, 2, 3, 4, 5, 6, np.NaN],

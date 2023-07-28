@@ -61,7 +61,7 @@ class ArbitraryImputer(BaseImputer):
     """
 
     def __init__(self, impute_value, columns, **kwargs) -> None:
-        """Initializes the instance with imputation value and columns to be imputed."""
+        """Initialize the instance with imputation value and columns to be imputed."""
         if columns is None:
             msg = f"{self.classname()}: columns must be specified in init for ArbitraryImputer"
             raise ValueError(msg)
@@ -148,7 +148,7 @@ class MedianImputer(BaseImputer):
     """
 
     def __init__(self, columns=None, weight=None, **kwargs) -> None:
-        """Initializes the instance with columns to be imputed and whether any weights must be applied."""
+        """Initialize the instance with columns to be imputed and whether any weights must be applied."""
         super().__init__(columns=columns, **kwargs)
 
         if not isinstance(weight, str) and weight is not None:
@@ -227,7 +227,7 @@ class MeanImputer(BaseImputer):
     """
 
     def __init__(self, columns=None, weight=None, **kwargs) -> None:
-        """Initializes the instance with columns to be imputed and whether any weights must be applied."""
+        """Initialize the instance with columns to be imputed and whether any weights must be applied."""
         super().__init__(columns=columns, **kwargs)
 
         if not isinstance(weight, str) and weight is not None:
@@ -302,7 +302,7 @@ class ModeImputer(BaseImputer):
     """
 
     def __init__(self, columns=None, weight=None, **kwargs) -> None:
-        """Initializes the instance with columns to be imputed and whether any weights must be applied."""
+        """Initialize the instance with columns to be imputed and whether any weights must be applied."""
         super().__init__(columns=columns, **kwargs)
 
         if weight is not None and not isinstance(weight, str):
@@ -363,7 +363,7 @@ class NearestMeanResponseImputer(BaseImputer):
     """
 
     def __init__(self, columns=None, **kwds) -> None:
-        """Initializes the instance with columns to be imputed."""
+        """Initialize the instance with columns to be imputed."""
         super().__init__(columns=columns, **kwds)
 
     def fit(self, X, y):
@@ -432,7 +432,7 @@ class NullIndicator(BaseTransformer):
     """
 
     def __init__(self, columns=None, **kwds) -> None:
-        """Initializes the instance with columns which the null indicator is created."""
+        """Initialize the instance with columns which the null indicator is created."""
         super().__init__(columns=columns, **kwds)
 
     def transform(self, X):

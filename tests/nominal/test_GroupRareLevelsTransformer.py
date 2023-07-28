@@ -253,7 +253,7 @@ class TestTransform:
     """Tests for GroupRareLevelsTransformer.transform()."""
 
     def expected_df_1():
-        """Expected output for test_expected_output_no_weight."""
+        """Define expected output for test_expected_output_no_weight."""
         df = pd.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.NaN]})
 
         df["b"] = pd.Series(
@@ -271,7 +271,7 @@ class TestTransform:
         return df
 
     def expected_df_2():
-        """Expected output for test_expected_output_weight."""
+        """Define expected output for test_expected_output_weight."""
         df = pd.DataFrame(
             {
                 "a": [2, 2, 2, 2, np.NaN, 2, 2, 2, 3, 3],

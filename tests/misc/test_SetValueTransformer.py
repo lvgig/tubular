@@ -54,7 +54,7 @@ class TestTransform:
     """Tests for the SetValueTransformer.transform method."""
 
     def expected_df_1():
-        """Expected output of test_value_set_in_transform."""
+        """Define expected output of test_value_set_in_transform."""
         df = d.create_df_2()
 
         df["a"] = "a"

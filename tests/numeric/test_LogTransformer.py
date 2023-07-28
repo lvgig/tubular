@@ -108,7 +108,7 @@ class TestTransform:
     """Tests for LogTransformer.transform()."""
 
     def expected_df_1():
-        """Expected output of test_expected_output_1."""
+        """Define expected output of test_expected_output_1."""
         df = d.create_df_3()
 
         df["a_new_col"] = np.log(df["a"])
@@ -117,7 +117,7 @@ class TestTransform:
         return df.drop(columns=["a", "b"])
 
     def expected_df_2():
-        """Expected output of test_expected_output_2."""
+        """Define expected output of test_expected_output_2."""
         df = d.create_df_3()
 
         df["a_new_col"] = np.log(df["a"] + 1)
@@ -126,7 +126,7 @@ class TestTransform:
         return df.drop(columns=["a", "b"])
 
     def expected_df_3():
-        """Expected output of test_expected_output_3."""
+        """Define expected output of test_expected_output_3."""
         df = d.create_df_3()
 
         df["a_new_col"] = np.log(df["a"])
@@ -135,7 +135,7 @@ class TestTransform:
         return df
 
     def expected_df_4():
-        """Expected output of test_expected_output_4."""
+        """Define expected output of test_expected_output_4."""
         df = d.create_df_3()
 
         df["a_new_col"] = np.log(df["a"] + 1)
@@ -144,7 +144,7 @@ class TestTransform:
         return df
 
     def expected_df_5():
-        """Expected output of test_expected_output_5."""
+        """Define expected output of test_expected_output_5."""
         df = d.create_df_4()
 
         df["a_new_col"] = np.log(df["a"] + 1) / np.log(5)
@@ -152,7 +152,7 @@ class TestTransform:
         return df
 
     def expected_df_6():
-        """Expected output of test_expected_output_6."""
+        """Expect output of test_expected_output_6."""
         df = d.create_df_4()
 
         df["a_new_col"] = np.log(df["a"]) / np.log(7)

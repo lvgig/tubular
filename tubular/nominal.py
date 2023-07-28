@@ -19,7 +19,7 @@ class BaseNominalTransformer(BaseTransformer):
     """
 
     def columns_set_or_check(self, X):
-        """Function to check or set columns attribute.
+        """Check or set columns attribute.
 
         If the columns attribute is None then set it to all object and category columns in X. Otherwise run the
         columns_check method.
@@ -102,7 +102,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
     """
 
     def __init__(self, columns=None, start_encoding=0, **kwargs):
-        """Initializes the instance with columns to be encoded with integer and optionally the integer to start from."""
+        """Initialize the instance with columns to be encoded with integer and optionally the integer to start from."""
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
 
         if not isinstance(start_encoding, int):
@@ -112,7 +112,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         self.start_encoding = start_encoding
 
     def fit(self, X, y=None):
-        """Creates mapping between nominal levels and integer values for categorical variables.
+        """Create mapping between nominal levels and integer values for categorical variables.
 
         Parameters
         ----------
@@ -162,7 +162,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         return BaseMappingTransformMixin.transform(self, X)
 
     def inverse_transform(self, X):
-        """Converts integer values back to categorical / nominal values. Does the inverse of the transform method.
+        """Convert integer values back to categorical / nominal values. Does the inverse of the transform method.
 
         Parameters
         ----------
@@ -272,7 +272,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         record_rare_levels=True,
         **kwargs,
     ):
-        """Initializes the instance with columns to be encoded with "rare" level name depending on cut off (optionally on weighted values)."""
+        """Initialize the instance with columns to be encoded with "rare" level name depending on cut off (optionally on weighted values)."""
         super().__init__(columns=columns, **kwargs)
 
         if not isinstance(cut_off_percent, float):
@@ -300,7 +300,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         self.record_rare_levels = record_rare_levels
 
     def fit(self, X, y=None):
-        """Records non-rare levels for categorical variables.
+        """Record non-rare levels for categorical variables.
 
         When transform is called, only levels records in mapping_ during fit will remain
         unchanged - all other levels will be grouped. If record_rare_levels is True then the
@@ -391,7 +391,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         return self
 
     def transform(self, X):
-        """Grouped rare levels together into a new 'rare' level.
+        """Group rare levels together into a new 'rare' level.
 
         Parameters
         ----------
@@ -529,7 +529,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         unseen_level_handling=None,
         **kwargs,
     ):
-        """Initializes the instance with columns to be encoded with mean of the weights column."""
+        """Initialize the instance with columns to be encoded with mean of the weights column."""
         if weights_column is not None and type(weights_column) is not str:
             msg = f"{self.classname()}: weights_column should be a str"
             raise TypeError(msg)
@@ -585,7 +585,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         ).divide(cat_freq + self.prior, axis="index")
 
     def _fit_binary_response(self, X, y, columns):
-        """Function to learn the MRE mappings for a given binary or continuous response.
+        """Learn the MRE mappings for a given binary or continuous response.
 
         Parameters
         ----------
@@ -838,7 +838,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
     """
 
     def __init__(self, columns=None, weights_column=None, **kwargs):
-        """Initializes the instance with columns to be encoded."""
+        """Initialize the instance with columns to be encoded."""
         if weights_column is not None and type(weights_column) is not str:
             msg = f"{self.classname()}: weights_column should be a str"
             raise TypeError(msg)
@@ -996,7 +996,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         verbose=False,
         **kwargs,
     ):
-        """Initializes the instance with columns to be one-hot-encoded."""
+        """Initialize the instance with columns to be one-hot-encoded."""
         BaseNominalTransformer.__init__(
             self,
             columns=columns,
@@ -1051,7 +1051,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         return self
 
     def _get_feature_names(self, input_features, **kwargs):
-        """Function to access the get_feature_names attribute of the scikit learn attribute. Will return the output columns of the OHE transformer.
+        """Access the get_feature_names attribute of the scikit learn attribute. Will return the output columns of the OHE transformer.
 
         In scikit learn 1.0 "get_feature_names" was deprecated and then replaced with "get_feature_names_out" in version 1.2. The logic in this
         function will call the correct attribute, or raise an error if it can't be found.

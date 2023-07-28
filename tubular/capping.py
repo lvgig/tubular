@@ -66,7 +66,7 @@ class CappingTransformer(BaseTransformer):
         weights_column=None,
         **kwargs,
     ) -> None:
-        """Initializes the instance with quantiles to set capping limit and the value to apply when cap is reached."""
+        """Initialize the instance with quantiles to set capping limit and the value to apply when cap is reached."""
         if capping_values is None and quantiles is None:
             msg = f"{self.classname()}: both capping_values and quantiles are None, either supply capping values in the capping_values argument or supply quantiles that can be learnt in the fit method"
             raise ValueError(msg)
@@ -102,7 +102,7 @@ class CappingTransformer(BaseTransformer):
         self._replacement_values = copy.deepcopy(self.capping_values)
 
     def check_capping_values_dict(self, capping_values_dict, dict_name):
-        """Performs checks on a dictionary passed to ."""
+        """Perform checks on a dictionary passed to ."""
         if type(capping_values_dict) is not dict:
             msg = f"{self.classname()}: {dict_name} should be dict of columns and capping values"
             raise TypeError(msg)
@@ -186,7 +186,7 @@ class CappingTransformer(BaseTransformer):
         return self
 
     def prepare_quantiles(self, values, quantiles, sample_weight=None):
-        """Method to call the weighted_quantile method and prepare the outputs.
+        """Call the weighted_quantile method and prepare the outputs.
 
         If there are no None values in the supplied quantiles then the outputs from weighted_quantile
         are returned as is. If there are then prepare_quantiles removes the None values before
@@ -231,7 +231,7 @@ class CappingTransformer(BaseTransformer):
         return results
 
     def weighted_quantile(self, values, quantiles, sample_weight=None):
-        """Method to calculate weighted quantiles.
+        """Calculate weighted quantiles.
 
         This method is adapted from the "Completely vectorized numpy solution" answer from user
         Alleo (https://stackoverflow.com/users/498892/alleo) to the following stackoverflow question;
@@ -445,7 +445,7 @@ class OutOfRangeNullTransformer(CappingTransformer):
         weights_column=None,
         **kwargs,
     ) -> None:
-        """Initializes the instance with quantiles to set capping limit."""
+        """Initialize the instance with quantiles to set capping limit."""
         super().__init__(
             capping_values=capping_values,
             quantiles=quantiles,
@@ -456,7 +456,7 @@ class OutOfRangeNullTransformer(CappingTransformer):
         self.set_replacement_values()
 
     def set_replacement_values(self):
-        """Method to set the _replacement_values to have all null values.
+        """Set the _replacement_values to have all null values.
 
         Keeps the existing keys in the _replacement_values dict and sets all values (except None) in the lists to np.NaN. Any None
         values remain in place.

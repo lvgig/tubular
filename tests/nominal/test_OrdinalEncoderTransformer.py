@@ -230,7 +230,7 @@ class TestTransform:
     """Tests for OrdinalEncoderTransformer.transform()."""
 
     def expected_df_1():
-        """Expected output for ."""
+        """Define expected output for ."""
         df = pd.DataFrame(
             {
                 "a": [1, 2, 3, 4, 5, 6],

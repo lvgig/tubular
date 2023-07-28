@@ -174,7 +174,7 @@ class TestTransform:
     """Tests for SeriesDtMethodTransformer.transform()."""
 
     def expected_df_1():
-        """Expected output of test_expected_output_no_overwrite."""
+        """Define expected output of test_expected_output_no_overwrite."""
         df = d.create_datediff_test_df()
 
         df["a_year"] = np.array(
@@ -185,7 +185,7 @@ class TestTransform:
         return df
 
     def expected_df_2():
-        """Expected output of test_expected_output_overwrite."""
+        """Define expected output of test_expected_output_overwrite."""
         df = d.create_datediff_test_df()
 
         df["a"] = np.array(
@@ -196,7 +196,7 @@ class TestTransform:
         return df
 
     def expected_df_3():
-        """Expected output of test_expected_output_callable."""
+        """Define expected output of test_expected_output_callable."""
         df = d.create_datediff_test_df()
 
         df["b_new"] = df["b"].dt.to_period("M")
