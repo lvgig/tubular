@@ -1,0 +1,259 @@
+@startuml tubular
+namespace tubular {
+  namespace base {}
+  namespace capping {}
+  namespace comparison {}
+  namespace dates {}
+  namespace imputers {}
+  namespace mapping {}
+  namespace misc {}
+  namespace nominal {}
+  namespace numeric {}
+  namespace strings {}
+}
+class tubular.base.BaseTransformer {
+  verbose: None
+  columns: None
+  columns: None
+  columns: None
+  copy: None
+}
+class tubular.base.DataFrameMethodTransformer {
+  new_column_name: None
+  pd_method_name: None
+  pd_method_kwargs: None
+  drop_original: None
+}
+class tubular.base.ReturnKeyDict {
+}
+class tubular.capping.CappingTransformer {
+  capping_values: None
+  capping_values: None
+  quantiles: None
+  weights_column: None
+  _replacement_values: None
+}
+class tubular.capping.OutOfRangeNullTransformer {
+}
+class tubular.comparison.EqualityChecker {
+  new_col_name: str
+  drop_original: bool
+}
+class tubular.dates.BetweenDatesTransformer {
+  new_column_name: None
+  lower_inclusive: None
+  upper_inclusive: None
+  column_lower: None
+  column_upper: None
+  column_between: None
+}
+class tubular.dates.DateDiffLeapYearTransformer {
+  new_column_name: None
+  drop_cols: None
+  missing_replacement: None
+  column_lower: None
+  column_upper: None
+}
+class tubular.dates.DateDifferenceTransformer {
+  units: None
+  new_column_name: None
+  new_column_name: None
+  column_lower: None
+  column_upper: None
+}
+class tubular.dates.DatetimeInfoExtractor {
+  include: None
+  datetime_mappings: None
+  mappings_provided: None
+  timeofday_mapping: None
+  timeofday_mapping: None
+  timeofmonth_mapping: None
+  timeofmonth_mapping: None
+  timeofyear_mapping: None
+  timeofyear_mapping: None
+  dayofweek_mapping: None
+  dayofweek_mapping: None
+}
+class tubular.dates.DatetimeSinusoidCalculator {
+  method: None
+  units: Union[str, dict]
+  period: Union[int, float, dict, dict]
+}
+class tubular.dates.SeriesDtMethodTransformer {
+  new_column_name: None
+  pd_method_name: None
+  pd_method_kwargs: None
+  _callable: None
+  _callable: None
+  column: None
+}
+class tubular.dates.ToDatetimeTransformer {
+  to_datetime_kwargs: None
+  new_column_name: None
+  column: None
+}
+class tubular.imputers.ArbitraryImputer {
+  impute_values_: None
+  impute_value: None
+}
+class tubular.imputers.BaseImputer {
+}
+class tubular.imputers.MeanImputer {
+  weight: None
+}
+class tubular.imputers.MedianImputer {
+  weight: None
+}
+class tubular.imputers.ModeImputer {
+  weight: None
+}
+class tubular.imputers.NearestMeanResponseImputer {
+}
+class tubular.imputers.NullIndicator {
+}
+class tubular.mapping.BaseMappingTransformMixin {
+}
+class tubular.mapping.BaseMappingTransformer {
+  mappings: None
+}
+class tubular.mapping.CrossColumnAddTransformer {
+  adjust_column: None
+}
+class tubular.mapping.CrossColumnMappingTransformer {
+  adjust_column: None
+}
+class tubular.mapping.CrossColumnMultiplyTransformer {
+  adjust_column: None
+}
+class tubular.mapping.MappingTransformer {
+}
+class tubular.misc.SetColumnDtype {
+  dtype: None
+}
+class tubular.misc.SetValueTransformer {
+  value: None
+}
+class tubular.nominal.BaseNominalTransformer {
+}
+class tubular.nominal.GroupRareLevelsTransformer {
+  cut_off_percent: None
+  weight: None
+  rare_level_name: None
+  record_rare_levels: None
+}
+class tubular.nominal.MeanResponseTransformer {
+  weights_column: None
+  prior: None
+  level: None
+  unseen_level_handling: None
+}
+class tubular.nominal.NominalToIntegerTransformer {
+  start_encoding: None
+}
+class tubular.nominal.OneHotEncodingTransformer {
+  _parameter_constraints: dict {static}
+  separator: None
+  drop_original: None
+}
+class tubular.nominal.OrdinalEncoderTransformer {
+  weights_column: None
+}
+class tubular.numeric.CutTransformer {
+  cut_kwargs: None
+  new_column_name: None
+  column: None
+}
+class tubular.numeric.InteractionTransformer {
+  min_degree: None
+  max_degree: None
+  max_degree: None
+  max_degree: None
+  nb_features_to_interact: None
+  nb_combinations: None
+  interaction_colname: None
+  nb_feature_out: None
+}
+class tubular.numeric.LogTransformer {
+  base: None
+  add_1: None
+  drop: None
+  suffix: None
+}
+class tubular.numeric.PCATransformer {
+  n_components: None
+  n_components: None
+  n_components: None
+  svd_solver: None
+  random_state: None
+  pca_column_prefix: None
+  pca: None
+  pca_column_prefix: None
+  feature_names_out: None
+  n_components_: None
+}
+class tubular.numeric.ScalingTransformer {
+  scaler: None
+  scaler: None
+  scaler: None
+  scaler_kwargs: None
+  scaler_type: None
+}
+class tubular.numeric.TwoColumnOperatorTransformer {
+  column1_name: None
+  column2_name: None
+}
+class tubular.strings.SeriesStrMethodTransformer {
+  new_column_name: None
+  pd_method_name: None
+  pd_method_kwargs: None
+}
+class tubular.strings.StringConcatenator {
+  new_column: None
+  separator: None
+}
+tubular.base.BaseTransformer <|-- tubular.base.DataFrameMethodTransformer
+tubular.base.BaseTransformer <|-- tubular.capping.CappingTransformer
+tubular.capping.CappingTransformer <|-- tubular.capping.OutOfRangeNullTransformer
+tubular.base.BaseTransformer <|-- tubular.comparison.EqualityChecker
+tubular.base.BaseTransformer <|-- tubular.dates.BetweenDatesTransformer
+tubular.base.BaseTransformer <|-- tubular.dates.DateDiffLeapYearTransformer
+tubular.base.BaseTransformer <|-- tubular.dates.DateDifferenceTransformer
+tubular.base.BaseTransformer <|-- tubular.dates.DatetimeInfoExtractor
+tubular.base.BaseTransformer <|-- tubular.dates.DatetimeSinusoidCalculator
+tubular.base.BaseTransformer <|-- tubular.dates.SeriesDtMethodTransformer
+tubular.base.BaseTransformer <|-- tubular.dates.ToDatetimeTransformer
+tubular.imputers.BaseImputer <|-- tubular.imputers.ArbitraryImputer
+tubular.base.BaseTransformer <|-- tubular.imputers.BaseImputer
+tubular.imputers.BaseImputer <|-- tubular.imputers.MeanImputer
+tubular.imputers.BaseImputer <|-- tubular.imputers.MedianImputer
+tubular.imputers.BaseImputer <|-- tubular.imputers.ModeImputer
+tubular.imputers.BaseImputer <|-- tubular.imputers.NearestMeanResponseImputer
+tubular.base.BaseTransformer <|-- tubular.imputers.NullIndicator
+tubular.base.BaseTransformer <|-- tubular.mapping.BaseMappingTransformMixin
+tubular.base.BaseTransformer <|-- tubular.mapping.BaseMappingTransformer
+tubular.mapping.BaseMappingTransformer <|-- tubular.mapping.CrossColumnAddTransformer
+tubular.mapping.BaseMappingTransformer <|-- tubular.mapping.CrossColumnMappingTransformer
+tubular.mapping.BaseMappingTransformer <|-- tubular.mapping.CrossColumnMultiplyTransformer
+tubular.mapping.BaseMappingTransformer <|-- tubular.mapping.MappingTransformer
+tubular.mapping.BaseMappingTransformMixin <|-- tubular.mapping.MappingTransformer
+tubular.base.BaseTransformer <|-- tubular.misc.SetColumnDtype
+tubular.base.BaseTransformer <|-- tubular.misc.SetValueTransformer
+tubular.base.BaseTransformer <|-- tubular.nominal.BaseNominalTransformer
+tubular.nominal.BaseNominalTransformer <|-- tubular.nominal.GroupRareLevelsTransformer
+tubular.nominal.BaseNominalTransformer <|-- tubular.nominal.MeanResponseTransformer
+tubular.mapping.BaseMappingTransformMixin <|-- tubular.nominal.MeanResponseTransformer
+tubular.nominal.BaseNominalTransformer <|-- tubular.nominal.NominalToIntegerTransformer
+tubular.mapping.BaseMappingTransformMixin <|-- tubular.nominal.NominalToIntegerTransformer
+tubular.nominal.BaseNominalTransformer <|-- tubular.nominal.OneHotEncodingTransformer
+tubular.nominal.BaseNominalTransformer <|-- tubular.nominal.OrdinalEncoderTransformer
+tubular.mapping.BaseMappingTransformMixin <|-- tubular.nominal.OrdinalEncoderTransformer
+tubular.base.BaseTransformer <|-- tubular.numeric.CutTransformer
+tubular.base.BaseTransformer <|-- tubular.numeric.InteractionTransformer
+tubular.base.BaseTransformer <|-- tubular.numeric.LogTransformer
+tubular.base.BaseTransformer <|-- tubular.numeric.PCATransformer
+tubular.base.BaseTransformer <|-- tubular.numeric.ScalingTransformer
+tubular.base.DataFrameMethodTransformer <|-- tubular.numeric.TwoColumnOperatorTransformer
+tubular.base.BaseTransformer <|-- tubular.strings.SeriesStrMethodTransformer
+tubular.base.BaseTransformer <|-- tubular.strings.StringConcatenator
+footer Generated by //py2puml//
+@enduml
