@@ -1,0 +1,254 @@
+classDiagram
+class BaseTransformer {
+  verbose: None
+  columns: None
+  columns: None
+  columns: None
+  copy: None
+}
+class DataFrameMethodTransformer {
+  new_column_name: None
+  pd_method_name: None
+  pd_method_kwargs: None
+  drop_original: None
+}
+class ReturnKeyDict {
+    no_params : None
+}
+class CappingTransformer {
+  capping_values: None
+  capping_values: None
+  quantiles: None
+  weights_column: None
+  _replacement_values: None
+}
+class OutOfRangeNullTransformer {
+    no_params : None
+}
+class EqualityChecker {
+  new_col_name: str
+  drop_original: bool
+}
+class BetweenDatesTransformer {
+  new_column_name: None
+  lower_inclusive: None
+  upper_inclusive: None
+  column_lower: None
+  column_upper: None
+  column_between: None
+}
+class DateDiffLeapYearTransformer {
+  new_column_name: None
+  drop_cols: None
+  missing_replacement: None
+  column_lower: None
+  column_upper: None
+}
+class DateDifferenceTransformer {
+  units: None
+  new_column_name: None
+  new_column_name: None
+  column_lower: None
+  column_upper: None
+}
+class DatetimeInfoExtractor {
+  include: None
+  datetime_mappings: None
+  mappings_provided: None
+  timeofday_mapping: None
+  timeofday_mapping: None
+  timeofmonth_mapping: None
+  timeofmonth_mapping: None
+  timeofyear_mapping: None
+  timeofyear_mapping: None
+  dayofweek_mapping: None
+  dayofweek_mapping: None
+}
+class DatetimeSinusoidCalculator {
+  method: None
+  units: Union[str, dict]
+  period: Union[int, float, dict, dict]
+}
+class SeriesDtMethodTransformer {
+  new_column_name: None
+  pd_method_name: None
+  pd_method_kwargs: None
+  _callable: None
+  _callable: None
+  column: None
+}
+class ToDatetimeTransformer {
+  to_datetime_kwargs: None
+  new_column_name: None
+  column: None
+}
+class ArbitraryImputer {
+  impute_values_: None
+  impute_value: None
+}
+class BaseImputer {
+    no_params : None
+}
+class MeanImputer {
+  weight: None
+}
+class MedianImputer {
+  weight: None
+}
+class ModeImputer {
+  weight: None
+}
+class NearestMeanResponseImputer {
+    no_params : None
+}
+class NullIndicator {
+    no_params : None
+}
+class BaseMappingTransformMixin {
+    no_params : None
+}
+class BaseMappingTransformer {
+  mappings: None
+}
+class CrossColumnAddTransformer {
+  adjust_column: None
+}
+class CrossColumnMappingTransformer {
+  adjust_column: None
+}
+class CrossColumnMultiplyTransformer {
+  adjust_column: None
+}
+class MappingTransformer {
+    no_params : None
+}
+class SetColumnDtype {
+  dtype: None
+}
+class SetValueTransformer {
+  value: None
+}
+class BaseNominalTransformer {
+    no_params : None
+}
+class GroupRareLevelsTransformer {
+  cut_off_percent: None
+  weight: None
+  rare_level_name: None
+  record_rare_levels: None
+}
+class MeanResponseTransformer {
+  weights_column: None
+  prior: None
+  level: None
+  unseen_level_handling: None
+}
+class NominalToIntegerTransformer {
+  start_encoding: None
+}
+class OneHotEncodingTransformer {
+  _parameter_constraints: dict
+  separator: None
+  drop_original: None
+}
+class OrdinalEncoderTransformer {
+  weights_column: None
+}
+class CutTransformer {
+  cut_kwargs: None
+  new_column_name: None
+  column: None
+}
+class InteractionTransformer {
+  min_degree: None
+  max_degree: None
+  max_degree: None
+  max_degree: None
+  nb_features_to_interact: None
+  nb_combinations: None
+  interaction_colname: None
+  nb_feature_out: None
+}
+class LogTransformer {
+  base: None
+  add_1: None
+  drop: None
+  suffix: None
+}
+class PCATransformer {
+  n_components: None
+  n_components: None
+  n_components: None
+  svd_solver: None
+  random_state: None
+  pca_column_prefix: None
+  pca: None
+  pca_column_prefix: None
+  feature_names_out: None
+  n_components_: None
+}
+class ScalingTransformer {
+  scaler: None
+  scaler: None
+  scaler: None
+  scaler_kwargs: None
+  scaler_type: None
+}
+class TwoColumnOperatorTransformer {
+  column1_name: None
+  column2_name: None
+}
+class SeriesStrMethodTransformer {
+  new_column_name: None
+  pd_method_name: None
+  pd_method_kwargs: None
+}
+class StringConcatenator {
+  new_column: None
+  separator: None
+}
+BaseTransformer <|-- DataFrameMethodTransformer
+BaseTransformer <|-- CappingTransformer
+CappingTransformer <|-- OutOfRangeNullTransformer
+BaseTransformer <|-- EqualityChecker
+BaseTransformer <|-- BetweenDatesTransformer
+BaseTransformer <|-- DateDiffLeapYearTransformer
+BaseTransformer <|-- DateDifferenceTransformer
+BaseTransformer <|-- DatetimeInfoExtractor
+BaseTransformer <|-- DatetimeSinusoidCalculator
+BaseTransformer <|-- SeriesDtMethodTransformer
+BaseTransformer <|-- ToDatetimeTransformer
+BaseImputer <|-- ArbitraryImputer
+BaseTransformer <|-- BaseImputer
+BaseImputer <|-- MeanImputer
+BaseImputer <|-- MedianImputer
+BaseImputer <|-- ModeImputer
+BaseImputer <|-- NearestMeanResponseImputer
+BaseTransformer <|-- NullIndicator
+BaseTransformer <|-- BaseMappingTransformMixin
+BaseTransformer <|-- BaseMappingTransformer
+BaseMappingTransformer <|-- CrossColumnAddTransformer
+BaseMappingTransformer <|-- CrossColumnMappingTransformer
+BaseMappingTransformer <|-- CrossColumnMultiplyTransformer
+BaseMappingTransformer <|-- MappingTransformer
+BaseMappingTransformMixin <|-- MappingTransformer
+BaseTransformer <|-- SetColumnDtype
+BaseTransformer <|-- SetValueTransformer
+BaseTransformer <|-- BaseNominalTransformer
+BaseNominalTransformer <|-- GroupRareLevelsTransformer
+BaseNominalTransformer <|-- MeanResponseTransformer
+BaseMappingTransformMixin <|-- MeanResponseTransformer
+BaseNominalTransformer <|-- NominalToIntegerTransformer
+BaseMappingTransformMixin <|-- NominalToIntegerTransformer
+BaseNominalTransformer <|-- OneHotEncodingTransformer
+BaseNominalTransformer <|-- OrdinalEncoderTransformer
+BaseMappingTransformMixin <|-- OrdinalEncoderTransformer
+BaseTransformer <|-- CutTransformer
+BaseTransformer <|-- InteractionTransformer
+BaseTransformer <|-- LogTransformer
+BaseTransformer <|-- PCATransformer
+BaseTransformer <|-- ScalingTransformer
+DataFrameMethodTransformer <|-- TwoColumnOperatorTransformer
+BaseTransformer <|-- SeriesStrMethodTransformer
+BaseTransformer <|-- StringConcatenator
+
