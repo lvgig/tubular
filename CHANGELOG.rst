@@ -16,6 +16,14 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+1.0.1 (unreleased)
+------------------
+
+Changed
+^^^^^^^
+- removed some unnescessary implementation tests `#130 <https://github.com/lvgig/tubular/pull/130>`_
+
+
 1.0.0 (2023-07-24)
 ------------------
 
