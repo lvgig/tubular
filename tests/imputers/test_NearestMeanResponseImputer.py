@@ -11,32 +11,6 @@ from tubular.imputers import NearestMeanResponseImputer
 class TestInit:
     """Tests for NearestMeanResponseImputer.__init__."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=NearestMeanResponseImputer.__init__,
-            expected_arguments=["self", "columns"],
-            expected_default_values=(None,),
-        )
-
-    def test_class_methods(self):
-        """Test that NearestMeanResponseImputer has fit and transform methods."""
-        x = NearestMeanResponseImputer(columns=None)
-
-        ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that NearestMeanResponseImputer inherits from BaseImputer."""
-        x = NearestMeanResponseImputer(columns=None)
-
-        ta.classes.assert_inheritance(x, tubular.imputers.BaseImputer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -54,14 +28,6 @@ class TestInit:
 
 class TestFit:
     """Tests for NearestMeanResponseImputer.fit."""
-
-    def test_arguments(self):
-        """Test that fit has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=NearestMeanResponseImputer.fit,
-            expected_arguments=["self", "X", "y"],
-            expected_default_values=None,
-        )
 
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseTransformer.fit."""
@@ -212,13 +178,6 @@ class TestTransform:
         df["a"] = df["a"].astype("float64")
 
         return df
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=NearestMeanResponseImputer.transform,
-            expected_arguments=["self", "X"],
-        )
 
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""

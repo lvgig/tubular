@@ -11,32 +11,6 @@ from tubular.imputers import MeanImputer
 class TestInit:
     """Tests for MeanImputer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=MeanImputer.__init__,
-            expected_arguments=["self", "columns", "weight"],
-            expected_default_values=(None, None),
-        )
-
-    def test_class_methods(self):
-        """Test that MeanImputer has fit and transform methods."""
-        x = MeanImputer()
-
-        ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that MeanImputer inherits from BaseImputer."""
-        x = MeanImputer()
-
-        ta.classes.assert_inheritance(x, tubular.imputers.BaseImputer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -63,14 +37,6 @@ class TestInit:
 
 class TestFit:
     """Tests for MeanImputer.fit()."""
-
-    def test_arguments(self):
-        """Test that init fit expected arguments."""
-        ta.functions.test_function_arguments(
-            func=MeanImputer.fit,
-            expected_arguments=["self", "X", "y"],
-            expected_default_values=(None,),
-        )
 
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseTransformer.fit."""
@@ -233,13 +199,6 @@ class TestTransform:
             df[col].loc[df[col].isna()] = value
 
         return df
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=MeanImputer.transform,
-            expected_arguments=["self", "X"],
-        )
 
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""

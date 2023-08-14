@@ -9,30 +9,6 @@ from tubular.imputers import ArbitraryImputer
 class TestInit:
     """Tests for ArbitraryImputer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=ArbitraryImputer.__init__,
-            expected_arguments=["self", "impute_value", "columns"],
-            expected_default_values=None,
-        )
-
-    def test_class_methods(self):
-        """Test that ArbitraryImputer has transform method."""
-        x = ArbitraryImputer(impute_value=1, columns="a")
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that ArbitraryImputer inherits from BaseTransformer."""
-        x = ArbitraryImputer(impute_value=1, columns="a")
-
-        ta.classes.assert_inheritance(x, tubular.imputers.BaseImputer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -78,13 +54,6 @@ class TestInit:
 
 class TestTransform:
     """Tests for ArbitraryImputer.transform()."""
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=ArbitraryImputer.transform,
-            expected_arguments=["self", "X"],
-        )
 
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""

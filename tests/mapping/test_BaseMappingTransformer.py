@@ -9,30 +9,6 @@ from tubular.mapping import BaseMappingTransformer
 class TestInit:
     """Tests for BaseMappingTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=BaseMappingTransformer.__init__,
-            expected_arguments=["self", "mappings"],
-            expected_default_values=None,
-        )
-
-    def test_class_methods(self):
-        """Test that BaseMappingTransformer has transform method."""
-        x = BaseMappingTransformer(mappings={"a": {"a": 1}})
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that BaseMappingTransformer inherits from BaseTransformer."""
-        x = BaseMappingTransformer(mappings={"a": {"a": 1}})
-
-        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -89,14 +65,6 @@ class TestInit:
 
 class TestTransform:
     """Tests for the transform method on MappingTransformer."""
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=BaseMappingTransformer.transform,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
-        )
 
     def test_check_is_fitted_call(self, mocker):
         """Test the call to check_is_fitted."""

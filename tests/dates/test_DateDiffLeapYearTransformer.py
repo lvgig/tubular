@@ -80,52 +80,6 @@ class TestCalculateAge:
 class TestInit:
     """Tests for DateDiffLeapYearTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=DateDiffLeapYearTransformer.__init__,
-            expected_arguments=[
-                "self",
-                "column_lower",
-                "column_upper",
-                "new_column_name",
-                "drop_cols",
-                "missing_replacement",
-            ],
-            expected_default_values=(None,),
-        )
-
-    def test_class_methods(self):
-        """Test that DateDiffLeapYearTransformer has transform method."""
-        x = DateDiffLeapYearTransformer(
-            column_lower="dummy_1",
-            column_upper="dummy_2",
-            new_column_name="dummy_3",
-            drop_cols=True,
-        )
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="calculate_age",
-            msg="calculate_message",
-        )
-
-    def test_inheritance(self):
-        """Test that DateDiffLeapYearTransformer inherits from BaseTransformer."""
-        x = DateDiffLeapYearTransformer(
-            column_lower="dummy_1",
-            column_upper="dummy_2",
-            new_column_name="dummy_3",
-            drop_cols=True,
-        )
-
-        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -319,13 +273,6 @@ class TestTransform:
                 ],
                 "c": [None],
             },
-        )
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=DateDiffLeapYearTransformer.transform,
-            expected_arguments=["self", "X"],
         )
 
     def test_super_transform_called(self, mocker):

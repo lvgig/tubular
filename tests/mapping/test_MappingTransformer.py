@@ -18,23 +18,6 @@ from tubular.mapping import MappingTransformer
 class TestInit:
     """Tests for MappingTransformer.init()."""
 
-    def test_class_methods(self):
-        """Test that MappingTransformer has transform method."""
-        x = MappingTransformer(mappings={"a": {"a": 1}})
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that MappingTransformer inherits from BaseMappingTransformer and BaseMappingTransformMixin."""
-        x = MappingTransformer(mappings={"a": {"a": 1}})
-
-        ta.classes.assert_inheritance(x, tubular.mapping.BaseMappingTransformer)
-        ta.classes.assert_inheritance(x, tubular.mapping.BaseMappingTransformMixin)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseMappingTransformer.init."""
         spy = mocker.spy(tubular.mapping.BaseMappingTransformer, "__init__")

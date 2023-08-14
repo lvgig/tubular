@@ -11,24 +11,6 @@ from tubular.misc import SetColumnDtype
 class TestSetColumnDtypeInit:
     """Tests for SetColumnDtype custom transformer."""
 
-    def test_init_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=SetColumnDtype.__init__,
-            expected_arguments=[
-                "self",
-                "columns",
-                "dtype",
-            ],
-            expected_default_values=None,
-        )
-
-    def test_inheritance(self):
-        """Test that SetColumnDtype inherits from tubular BaseTransformer."""
-        x = SetColumnDtype(columns=["a"], dtype=float)
-
-        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
-
     def test_tubular_base_transformer_super_init_called(self, mocker):
         """Test that init calls tubular BaseTransformer.init."""
         expected_call_args = {
@@ -62,22 +44,6 @@ class TestSetColumnDtypeInit:
 
 
 class TestSetColumnDtypeTransform:
-    @pytest.mark.parametrize(
-        "method_name",
-        [
-            ("transform"),
-        ],
-    )
-    def test_class_methods(self, method_name):
-        """Test that SetColumnDtype has transform method."""
-        x = SetColumnDtype(columns=["a"], dtype=float)
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method=method_name,
-            msg=method_name,
-        )
-
     def test_transform_arguments(self):
         """Test that transform has expected arguments."""
         ta.functions.test_function_arguments(

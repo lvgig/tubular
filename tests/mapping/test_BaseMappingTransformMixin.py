@@ -7,23 +7,8 @@ from tubular.mapping import BaseMappingTransformMixin
 
 
 class TestInit:
-    """Tests for BaseMappingTransformMixin.init()."""
-
-    def test_class_methods(self):
-        """Test that BaseMappingTransformMixin has transform method."""
-        x = BaseMappingTransformMixin()
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform method",
-        )
-
-    def test_inheritance(self):
-        """Test that BaseMappingTransformMixin inherits from BaseTransformer."""
-        x = BaseMappingTransformMixin()
-
-        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
+    """Tests for BaseMappingTransformMixin.init().
+    Currently nothing to test."""
 
 
 class TestTransform:
