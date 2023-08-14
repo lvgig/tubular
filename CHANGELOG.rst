@@ -22,10 +22,12 @@ Each individual change should have a link to the pull request after the descript
 Added
 ^^^^^
 - added flake8_bugbear (B) to ruff rules `#131 <https://github.com/lvgig/tubular/pull/131>`_
+- added flake8_datetimez (DTZ) to ruff rules `#132 <https://github.com/lvgig/tubular/pull/132>`_
 
 Changed
 ^^^^^^^
-- minor chnages to comply with flake8_bugbear (B) ruff rules `#131 <https://github.com/lvgig/tubular/pull/131>`_
+- minor changes to comply with flake8_bugbear (B) ruff rules `#131 <https://github.com/lvgig/tubular/pull/131>`_
+- minor changes to comply with flake8_datetimez (DTZ) ruff rules `#132 <https://github.com/lvgig/tubular/pull/132>`_
 
 Removed
 ^^^^^^^
