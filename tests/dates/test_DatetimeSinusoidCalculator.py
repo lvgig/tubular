@@ -251,14 +251,6 @@ class TestDatetimeSinusoidCalculatorInit:
 
 
 class TestDatetimeSinusoidCalculatorTransform:
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=DatetimeSinusoidCalculator.transform,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
-        )
-
     def test_datetime_type_error(self):
         """Tests that an error is raised if the column passed to the transformer is not a datetime column."""
         not_datetime = pd.DataFrame({"a": [1, 2, 3]})

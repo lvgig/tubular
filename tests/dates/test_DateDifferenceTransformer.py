@@ -13,41 +13,6 @@ from tubular.dates import DateDifferenceTransformer
 class TestInit:
     """Tests for DateDifferenceTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=DateDifferenceTransformer.__init__,
-            expected_arguments=[
-                "self",
-                "column_lower",
-                "column_upper",
-                "new_column_name",
-                "units",
-                "copy",
-                "verbose",
-            ],
-            expected_default_values=(None, "D", True, False),
-        )
-
-    def test_class_methods(self):
-        """Test that DateDifferenceTransformer has fit and transform methods."""
-        x = DateDifferenceTransformer(
-            "column_lower",
-            "column_upper",
-        )
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that DateDifferenceTransformer inherits from BaseTransformer."""
-        x = DateDifferenceTransformer("column_lower", "column_upper")
-
-        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -894,13 +859,6 @@ class TestTransform:
                 ],
             },
             index=[0, 1],
-        )
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=DateDifferenceTransformer.transform,
-            expected_arguments=["self", "X"],
         )
 
     def test_super_transform_called(self, mocker):

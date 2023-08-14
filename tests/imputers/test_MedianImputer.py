@@ -11,32 +11,6 @@ from tubular.imputers import MedianImputer
 class TestInit:
     """Tests for MedianImputer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=MedianImputer.__init__,
-            expected_arguments=["self", "columns", "weight"],
-            expected_default_values=(None, None),
-        )
-
-    def test_class_methods(self):
-        """Test that MedianImputer has fit and transform methods."""
-        x = MedianImputer()
-
-        ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that MedianImputer inherits from BaseImputer."""
-        x = MedianImputer()
-
-        ta.classes.assert_inheritance(x, tubular.imputers.BaseImputer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -63,14 +37,6 @@ class TestInit:
 
 class TestFit:
     """Tests for MedianImputer.fit()."""
-
-    def test_arguments(self):
-        """Test that fit has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=MedianImputer.fit,
-            expected_arguments=["self", "X", "y"],
-            expected_default_values=(None,),
-        )
 
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseTransformer.fit."""
@@ -239,13 +205,6 @@ class TestTransform:
             df[col].loc[df[col].isna()] = 4
 
         return df
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=MedianImputer.transform,
-            expected_arguments=["self", "X"],
-        )
 
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""

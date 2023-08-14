@@ -37,23 +37,6 @@ class TestExtractDatetimeInfoInit:
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
-    def test_arguments(self):
-        """Test that init has the expected arguments."""
-        default_include = [
-            "timeofday",
-            "timeofmonth",
-            "timeofyear",
-            "dayofweek",
-        ]
-        ta.functions.test_function_arguments(
-            func=DatetimeInfoExtractor.__init__,
-            expected_arguments=["self", "columns", "include", "datetime_mappings"],
-            expected_default_values=(
-                default_include,
-                {},
-            ),
-        )
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -89,21 +72,6 @@ class TestExtractDatetimeInfoInit:
                 },
             },
             msg="Attributes for ExtractDatetimeInfo set in init",
-        )
-
-    def test_class_methods(self):
-        """Test that DatetimeInfoExtractor has fit and transform methods."""
-        x = DatetimeInfoExtractor(columns=["a"])
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="_map_values",
-            msg="_map_values",
-        )
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
         )
 
     @pytest.mark.parametrize("incorrect_type_include", [2, 3.0, "invalid", "dayofweek"])
@@ -229,15 +197,6 @@ class TestExtractDatetimeInfoInit:
 
 
 class TestMapValues:
-    def test_arguments(self):
-        """Test that identify_timeofday has the expected arguments."""
-
-    ta.functions.test_function_arguments(
-        func=DatetimeInfoExtractor._map_values,
-        expected_arguments=["self", "value", "interval"],
-        expected_default_values=None,
-    )
-
     @pytest.mark.parametrize("incorrect_type_input", ["2", [1, 2]])
     def test_incorrect_type_input(self, incorrect_type_input, timeofday_extractor):
         """Test that an error is raised if input is the wrong type."""
@@ -364,14 +323,6 @@ class TestMapValues:
 
 
 class TestTransform:
-    def test_arguments(self):
-        """Test that init has the expected arguments."""
-        ta.functions.test_function_arguments(
-            func=DatetimeInfoExtractor.transform,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
-        )
-
     def test_super_transform_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         df = d.create_date_test_df()

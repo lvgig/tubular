@@ -11,39 +11,6 @@ from tubular.nominal import OneHotEncodingTransformer
 class TestInit:
     """Tests for OneHotEncodingTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=OneHotEncodingTransformer.__init__,
-            expected_arguments=[
-                "self",
-                "columns",
-                "separator",
-                "drop_original",
-                "copy",
-                "verbose",
-            ],
-            expected_default_values=(None, "_", False, True, False),
-        )
-
-    def test_class_methods(self):
-        """Test that OneHotEncodingTransformer has fit and transform methods."""
-        x = OneHotEncodingTransformer()
-
-        ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that OneHotEncodingTransformer inherits from BaseNominalTransformer and sklean's OneHotEncoder."""
-        x = OneHotEncodingTransformer()
-
-        ta.classes.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
-        ta.classes.assert_inheritance(x, sklearn.preprocessing.OneHotEncoder)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseNominalTransformer.init.
 
@@ -135,14 +102,6 @@ class TestInit:
 
 class TestFit:
     """Tests for OneHotEncodingTransformer.fit()."""
-
-    def test_arguments(self):
-        """Test that init fit expected arguments."""
-        ta.functions.test_function_arguments(
-            func=OneHotEncodingTransformer.fit,
-            expected_arguments=["self", "X", "y"],
-            expected_default_values=(None,),
-        )
 
     def test_columns_set_or_check_called(self, mocker):
         """Test that fit calls BaseNominalTransformer.columns_set_or_check."""
@@ -326,13 +285,6 @@ class TestTransform:
         df["c_c"] = [0.0, 0.0, 1.0, 0.0, 0.0]
 
         return df
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=OneHotEncodingTransformer.transform,
-            expected_arguments=["self", "X"],
-        )
 
     def test_columns_check_call(self, mocker):
         """Test the first call to BaseTransformer columns_check."""

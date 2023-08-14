@@ -3,7 +3,7 @@
 # McCabe complexity (`C901`) by default.
 select = ["E", "F", "W", "I", "UP", "ASYNC", "YTT", "A", "COM", "C4", "T10", "EM", 
 "FA", "ISC", "PIE", "PYI", "Q", "RSE", "RET", "SLOT", "SIM", "TID", "TCH", "INT", 
-"PD", "PGH", "PLC", "PLE", "PLW", "FLY", "NPY", "PERF","DTZ"]
+"PD", "PGH", "PLC", "PLE", "PLW", "FLY", "NPY", "PERF", "B", "DTZ"]
 
 # ignore E501 - linelength limit (covered by black except in docstrings) 
 # and PD901 - use of df variable name

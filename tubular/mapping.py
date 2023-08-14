@@ -188,11 +188,13 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
             if len(values_to_be_mapped.intersection(values_in_df)) == 0:
                 warnings.warn(
                     f"{self.classname()}: No values from mapping for {col} exist in dataframe.",
+                    stacklevel=2,
                 )
 
             if len(values_to_be_mapped.difference(values_in_df)) > 0:
                 warnings.warn(
                     f"{self.classname()}: There are values in the mapping for {col} that are not present in the dataframe",
+                    stacklevel=2,
                 )
 
         X = BaseMappingTransformMixin.transform(self, X)
@@ -215,6 +217,7 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
                     # Confirm the initial and end dtypes are not categories
                     warnings.warn(
                         f"{self.classname()}: This mapping changes {col} dtype from {original_dtypes[col]} to {mapped_dtypes[col]}. This is often caused by having multiple dtypes in one column, or by not mapping all values.",
+                        stacklevel=2,
                     )
 
         return X
