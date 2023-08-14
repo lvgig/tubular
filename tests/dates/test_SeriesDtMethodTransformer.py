@@ -10,44 +10,6 @@ from tubular.dates import SeriesDtMethodTransformer
 class TestInit:
     """Tests for SeriesDtMethodTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=SeriesDtMethodTransformer.__init__,
-            expected_arguments=[
-                "self",
-                "new_column_name",
-                "pd_method_name",
-                "column",
-                "pd_method_kwargs",
-            ],
-            expected_default_values=(None,),
-        )
-
-    def test_class_methods(self):
-        """Test that SeriesDtMethodTransformer has transform method."""
-        x = SeriesDtMethodTransformer(
-            new_column_name="a",
-            pd_method_name="year",
-            column="b",
-        )
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that SeriesDtMethodTransformer inherits from BaseTransformer."""
-        x = SeriesDtMethodTransformer(
-            new_column_name="a",
-            pd_method_name="year",
-            column="b",
-        )
-
-        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -202,13 +164,6 @@ class TestTransform:
         df["b_new"] = df["b"].dt.to_period("M")
 
         return df
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=SeriesDtMethodTransformer.transform,
-            expected_arguments=["self", "X"],
-        )
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""

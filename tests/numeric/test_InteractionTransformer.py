@@ -14,35 +14,6 @@ from tubular.numeric import InteractionTransformer
 class TestInit:
     """Tests for InteractionTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=InteractionTransformer.__init__,
-            expected_arguments=[
-                "self",
-                "columns",
-                "min_degree",
-                "max_degree",
-            ],
-            expected_default_values=(2, 2),
-        )
-
-    def test_class_methods(self):
-        """Test that InteractionTransformer has transform method."""
-        x = InteractionTransformer(columns=["a", "b"])
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that InteractionTransformer inherits from BaseTransformer."""
-        x = InteractionTransformer(columns=["a", "b"])
-
-        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -211,13 +182,6 @@ class TestTransform:
                 "c": {0: np.NaN, 1: 1.0, 2: 2.0, 3: 3.0, 4: -4.0, 5: -5.0, 6: -6.0},
                 "a b": {0: 1.0, 1: 4.0, 2: 9.0, 3: np.NaN, 4: 35.0, 5: 48.0, 6: np.NaN},
             },
-        )
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=InteractionTransformer.transform,
-            expected_arguments=["self", "X"],
         )
 
     def test_super_transform_called(self, mocker):

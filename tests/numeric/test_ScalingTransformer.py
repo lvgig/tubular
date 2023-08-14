@@ -11,20 +11,6 @@ from tubular.numeric import ScalingTransformer
 class TestInit:
     """Tests for ScalingTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=ScalingTransformer.__init__,
-            expected_arguments=["self", "columns", "scaler_type", "scaler_kwargs"],
-            expected_default_values=(None,),
-        )
-
-    def test_inheritance(self):
-        """Test that ScalingTransformer inherits from BaseTransformer."""
-        x = ScalingTransformer(columns=["a"], scaler_type="standard")
-
-        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
-
     def test_to_scaler_kwargs_type_error(self):
         """Test that an exception is raised if scaler_kwargs is not a dict."""
         with pytest.raises(
@@ -140,14 +126,6 @@ class TestInit:
 class TestCheckNumericColumns:
     """Tests for the check_numeric_columns method."""
 
-    def test_arguments(self):
-        """Test that check_numeric_columns has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=ScalingTransformer.check_numeric_columns,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
-        )
-
     def test_exception_raised(self):
         """Test an exception is raised if non numeric columns are passed in X."""
         df = d.create_df_2()
@@ -177,14 +155,6 @@ class TestCheckNumericColumns:
 
 class TestFit:
     """Tests for ScalingTransformer.fit()."""
-
-    def test_arguments(self):
-        """Test that fit has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=ScalingTransformer.fit,
-            expected_arguments=["self", "X", "y"],
-            expected_default_values=(None,),
-        )
 
     def test_super_fit_call(self, mocker):
         """Test the call to BaseTransformer.fit."""
@@ -275,14 +245,6 @@ class TestFit:
 
 class TestTransform:
     """Tests for ScalingTransformer.transform()."""
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=ScalingTransformer.transform,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
-        )
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""

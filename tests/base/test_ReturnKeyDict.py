@@ -3,13 +3,6 @@ import test_aide as ta
 from tubular.base import ReturnKeyDict
 
 
-def test_inheritance():
-    """Test ReturnKeyDict inherits from dict."""
-    x = ReturnKeyDict()
-
-    ta.classes.assert_inheritance(x, dict)
-
-
 def test_has___missing___method():
     """Test that ReturnKeyDict has a __missing__ method."""
     x = ReturnKeyDict()

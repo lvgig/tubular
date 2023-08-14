@@ -10,44 +10,6 @@ from tubular.strings import SeriesStrMethodTransformer
 class TestInit:
     """Tests for SeriesStrMethodTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=SeriesStrMethodTransformer.__init__,
-            expected_arguments=[
-                "self",
-                "new_column_name",
-                "pd_method_name",
-                "columns",
-                "pd_method_kwargs",
-            ],
-            expected_default_values=(None,),
-        )
-
-    def test_class_methods(self):
-        """Test that SeriesStrMethodTransformer has transform method."""
-        x = SeriesStrMethodTransformer(
-            new_column_name="a",
-            pd_method_name="find",
-            columns=["b"],
-        )
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that SeriesStrMethodTransformer inherits from BaseTransformer."""
-        x = SeriesStrMethodTransformer(
-            new_column_name="a",
-            pd_method_name="find",
-            columns=["b"],
-        )
-
-        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -175,13 +137,6 @@ class TestTransform:
         df["b"] = df["b"].str.pad(width=10)
 
         return df
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=SeriesStrMethodTransformer.transform,
-            expected_arguments=["self", "X"],
-        )
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""

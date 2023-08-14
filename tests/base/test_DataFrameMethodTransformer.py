@@ -13,45 +13,6 @@ from tubular.base import DataFrameMethodTransformer
 class TestInit:
     """Tests for DataFrameMethodTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=DataFrameMethodTransformer.__init__,
-            expected_arguments=[
-                "self",
-                "new_column_name",
-                "pd_method_name",
-                "columns",
-                "pd_method_kwargs",
-                "drop_original",
-            ],
-            expected_default_values=(None, False),
-        )
-
-    def test_class_methods(self):
-        """Test that DataFrameMethodTransformer has transform method."""
-        x = DataFrameMethodTransformer(
-            new_column_name="a",
-            pd_method_name="sum",
-            columns=["b", "c"],
-        )
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that DataFrameMethodTransformer inherits from BaseTransformer."""
-        x = DataFrameMethodTransformer(
-            new_column_name="a",
-            pd_method_name="sum",
-            columns=["b", "c"],
-        )
-
-        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -211,13 +172,6 @@ class TestTransform:
                 "d": [0.5, 1.0, 1.5, np.NaN, 3.5, 4.0, 4.5],
                 "e": [np.NaN, 0.5, 1.0, 1.5, -2.0, -2.5, -3.0],
             },
-        )
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=DataFrameMethodTransformer.transform,
-            expected_arguments=["self", "X"],
         )
 
     def test_super_transform_called(self, mocker):

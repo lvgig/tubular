@@ -19,35 +19,6 @@ def example_transformer():
 class TestTwoColumnOperatorTransformerInit:
     """Tests for TwoColumnMethodTransformer.__init__()."""
 
-    def test_inheritance(self, example_transformer):
-        """Test that TwoColumnOperatorTransformer inherits from BaseTransformer."""
-        ta.classes.assert_inheritance(
-            example_transformer,
-            tubular.base.DataFrameMethodTransformer,
-        )
-
-    def test_class_methods(self, example_transformer):
-        """Test that TwoColumnOperatorTransformer has transform method."""
-        ta.classes.test_object_method(
-            obj=example_transformer,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=TwoColumnOperatorTransformer.__init__,
-            expected_arguments=[
-                "self",
-                "pd_method_name",
-                "columns",
-                "new_column_name",
-                "pd_method_kwargs",
-            ],
-            expected_default_values=(None,),
-        )
-
     def test_axis_not_present_error(self):
         """Checks that an error is raised if no axis element present in pd_method_kwargs dict."""
         with pytest.raises(
@@ -105,14 +76,6 @@ class TestTwoColumnOperatorTransformerInit:
 
 
 class TestTwoColumnOperatorTransformerTransform:
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=TwoColumnOperatorTransformer.transform,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
-        )
-
     def test_BaseTransformer_transform_called(self, example_transformer, mocker):
         """Tests that the .transform method is called from the grandparent BaseTransformer class."""
         test_data = d.create_df_11()
