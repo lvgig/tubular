@@ -178,6 +178,7 @@ class CappingTransformer(BaseTransformer):
         else:
             warnings.warn(
                 f"{self.classname()}: quantiles not set so no fitting done in CappingTransformer",
+                stacklevel=2,
             )
 
         self._replacement_values = copy.deepcopy(self.capping_values)
