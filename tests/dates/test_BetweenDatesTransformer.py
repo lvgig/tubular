@@ -228,7 +228,7 @@ class TestTransform:
 
         with pytest.raises(
             TypeError,
-            match=r"BetweenDatesTransformer: a should be datetime64\[ns\] type but got int64",
+            match=r"BetweenDatesTransformer: a should be datetime64\[ns\] or datetime64\[ns, UTC\] type but got int64",
         ):
             x.transform(df)
 
@@ -375,7 +375,7 @@ class TestTransform:
 
         df = d.create_is_between_dates_df_2()
 
-        df["c"][0] = datetime.datetime(1989, 3, 1)
+        df["c"][0] = datetime.datetime(1989, 3, 1, tzinfo=datetime.timezone.utc)
 
         with pytest.warns(Warning, match="not all c are greater than or equal to a"):
             x.transform(df)

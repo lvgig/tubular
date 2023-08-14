@@ -109,19 +109,19 @@ class TestTransform:
                 "a": [1950, 1960, 2000, 2001, np.NaN, 2010],
                 "b": [1, 2, 3, 4, 5, np.NaN],
                 "a_Y": [
-                    datetime.datetime(1950, 1, 1),
-                    datetime.datetime(1960, 1, 1),
-                    datetime.datetime(2000, 1, 1),
-                    datetime.datetime(2001, 1, 1),
+                    datetime.datetime(1950, 1, 1, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(1960, 1, 1, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2000, 1, 1, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2001, 1, 1, tzinfo=datetime.timezone.utc),
                     pd.NaT,
-                    datetime.datetime(2010, 1, 1),
+                    datetime.datetime(2010, 1, 1, tzinfo=datetime.timezone.utc),
                 ],
                 "b_m": [
-                    datetime.datetime(1900, 1, 1),
-                    datetime.datetime(1900, 2, 1),
-                    datetime.datetime(1900, 3, 1),
-                    datetime.datetime(1900, 4, 1),
-                    datetime.datetime(1900, 5, 1),
+                    datetime.datetime(1900, 1, 1, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(1900, 2, 1, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(1900, 3, 1, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(1900, 4, 1, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(1900, 5, 1, tzinfo=datetime.timezone.utc),
                     pd.NaT,
                 ],
             },
@@ -202,17 +202,20 @@ class TestTransform:
         to_dt_1 = ToDatetimeTransformer(
             column="a",
             new_column_name="a_Y",
-            to_datetime_kwargs={"format": "%Y"},
+            to_datetime_kwargs={"format": "%Y", "utc": datetime.timezone.utc},
         )
 
         to_dt_2 = ToDatetimeTransformer(
             column="b",
             new_column_name="b_m",
-            to_datetime_kwargs={"format": "%m"},
+            to_datetime_kwargs={"format": "%m", "utc": datetime.timezone.utc},
         )
 
         df_transformed = to_dt_1.transform(df)
         df_transformed = to_dt_2.transform(df_transformed)
+
+        print(df_transformed)
+        print(expected)
 
         ta.equality.assert_equal_dispatch(
             expected=expected,
