@@ -61,7 +61,7 @@ class ArbitraryImputer(BaseImputer):
     def __init__(
         self,
         impute_value: int | float | str,
-        columns: str | list | None = None,
+        columns: str | list[str] | None = None,
         **kwargs,
     ) -> None:
         if columns is None:
@@ -150,7 +150,7 @@ class MedianImputer(BaseImputer):
 
     def __init__(
         self,
-        columns: str | list | None = None,
+        columns: str | list[str] | None = None,
         weight: str | None = None,
         **kwargs,
     ) -> None:
@@ -233,7 +233,7 @@ class MeanImputer(BaseImputer):
 
     def __init__(
         self,
-        columns: str | list | None = None,
+        columns: str | list[str] | None = None,
         weight: str | None = None,
         **kwargs,
     ) -> None:
@@ -312,7 +312,7 @@ class ModeImputer(BaseImputer):
 
     def __init__(
         self,
-        columns: str | list | None = None,
+        columns: str | list[str] | None = None,
         weight: str | None = None,
         **kwargs,
     ) -> None:
@@ -373,7 +373,7 @@ class NearestMeanResponseImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns: str | list | None = None, **kwds) -> None:
+    def __init__(self, columns: str | list[str] | None = None, **kwds) -> None:
         super().__init__(columns=columns, **kwds)
 
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
@@ -441,7 +441,7 @@ class NullIndicator(BaseTransformer):
 
     """
 
-    def __init__(self, columns: str | list | None = None, **kwds) -> None:
+    def __init__(self, columns: str | list[str] | None = None, **kwds) -> None:
         super().__init__(columns=columns, **kwds)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:

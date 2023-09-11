@@ -21,7 +21,7 @@ class SetValueTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, columns: str | list, value: type, **kwargs) -> None:
+    def __init__(self, columns: str | list[str], value: type, **kwargs) -> None:
         self.value = value
 
         super().__init__(columns=columns, **kwargs)
@@ -60,7 +60,7 @@ class SetColumnDtype(BaseTransformer):
         e.g. float or 'float'
     """
 
-    def __init__(self, columns: str | list, dtype: type | str) -> None:
+    def __init__(self, columns: str | list[str], dtype: type | str) -> None:
         super().__init__(columns, copy=True)
 
         self.__validate_dtype(dtype)
