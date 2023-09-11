@@ -747,6 +747,12 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         return self
 
+    def map_imputation_values(self, X):
+        for c in self.columns:
+            X[c] = X[c].map(self.mappings[c])
+
+        return X
+
     def transform(self, X):
         """Transform method to apply mean response encoding stored in the mappings attribute to
         each column in the columns attribute.
@@ -783,12 +789,12 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             for c in self.columns:
                 # finding rows with values not in the keys of mappings dictionary
                 unseen_indices[c] = X[~X[c].isin(self.mappings[c].keys())].index
-            X = BaseMappingTransformMixin.transform(self, X)
+            X = self.map_imputation_values(X)
             for c in self.columns:
                 X.loc[unseen_indices[c], c] = self.unseen_levels_encoding_dict[c]
         else:
             self.check_mappable_rows(X)
-            X = BaseMappingTransformMixin.transform(self, X)
+            X = self.map_imputation_values(X)
 
         if self.level:
             # Setting self.columns back so that the transformer object is unchanged after transform is called
