@@ -429,7 +429,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         return X
 
 
-class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin):
+class MeanResponseTransformer(BaseNominalTransformer):
     """Transformer to apply mean response encoding. This converts categorical variables to
     numeric by mapping levels to the mean response for that level.
 
@@ -789,11 +789,13 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             for c in self.columns:
                 # finding rows with values not in the keys of mappings dictionary
                 unseen_indices[c] = X[~X[c].isin(self.mappings[c].keys())].index
+            X = super().transform(X)
             X = self.map_imputation_values(X)
             for c in self.columns:
                 X.loc[unseen_indices[c], c] = self.unseen_levels_encoding_dict[c]
         else:
             self.check_mappable_rows(X)
+            X = super().transform(X)
             X = self.map_imputation_values(X)
 
         if self.level:
