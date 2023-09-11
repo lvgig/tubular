@@ -32,7 +32,7 @@ class BaseMappingTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, mappings, **kwargs) -> None:
+    def __init__(self, mappings: dict, **kwargs) -> None:
         if isinstance(mappings, dict):
             if not len(mappings) > 0:
                 msg = f"{self.classname()}: mappings has no values"
@@ -53,7 +53,7 @@ class BaseMappingTransformer(BaseTransformer):
 
         super().__init__(columns=columns, **kwargs)
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Base mapping transformer transform method.  Checks that the mappings
         dict has been fitted and calls the BaseTransformer transform method.
 
@@ -81,7 +81,7 @@ class BaseMappingTransformMixin(BaseTransformer):
 
     """
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Applies the mapping defined in the mappings dict to each column in the columns
         attribute.
 
@@ -137,7 +137,7 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
 
     """
 
-    def __init__(self, mappings, **kwargs) -> None:
+    def __init__(self, mappings: dict, **kwargs) -> None:
         for k, v in mappings.items():
             if isinstance(v, dict):
                 mappings[k] = ReturnKeyDict(v)
@@ -148,7 +148,11 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
 
         BaseMappingTransformer.__init__(self, mappings=mappings, **kwargs)
 
-    def transform(self, X, suppress_dtype_warning=False):
+    def transform(
+        self,
+        X: pd.DataFrame,
+        suppress_dtype_warning: bool = False,
+    ) -> pd.DataFrame:
         """Transform the input data X according to the mappings in the mappings attribute dict.
 
         This method calls the BaseMappingTransformMixin.transform. Note, this transform method is
@@ -252,7 +256,7 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
 
     """
 
-    def __init__(self, adjust_column, mappings, **kwargs) -> None:
+    def __init__(self, adjust_column: str, mappings: dict, **kwargs) -> None:
         super().__init__(mappings=mappings, **kwargs)
 
         if not isinstance(adjust_column, str):
@@ -265,7 +269,7 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
 
         self.adjust_column = adjust_column
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transforms values in given column using the values provided in the adjustments dictionary.
 
         Parameters
@@ -330,7 +334,7 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
 
     """
 
-    def __init__(self, adjust_column, mappings, **kwargs) -> None:
+    def __init__(self, adjust_column: str, mappings: dict, **kwargs) -> None:
         super().__init__(mappings=mappings, **kwargs)
 
         if not isinstance(adjust_column, str):
@@ -345,7 +349,7 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
 
         self.adjust_column = adjust_column
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transforms values in given column using the values provided in the adjustments dictionary.
 
         Parameters
@@ -414,7 +418,7 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
 
     """
 
-    def __init__(self, adjust_column, mappings, **kwargs) -> None:
+    def __init__(self, adjust_column: str, mappings: dict, **kwargs) -> None:
         super().__init__(mappings=mappings, **kwargs)
 
         if not isinstance(adjust_column, str):
@@ -429,7 +433,7 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
 
         self.adjust_column = adjust_column
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transforms values in given column using the values provided in the adjustments dictionary.
 
         Parameters
