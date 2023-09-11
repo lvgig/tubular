@@ -57,11 +57,11 @@ class LogTransformer(BaseTransformer):
 
     def __init__(
         self,
-        columns,
-        base=None,
-        add_1=False,
-        drop=True,
-        suffix="log",
+        columns: str | list[str] | None,
+        base: float | int | None = None,
+        add_1: bool = False,
+        drop: bool = True,
+        suffix: str = "log",
         **kwargs,
     ) -> None:
         super().__init__(columns=columns, **kwargs)
@@ -79,7 +79,7 @@ class LogTransformer(BaseTransformer):
         self.drop = drop
         self.suffix = suffix
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Applies the log transform to the specified columns.
 
         If the drop attribute is True then the original columns are dropped. If
@@ -164,7 +164,13 @@ class CutTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, column, new_column_name, cut_kwargs={}, **kwargs) -> None:
+    def __init__(
+        self,
+        column: str,
+        new_column_name: str,
+        cut_kwargs: dict = {},
+        **kwargs,
+    ) -> None:
         if type(column) is not str:
             msg = f"{self.classname()}: column arg (name of column) should be a single str giving the column to discretise"
             raise TypeError(msg)
@@ -191,7 +197,7 @@ class CutTransformer(BaseTransformer):
 
         super().__init__(columns=[column], **kwargs)
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Discretise specified column using pd.cut.
 
         Parameters
@@ -260,10 +266,10 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
 
     def __init__(
         self,
-        pd_method_name,
-        columns,
-        new_column_name,
-        pd_method_kwargs={"axis": 0},
+        pd_method_name: str,
+        columns: list[str],
+        new_column_name: str,
+        pd_method_kwargs: dict = {"axis": 0},
         **kwargs,
     ) -> None:
         """Performs input checks not done in either DataFrameMethodTransformer.__init__ or BaseTransformer.__init__."""
@@ -292,7 +298,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
             **kwargs,
         )
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform input data by applying the chosen method to the two specified columns.
 
         Args:
@@ -343,7 +349,13 @@ class ScalingTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, columns, scaler_type, scaler_kwargs={}, **kwargs) -> None:
+    def __init__(
+        self,
+        columns: str | list[str] | None,
+        scaler_type: str,
+        scaler_kwargs: dict = {},
+        **kwargs,
+    ) -> None:
         if type(scaler_kwargs) is not dict:
             msg = f"{self.classname()}: scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
             raise TypeError(msg)
@@ -375,7 +387,7 @@ class ScalingTransformer(BaseTransformer):
 
         super().__init__(columns=columns, **kwargs)
 
-    def check_numeric_columns(self, X):
+    def check_numeric_columns(self, X: pd.DataFrame) -> pd.DataFrame:
         """Method to check all columns (specicifed in self.columns) in X are all numeric.
 
         Parameters
@@ -399,7 +411,7 @@ class ScalingTransformer(BaseTransformer):
 
         return X
 
-    def fit(self, X, y=None):
+    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Fit scaler to input data.
 
         Parameters
@@ -419,7 +431,7 @@ class ScalingTransformer(BaseTransformer):
 
         return self
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform input data X with fitted scaler.
 
         Parameters
@@ -487,7 +499,13 @@ class InteractionTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, columns, min_degree=2, max_degree=2, **kwargs) -> None:
+    def __init__(
+        self,
+        columns: str | list[str] | None,
+        min_degree: int = 2,
+        max_degree: int = 2,
+        **kwargs,
+    ) -> None:
         super().__init__(columns=columns, **kwargs)
 
         if len(columns) < 2:
@@ -524,7 +542,7 @@ class InteractionTransformer(BaseTransformer):
         self.interaction_colname = []
         self.nb_feature_out = -1
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Generate from input pandas DataFrame (X) new interaction features using the "product" pandas.DataFrame method
          and add this column or columns in X.
 
@@ -655,11 +673,11 @@ class PCATransformer(BaseTransformer):
 
     def __init__(
         self,
-        columns,
-        n_components=2,
-        svd_solver="auto",
-        random_state=None,
-        pca_column_prefix="pca_",
+        columns: str | list[str] | None,
+        n_components: int = 2,
+        svd_solver: str = "auto",
+        random_state: int = None,
+        pca_column_prefix: str = "pca_",
         **kwargs,
     ) -> None:
         super().__init__(columns=columns, **kwargs)
@@ -721,7 +739,7 @@ class PCATransformer(BaseTransformer):
         self.feature_names_out = None
         self.n_components_ = None
 
-    def check_numeric_columns(self, X):
+    def check_numeric_columns(self, X: pd.DataFrame) -> pd.DataFrame:
         """Method to check all columns (specicifed in self.columns) in X are all numeric.
 
         Parameters
@@ -745,7 +763,7 @@ class PCATransformer(BaseTransformer):
 
         return X
 
-    def fit(self, X, y=None):
+    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Fit PCA to input data.
 
         Parameters
@@ -776,7 +794,7 @@ class PCATransformer(BaseTransformer):
 
         return self
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Generate from input pandas DataFrame (X) PCA features and add this column or columns in X.
 
         Parameters
