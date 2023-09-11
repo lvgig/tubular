@@ -68,11 +68,11 @@ class TestTransform:
 
         mapping = {
             "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
-            # "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
+            "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
         }
 
         x = BaseMappingTransformMixin()
-        x.columns = ["a"]  # , "b"]
+        x.columns = ["a", "b"]
         x.mappings = mapping
 
         x.transform(df)
@@ -84,9 +84,14 @@ class TestTransform:
         call_pos_arg = call_args[0]
         call_kwargs = call_args[1]
 
-        assert call_kwargs == {}
+        assert call_kwargs == {"regex": False}
 
-        expected_pos_args = (df["a"], mapping["a"])
+        # pd.Series.replace separates dict into to replace and value lists
+        expected_pos_args = (
+            df["a"],
+            [1, 2, 3, 4, 5, 6],
+            ["a", "b", "c", "d", "e", "f"],
+        )
 
         ta.equality.assert_equal_dispatch(
             expected_pos_args,
@@ -99,9 +104,14 @@ class TestTransform:
         call_pos_arg = call_args[0]
         call_kwargs = call_args[1]
 
-        assert call_kwargs == {}
+        assert call_kwargs == {"regex": False}
 
-        expected_pos_args = (df["b"], mapping["b"])
+        # pd.Series.replace separates dict into to replace and value lists
+        expected_pos_args = (
+            df["b"],
+            ["a", "b", "c", "d", "e", "f"],
+            [1, 2, 3, 4, 5, 6],
+        )
 
         ta.equality.assert_equal_dispatch(
             expected_pos_args,
