@@ -21,12 +21,12 @@ class SetValueTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, columns, value, **kwargs) -> None:
+    def __init__(self, columns: str | list, value: type, **kwargs) -> None:
         self.value = value
 
         super().__init__(columns=columns, **kwargs)
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Set columns to value.
 
         Parameters
@@ -60,21 +60,21 @@ class SetColumnDtype(BaseTransformer):
         e.g. float or 'float'
     """
 
-    def __init__(self, columns, dtype) -> None:
+    def __init__(self, columns: str | list, dtype: type | str) -> None:
         super().__init__(columns, copy=True)
 
         self.__validate_dtype(dtype)
 
         self.dtype = dtype
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         X = super().transform(X)
 
         X[self.columns] = X[self.columns].astype(self.dtype)
 
         return X
 
-    def __validate_dtype(self, dtype: str):
+    def __validate_dtype(self, dtype: str) -> None:
         """Check string is a valid dtype."""
         try:
             pd.api.types.pandas_dtype(dtype)
