@@ -676,7 +676,7 @@ class PCATransformer(BaseTransformer):
         columns: str | list[str] | None,
         n_components: int = 2,
         svd_solver: str = "auto",
-        random_state: int = None,
+        random_state: int | np.random.RandomState = None,
         pca_column_prefix: str = "pca_",
         **kwargs,
     ) -> None:
