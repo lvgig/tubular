@@ -15,7 +15,7 @@ class BaseImputer(BaseTransformer):
     Other imputers in this module should inherit from this class.
     """
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Impute missing values with median values calculated from fit method.
 
         Parameters
@@ -58,7 +58,12 @@ class ArbitraryImputer(BaseImputer):
         Value to impute nulls with.
     """
 
-    def __init__(self, impute_value, columns, **kwargs) -> None:
+    def __init__(
+        self,
+        impute_value: int | float | str,
+        columns: str | list | None = None,
+        **kwargs,
+    ) -> None:
         if columns is None:
             msg = f"{self.classname()}: columns must be specified in init for ArbitraryImputer"
             raise ValueError(msg)
@@ -76,7 +81,7 @@ class ArbitraryImputer(BaseImputer):
         self.impute_values_ = {}
         self.impute_value = impute_value
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Impute missing values with the supplied impute_value.
         If columns is None all columns in X will be imputed.
 
@@ -143,7 +148,12 @@ class MedianImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns=None, weight=None, **kwargs) -> None:
+    def __init__(
+        self,
+        columns: str | list | None = None,
+        weight: str | None = None,
+        **kwargs,
+    ) -> None:
         super().__init__(columns=columns, **kwargs)
 
         if not isinstance(weight, str) and weight is not None:
@@ -152,7 +162,7 @@ class MedianImputer(BaseImputer):
 
         self.weight = weight
 
-    def fit(self, X, y=None):
+    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Calculate median values to impute with from X.
 
         Parameters
@@ -221,7 +231,12 @@ class MeanImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns=None, weight=None, **kwargs) -> None:
+    def __init__(
+        self,
+        columns: str | list | None = None,
+        weight: str | None = None,
+        **kwargs,
+    ) -> None:
         super().__init__(columns=columns, **kwargs)
 
         if not isinstance(weight, str) and weight is not None:
@@ -230,7 +245,7 @@ class MeanImputer(BaseImputer):
 
         self.weight = weight
 
-    def fit(self, X, y=None):
+    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Calculate mean values to impute with from X.
 
         Parameters
@@ -295,7 +310,12 @@ class ModeImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns=None, weight=None, **kwargs) -> None:
+    def __init__(
+        self,
+        columns: str | list | None = None,
+        weight: str | None = None,
+        **kwargs,
+    ) -> None:
         super().__init__(columns=columns, **kwargs)
 
         if weight is not None and not isinstance(weight, str):
@@ -304,7 +324,7 @@ class ModeImputer(BaseImputer):
 
         self.weight = weight
 
-    def fit(self, X, y=None):
+    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Calculate mode values to impute with from X.
 
         Parameters
@@ -353,10 +373,10 @@ class NearestMeanResponseImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns=None, **kwds) -> None:
+    def __init__(self, columns: str | list | None = None, **kwds) -> None:
         super().__init__(columns=columns, **kwds)
 
-    def fit(self, X, y):
+    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Calculate mean values to impute with.
 
         Parameters
@@ -421,10 +441,10 @@ class NullIndicator(BaseTransformer):
 
     """
 
-    def __init__(self, columns=None, **kwds) -> None:
+    def __init__(self, columns: str | list | None = None, **kwds) -> None:
         super().__init__(columns=columns, **kwds)
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Create new columns indicating the position of null values for each variable in self.columns.
 
         Parameters
