@@ -1,4 +1,5 @@
 """This module contains transformers that apply encodings to nominal columns."""
+from __future__ import annotations
 
 import warnings
 

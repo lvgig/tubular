@@ -1,5 +1,7 @@
 """This module contains transformers that apply different types of mappings to columns."""
 
+from __future__ import annotations
+
 import warnings
 from collections import OrderedDict
 

@@ -1,5 +1,7 @@
 """This module contains transformers that apply string functions."""
 
+from __future__ import annotations
+
 import pandas as pd
 
 from tubular.base import BaseTransformer

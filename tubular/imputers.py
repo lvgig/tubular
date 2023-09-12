@@ -1,5 +1,7 @@
 """This module contains transformers that deal with imputation of missing values."""
 
+from __future__ import annotations
+
 import warnings
 
 import numpy as np
