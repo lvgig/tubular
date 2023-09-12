@@ -11,30 +11,6 @@ from tubular.mapping import CrossColumnAddTransformer
 class TestInit:
     """Tests for CrossColumnAddTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=CrossColumnAddTransformer.__init__,
-            expected_arguments=["self", "adjust_column", "mappings"],
-            expected_default_values=None,
-        )
-
-    def test_class_methods(self):
-        """Test that CrossColumnAddTransformer has transform method."""
-        x = CrossColumnAddTransformer(mappings={"a": {"a": 1}}, adjust_column="b")
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that CrossColumnAddTransformer inherits from BaseMappingTransformer."""
-        x = CrossColumnAddTransformer(mappings={"a": {"a": 1}}, adjust_column="b")
-
-        ta.classes.assert_inheritance(x, tubular.mapping.BaseMappingTransformer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseMappingTransformer.init."""
         expected_call_args = {
@@ -114,14 +90,6 @@ class TestTransform:
         df["c"] = df["c"].astype("category")
 
         return df
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=CrossColumnAddTransformer.transform,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
-        )
 
     def test_check_is_fitted_call(self, mocker):
         """Test the call to check_is_fitted."""

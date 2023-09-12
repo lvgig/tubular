@@ -251,20 +251,12 @@ class TestDatetimeSinusoidCalculatorInit:
 
 
 class TestDatetimeSinusoidCalculatorTransform:
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=DatetimeSinusoidCalculator.transform,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
-        )
-
     def test_datetime_type_error(self):
         """Tests that an error is raised if the column passed to the transformer is not a datetime column."""
         not_datetime = pd.DataFrame({"a": [1, 2, 3]})
         column = "a"
         message = re.escape(
-            f"{column} should be datetime64[ns] type but got {not_datetime[column].dtype}",
+            f"DatetimeSinusoidCalculator : {column} should be datetime64[ns] or datetime64[ns, UTC] type but got {not_datetime[column].dtype}",
         )
         with pytest.raises(TypeError, match=message):
             x = DatetimeSinusoidCalculator(

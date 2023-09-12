@@ -11,39 +11,6 @@ from tubular.nominal import GroupRareLevelsTransformer
 class TestInit:
     """Tests for GroupRareLevelsTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=GroupRareLevelsTransformer.__init__,
-            expected_arguments=[
-                "self",
-                "columns",
-                "cut_off_percent",
-                "weight",
-                "rare_level_name",
-                "record_rare_levels",
-            ],
-            expected_default_values=(None, 0.01, None, "rare", True),
-        )
-
-    def test_class_methods(self):
-        """Test that GroupRareLevelsTransformer has fit and transform methods."""
-        x = GroupRareLevelsTransformer()
-
-        ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that NominalToIntegerTransformer inherits from BaseNominalTransformer."""
-        x = GroupRareLevelsTransformer()
-
-        ta.classes.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -121,14 +88,6 @@ class TestInit:
 
 class TestFit:
     """Tests for GroupRareLevelsTransformer.fit()."""
-
-    def test_arguments(self):
-        """Test that init fit expected arguments."""
-        ta.functions.test_function_arguments(
-            func=GroupRareLevelsTransformer.fit,
-            expected_arguments=["self", "X", "y"],
-            expected_default_values=(None,),
-        )
 
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseTransformer.fit."""
@@ -287,13 +246,6 @@ class TestTransform:
         )
 
         return df
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=GroupRareLevelsTransformer.transform,
-            expected_arguments=["self", "X"],
-        )
 
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""

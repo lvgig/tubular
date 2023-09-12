@@ -168,7 +168,10 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             raise ValueError(msg)
 
         if not (X.index == y.index).all():
-            warnings.warn(f"{self.classname()}: X and y do not have equal indexes")
+            warnings.warn(
+                f"{self.classname()}: X and y do not have equal indexes",
+                stacklevel=2,
+            )
 
         X_y = X.copy()
 
@@ -377,7 +380,7 @@ class DataFrameMethodTransformer(BaseTransformer):
         new_column_name: list[str] | str,
         pd_method_name: str,
         columns: list[str] | str | None,
-        pd_method_kwargs: dict[str, Any] = {},
+        pd_method_kwargs: dict[str, Any] | None = None,
         drop_original: bool = False,
         **kwargs,
     ) -> None:
@@ -397,14 +400,17 @@ class DataFrameMethodTransformer(BaseTransformer):
             msg = f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
             raise TypeError(msg)
 
-        if type(pd_method_kwargs) is not dict:
-            msg = f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
-            raise TypeError(msg)
-
-        for i, k in enumerate(pd_method_kwargs.keys()):
-            if type(k) is not str:
-                msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
+        if pd_method_kwargs is None:
+            pd_method_kwargs = {}
+        else:
+            if type(pd_method_kwargs) is not dict:
+                msg = f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
                 raise TypeError(msg)
+
+            for i, k in enumerate(pd_method_kwargs.keys()):
+                if type(k) is not str:
+                    msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
+                    raise TypeError(msg)
 
         if type(drop_original) is not bool:
             msg = f"{self.classname()}: unexpected type ({type(drop_original)}) for drop_original, expecting bool"

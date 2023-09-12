@@ -14,21 +14,6 @@ def example_transformer():
 class TestInit:
     """Tests for the EqualityChecker.__init__ method."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=EqualityChecker.__init__,
-            expected_arguments=["self", "columns", "new_col_name", "drop_original"],
-            expected_default_values=(False,),
-        )
-
-    def test_inheritance(self, example_transformer):
-        """Test EqualityChecker inherits from BaseTransformer."""
-        assert isinstance(
-            example_transformer,
-            tubular.base.BaseTransformer,
-        ), "EqualityChecker is not instance of tubular.base.BaseTransformer"
-
     def test_super_init_call(self, mocker):
         """Test that BaseTransformer.init is called as expected."""
         expected_call_args = {
@@ -50,15 +35,6 @@ class TestInit:
                 verbose=False,
                 copy=False,
             )
-
-    def test_class_methods(self, example_transformer):
-        """Test that EqualityChecker has transform method."""
-        msg = "no transformation method in class"
-        ta.classes.test_object_method(
-            obj=example_transformer,
-            expected_method="transform",
-            msg=msg,
-        )
 
     def test_value_new_col_name(self, example_transformer):
         """Test that the value passed in the new column name arg is correct."""
@@ -115,14 +91,6 @@ class TestInit:
 
 class TestTransform:
     """Tests for the EqualityChecker.transform method."""
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=EqualityChecker.transform,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
-        )
 
     def test_super_transform_called(self, mocker, example_transformer):
         """Test that BaseTransformer.transform called."""

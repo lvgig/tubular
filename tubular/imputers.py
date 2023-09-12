@@ -347,7 +347,10 @@ class ModeImputer(BaseImputer):
                 if len(mode_value) == 0:
                     self.impute_values_[c] = np.nan
 
-                    warnings.warn(f"ModeImputer: The Mode of column {c} is NaN.")
+                    warnings.warn(
+                        f"ModeImputer: The Mode of column {c} is NaN.",
+                        stacklevel=2,
+                    )
 
                 else:
                     self.impute_values_[c] = mode_value[0]

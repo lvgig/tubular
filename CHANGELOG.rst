@@ -16,7 +16,26 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
-1.0.0 (unreleased)
+1.0.1 (unreleased)
+------------------
+
+Added
+^^^^^
+- added flake8_bugbear (B) to ruff rules `#131 <https://github.com/lvgig/tubular/pull/131>`_
+- added flake8_datetimez (DTZ) to ruff rules `#132 <https://github.com/lvgig/tubular/pull/132>`_
+
+Changed
+^^^^^^^
+- minor changes to comply with flake8_bugbear (B) ruff rules `#131 <https://github.com/lvgig/tubular/pull/131>`_
+- minor changes to comply with flake8_datetimez (DTZ) ruff rules `#132 <https://github.com/lvgig/tubular/pull/132>`_
+
+Removed
+^^^^^^^
+- removed some unnescessary implementation tests `#130 <https://github.com/lvgig/tubular/pull/130>`_
+
+
+
+1.0.0 (2023-07-24)
 ------------------
 
 Changed

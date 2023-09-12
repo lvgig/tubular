@@ -11,30 +11,6 @@ from tubular.imputers import NullIndicator
 class TestInit:
     """Tests for NullIndicator.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=NullIndicator.__init__,
-            expected_arguments=["self", "columns"],
-            expected_default_values=(None,),
-        )
-
-    def test_class_methods(self):
-        """Test that NullIndicator has transform method."""
-        x = NullIndicator()
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that NullIndicator inherits from BaseTransformer."""
-        x = NullIndicator()
-
-        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -63,13 +39,6 @@ class TestTransform:
                 "b_nulls": [1, 0, 0, 0, 0, 0],
                 "c_nulls": [0, 0, 0, 0, 0, 0],
             },
-        )
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=NullIndicator.transform,
-            expected_arguments=["self", "X"],
         )
 
     def test_super_transform_called(self, mocker):

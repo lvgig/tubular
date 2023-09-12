@@ -54,7 +54,7 @@ class SeriesStrMethodTransformer(BaseTransformer):
         new_column_name: str,
         pd_method_name: str,
         columns: str,
-        pd_method_kwargs: dict = {},
+        pd_method_kwargs: dict | None = None,
         **kwargs,
     ) -> None:
         if type(columns) is list and len(columns) > 1:
@@ -71,9 +71,12 @@ class SeriesStrMethodTransformer(BaseTransformer):
             msg = f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
             raise TypeError(msg)
 
-        if type(pd_method_kwargs) is not dict:
-            msg = f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
-            raise TypeError(msg)
+        if pd_method_kwargs is None:
+            pd_method_kwargs = {}
+        else:
+            if type(pd_method_kwargs) is not dict:
+                msg = f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
+                raise TypeError(msg)
 
         for i, k in enumerate(pd_method_kwargs.keys()):
             if type(k) is not str:

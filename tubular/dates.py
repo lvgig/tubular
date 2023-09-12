@@ -288,7 +288,7 @@ class ToDatetimeTransformer(BaseTransformer):
         self,
         column: str,
         new_column_name: str,
-        to_datetime_kwargs: dict = {},
+        to_datetime_kwargs: dict | None = None,
         **kwargs,
     ) -> None:
         if type(column) is not str:
@@ -299,14 +299,17 @@ class ToDatetimeTransformer(BaseTransformer):
             msg = f"{self.classname()}: new_column_name must be a str"
             raise TypeError(msg)
 
-        if type(to_datetime_kwargs) is not dict:
-            msg = f"{self.classname()}: to_datetime_kwargs should be a dict but got type {type(to_datetime_kwargs)}"
-            raise TypeError(msg)
-
-        for i, k in enumerate(to_datetime_kwargs.keys()):
-            if type(k) is not str:
-                msg = f"{self.classname()}: unexpected type ({type(k)}) for to_datetime_kwargs key in position {i}, must be str"
+        if to_datetime_kwargs is None:
+            to_datetime_kwargs = {}
+        else:
+            if type(to_datetime_kwargs) is not dict:
+                msg = f"{self.classname()}: to_datetime_kwargs should be a dict but got type {type(to_datetime_kwargs)}"
                 raise TypeError(msg)
+
+            for i, k in enumerate(to_datetime_kwargs.keys()):
+                if type(k) is not str:
+                    msg = f"{self.classname()}: unexpected type ({type(k)}) for to_datetime_kwargs key in position {i}, must be str"
+                    raise TypeError(msg)
 
         self.to_datetime_kwargs = to_datetime_kwargs
         self.new_column_name = new_column_name
@@ -395,7 +398,7 @@ class SeriesDtMethodTransformer(BaseTransformer):
         new_column_name: str,
         pd_method_name: str,
         column: str,
-        pd_method_kwargs: dict = {},
+        pd_method_kwargs: dict | None = None,,
         **kwargs,
     ) -> None:
         if type(column) is not str:
@@ -412,21 +415,26 @@ class SeriesDtMethodTransformer(BaseTransformer):
             msg = f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
             raise TypeError(msg)
 
-        if type(pd_method_kwargs) is not dict:
-            msg = f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
-            raise TypeError(msg)
-
-        for i, k in enumerate(pd_method_kwargs.keys()):
-            if type(k) is not str:
-                msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
+        if pd_method_kwargs is None:
+            pd_method_kwargs = {}
+        else:
+            if type(pd_method_kwargs) is not dict:
+                msg = f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
                 raise TypeError(msg)
+
+            for i, k in enumerate(pd_method_kwargs.keys()):
+                if type(k) is not str:
+                    msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
+                    raise TypeError(msg)
 
         self.new_column_name = new_column_name
         self.pd_method_name = pd_method_name
         self.pd_method_kwargs = pd_method_kwargs
 
         try:
-            ser = pd.Series([datetime.datetime(2020, 12, 21)])
+            ser = pd.Series(
+                [datetime.datetime(2020, 12, 21, tzinfo=datetime.timezone.utc)],
+            )
             getattr(ser.dt, pd_method_name)
 
         except Exception as err:
@@ -606,13 +614,16 @@ class BetweenDatesTransformer(BaseTransformer):
         X = super().transform(X)
 
         for col in self.columns:
-            if not pd.api.types.is_datetime64_dtype(X[col]):
-                msg = f"{self.classname()}: {col} should be datetime64[ns] type but got {X[col].dtype}"
+            if (not pd.api.types.is_datetime64_dtype(X[col])) and (
+                not pd.api.types.is_datetime64tz_dtype(X[col])
+            ):
+                msg = f"{self.classname()}: {col} should be datetime64[ns] or datetime64[ns, UTC] type but got {X[col].dtype}"
                 raise TypeError(msg)
 
         if not (X[self.columns[0]] <= X[self.columns[2]]).all():
             warnings.warn(
                 f"{self.classname()}: not all {self.columns[2]} are greater than or equal to {self.columns[0]}",
+                stacklevel=2,
             )
 
         if self.lower_inclusive:
@@ -696,7 +707,7 @@ class DatetimeInfoExtractor(BaseTransformer):
     include : list of str, default = ["timeofday", "timeofmonth", "timeofyear", "dayofweek"]
         Which datetime categorical information to extract
 
-    datetime_mappings : dict, default = {}
+    datetime_mappings : dict, default = None
         Optional argument to define custom mappings for datetime values.
 
     """
@@ -708,16 +719,22 @@ class DatetimeInfoExtractor(BaseTransformer):
         | list[str] = ["timeofday", "timeofmonth", "timeofyear", "dayofweek"],
         datetime_mappings: dict[
             str,
-        ] = {},
+        ] | None = None,
         **kwargs,
     ) -> None:
-        if type(include) is not list:
-            msg = f"{self.classname()}: include should be List"
-            raise TypeError(msg)
+        if include is None:
+            include = ["timeofday", "timeofmonth", "timeofyear", "dayofweek"]
+        else:
+            if type(include) is not list:
+                msg = f"{self.classname()}: include should be List"
+                raise TypeError(msg)
 
-        if type(datetime_mappings) is not dict:
-            msg = f"{self.classname()}: datetime_mappings should be Dict"
-            raise TypeError(msg)
+        if datetime_mappings is None:
+            datetime_mappings = {}
+        else:
+            if type(datetime_mappings) is not dict:
+                msg = f"{self.classname()}: datetime_mappings should be Dict"
+                raise TypeError(msg)
 
         super().__init__(columns=columns, **kwargs)
 
@@ -907,7 +924,7 @@ class DatetimeInfoExtractor(BaseTransformer):
                     msg = (
                         f"{self.classname()}: values in {col} should be datetime64[ns]"
                     )
-                    raise TypeError(msg)
+                    raise TypeError(msg) from None
 
         for col in self.columns:
             if "timeofday" in self.include:
@@ -1111,8 +1128,10 @@ class DatetimeSinusoidCalculator(BaseTransformer):
         X = super().transform(X)
 
         for column in self.columns:
-            if not pd.api.types.is_datetime64_dtype(X[column]):
-                msg = f"{self.classname()} : {column} should be datetime64[ns] type but got {X[column].dtype}"
+            if (not pd.api.types.is_datetime64_dtype(X[column])) and (
+                not pd.api.types.is_datetime64tz_dtype(X[column])
+            ):
+                msg = f"{self.classname()} : {column} should be datetime64[ns] or datetime64[ns, UTC] type but got {X[column].dtype}"
                 raise TypeError(msg)
             if not isinstance(self.units, dict):
                 column_in_desired_unit = getattr(X[column].dt, self.units)

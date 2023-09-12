@@ -10,38 +10,6 @@ from tubular.nominal import NominalToIntegerTransformer
 class TestInit:
     """Tests for NominalToIntegerTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=NominalToIntegerTransformer.__init__,
-            expected_arguments=["self", "columns", "start_encoding"],
-            expected_default_values=(None, 0),
-        )
-
-    def test_class_methods(self):
-        """Test that NominalToIntegerTransformer has fit and transform methods."""
-        x = NominalToIntegerTransformer()
-
-        ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="inverse_transform",
-            msg="inverse_transform",
-        )
-
-    def test_inheritance(self):
-        """Test that NominalToIntegerTransformer inherits from BaseNominalTransformer."""
-        x = NominalToIntegerTransformer()
-
-        ta.classes.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         spy = mocker.spy(tubular.base.BaseTransformer, "__init__")
@@ -92,14 +60,6 @@ class TestInit:
 
 class TestFit:
     """Tests for NominalToIntegerTransformer.fit()."""
-
-    def test_arguments(self):
-        """Test that init fit expected arguments."""
-        ta.functions.test_function_arguments(
-            func=NominalToIntegerTransformer.fit,
-            expected_arguments=["self", "X", "y"],
-            expected_default_values=(None,),
-        )
 
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseTransformer.fit."""
@@ -200,13 +160,6 @@ class TestTransform:
 
         return df
 
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=NominalToIntegerTransformer.transform,
-            expected_arguments=["self", "X"],
-        )
-
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""
         df = d.create_df_1()
@@ -303,13 +256,6 @@ class TestTransform:
 
 class TestInverseTransform:
     """Tests for NominalToIntegerTransformer.inverse_transform()."""
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=NominalToIntegerTransformer.inverse_transform,
-            expected_arguments=["self", "X"],
-        )
 
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""

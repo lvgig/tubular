@@ -13,30 +13,6 @@ from tubular.numeric import CutTransformer
 class TestInit:
     """Tests for CutTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=CutTransformer.__init__,
-            expected_arguments=["self", "column", "new_column_name", "cut_kwargs"],
-            expected_default_values=({},),
-        )
-
-    def test_class_methods(self):
-        """Test that CutTransformer has transform method."""
-        x = CutTransformer(column="a", new_column_name="b")
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that CutTransformer inherits from BaseTransformer."""
-        x = CutTransformer(column="a", new_column_name="b")
-
-        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -129,13 +105,6 @@ class TestTransform:
         )
 
         return df
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=CutTransformer.transform,
-            expected_arguments=["self", "X"],
-        )
 
     def test_super_transform_call(self, mocker):
         """Test the call to BaseTransformer.transform is as expected."""

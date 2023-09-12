@@ -14,35 +14,6 @@ from tubular.dates import ToDatetimeTransformer
 class TestInit:
     """Tests for ToDatetimeTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=ToDatetimeTransformer.__init__,
-            expected_arguments=[
-                "self",
-                "column",
-                "new_column_name",
-                "to_datetime_kwargs",
-            ],
-            expected_default_values=({},),
-        )
-
-    def test_class_methods(self):
-        """Test that ToDatetimeTransformer has fit and transform methods."""
-        to_dt = ToDatetimeTransformer(column="a", new_column_name="b")
-
-        ta.classes.test_object_method(
-            obj=to_dt,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that ToDatetimeTransformer inherits from BaseTransformer."""
-        to_dt = ToDatetimeTransformer(column="a", new_column_name="b")
-
-        ta.classes.assert_inheritance(to_dt, tubular.base.BaseTransformer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -138,29 +109,22 @@ class TestTransform:
                 "a": [1950, 1960, 2000, 2001, np.NaN, 2010],
                 "b": [1, 2, 3, 4, 5, np.NaN],
                 "a_Y": [
-                    datetime.datetime(1950, 1, 1),
-                    datetime.datetime(1960, 1, 1),
-                    datetime.datetime(2000, 1, 1),
-                    datetime.datetime(2001, 1, 1),
+                    datetime.datetime(1950, 1, 1, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(1960, 1, 1, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2000, 1, 1, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(2001, 1, 1, tzinfo=datetime.timezone.utc),
                     pd.NaT,
-                    datetime.datetime(2010, 1, 1),
+                    datetime.datetime(2010, 1, 1, tzinfo=datetime.timezone.utc),
                 ],
                 "b_m": [
-                    datetime.datetime(1900, 1, 1),
-                    datetime.datetime(1900, 2, 1),
-                    datetime.datetime(1900, 3, 1),
-                    datetime.datetime(1900, 4, 1),
-                    datetime.datetime(1900, 5, 1),
+                    datetime.datetime(1900, 1, 1, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(1900, 2, 1, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(1900, 3, 1, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(1900, 4, 1, tzinfo=datetime.timezone.utc),
+                    datetime.datetime(1900, 5, 1, tzinfo=datetime.timezone.utc),
                     pd.NaT,
                 ],
             },
-        )
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=ToDatetimeTransformer.transform,
-            expected_arguments=["self", "X"],
         )
 
     def test_super_transform_call(self, mocker):
@@ -238,17 +202,20 @@ class TestTransform:
         to_dt_1 = ToDatetimeTransformer(
             column="a",
             new_column_name="a_Y",
-            to_datetime_kwargs={"format": "%Y"},
+            to_datetime_kwargs={"format": "%Y", "utc": datetime.timezone.utc},
         )
 
         to_dt_2 = ToDatetimeTransformer(
             column="b",
             new_column_name="b_m",
-            to_datetime_kwargs={"format": "%m"},
+            to_datetime_kwargs={"format": "%m", "utc": datetime.timezone.utc},
         )
 
         df_transformed = to_dt_1.transform(df)
         df_transformed = to_dt_2.transform(df_transformed)
+
+        print(df_transformed)
+        print(expected)
 
         ta.equality.assert_equal_dispatch(
             expected=expected,

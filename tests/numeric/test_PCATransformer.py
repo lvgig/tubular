@@ -10,27 +10,6 @@ from tubular.numeric import PCATransformer
 class TestInit:
     """Tests for PCATransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=PCATransformer.__init__,
-            expected_arguments=[
-                "self",
-                "columns",
-                "n_components",
-                "svd_solver",
-                "random_state",
-                "pca_column_prefix",
-            ],
-            expected_default_values=(2, "auto", None, "pca_"),
-        )
-
-    def test_inheritance(self):
-        """Test that PCATransformer inherits from BaseTransformer."""
-        x = PCATransformer(columns=["a"])
-
-        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
-
     def test_to_random_state_type_error(self):
         """Test that an exception is raised if random_state is not a int or None."""
         with pytest.raises(
@@ -124,14 +103,6 @@ class TestInit:
 class TestCheckNumericColumns:
     """Tests for the check_numeric_columns method."""
 
-    def test_arguments(self):
-        """Test that check_numeric_columns has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=PCATransformer.check_numeric_columns,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
-        )
-
     def test_exception_raised(self):
         """Test an exception is raised if non numeric columns are passed in X."""
         df = d.create_df_2()
@@ -161,14 +132,6 @@ class TestCheckNumericColumns:
 
 class TestFit:
     """Tests for PCATransformer.fit()."""
-
-    def test_arguments(self):
-        """Test that fit has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=PCATransformer.fit,
-            expected_arguments=["self", "X", "y"],
-            expected_default_values=(None,),
-        )
 
     def test_super_fit_call(self, mocker):
         """Test the call to BaseTransformer.fit."""
@@ -339,14 +302,6 @@ def create_svd_sovler_output():
 
 class TestTransform:
     """Tests for PCATransformer.transform()."""
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=PCATransformer.transform,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
-        )
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""

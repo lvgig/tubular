@@ -13,14 +13,6 @@ from tubular.numeric import LogTransformer
 class TestInit:
     """Tests for LogTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=LogTransformer.__init__,
-            expected_arguments=["self", "columns", "base", "add_1", "drop", "suffix"],
-            expected_default_values=(None, False, True, "log"),
-        )
-
     def test_base_type_error(self):
         """Test that an exception is raised if base is non-numeric."""
         with pytest.raises(
@@ -42,22 +34,6 @@ class TestInit:
                 columns=["a"],
                 base=0,
             )
-
-    def test_class_methods(self):
-        """Test that LogTransformer has transform method."""
-        x = LogTransformer(columns="a")
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that LogTransformer inherits from BaseTransformer."""
-        x = LogTransformer(columns="a")
-
-        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
@@ -158,13 +134,6 @@ class TestTransform:
         df["a_new_col"] = np.log(df["a"]) / np.log(7)
 
         return df.drop("a", axis=1)
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=LogTransformer.transform,
-            expected_arguments=["self", "X"],
-        )
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""

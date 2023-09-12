@@ -168,7 +168,7 @@ class CutTransformer(BaseTransformer):
         self,
         column: str,
         new_column_name: str,
-        cut_kwargs: dict = {},
+        cut_kwargs: dict | None = None,
         **kwargs,
     ) -> None:
         if type(column) is not str:
@@ -179,9 +179,12 @@ class CutTransformer(BaseTransformer):
             msg = f"{self.classname()}: new_column_name must be a str"
             raise TypeError(msg)
 
-        if type(cut_kwargs) is not dict:
-            msg = f"{self.classname()}: cut_kwargs should be a dict but got type {type(cut_kwargs)}"
-            raise TypeError(msg)
+        if cut_kwargs is None:
+            cut_kwargs = {}
+        else:
+            if type(cut_kwargs) is not dict:
+                msg = f"{self.classname()}: cut_kwargs should be a dict but got type {type(cut_kwargs)}"
+                raise TypeError(msg)
 
         for i, k in enumerate(cut_kwargs.keys()):
             if type(k) is not str:
@@ -269,17 +272,19 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         pd_method_name: str,
         columns: list[str],
         new_column_name: str,
-        pd_method_kwargs: dict = {"axis": 0},
+        pd_method_kwargs: dict | None = None,
         **kwargs,
     ) -> None:
         """Performs input checks not done in either DataFrameMethodTransformer.__init__ or BaseTransformer.__init__."""
-        if "axis" not in pd_method_kwargs.keys():
-            msg = f'{self.classname()}: pd_method_kwargs must contain an entry "axis" set to 0 or 1'
-            raise ValueError(msg)
-
-        if pd_method_kwargs["axis"] not in [0, 1]:
-            msg = f"{self.classname()}: pd_method_kwargs 'axis' must be 0 or 1"
-            raise ValueError(msg)
+        if pd_method_kwargs is None:
+            pd_method_kwargs = {"axis": 0}
+        else:
+            if "axis" not in pd_method_kwargs.keys():
+                msg = f'{self.classname()}: pd_method_kwargs must contain an entry "axis" set to 0 or 1'
+                raise ValueError(msg)
+            if pd_method_kwargs["axis"] not in [0, 1]:
+                msg = f"{self.classname()}: pd_method_kwargs 'axis' must be 0 or 1"
+                raise ValueError(msg)
 
         if type(columns) is not list and len(columns) != 2:
             msg = f"{self.classname()}: columns must be a list containing two column names but got {columns}"
@@ -353,12 +358,15 @@ class ScalingTransformer(BaseTransformer):
         self,
         columns: str | list[str] | None,
         scaler_type: str,
-        scaler_kwargs: dict = {},
+        scaler_kwargs: dict | None = None,
         **kwargs,
     ) -> None:
-        if type(scaler_kwargs) is not dict:
-            msg = f"{self.classname()}: scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
-            raise TypeError(msg)
+        if scaler_kwargs is None:
+            scaler_kwargs = {}
+        else:
+            if type(scaler_kwargs) is not dict:
+                msg = f"{self.classname()}: scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
+                raise TypeError(msg)
 
         for i, k in enumerate(scaler_kwargs.keys()):
             if type(k) is not str:

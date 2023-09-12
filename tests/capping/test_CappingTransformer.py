@@ -11,45 +11,6 @@ from tubular.capping import CappingTransformer
 class TestInit:
     """Tests for CappingTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=CappingTransformer.__init__,
-            expected_arguments=[
-                "self",
-                "capping_values",
-                "quantiles",
-                "weights_column",
-            ],
-            expected_default_values=(None, None, None),
-        )
-
-    @pytest.mark.parametrize(
-        "method_name",
-        [
-            ("transform"),
-            ("fit"),
-            ("check_capping_values_dict"),
-            ("weighted_quantile"),
-            ("prepare_quantiles"),
-        ],
-    )
-    def test_class_methods(self, method_name):
-        """Test that CappingTransformer has transform method."""
-        x = CappingTransformer(capping_values={"a": [1, 3]})
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method=method_name,
-            msg=method_name,
-        )
-
-    def test_inheritance(self):
-        """Test that CappingTransformer inherits from BaseTransformer."""
-        x = CappingTransformer(capping_values={"a": [1, 3]})
-
-        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
-
     def test_capping_values_quantiles_both_none_error(self):
         """Test that an exception is raised if both capping_values and quantiles are passed as None."""
         with pytest.raises(
@@ -195,14 +156,6 @@ class TestInit:
 class TestCheckCappingValuesDict:
     """Tests for the CappingTransformer.check_capping_values_dict() method."""
 
-    def test_arguments(self):
-        """Test that check_capping_values_dict has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=CappingTransformer.check_capping_values_dict,
-            expected_arguments=["self", "capping_values_dict", "dict_name"],
-            expected_default_values=None,
-        )
-
     def test_capping_values_not_dict_error(self):
         """Test that an exception is raised if capping_values_dict is not a dict."""
         x = CappingTransformer(capping_values={"a": [1, 3], "b": [None, -1]})
@@ -311,14 +264,6 @@ class TestCheckCappingValuesDict:
 
 class TestFit:
     """Tests for CappingTransformer.fit()."""
-
-    def test_arguments(self):
-        """Test that fit has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=CappingTransformer.fit,
-            expected_arguments=["self", "X", "y"],
-            expected_default_values=(None,),
-        )
 
     def test_quantiles_none_error(self):
         """Test that an exception is raised if quantiles is None when fit is run."""
@@ -469,14 +414,6 @@ class TestFit:
 class TestPrepareQuantiles:
     """Tests for the CappingTransformer.prepare_quantiles method."""
 
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=CappingTransformer.prepare_quantiles,
-            expected_arguments=["self", "values", "quantiles", "sample_weight"],
-            expected_default_values=(None,),
-        )
-
     @pytest.mark.parametrize(
         ("values", "quantiles", "sample_weight", "expected_quantiles"),
         [
@@ -611,13 +548,6 @@ class TestTransform:
         df["c"] = df["c"].astype("category")
 
         return df
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=CappingTransformer.transform,
-            expected_arguments=["self", "X"],
-        )
 
     def test_check_is_fitted_call_count(self, mocker):
         """Test there are 2 calls to BaseTransformer check_is_fitted in transform."""
@@ -786,14 +716,6 @@ class TestTransform:
 
 class TestWeightedQuantile:
     """Tests for the CappingTransformer.weighted_quantile method."""
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=CappingTransformer.weighted_quantile,
-            expected_arguments=["self", "values", "quantiles", "sample_weight"],
-            expected_default_values=(None,),
-        )
 
     @pytest.mark.parametrize(
         ("values", "sample_weight", "quantiles", "expected_quantiles"),
