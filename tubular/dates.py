@@ -398,7 +398,7 @@ class SeriesDtMethodTransformer(BaseTransformer):
         new_column_name: str,
         pd_method_name: str,
         column: str,
-        pd_method_kwargs: dict | None = None,,
+        pd_method_kwargs: dict | None = None,
         **kwargs,
     ) -> None:
         if type(column) is not str:
@@ -715,11 +715,11 @@ class DatetimeInfoExtractor(BaseTransformer):
     def __init__(
         self,
         columns: str | list[str],
-        include: str
-        | list[str] = ["timeofday", "timeofmonth", "timeofyear", "dayofweek"],
+        include: str | list[str] | None = None,
         datetime_mappings: dict[
             str,
-        ] | None = None,
+        ]
+        | None = None,
         **kwargs,
     ) -> None:
         if include is None:
