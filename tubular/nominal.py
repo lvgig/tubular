@@ -104,7 +104,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         self,
         columns: str | list[str] | None = None,
         start_encoding: int = 0,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
 
@@ -272,7 +272,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         weight: str | None = None,
         rare_level_name: str | list[str] | None = "rare",
         record_rare_levels: bool = True,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
@@ -527,7 +527,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         prior: int = 0,
         level: str | list | None = None,
         unseen_level_handling: str | int | float | None = None,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         if weights_column is not None and type(weights_column) is not str:
             msg = f"{self.classname()}: weights_column should be a str"
@@ -848,7 +848,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
         self,
         columns: str | list[str] | None = None,
         weights_column: str | None = None,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         if weights_column is not None and type(weights_column) is not str:
             msg = f"{self.classname()}: weights_column should be a str"
@@ -1003,7 +1003,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         drop_original: bool = False,
         copy: bool = True,
         verbose: bool = False,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         BaseNominalTransformer.__init__(
             self,
@@ -1056,7 +1056,11 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         return self
 
-    def _get_feature_names(self, input_features: list[str], **kwargs) -> list[str]:
+    def _get_feature_names(
+        self,
+        input_features: list[str],
+        **kwargs: dict[str, bool],
+    ) -> list[str]:
         """Function to access the get_feature_names attribute of the scikit learn attribute. Will return the output columns of the OHE transformer.
 
         In scikit learn 1.0 "get_feature_names" was deprecated and then replaced with "get_feature_names_out" in version 1.2. The logic in this

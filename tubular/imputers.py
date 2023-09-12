@@ -64,7 +64,7 @@ class ArbitraryImputer(BaseImputer):
         self,
         impute_value: int | float | str,
         columns: str | list[str] | None = None,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         if columns is None:
             msg = f"{self.classname()}: columns must be specified in init for ArbitraryImputer"
@@ -154,7 +154,7 @@ class MedianImputer(BaseImputer):
         self,
         columns: str | list[str] | None = None,
         weight: str | None = None,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
@@ -237,7 +237,7 @@ class MeanImputer(BaseImputer):
         self,
         columns: str | list[str] | None = None,
         weight: str | None = None,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
@@ -316,7 +316,7 @@ class ModeImputer(BaseImputer):
         self,
         columns: str | list[str] | None = None,
         weight: str | None = None,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
@@ -378,8 +378,12 @@ class NearestMeanResponseImputer(BaseImputer):
 
     """
 
-    def __init__(self, columns: str | list[str] | None = None, **kwds) -> None:
-        super().__init__(columns=columns, **kwds)
+    def __init__(
+        self,
+        columns: str | list[str] | None = None,
+        **kwargs: dict[str, bool],
+    ) -> None:
+        super().__init__(columns=columns, **kwargs)
 
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Calculate mean values to impute with.
@@ -446,8 +450,12 @@ class NullIndicator(BaseTransformer):
 
     """
 
-    def __init__(self, columns: str | list[str] | None = None, **kwds) -> None:
-        super().__init__(columns=columns, **kwds)
+    def __init__(
+        self,
+        columns: str | list[str] | None = None,
+        **kwargs: dict[str, bool],
+    ) -> None:
+        super().__init__(columns=columns, **kwargs)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Create new columns indicating the position of null values for each variable in self.columns.

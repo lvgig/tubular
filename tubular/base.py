@@ -382,7 +382,7 @@ class DataFrameMethodTransformer(BaseTransformer):
         columns: list[str] | str | None,
         pd_method_kwargs: dict[str, Any] | None = None,
         drop_original: bool = False,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 

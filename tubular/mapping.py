@@ -34,7 +34,7 @@ class BaseMappingTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, mappings: dict[str, dict], **kwargs) -> None:
+    def __init__(self, mappings: dict[str, dict], **kwargs: dict[str, bool]) -> None:
         if isinstance(mappings, dict):
             if not len(mappings) > 0:
                 msg = f"{self.classname()}: mappings has no values"
@@ -139,7 +139,7 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
 
     """
 
-    def __init__(self, mappings: dict[str, dict], **kwargs) -> None:
+    def __init__(self, mappings: dict[str, dict], **kwargs: dict[str, bool]) -> None:
         for k, v in mappings.items():
             if isinstance(v, dict):
                 mappings[k] = ReturnKeyDict(v)
@@ -261,7 +261,12 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
 
     """
 
-    def __init__(self, adjust_column: str, mappings: dict[str, dict], **kwargs) -> None:
+    def __init__(
+        self,
+        adjust_column: str,
+        mappings: dict[str, dict],
+        **kwargs: dict[str, bool],
+    ) -> None:
         super().__init__(mappings=mappings, **kwargs)
 
         if not isinstance(adjust_column, str):
@@ -339,7 +344,12 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
 
     """
 
-    def __init__(self, adjust_column: str, mappings: dict[str, dict], **kwargs) -> None:
+    def __init__(
+        self,
+        adjust_column: str,
+        mappings: dict[str, dict],
+        **kwargs: dict[str, bool],
+    ) -> None:
         super().__init__(mappings=mappings, **kwargs)
 
         if not isinstance(adjust_column, str):
@@ -423,7 +433,12 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
 
     """
 
-    def __init__(self, adjust_column: str, mappings: dict[str, dict], **kwargs) -> None:
+    def __init__(
+        self,
+        adjust_column: str,
+        mappings: dict[str, dict],
+        **kwargs: dict[str, bool],
+    ) -> None:
         super().__init__(mappings=mappings, **kwargs)
 
         if not isinstance(adjust_column, str):

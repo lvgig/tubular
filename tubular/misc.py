@@ -23,7 +23,12 @@ class SetValueTransformer(BaseTransformer):
 
     """
 
-    def __init__(self, columns: str | list[str], value: type, **kwargs) -> None:
+    def __init__(
+        self,
+        columns: str | list[str],
+        value: type,
+        **kwargs: dict[str, bool],
+    ) -> None:
         self.value = value
 
         super().__init__(columns=columns, **kwargs)

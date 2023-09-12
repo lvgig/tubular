@@ -63,7 +63,7 @@ class DateDiffLeapYearTransformer(BaseTransformer):
         new_column_name: str,
         drop_cols: bool,
         missing_replacement: int | float | str | None = None,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         if not isinstance(column_lower, str):
             msg = f"{self.classname()}: column_lower should be a str"
@@ -289,7 +289,7 @@ class ToDatetimeTransformer(BaseTransformer):
         column: str,
         new_column_name: str,
         to_datetime_kwargs: dict | None = None,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         if type(column) is not str:
             msg = f"{self.classname()}: column should be a single str giving the column to transform to datetime"
@@ -399,7 +399,7 @@ class SeriesDtMethodTransformer(BaseTransformer):
         pd_method_name: str,
         column: str,
         pd_method_kwargs: dict | None = None,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         if type(column) is not str:
             msg = f"{self.classname()}: column should be a str but got {type(column)}"
@@ -555,7 +555,7 @@ class BetweenDatesTransformer(BaseTransformer):
         new_column_name: str,
         lower_inclusive: bool = True,
         upper_inclusive: bool = True,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         if type(column_lower) is not str:
             msg = f"{self.classname()}: column_lower should be str"
@@ -720,7 +720,7 @@ class DatetimeInfoExtractor(BaseTransformer):
             str,
         ]
         | None = None,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         if include is None:
             include = ["timeofday", "timeofmonth", "timeofyear", "dayofweek"]

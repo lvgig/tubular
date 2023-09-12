@@ -64,7 +64,7 @@ class LogTransformer(BaseTransformer):
         add_1: bool = False,
         drop: bool = True,
         suffix: str = "log",
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
@@ -171,7 +171,7 @@ class CutTransformer(BaseTransformer):
         column: str,
         new_column_name: str,
         cut_kwargs: dict | None = None,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         if type(column) is not str:
             msg = f"{self.classname()}: column arg (name of column) should be a single str giving the column to discretise"
@@ -275,7 +275,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         columns: list[str],
         new_column_name: str,
         pd_method_kwargs: dict | None = None,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         """Performs input checks not done in either DataFrameMethodTransformer.__init__ or BaseTransformer.__init__."""
         if pd_method_kwargs is None:
@@ -361,7 +361,7 @@ class ScalingTransformer(BaseTransformer):
         columns: str | list[str] | None,
         scaler_type: str,
         scaler_kwargs: dict | None = None,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         if scaler_kwargs is None:
             scaler_kwargs = {}
@@ -514,7 +514,7 @@ class InteractionTransformer(BaseTransformer):
         columns: str | list[str] | None,
         min_degree: int = 2,
         max_degree: int = 2,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
@@ -688,7 +688,7 @@ class PCATransformer(BaseTransformer):
         svd_solver: str = "auto",
         random_state: int | np.random.RandomState = None,
         pca_column_prefix: str = "pca_",
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 

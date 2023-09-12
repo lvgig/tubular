@@ -66,7 +66,7 @@ class CappingTransformer(BaseTransformer):
         capping_values: dict[str, list[int | float | None]] | None = None,
         quantiles: dict[str, list[int | float]] | None = None,
         weights_column: str | None = None,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         if capping_values is None and quantiles is None:
             msg = f"{self.classname()}: both capping_values and quantiles are None, either supply capping values in the capping_values argument or supply quantiles that can be learnt in the fit method"
@@ -459,7 +459,7 @@ class OutOfRangeNullTransformer(CappingTransformer):
         capping_values: dict[str, list[int | float | None]] | None = None,
         quantiles: dict[str, list[int | float | None]] | None = None,
         weights_column: str | None = None,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(
             capping_values=capping_values,

@@ -1,6 +1,11 @@
-import pandas as pd
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from tubular.base import BaseTransformer
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 
 class EqualityChecker(BaseTransformer):
@@ -27,7 +32,7 @@ class EqualityChecker(BaseTransformer):
         columns: list,
         new_col_name: str,
         drop_original: bool = False,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 

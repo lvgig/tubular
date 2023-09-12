@@ -57,7 +57,7 @@ class SeriesStrMethodTransformer(BaseTransformer):
         pd_method_name: str,
         columns: str,
         pd_method_kwargs: dict | None = None,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         if type(columns) is list and len(columns) > 1:
             msg = f"{self.classname()}: columns arg should contain only 1 column name but got {len(columns)}"
