@@ -57,13 +57,21 @@ class TestInit:
         ):
             GroupRareLevelsTransformer(weight=2)
 
-    def test_record_rare_levels_not_str_error(self):
+    def test_record_rare_levels_not_bool_error(self):
         """Test that an exception is raised if record_rare_levels is not a bool."""
         with pytest.raises(
             ValueError,
             match="GroupRareLevelsTransformer: record_rare_levels must be a bool",
         ):
             GroupRareLevelsTransformer(record_rare_levels=2)
+
+    def test_encode_unseen_levels_not_bool_error(self):
+        """Test that an exception is raised if encode_unseen_levels is not a bool."""
+        with pytest.raises(
+            ValueError,
+            match="GroupRareLevelsTransformer: encode_unseen_levels must be a bool",
+        ):
+            GroupRareLevelsTransformer(encode_unseen_levels=2)
 
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that the values passed in init are saved in an attribute of the same name."""
@@ -72,6 +80,7 @@ class TestInit:
             weight="aaa",
             rare_level_name="bbb",
             record_rare_levels=False,
+            encode_unseen_levels=True,
         )
 
         ta.classes.test_object_attributes(
@@ -81,6 +90,7 @@ class TestInit:
                 "weight": "aaa",
                 "rare_level_name": "bbb",
                 "record_rare_levels": False,
+                "encode_unseen_levels": True,
             },
             msg="Attributes for GroupRareLevelsTransformer set in init",
         )
@@ -206,6 +216,23 @@ class TestFit:
             x = GroupRareLevelsTransformer(columns=["c"])
 
             x.fit(df)
+
+    def test_training_data_levels_stored(self):
+        """Test that the levels present in the training data are stored if encode_unseen_levels is false"""
+        df = d.create_df_8()
+
+        expected_training_data_levels = {
+            "b": set(["w", "z", "y", "x"]),
+            "c": set(["a", "c", "b"]),
+        }
+
+        x = GroupRareLevelsTransformer(columns=["b", "c"], encode_unseen_levels=False)
+        x.fit(df)
+        ta.equality.assert_equal_dispatch(
+            expected=expected_training_data_levels,
+            actual=x.training_data_levels,
+            msg="Training data values not correctly stored when encode_unseen_levels is false",
+        )
 
 
 class TestTransform:
@@ -405,3 +432,25 @@ class TestTransform:
         assert (
             pd.Series(label).dtype == df_2[col].dtypes
         ), "column type should be the same as label type"
+
+    def test_expected_output_unseen_levels_not_encoded(self):
+        """Test that unseen levels are not encoded when encode_unseen_levels is false"""
+
+        df = d.create_df_8()
+
+        expected = ["w", "w", "rare", "rare", "unseen_level"]
+
+        x = GroupRareLevelsTransformer(
+            columns=["b", "c"], cut_off_percent=0.3, encode_unseen_levels=False
+        )
+        x.fit(df)
+
+        df["b"] = ["w", "w", "z", "y", "unseen_level"]
+
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=expected,
+            actual=list(df_transformed["b"]),
+            msg="Unseen levels are not left unchanged when encode_unseen_levels is set to false",
+        )
