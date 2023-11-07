@@ -227,6 +227,9 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         Care should be taken if working with nominal variables with many levels as this could potentially
         result in many being stored in this attribute.
 
+    encode_unseen_levels : bool, default = True
+        If True, unseen levels in new data will be passed to rare, if set to false they will be left unchanged.
+
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
 
@@ -257,6 +260,13 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         Name of weights columns to use if cut_off_percent should be in terms of sum of weight
         not number of rows.
 
+    encode_unseen_levels : bool
+        If True, unseen levels in new data will be passed to rare, if set to false they will be left unchanged.
+
+    training_data_levels : dict[set]
+        Dictionary containing the set of values present in the training data for each column in self.columns. It
+        will only exist in if encode_unseen_levels is set to False.
+
     """
 
     def __init__(
@@ -266,6 +276,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         weight=None,
         rare_level_name="rare",
         record_rare_levels=True,
+        encode_unseen_levels : bool = True,
         **kwargs,
     ):
         super().__init__(columns=columns, **kwargs)
@@ -293,6 +304,12 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
             raise ValueError(msg)
 
         self.record_rare_levels = record_rare_levels
+
+        if not isinstance(encode_unseen_levels, bool):
+            msg = f"{self.classname()}: encode_unseen_levels must be a bool"
+            raise ValueError(msg)
+
+        self.encode_unseen_levels = encode_unseen_levels
 
     def fit(self, X, y=None):
         """Records non-rare levels for categorical variables.
@@ -383,6 +400,11 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                         key=str,
                     )
 
+        if not self.encode_unseen_levels:
+            self.training_data_levels = {}
+            for c in self.columns:
+                self.training_data_levels[c] = set(X[c])
+
         return self
 
     def transform(self, X):
@@ -402,6 +424,12 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         X = BaseNominalTransformer.transform(self, X)
 
         self.check_is_fitted(["mapping_"])
+
+        if not self.encode_unseen_levels:
+            for c in self.columns:
+                unseen_vals = set(X[c]) - set(self.training_data_levels[c])
+                for unseen_val in unseen_vals:
+                    self.mapping_[c].append(unseen_val)
 
         for c in self.columns:
             # for categorical dtypes have to set new category for the impute values first
