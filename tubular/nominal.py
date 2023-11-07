@@ -276,7 +276,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         weight=None,
         rare_level_name="rare",
         record_rare_levels=True,
-        encode_unseen_levels : bool = True,
+        encode_unseen_levels: bool = True,
         **kwargs,
     ):
         super().__init__(columns=columns, **kwargs)
