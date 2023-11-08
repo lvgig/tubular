@@ -222,8 +222,8 @@ class TestFit:
         df = d.create_df_8()
 
         expected_training_data_levels = {
-            "b": set(["w", "z", "y", "x"]),
-            "c": set(["a", "c", "b"]),
+            "b": set("w", "z", "y", "x"),
+            "c": set("a", "c", "b"),
         }
 
         x = GroupRareLevelsTransformer(columns=["b", "c"], encode_unseen_levels=False)
@@ -441,7 +441,9 @@ class TestTransform:
         expected = ["w", "w", "rare", "rare", "unseen_level"]
 
         x = GroupRareLevelsTransformer(
-            columns=["b", "c"], cut_off_percent=0.3, encode_unseen_levels=False
+            columns=["b", "c"],
+            cut_off_percent=0.3,
+            encode_unseen_levels=False,
         )
         x.fit(df)
 
