@@ -222,8 +222,8 @@ class TestFit:
         df = d.create_df_8()
 
         expected_training_data_levels = {
-            "b": set("w", "z", "y", "x"),
-            "c": set("a", "c", "b"),
+            "b": set(df["b"]),
+            "c": set(df["c"]),
         }
 
         x = GroupRareLevelsTransformer(columns=["b", "c"], encode_unseen_levels=False)
