@@ -1,6 +1,10 @@
 # tests to apply to all transformers
 import pytest
 import sklearn.base as b
+import pkgutil
+from pathlib import Path
+from importlib import import_module
+import inspect
 
 import tubular.base as base
 import tubular.capping as capping
@@ -12,6 +16,34 @@ import tubular.misc as misc
 import tubular.nominal as nominal
 import tubular.numeric as numeric
 import tubular.strings as strings
+
+
+root = str(Path(__file__).parent.parent)
+
+print(root)
+
+all_classes = []
+modules_to_ignore = [
+    "tests",
+    "conftest",
+    "setup",
+]
+
+for importer, modname, ispkg in pkgutil.walk_packages(
+    path = [root], #prefix = "tubular.tubular."
+    ):
+    mod_parts = modname.split(".")
+    if any(part in modules_to_ignore for part in mod_parts) or "_" in modname:
+        continue
+    module = import_module(modname)
+    classes = inspect.getmembers(module, inspect.isclass)
+    classes = [
+        (name, transformer) for name, transformer in classes if issubclass(transformer, base.BaseTransformer)
+    ] 
+
+    all_classes.extend(classes)
+
+all_classes = set(all_classes)
 
 
 class TestInit:
@@ -120,7 +152,7 @@ class TestInit:
         """Test that transformer can be used in sklearn.base.clone function."""
         b.clone(transformer)
 
-    @pytest.mark.parametrize("transformer", ListOfTransformers())
-    def test_unexpected_kwarg(self, transformer):
-        """Test that transformer can be used in sklearn.base.clone function."""
-        b.clone(transformer)
+    # @pytest.mark.parametrize("transformer", ListOfTransformers())
+    # def test_unexpected_kwarg(self, transformer):
+    #     """Test that transformer can be used in sklearn.base.clone function."""
+    #     b.clone(transformer)
