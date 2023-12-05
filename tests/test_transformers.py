@@ -509,7 +509,7 @@ class TestTransform:
             reason = """"
                        DateDiffLeapYearTransformer raises incorrect type error on datetime.datetime objects.
                        
-                       The check on upper column values checks the type of the row (pd.Series) rather than row.dtype
+                       The check on upper column values yields pandas._libs.tslibs.timestamps.Timestamp dtype, rather than datetime.
                        """
                        )
     @pytest.mark.parametrize("transformer_name, transformer", get_all_classes())
