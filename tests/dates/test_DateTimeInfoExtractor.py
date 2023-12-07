@@ -351,9 +351,9 @@ class TestTransform:
             [
                 ["numeric_col"],
                 ["string_col"],
-                ["bool_col",],
+                ["bool_col"],
                 ["empty_col"],
-            ]
+            ],
     )
     def test_input_data_check_column_errors(self, columns):
         """ Check that errors are raised on a variety of different non datatypes"""
@@ -364,7 +364,7 @@ class TestTransform:
         msg = f"{x.classname()}: {columns[0]} should be datetime64 or date type but got {df[columns[0]].dtype}"
 
         with pytest.raises(TypeError, match=msg):
-            x.transform(df) 
+            x.transform(df)
 
     def test_cast_to_date_warning(self):
         "Test that transform raises a warning if column is date but not datetime"
@@ -376,11 +376,11 @@ class TestTransform:
         msg = (
                     f"""
                     {x.classname()}: temporarily cast {column} from datetime64 to date before transforming in order to apply the datetime method.
-                    
+
                     This will artificially increase the precision of each data point in the column. Original column not changed.
                     """
         )
-            
+
         with pytest.warns(UserWarning, match = msg):
             x.transform(d.create_date_diff_different_dtypes())
 

@@ -3,7 +3,6 @@
 import datetime
 import warnings
 from typing import List, Union
-import warnings
 
 import numpy as np
 import pandas as pd
@@ -14,16 +13,16 @@ from tubular.base import BaseTransformer
 class BaseDateTransformer(BaseTransformer):
 
     #need to check that letting through dates doesn't break each transformer
-    #fine 
+    #fine
     def check_columns_are_date_or_datetime(self, X):
 
         for col in self.columns:
             if (not pd.api.types.is_datetime64_any_dtype(X[col]) and
-                pd.api.types.infer_dtype(X[col]) != 'date' 
+                pd.api.types.infer_dtype(X[col]) != "date"
             ):
                 msg = f"{self.classname()}: {col} should be datetime64 or date type but got {X[col].dtype}"
                 raise TypeError(msg)
-    
+
 
     def cast_columns_to_datetime(self, X):
         """
@@ -42,28 +41,30 @@ class BaseDateTransformer(BaseTransformer):
                 warnings.warn(
                     f"""
                     {self.classname()}: temporarily cast {column} from datetime64 to date before transforming in order to apply the datetime method.
-                    
+
                     This will artificially increase the precision of each data point in the column. Original column not changed.
-                    """
+                    """,
+                    stacklevel=2,
                     )
 
         return temp
 
     def match_column_dtypes(self, X):
         """
-        Check the dtype of the two columns to be compared by the transformer. If one is datetime.date and one is 
+        Check the dtype of the two columns to be compared by the transformer. If one is datetime.date and one is
         datetime.datetime, the datetime.datetime column will be cast to datetime.date.
 
         The casting is done this way to avoid artificially creating precision we don't have by going from a date to a datetime object
         """
         if len(self.columns) != 2:
-            raise ValueError(f"{self.classname}: match_column_dtypes() called expecting 2 columns but got {len(self.columns)}")
-        
+            msg = f"{self.classname}: match_column_dtypes() called expecting 2 columns but got {len(self.columns)}"
+            raise ValueError(msg)
+
         self.check_columns_are_date_or_datetime(X)
 
 
         column_one_name, column_two_name = self.columns
-        
+
         column_one_datetime64 = pd.api.types.is_datetime64_any_dtype(X[column_one_name])
         column_two_datetime64 = pd.api.types.is_datetime64_any_dtype(X[column_two_name])
 
@@ -75,10 +76,11 @@ class BaseDateTransformer(BaseTransformer):
 
             warnings.warn(
                 f"""
-                {self.classname()}: temporarily cast {column_two_name} from datetime64 to date before transforming in order to match {column_one_name}. 
-                
+                {self.classname()}: temporarily cast {column_two_name} from datetime64 to date before transforming in order to match {column_one_name}.
+
                 Some precision may be lost from {column_two_name}. Original column not changed.
-                """
+                """,
+                stacklevel=2,
                 )
 
         elif column_one_datetime64 and not column_two_datetime64:
@@ -87,13 +89,14 @@ class BaseDateTransformer(BaseTransformer):
 
             warnings.warn(
                 f"""
-                {self.classname()}: temporarily cast {column_one_name} from datetime64 to date before transforming in order to match {column_two_name}. 
-                
+                {self.classname()}: temporarily cast {column_one_name} from datetime64 to date before transforming in order to match {column_two_name}.
+
                 Some precision may be lost from {column_one_name}. Original column not changed.
-                """
+                """,
+                stacklevel=2,
                 )
 
-        return temp          
+        return temp
 
 
 class DateDiffLeapYearTransformer(BaseDateTransformer):

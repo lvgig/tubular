@@ -623,37 +623,6 @@ def create_is_between_dates_df_2():
         },
     )
 
-def create_is_between_dates_df_2():
-    """Create df to use in IsBetweenDates tests. Contains 3 columns of 5 datatime values, covers edge cases."""
-    return pd.DataFrame(
-        {
-            "a": [
-                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
-                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
-                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
-                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
-                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
-                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
-            ],
-            "b": [
-                datetime.datetime(1990, 1, 20, tzinfo=datetime.timezone.utc),
-                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
-                datetime.datetime(1990, 2, 2, tzinfo=datetime.timezone.utc),
-                datetime.datetime(1990, 2, 6, tzinfo=datetime.timezone.utc),
-                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
-                datetime.datetime(1990, 3, 2, tzinfo=datetime.timezone.utc),
-            ],
-            "c": [
-                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
-                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
-                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
-                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
-                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
-                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
-            ],
-        },
-    )
-
 def create_is_between_dates_df_3():
     """Create df to use in IsBetweenDates tests. Contains 3 columns of 5 datatime values, covers edge cases, has mixed date data types."""
     return pd.DataFrame(
@@ -724,18 +693,18 @@ def create_date_diff_different_dtypes():
         return pd.DataFrame(
             {
                 "date_col_1": [
-                    datetime.date(1993, 9, 27),  
-                    datetime.date(2000, 3, 19),  
-                    datetime.date(2018, 11, 10),  
-                    datetime.date(2018, 10, 10),  
-                    datetime.date(2018, 10, 10), 
-                    datetime.date(2018, 10, 10),  
-                    datetime.date(2018, 12, 10),  
+                    datetime.date(1993, 9, 27),
+                    datetime.date(2000, 3, 19),
+                    datetime.date(2018, 11, 10),
+                    datetime.date(2018, 10, 10),
+                    datetime.date(2018, 10, 10),
+                    datetime.date(2018, 10, 10),
+                    datetime.date(2018, 12, 10),
                     datetime.date(
                         1985,
                         7,
                         23,
-                    ),  
+                    ),
                 ],
                 "date_col_2": [
                     datetime.date(2020, 5, 1),
@@ -748,18 +717,18 @@ def create_date_diff_different_dtypes():
                     datetime.date(2015, 7, 23),
                 ],
                 "datetime_col_1": [
-                    datetime.datetime(1993, 9, 27),  
-                    datetime.datetime(2000, 3, 19),  
-                    datetime.datetime(2018, 11, 10),  
-                    datetime.datetime(2018, 10, 10),  
-                    datetime.datetime(2018, 10, 10), 
-                    datetime.datetime(2018, 10, 10),  
-                    datetime.datetime(2018, 12, 10),  
+                    datetime.datetime(1993, 9, 27),
+                    datetime.datetime(2000, 3, 19),
+                    datetime.datetime(2018, 11, 10),
+                    datetime.datetime(2018, 10, 10),
+                    datetime.datetime(2018, 10, 10),
+                    datetime.datetime(2018, 10, 10),
+                    datetime.datetime(2018, 12, 10),
                     datetime.datetime(
                         1985,
                         7,
                         23,
-                    ),  
+                    ),
                 ],
                 "datetime_col_2": [
                     datetime.datetime(2020, 5, 1),
@@ -780,17 +749,17 @@ def create_date_diff_different_dtypes_and_nans():
             {
                 "date_col_1": [
                     np.nan,
-                    datetime.date(2000, 3, 19),  
-                    datetime.date(2018, 11, 10),  
-                    datetime.date(2018, 10, 10),  
-                    datetime.date(2018, 10, 10), 
-                    datetime.date(2018, 10, 10),  
-                    datetime.date(2018, 12, 10),  
+                    datetime.date(2000, 3, 19),
+                    datetime.date(2018, 11, 10),
+                    datetime.date(2018, 10, 10),
+                    datetime.date(2018, 10, 10),
+                    datetime.date(2018, 10, 10),
+                    datetime.date(2018, 12, 10),
                     datetime.date(
                         1985,
                         7,
                         23,
-                    ),  
+                    ),
                 ],
                 "date_col_2": [
                     datetime.date(2020, 5, 1),
@@ -803,18 +772,18 @@ def create_date_diff_different_dtypes_and_nans():
                     datetime.date(2015, 7, 23),
                 ],
                 "datetime_col_1": [
-                    datetime.datetime(1993, 9, 27),  
-                    datetime.datetime(2000, 3, 19),  
-                    datetime.datetime(2018, 11, 10),  
-                    datetime.datetime(2018, 10, 10),  
-                    datetime.datetime(2018, 10, 10), 
-                    datetime.datetime(2018, 10, 10),  
-                    datetime.datetime(2018, 12, 10),  
+                    datetime.datetime(1993, 9, 27),
+                    datetime.datetime(2000, 3, 19),
+                    datetime.datetime(2018, 11, 10),
+                    datetime.datetime(2018, 10, 10),
+                    datetime.datetime(2018, 10, 10),
+                    datetime.datetime(2018, 10, 10),
+                    datetime.datetime(2018, 12, 10),
                     datetime.datetime(
                         1985,
                         7,
                         23,
-                    ),  
+                    ),
                 ],
                 "datetime_col_2": [
                     np.nan,
@@ -869,18 +838,18 @@ def create_date_diff_incorrect_dtypes():
         return pd.DataFrame(
             {
                 "date_col": [
-                    datetime.date(1993, 9, 27),  
-                    datetime.date(2000, 3, 19),  
-                    datetime.date(2018, 11, 10),  
-                    datetime.date(2018, 10, 10),  
-                    datetime.date(2018, 10, 10), 
-                    datetime.date(2018, 10, 10),  
-                    datetime.date(2018, 12, 10),  
+                    datetime.date(1993, 9, 27),
+                    datetime.date(2000, 3, 19),
+                    datetime.date(2018, 11, 10),
+                    datetime.date(2018, 10, 10),
+                    datetime.date(2018, 10, 10),
+                    datetime.date(2018, 10, 10),
+                    datetime.date(2018, 12, 10),
                     datetime.date(
                         1985,
                         7,
                         23,
-                    ),  
+                    ),
                 ],
                 "numeric_col": [
                     2,
@@ -1176,7 +1145,7 @@ def expected_date_diff_df_3():
                 -1064.9583333333333,
                 -1125.9583333333333,
                 10957.0,
-            ], 
-            'dates output' : [9713.0, 7220.0, 0.0, 31.0, -30.0, -1065.0, -1126.0, 10957.0]    
-        }
+            ],
+            "dates output" : [9713.0, 7220.0, 0.0, 31.0, -30.0, -1065.0, -1126.0, 10957.0],
+        },
     )

@@ -203,9 +203,9 @@ class TestTransform:
         msg = (
                     f"""
                     {x.classname()}: temporarily cast {column} from datetime64 to date before transforming in order to apply the datetime method.
-                    
+
                     This will artificially increase the precision of each data point in the column. Original column not changed.
-                    """      
+                    """
         )
 
         with pytest.warns(UserWarning, match=msg):

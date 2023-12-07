@@ -1,14 +1,11 @@
 import datetime
 
-import pandas as pd
 import pytest
 import test_aide as ta
 
 import tests.test_data as d
 import tubular
 from tubular.dates import BetweenDatesTransformer
-
-import itertools
 
 
 class TestInit:
@@ -227,7 +224,7 @@ class TestTransform:
                 (["date_col", "date_col", "bool_col"], 2),
                 (["date_col", "date_col", "empty_col"], 2),
 
-            ]
+            ],
     )
     def test_input_data_check_column_errors(self, columns, bad_col):
         """ Check that errors are raised on a variety of different non date datatypes"""
@@ -242,7 +239,7 @@ class TestTransform:
         msg = f"{x.classname()}: {columns[bad_col]} should be datetime64 or date type but got {df[columns[bad_col]].dtype}"
 
         with pytest.raises(TypeError, match=msg):
-            x.transform(df) 
+            x.transform(df)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -402,7 +399,7 @@ class TestTransform:
                 ["a_datetime", "b_date", "c_date"],
                 ["a_datetime", "b_date", "c_datetime"],
                 ["a_datetime", "b_datetime", "c_date"],
-            ]
+            ],
     )
     def test_output_different_date_dtypes(self, columns):
         """Test the output of transform is as expected if both limits are exclusive."""
