@@ -1164,7 +1164,7 @@ def create_date_diff_different_dtypes_2():
             },
         )
 
-def expected_date_diff_df_2():
+def expected_date_diff_df_3():
     return pd.DataFrame(
         {
             "datetime output": [

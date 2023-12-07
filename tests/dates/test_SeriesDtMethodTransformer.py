@@ -164,18 +164,18 @@ class TestTransform:
         df["b_new"] = df["b"].dt.to_period("M")
 
         return df
-    
+
     @pytest.mark.parametrize(
-            ("columns"),
-            [
-                ["numeric_col"],
-                ["string_col"],
-                ["bool_col",],
-                ["empty_col"],
-            ]
+        ("columns"),
+        [
+            ["numeric_col"],
+            ["string_col"],
+            ["bool_col"],
+            ["empty_col"],
+        ],
     )
     def test_input_data_check_column_errors(self, columns):
-        """ Check that errors are raised on a variety of different non datatypes"""
+        """Check that errors are raised on a variety of different non datatypes"""
         x = SeriesDtMethodTransformer(
             new_column_name="a2",
             pd_method_name="year",
@@ -198,7 +198,6 @@ class TestTransform:
             column="date_col_1",
         )
 
-
         column = "date_col_1"
 
         msg = (
@@ -206,11 +205,11 @@ class TestTransform:
                     {x.classname()}: temporarily cast {column} from datetime64 to date before transforming in order to apply the datetime method.
                     
                     This will artificially increase the precision of each data point in the column. Original column not changed.
-                    """
+                    """      
         )
-            
-        with pytest.warns(UserWarning, match = msg):
-            x.transform(d.create_date_diff_different_dtypes())
+
+        with pytest.warns(UserWarning, match=msg):
+            x.transform(d.create_date_diff_different_dtypes_2())
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
@@ -222,15 +221,16 @@ class TestTransform:
             column="a",
         )
 
-        expected_call_args = {0: {"args": (d.create_datediff_test_df(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (df.copy(),), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
             mocker,
             tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
+            return_value=df,
         ):
-            x.transform(df)
+            x.transform(df.copy())
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -326,7 +326,6 @@ class TestTransform:
             expected=expected,
             msg_tag="Unexpected values in SeriesDtMethodTransformer.transform with to_period on date data",
         )
-
 
     def test_attributes_unchanged_by_transform(self):
         """Test that attributes set in init are unchanged by the transform method."""

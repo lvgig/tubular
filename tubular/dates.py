@@ -19,7 +19,7 @@ class BaseDateTransformer(BaseTransformer):
 
         for col in self.columns:
             if (not pd.api.types.is_datetime64_any_dtype(X[col]) and
-                pd.api.types.infer_dtype(X[col]) != 'date'
+                pd.api.types.infer_dtype(X[col]) != 'date' 
             ):
                 msg = f"{self.classname()}: {col} should be datetime64 or date type but got {X[col].dtype}"
                 raise TypeError(msg)

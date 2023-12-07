@@ -862,20 +862,20 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-            ("columns, bad_col"),
-            [
-                (["date_col", "numeric_col"], 1),
-                (["date_col", "string_col"], 1),
-                (["date_col", "bool_col"], 1),
-                (["date_col", "empty_col"], 1),
-                (["numeric_col", "date_col"], 0),
-                (["string_col", "date_col"], 0),
-                (["bool_col", "date_col"], 0),
-                (["empty_col", "date_col"], 0),
-            ]
+        ("columns, bad_col"),
+        [
+            (["date_col", "numeric_col"], 1),
+            (["date_col", "string_col"], 1),
+            (["date_col", "bool_col"], 1),
+            (["date_col", "empty_col"], 1),
+            (["numeric_col", "date_col"], 0),
+            (["string_col", "date_col"], 0),
+            (["bool_col", "date_col"], 0),
+            (["empty_col", "date_col"], 0),
+        ],
     )
     def test_input_data_check_column_errors(self, columns, bad_col):
-        """ Check that errors are raised on a variety of different non date datatypes"""
+        """Check that errors are raised on a variety of different non date datatypes"""
         x = DateDifferenceTransformer(
             column_lower=columns[0],
             column_upper=columns[1],
@@ -886,7 +886,7 @@ class TestTransform:
         msg = f"{x.classname()}: {columns[bad_col]} should be datetime64 or date type but got {df[columns[bad_col]].dtype}"
 
         with pytest.raises(TypeError, match=msg):
-            x.transform(df) 
+            x.transform(df)
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
@@ -912,14 +912,13 @@ class TestTransform:
         ):
             x.transform(df)
 
-
     @pytest.mark.parametrize(
-            ("columns, datetime_col, date_col"),
-            [
-                (["date_col_1", "datetime_col_2"], 1, 0),
-                (["datetime_col_1", "date_col_2"], 0, 1),
-            ]
-    )  
+        ("columns, datetime_col, date_col"),
+        [
+            (["date_col_1", "datetime_col_2"], 1, 0),
+            (["datetime_col_1", "date_col_2"], 0, 1),
+        ],
+    )
     def test_cast_to_date_warning(self, columns, datetime_col, date_col):
         "Test that transform raises a warning if one column is a date and one is datetime"
 
@@ -929,15 +928,17 @@ class TestTransform:
             new_column_name="c",
         )
 
-        msg =  f"""
+        msg = (
+                f"""
                 {x.classname()}: temporarily cast {columns[datetime_col]} from datetime64 to date before transforming in order to match {columns[date_col]}. 
                 
                 Some precision may be lost from {columns[datetime_col]}. Original column not changed.
                 """
-            
-        with pytest.warns(UserWarning, match = msg):
-            x.transform(d.create_date_diff_different_dtypes())
+                )
+        
 
+        with pytest.warns(UserWarning, match=msg):
+            x.transform(d.create_date_diff_different_dtypes())
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -1086,13 +1087,13 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-            ("columns, output"),
-            [
-                (["date_col_1", "date_col_2"], 'dates output'),
-                (["date_col_1", "datetime_col_2"], 'dates output'),
-                (["datetime_col_1", "date_col_2"], 'dates output'),
-                (["datetime_col_1", "datetime_col_2"], "datetime output"),
-            ]
+        ("columns, output"),
+        [
+            (["date_col_1", "date_col_2"], "dates output"),
+            (["date_col_1", "datetime_col_2"], "dates output"),
+            (["datetime_col_1", "date_col_2"], "dates output"),
+            (["datetime_col_1", "datetime_col_2"], "datetime output"),
+        ],
     )
     def test_expcected_output_different_date_types(self, columns, output):
         "Test that transform works for different date datatype combinations"
@@ -1106,7 +1107,7 @@ class TestTransform:
             verbose=False,
         )
 
-        output_col = d.expected_date_diff_df_2()[output]
+        output_col = d.expected_date_diff_df_3()[output]
         df = d.create_date_diff_different_dtypes_2()
         expected = df.copy()
         expected["D"] = output_col
@@ -1115,6 +1116,6 @@ class TestTransform:
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
-            expected= expected,
+            expected=expected,
             msg_tag=f"Unexpected values in DateDifferenceTransformer.transform between {columns[0]} and {columns[1]}",
         )
