@@ -164,6 +164,53 @@ class TestTransform:
         df["b_new"] = df["b"].dt.to_period("M")
 
         return df
+    
+    @pytest.mark.parametrize(
+            ("columns"),
+            [
+                ["numeric_col"],
+                ["string_col"],
+                ["bool_col",],
+                ["empty_col"],
+            ]
+    )
+    def test_input_data_check_column_errors(self, columns):
+        """ Check that errors are raised on a variety of different non datatypes"""
+        x = SeriesDtMethodTransformer(
+            new_column_name="a2",
+            pd_method_name="year",
+            column=columns[0],
+        )
+
+        df = d.create_date_diff_incorrect_dtypes()
+
+        msg = f"{x.classname()}: {columns[0]} should be datetime64 or date type but got {df[columns[0]].dtype}"
+
+        with pytest.raises(TypeError, match=msg):
+            x.transform(df)
+
+    def test_cast_to_date_warning(self):
+        "Test that transform raises a warning if column is date but not datetime"
+
+        x = SeriesDtMethodTransformer(
+            new_column_name="a2",
+            pd_method_name="year",
+            column="date_col_1",
+        )
+
+
+        column = "date_col_1"
+
+        msg = (
+                    f"""
+                    {x.classname()}: temporarily cast {column} from datetime64 to date before transforming in order to apply the datetime method.
+                    
+                    This will artificially increase the precision of each data point in the column. Original column not changed.
+                    """
+        )
+            
+        with pytest.warns(UserWarning, match = msg):
+            x.transform(d.create_date_diff_different_dtypes())
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
@@ -256,6 +303,30 @@ class TestTransform:
             expected=expected,
             msg_tag="Unexpected values in SeriesDtMethodTransformer.transform with to_period",
         )
+
+    def test_expected_output_date_date(self):
+        "Test that date columns are being correctly cast to date for transform"
+
+        df = d.create_date_diff_different_dtypes()
+
+        x = SeriesDtMethodTransformer(
+            new_column_name="new",
+            pd_method_name="to_period",
+            column="date_col_1",
+            pd_method_kwargs={"freq": "M"},
+        )
+
+        expected = df.copy()
+        expected["new"] = expected["datetime_col_1"].dt.to_period(freq="M")
+
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_frame_equal_msg(
+            actual=df_transformed,
+            expected=expected,
+            msg_tag="Unexpected values in SeriesDtMethodTransformer.transform with to_period on date data",
+        )
+
 
     def test_attributes_unchanged_by_transform(self):
         """Test that attributes set in init are unchanged by the transform method."""

@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import test_aide as ta
+import warnings
 
 import tests.test_data as d
 import tubular
@@ -43,38 +44,6 @@ class TestCalculateAge:
         val = date_transformer.calculate_age(row=row)
 
         assert val == "missing_replacement"
-
-    def test_upper_column_type_error(self):
-        """Test that an exception is raised if uppder date value is not a datetime object."""
-        row = pd.Series({"a": datetime.date(2020, 5, 10), "b": "dummy_val"})
-        date_transformer = DateDiffLeapYearTransformer(
-            column_lower="a",
-            column_upper="b",
-            new_column_name="c",
-            drop_cols=True,
-        )
-
-        with pytest.raises(
-            TypeError,
-            match="DateDiffLeapYearTransformer: upper column values should be datetime.datetime or datetime.date objects",
-        ):
-            date_transformer.calculate_age(row=row)
-
-    def test_lower_column_type_error(self):
-        """Test that an exception is raised if lower date value is not a datetime object."""
-        row = pd.Series({"a": "dummy_val", "b": datetime.date(2020, 5, 10)})
-        date_transformer = DateDiffLeapYearTransformer(
-            column_lower="a",
-            column_upper="b",
-            new_column_name="c",
-            drop_cols=True,
-        )
-
-        with pytest.raises(
-            TypeError,
-            match="DateDiffLeapYearTransformer: lower column values should be datetime.datetime or datetime.date objects",
-        ):
-            date_transformer.calculate_age(row=row)
 
 
 class TestInit:
@@ -274,6 +243,34 @@ class TestTransform:
                 "c": [None],
             },
         )
+  
+    @pytest.mark.parametrize(
+            ("columns, bad_col"),
+            [
+                (["date_col", "numeric_col"], 1),
+                (["date_col", "string_col"], 1),
+                (["date_col", "bool_col"], 1),
+                (["date_col", "empty_col"], 1),
+                (["numeric_col", "date_col"], 0),
+                (["string_col", "date_col"], 0),
+                (["bool_col", "date_col"], 0),
+                (["empty_col", "date_col"], 0),
+            ]
+    )
+    def test_input_data_check_column_errors(self, columns, bad_col):
+        """ Check that errors are raised on a variety of different non datatypes"""
+        x = DateDiffLeapYearTransformer(
+            column_lower=columns[0],
+            column_upper=columns[1],
+            new_column_name="c",
+            drop_cols=True,
+        )
+        df = d.create_date_diff_incorrect_dtypes()
+
+        msg = f"{x.classname()}: {columns[bad_col]} should be datetime64 or date type but got {df[columns[bad_col]].dtype}"
+
+        with pytest.raises(TypeError, match=msg):
+            x.transform(df) 
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
@@ -348,25 +345,59 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        ("df", "expected"),
-        ta.pandas.adjusted_dataframe_params(
-            d.create_date_test_nulls_df(),
-            expected_df_3(),
-        ),
+            ("columns"),
+            [
+                ["date_col_1", "date_col_2"],
+                ["date_col_1", "datetime_col_2"],
+                ["datetime_col_1", "date_col_2"],
+                ["datetime_col_1", "datetime_col_2"],
+            ]
     )
-    def test_expected_output_nulls(self, df, expected):
-        """Test that the output is expected from transform, when columns are nulls."""
+    def test_expcected_output_different_date_types(self, columns):
+        "Test that transform works for different date datatype combinations"
+
         x = DateDiffLeapYearTransformer(
-            column_lower="a",
-            column_upper="b",
+            column_lower=columns[0],
+            column_upper=columns[1],
             new_column_name="c",
-            drop_cols=False,
+            drop_cols=True,
         )
 
-        df_transformed = x.transform(df)
+        expected = d.expected_date_diff_df_1()
+        df = d.create_date_diff_different_dtypes()
+
+        df_transformed = x.transform(df[columns])
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
-            expected=expected,
-            msg_tag="Unexpected values in DateDiffLeapYearTransformer.transform (nulls)",
+            expected= expected,
+            msg_tag=f"Unexpected values in DateDiffLeapYearTransformer.transform between {columns[0]} and {columns[1]}",
         )
+
+    @pytest.mark.parametrize(
+            ("columns"),
+            [
+                ["date_col_1", "date_col_2"],
+                ["date_col_1", "datetime_col_2"],
+            ]
+    )
+    def test_expected_output_nans_in_data(self, columns):
+        "Test that transform works for different date datatype combinations with nans in data"
+        x = DateDiffLeapYearTransformer(
+            column_lower=columns[0],
+            column_upper=columns[1],
+            new_column_name="c",
+            drop_cols=True,
+        )
+
+        expected = d.expected_date_diff_df_2()
+        df = d.create_date_diff_different_dtypes_and_nans()
+
+        df_transformed = x.transform(df[columns])
+
+        ta.equality.assert_frame_equal_msg(
+            actual=df_transformed,
+            expected= expected,
+            msg_tag=f"Unexpected values in DateDiffLeapYearTransformer.transform between {columns[0]} and {columns[1]}",
+        )
+
