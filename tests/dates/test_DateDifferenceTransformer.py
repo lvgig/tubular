@@ -928,14 +928,11 @@ class TestTransform:
             new_column_name="c",
         )
 
-        msg = (
-                f"""
+        msg = f"""
                 {x.classname()}: temporarily cast {columns[datetime_col]} from datetime64 to date before transforming in order to match {columns[date_col]}.
 
                 Some precision may be lost from {columns[datetime_col]}. Original column not changed.
                 """
-                )
-
 
         with pytest.warns(UserWarning, match=msg):
             x.transform(d.create_date_diff_different_dtypes())

@@ -71,7 +71,6 @@ class BaseDateTransformer(BaseTransformer):
         temp = X.copy()
 
         if not column_one_datetime64 and column_two_datetime64:
-
             temp[column_two_name] = X[column_two_name].apply(lambda x: x.date())
 
             warnings.warn(
@@ -84,7 +83,6 @@ class BaseDateTransformer(BaseTransformer):
             )
 
         elif column_one_datetime64 and not column_two_datetime64:
-
             temp[column_one_name] = X[column_one_name].apply(lambda x: x.date())
 
             warnings.warn(

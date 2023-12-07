@@ -209,25 +209,24 @@ class TestTransform:
             x.transform(df)
 
     @pytest.mark.parametrize(
-            ("columns, bad_col"),
-            [
-                (["date_col", "numeric_col", "date_col"], 1),
-                (["date_col", "string_col", "date_col"], 1),
-                (["date_col", "bool_col", "date_col"], 1),
-                (["date_col", "empty_col", "date_col"], 1),
-                (["numeric_col", "date_col", "date_col"], 0),
-                (["string_col", "date_col", "date_col"], 0),
-                (["bool_col", "date_col", "date_col"], 0),
-                (["empty_col", "date_col", "date_col"], 0),
-                (["date_col", "date_col", "numeric_col"], 2),
-                (["date_col", "date_col", "string_col"], 2),
-                (["date_col", "date_col", "bool_col"], 2),
-                (["date_col", "date_col", "empty_col"], 2),
-
-            ],
+        ("columns, bad_col"),
+        [
+            (["date_col", "numeric_col", "date_col"], 1),
+            (["date_col", "string_col", "date_col"], 1),
+            (["date_col", "bool_col", "date_col"], 1),
+            (["date_col", "empty_col", "date_col"], 1),
+            (["numeric_col", "date_col", "date_col"], 0),
+            (["string_col", "date_col", "date_col"], 0),
+            (["bool_col", "date_col", "date_col"], 0),
+            (["empty_col", "date_col", "date_col"], 0),
+            (["date_col", "date_col", "numeric_col"], 2),
+            (["date_col", "date_col", "string_col"], 2),
+            (["date_col", "date_col", "bool_col"], 2),
+            (["date_col", "date_col", "empty_col"], 2),
+        ],
     )
     def test_input_data_check_column_errors(self, columns, bad_col):
-        """ Check that errors are raised on a variety of different non date datatypes"""
+        """Check that errors are raised on a variety of different non date datatypes"""
         x = BetweenDatesTransformer(
             column_lower=columns[0],
             column_between=columns[1],
@@ -389,17 +388,16 @@ class TestTransform:
         with pytest.warns(Warning, match="not all c are greater than or equal to a"):
             x.transform(df)
 
-
     @pytest.mark.parametrize(
-            ("columns"),
-            [
-                ["a_date", "b_date", "c_date"],
-                ["a_date", "b_date", "c_datetime"],
-                ["a_date", "b_datetime", "c_datetime"],
-                ["a_datetime", "b_date", "c_date"],
-                ["a_datetime", "b_date", "c_datetime"],
-                ["a_datetime", "b_datetime", "c_date"],
-            ],
+        ("columns"),
+        [
+            ["a_date", "b_date", "c_date"],
+            ["a_date", "b_date", "c_datetime"],
+            ["a_date", "b_datetime", "c_datetime"],
+            ["a_datetime", "b_date", "c_date"],
+            ["a_datetime", "b_date", "c_datetime"],
+            ["a_datetime", "b_datetime", "c_date"],
+        ],
     )
     def test_output_different_date_dtypes(self, columns):
         """Test the output of transform is as expected if both limits are exclusive."""

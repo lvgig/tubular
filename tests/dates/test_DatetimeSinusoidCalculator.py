@@ -251,25 +251,23 @@ class TestDatetimeSinusoidCalculatorInit:
 
 
 class TestDatetimeSinusoidCalculatorTransform:
-
-
     @pytest.mark.parametrize(
-            ("columns"),
-            [
-                ["numeric_col"],
-                ["string_col"],
-                ["bool_col"],
-                ["empty_col"],
-            ],
+        ("columns"),
+        [
+            ["numeric_col"],
+            ["string_col"],
+            ["bool_col"],
+            ["empty_col"],
+        ],
     )
     def test_input_data_check_column_errors(self, columns):
-        """ Check that errors are raised on a variety of different non datatypes"""
+        """Check that errors are raised on a variety of different non datatypes"""
         x = DatetimeSinusoidCalculator(
             columns,
             "cos",
             "month",
             12,
-            )
+        )
 
         df = d.create_date_diff_incorrect_dtypes()
 
@@ -286,19 +284,17 @@ class TestDatetimeSinusoidCalculatorTransform:
             "cos",
             "month",
             12,
-            )
+        )
 
         column = "date_col_1"
 
-        msg = (
-                    f"""
+        msg = f"""
                     {x.classname()}: temporarily cast {column} from datetime64 to date before transforming in order to apply the datetime method.
 
                     This will artificially increase the precision of each data point in the column. Original column not changed.
                     """
-        )
 
-        with pytest.warns(UserWarning, match = msg):
+        with pytest.warns(UserWarning, match=msg):
             x.transform(d.create_date_diff_different_dtypes())
 
     def test_BaseTransformer_transform_called(self, example_transformer, mocker):
@@ -467,7 +463,6 @@ class TestDatetimeSinusoidCalculatorTransform:
             expected=expected,
             msg_tag="DatetimeSinusoidCalculator transformer does not produce the expected output",
         )
-
 
     def test_expected_output_dict_both(self):
         expected = d.create_datediff_test_df()
