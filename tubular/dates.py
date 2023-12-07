@@ -11,18 +11,19 @@ from tubular.base import BaseTransformer
 
 
 class BaseDateTransformer(BaseTransformer):
+    """
+    Transformer with date data checks needed by all transformers taking dates as input data.
+    """
 
-    #need to check that letting through dates doesn't break each transformer
-    #fine
     def check_columns_are_date_or_datetime(self, X):
-
+        "Raise a type error if a column to be operated on is not a datetime.datetime or datetime.date object"
         for col in self.columns:
-            if (not pd.api.types.is_datetime64_any_dtype(X[col]) and
-                pd.api.types.infer_dtype(X[col]) != "date"
+            if (
+                not pd.api.types.is_datetime64_any_dtype(X[col])
+                and pd.api.types.infer_dtype(X[col]) != "date"
             ):
                 msg = f"{self.classname()}: {col} should be datetime64 or date type but got {X[col].dtype}"
                 raise TypeError(msg)
-
 
     def cast_columns_to_datetime(self, X):
         """
@@ -45,7 +46,7 @@ class BaseDateTransformer(BaseTransformer):
                     This will artificially increase the precision of each data point in the column. Original column not changed.
                     """,
                     stacklevel=2,
-                    )
+                )
 
         return temp
 
@@ -61,7 +62,6 @@ class BaseDateTransformer(BaseTransformer):
             raise ValueError(msg)
 
         self.check_columns_are_date_or_datetime(X)
-
 
         column_one_name, column_two_name = self.columns
 
@@ -81,7 +81,7 @@ class BaseDateTransformer(BaseTransformer):
                 Some precision may be lost from {column_two_name}. Original column not changed.
                 """,
                 stacklevel=2,
-                )
+            )
 
         elif column_one_datetime64 and not column_two_datetime64:
 
@@ -94,7 +94,7 @@ class BaseDateTransformer(BaseTransformer):
                 Some precision may be lost from {column_one_name}. Original column not changed.
                 """,
                 stacklevel=2,
-                )
+            )
 
         return temp
 
