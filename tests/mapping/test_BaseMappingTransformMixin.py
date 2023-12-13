@@ -86,6 +86,7 @@ class TestTransform:
 
         # not totally sure where this kwarg is injected from but regex=False is the
         # desired default behaviour for Series.replace in this case so leaving for now.
+        # Likely to do with the way DataFrame.replace is implemented.
         assert call_kwargs == {"regex": False}
 
         # pd.Series.replace separates dict into to replace and value lists
