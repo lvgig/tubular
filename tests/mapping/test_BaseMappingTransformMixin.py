@@ -84,6 +84,8 @@ class TestTransform:
         call_pos_arg = call_args[0]
         call_kwargs = call_args[1]
 
+        # not totally sure where this kwarg is injected from but regex=False is the
+        # desired default behaviour for Series.replace in this case so leaving for now.
         assert call_kwargs == {"regex": False}
 
         # pd.Series.replace separates dict into to replace and value lists
