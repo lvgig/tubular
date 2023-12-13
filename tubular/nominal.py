@@ -497,8 +497,8 @@ class MeanResponseTransformer(BaseNominalTransformer):
         Only created in the mutli-level case. Generated from level, list of all the response levels to encode against.
 
     mappings : dict
-        Created in fit. Dict of key (column names) value (mapping of categorical levels to numeric,
-        mean response values) pairs.
+        Created in fit. A nested Dict of {column names : column specific mapping dictionary} pairs.  Column
+        specific mapping dictionaries contain {initial value : mapped value} pairs.
 
     mapped_columns : list
         Only created in the multi-level case. A list of the new columns produced by encoded the columns in self.columns
@@ -748,6 +748,7 @@ class MeanResponseTransformer(BaseNominalTransformer):
         return self
 
     def map_imputation_values(self, X):
+        """maps columns defined by self.columns in X according the the corresponding mapping dictionary contained in self.mappings"""
         for c in self.columns:
             X[c] = X[c].map(self.mappings[c])
 
