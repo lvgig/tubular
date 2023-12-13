@@ -748,7 +748,18 @@ class MeanResponseTransformer(BaseNominalTransformer):
         return self
 
     def map_imputation_values(self, X):
-        """maps columns defined by self.columns in X according the the corresponding mapping dictionary contained in self.mappings"""
+        """maps columns defined by self.columns in X according the the corresponding mapping dictionary contained in self.mappings
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data to with catgeorical variable columns to transform.
+
+        Returns
+        -------
+        X : pd.DataFrame
+            input dataframe with mappings applied
+        """
         for c in self.columns:
             X[c] = X[c].map(self.mappings[c])
 
