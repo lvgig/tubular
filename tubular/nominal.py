@@ -441,7 +441,7 @@ class MeanResponseTransformer(BaseNominalTransformer):
     to n * len(columns) new columns, of with names of the form {column}_{response_level}. The
     original columns will be removed from the dataframe. This functionality is controlled using
     the 'level' parameter. Note that the above only works for a n > 1 level categorical response.
-    Do not use 'level' parameter for a n > 1 level numerical response. In this case, use the standard
+    Do not use 'level' parameter for a n = 1 level numerical response. In this case, use the standard
     mean response transformer without the 'level' parameter.
 
     If a categorical variable contains null values these will not be transformed.
