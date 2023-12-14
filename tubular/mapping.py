@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from pandas.api.types import is_categorical_dtype
 
-from tubular.base import BaseTransformer, ReturnKeyDict
+from tubular.base import BaseTransformer
 
 
 class BaseMappingTransformer(BaseTransformer):
@@ -100,10 +100,7 @@ class BaseMappingTransformMixin(BaseTransformer):
 
         X = super().transform(X)
 
-        for c in self.columns:
-            X[c] = X[c].map(self.mappings[c])
-
-        return X
+        return X.replace(self.mappings)
 
 
 class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
@@ -111,12 +108,11 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
 
     Note, the MappingTransformer does not require 'self-mappings' to be defined i.e. if you want
     to map a value to itself, you can omit this value from the mappings rather than having to
-    map it to itself. This is because it uses the ReturnKeyDict  type to store the mappings
-    for each columns, this dict will return the key i.e. the original value in that row if it
-    is not available in the mapping dict.
+    map it to itself. This is because it uses the pandas replace method which only replaces values
+    which have a corresponding mapping.
 
     This transformer inherits from BaseMappingTransformMixin as well as the BaseMappingTransformer
-    in order to access the standard pd.Series.map transform function.
+    in order to access the pd.Series.replace transform function.
 
     Parameters
     ----------
@@ -139,10 +135,7 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
 
     def __init__(self, mappings, **kwargs):
         for k, v in mappings.items():
-            if isinstance(v, dict):
-                mappings[k] = ReturnKeyDict(v)
-
-            else:
+            if not isinstance(v, dict):
                 msg = f"{self.classname()}: each item in mappings should be a dict but got type {type(v)} for key {k}"
                 raise TypeError(msg)
 

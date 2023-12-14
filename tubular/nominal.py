@@ -429,7 +429,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         return X
 
 
-class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin):
+class MeanResponseTransformer(BaseNominalTransformer):
     """Transformer to apply mean response encoding. This converts categorical variables to
     numeric by mapping levels to the mean response for that level.
 
@@ -441,7 +441,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
     to n * len(columns) new columns, of with names of the form {column}_{response_level}. The
     original columns will be removed from the dataframe. This functionality is controlled using
     the 'level' parameter. Note that the above only works for a n > 1 level categorical response.
-    Do not use 'level' parameter for a n > 1 level numerical response. In this case, use the standard
+    Do not use 'level' parameter for a n = 1 level numerical response. In this case, use the standard
     mean response transformer without the 'level' parameter.
 
     If a categorical variable contains null values these will not be transformed.
@@ -497,8 +497,8 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         Only created in the mutli-level case. Generated from level, list of all the response levels to encode against.
 
     mappings : dict
-        Created in fit. Dict of key (column names) value (mapping of categorical levels to numeric,
-        mean response values) pairs.
+        Created in fit. A nested Dict of {column names : column specific mapping dictionary} pairs.  Column
+        specific mapping dictionaries contain {initial value : mapped value} pairs.
 
     mapped_columns : list
         Only created in the multi-level case. A list of the new columns produced by encoded the columns in self.columns
@@ -747,6 +747,24 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         return self
 
+    def map_imputation_values(self, X):
+        """maps columns defined by self.columns in X according the the corresponding mapping dictionary contained in self.mappings
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data to with catgeorical variable columns to transform.
+
+        Returns
+        -------
+        X : pd.DataFrame
+            input dataframe with mappings applied
+        """
+        for c in self.columns:
+            X[c] = X[c].map(self.mappings[c])
+
+        return X
+
     def transform(self, X):
         """Transform method to apply mean response encoding stored in the mappings attribute to
         each column in the columns attribute.
@@ -783,12 +801,14 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             for c in self.columns:
                 # finding rows with values not in the keys of mappings dictionary
                 unseen_indices[c] = X[~X[c].isin(self.mappings[c].keys())].index
-            X = BaseMappingTransformMixin.transform(self, X)
+            X = super().transform(X)
+            X = self.map_imputation_values(X)
             for c in self.columns:
                 X.loc[unseen_indices[c], c] = self.unseen_levels_encoding_dict[c]
         else:
             self.check_mappable_rows(X)
-            X = BaseMappingTransformMixin.transform(self, X)
+            X = super().transform(X)
+            X = self.map_imputation_values(X)
 
         if self.level:
             # Setting self.columns back so that the transformer object is unchanged after transform is called
