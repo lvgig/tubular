@@ -15,11 +15,25 @@ class BaseDateTransformer(BaseTransformer):
     Transformer with date data checks needed by all transformers taking dates as input data.
     """
 
+    def _generate_is_datetime64_dict(self, X):
+        """
+        Function to generate a dictionary attribute storing the result of pd.api.types.is_datetime64_any_dtype()
+        for each column in self.columns to avoid repeated calls to this function.
+        """
+
+        self._is_datetime64_dict = {}
+
+        for col in self.columns:
+            self._is_datetime64_dict[col] = pd.api.types.is_datetime64_any_dtype(X[col])
+
     def check_columns_are_date_or_datetime(self, X):
         "Raise a type error if a column to be operated on is not a datetime.datetime or datetime.date object"
+
+        self._generate_is_datetime64_dict(X)
+
         for col in self.columns:
             if (
-                not pd.api.types.is_datetime64_any_dtype(X[col])
+                not self._is_datetime64_dict[col]
                 and pd.api.types.infer_dtype(X[col]) != "date"
             ):
                 msg = f"{self.classname()}: {col} should be datetime64 or date type but got {X[col].dtype}"
@@ -36,7 +50,7 @@ class BaseDateTransformer(BaseTransformer):
         temp = X[self.columns].copy()
 
         for column in self.columns:
-            if not pd.api.types.is_datetime64_any_dtype(X[column]):
+            if not self._is_datetime64_dict[column]:
                 temp[column] = pd.to_datetime(X[column])
 
                 warnings.warn(
@@ -65,12 +79,12 @@ class BaseDateTransformer(BaseTransformer):
 
         column_one_name, column_two_name = self.columns
 
-        column_one_datetime64 = pd.api.types.is_datetime64_any_dtype(X[column_one_name])
-        column_two_datetime64 = pd.api.types.is_datetime64_any_dtype(X[column_two_name])
-
         temp = X[self.columns].copy()
 
-        if not column_one_datetime64 and column_two_datetime64:
+        if (
+            not self._is_datetime64_dict[column_one_name]
+            and self._is_datetime64_dict[column_two_name]
+        ):
             temp[column_two_name] = X[column_two_name].apply(lambda x: x.date())
 
             warnings.warn(
@@ -82,7 +96,10 @@ class BaseDateTransformer(BaseTransformer):
                 stacklevel=2,
             )
 
-        elif column_one_datetime64 and not column_two_datetime64:
+        elif (
+            self._is_datetime64_dict[column_one_name]
+            and not self._is_datetime64_dict[column_two_name]
+        ):
             temp[column_one_name] = X[column_one_name].apply(lambda x: x.date())
 
             warnings.warn(
