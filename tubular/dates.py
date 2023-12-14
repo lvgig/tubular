@@ -1,6 +1,7 @@
 """This module contains a transformer that applies capping to numeric columns."""
 
 import datetime
+import itertools
 import warnings
 from typing import List, Union
 
@@ -64,6 +65,35 @@ class BaseDateTransformer(BaseTransformer):
 
         return temp
 
+    def _cast_non_matching_columns(self, temp, column_A_name, column_B_name):
+        """
+        Helper function that asymetrically compares column A to column B and casts column B to match column A. This will need calling twice.
+
+        If any casting is done a user warning is raised.
+
+        Operation is:
+        - check column A is not datetime 64 (assumed that only other option is 'date' type based on prior checks)
+        - check column B is datetime 64
+        - if both of the above are true, cast column B to 'date'
+        """
+
+        if (
+            not self._is_datetime64_dict[column_A_name]
+            and self._is_datetime64_dict[column_B_name]
+        ):
+            temp[column_B_name] = temp[column_B_name].apply(lambda x: x.date())
+
+            warnings.warn(
+                f"""
+                {self.classname()}: temporarily cast {column_B_name} from datetime64 to date before transforming in order to match {column_A_name}.
+
+                Some precision may be lost from {column_B_name}. Original column not changed.
+                """,
+                stacklevel=2,
+            )
+
+        return temp
+
     def match_column_dtypes(self, X):
         """
         Check the dtype of the two columns to be compared by the transformer. If one is datetime.date and one is
@@ -77,38 +107,14 @@ class BaseDateTransformer(BaseTransformer):
 
         self.check_columns_are_date_or_datetime(X)
 
-        column_one_name, column_two_name = self.columns
-
         temp = X[self.columns].copy()
 
-        if (
-            not self._is_datetime64_dict[column_one_name]
-            and self._is_datetime64_dict[column_two_name]
-        ):
-            temp[column_two_name] = X[column_two_name].apply(lambda x: x.date())
+        for column_one_name, column_two_name in itertools.permutations(self.columns):
 
-            warnings.warn(
-                f"""
-                {self.classname()}: temporarily cast {column_two_name} from datetime64 to date before transforming in order to match {column_one_name}.
-
-                Some precision may be lost from {column_two_name}. Original column not changed.
-                """,
-                stacklevel=2,
-            )
-
-        elif (
-            self._is_datetime64_dict[column_one_name]
-            and not self._is_datetime64_dict[column_two_name]
-        ):
-            temp[column_one_name] = X[column_one_name].apply(lambda x: x.date())
-
-            warnings.warn(
-                f"""
-                {self.classname()}: temporarily cast {column_one_name} from datetime64 to date before transforming in order to match {column_two_name}.
-
-                Some precision may be lost from {column_one_name}. Original column not changed.
-                """,
-                stacklevel=2,
+            temp = self._cast_non_matching_columns(
+                temp,
+                column_one_name,
+                column_two_name,
             )
 
         return temp
