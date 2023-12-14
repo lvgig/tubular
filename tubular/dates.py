@@ -33,7 +33,7 @@ class BaseDateTransformer(BaseTransformer):
 
         self.check_columns_are_date_or_datetime(X)
 
-        temp = X.copy()
+        temp = X[self.columns].copy()
 
         for column in self.columns:
             if not pd.api.types.is_datetime64_any_dtype(X[column]):
@@ -68,7 +68,7 @@ class BaseDateTransformer(BaseTransformer):
         column_one_datetime64 = pd.api.types.is_datetime64_any_dtype(X[column_one_name])
         column_two_datetime64 = pd.api.types.is_datetime64_any_dtype(X[column_two_name])
 
-        temp = X.copy()
+        temp = X[self.columns].copy()
 
         if not column_one_datetime64 and column_two_datetime64:
             temp[column_two_name] = X[column_two_name].apply(lambda x: x.date())
