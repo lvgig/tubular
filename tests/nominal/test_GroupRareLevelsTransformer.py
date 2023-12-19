@@ -65,13 +65,13 @@ class TestInit:
         ):
             GroupRareLevelsTransformer(record_rare_levels=2)
 
-    def test_encode_unseen_levels_not_bool_error(self):
-        """Test that an exception is raised if encode_unseen_levels is not a bool."""
+    def test_unseen_levels_to_rare_not_bool_error(self):
+        """Test that an exception is raised if unseen_levels_to_rare is not a bool."""
         with pytest.raises(
             ValueError,
-            match="GroupRareLevelsTransformer: encode_unseen_levels must be a bool",
+            match="GroupRareLevelsTransformer: unseen_levels_to_rare must be a bool",
         ):
-            GroupRareLevelsTransformer(encode_unseen_levels=2)
+            GroupRareLevelsTransformer(unseen_levels_to_rare=2)
 
 
 class TestFit:
@@ -196,7 +196,7 @@ class TestFit:
             x.fit(df)
 
     def test_training_data_levels_stored(self):
-        """Test that the levels present in the training data are stored if encode_unseen_levels is false"""
+        """Test that the levels present in the training data are stored if unseen_levels_to_rare is false"""
         df = d.create_df_8()
 
         expected_training_data_levels = {
@@ -204,12 +204,12 @@ class TestFit:
             "c": set(df["c"]),
         }
 
-        x = GroupRareLevelsTransformer(columns=["b", "c"], encode_unseen_levels=False)
+        x = GroupRareLevelsTransformer(columns=["b", "c"], unseen_levels_to_rare=False)
         x.fit(df)
         ta.equality.assert_equal_dispatch(
             expected=expected_training_data_levels,
             actual=x.training_data_levels,
-            msg="Training data values not correctly stored when encode_unseen_levels is false",
+            msg="Training data values not correctly stored when unseen_levels_to_rare is false",
         )
 
 
@@ -412,7 +412,7 @@ class TestTransform:
         ), "column type should be the same as label type"
 
     def test_expected_output_unseen_levels_not_encoded(self):
-        """Test that unseen levels are not encoded when encode_unseen_levels is false"""
+        """Test that unseen levels are not encoded when unseen_levels_to_rare is false"""
 
         df = d.create_df_8()
 
@@ -421,7 +421,7 @@ class TestTransform:
         x = GroupRareLevelsTransformer(
             columns=["b", "c"],
             cut_off_percent=0.3,
-            encode_unseen_levels=False,
+            unseen_levels_to_rare=False,
         )
         x.fit(df)
 
@@ -432,5 +432,5 @@ class TestTransform:
         ta.equality.assert_equal_dispatch(
             expected=expected,
             actual=list(df_transformed["b"]),
-            msg="Unseen levels are not left unchanged when encode_unseen_levels is set to false",
+            msg="Unseen levels are not left unchanged when unseen_levels_to_rare is set to false",
         )
