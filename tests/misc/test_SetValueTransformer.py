@@ -9,23 +9,6 @@ from tubular.misc import SetValueTransformer
 class TestInit:
     """Tests for the SetValueTransformer.__init__ method."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=SetValueTransformer.__init__,
-            expected_arguments=["self", "columns", "value"],
-            expected_default_values=None,
-        )
-
-    def test_inheritance(self):
-        """Test SetValueTransformer inherits from BaseTransformer."""
-        x = SetValueTransformer(columns=["a"], value=1)
-
-        assert isinstance(
-            x,
-            tubular.base.BaseTransformer,
-        ), "SetValueTransformer is not instance of tubular.base.BaseTransformer"
-
     def test_super_init_call(self, mocker):
         """Test that BaseTransformer.init us called as expected."""
         expected_call_args = {
@@ -61,14 +44,6 @@ class TestTransform:
         df["b"] = "a"
 
         return df
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=SetValueTransformer.transform,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
-        )
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""

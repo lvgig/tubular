@@ -1,44 +1,15 @@
 import datetime
 
-import pandas as pd
 import pytest
 import test_aide as ta
 
 import tests.test_data as d
 import tubular
-from tubular.base import BaseTransformer
 from tubular.dates import BetweenDatesTransformer
 
 
 class TestInit:
     "tests for BetweenDatesTransformer.__init__."
-
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=BetweenDatesTransformer.__init__,
-            expected_arguments=[
-                "self",
-                "column_lower",
-                "column_between",
-                "column_upper",
-                "new_column_name",
-                "lower_inclusive",
-                "upper_inclusive",
-            ],
-            expected_default_values=(True, True),
-        )
-
-    def test_inheritance(self):
-        """Test that BetweenDatesTransformer inherits from BaseTransformer."""
-        x = BetweenDatesTransformer(
-            column_lower="a",
-            column_between="b",
-            column_upper="c",
-            new_column_name="d",
-        )
-
-        ta.classes.assert_inheritance(x, BaseTransformer)
 
     def test_super_init_called(self, mocker):
         """Test that super.__init__ called."""
@@ -144,21 +115,6 @@ class TestInit:
                 upper_inclusive=1,
             )
 
-    def test_class_methods(self):
-        """Test that BetweenDatesTransformer has transform method."""
-        x = BetweenDatesTransformer(
-            column_lower="a",
-            column_between="b",
-            column_upper="c",
-            new_column_name="d",
-        )
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform method not present",
-        )
-
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that attributes are set by init."""
         x = BetweenDatesTransformer(
@@ -228,14 +184,6 @@ class TestTransform:
 
         return df
 
-    def test_arguments(self):
-        """Test that fit has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=BetweenDatesTransformer.transform,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
-        )
-
     def test_super_transform_call(self, mocker):
         """Test that call the BaseTransformer.transform() is as expected."""
         df = d.create_is_between_dates_df_1()
@@ -260,27 +208,36 @@ class TestTransform:
         ):
             x.transform(df)
 
-    def test_cols_not_datetime(self):
-        """Test that an exception is raised if cols not datetime."""
-        df = pd.DataFrame(
-            {
-                "a": [2, 1],
-                "b": pd.date_range(start="1/3/2016", end="27/09/2017", periods=2),
-                "c": pd.date_range(start="1/2/2016", end="27/04/2017", periods=2),
-            },
-        )
-
+    @pytest.mark.parametrize(
+        ("columns, bad_col"),
+        [
+            (["date_col", "numeric_col", "date_col"], 1),
+            (["date_col", "string_col", "date_col"], 1),
+            (["date_col", "bool_col", "date_col"], 1),
+            (["date_col", "empty_col", "date_col"], 1),
+            (["numeric_col", "date_col", "date_col"], 0),
+            (["string_col", "date_col", "date_col"], 0),
+            (["bool_col", "date_col", "date_col"], 0),
+            (["empty_col", "date_col", "date_col"], 0),
+            (["date_col", "date_col", "numeric_col"], 2),
+            (["date_col", "date_col", "string_col"], 2),
+            (["date_col", "date_col", "bool_col"], 2),
+            (["date_col", "date_col", "empty_col"], 2),
+        ],
+    )
+    def test_input_data_check_column_errors(self, columns, bad_col):
+        """Check that errors are raised on a variety of different non date datatypes"""
         x = BetweenDatesTransformer(
-            column_lower="a",
-            column_between="b",
-            column_upper="c",
+            column_lower=columns[0],
+            column_between=columns[1],
+            column_upper=columns[2],
             new_column_name="d",
         )
+        df = d.create_date_diff_incorrect_dtypes()
 
-        with pytest.raises(
-            TypeError,
-            match=r"BetweenDatesTransformer: a should be datetime64\[ns\] type but got int64",
-        ):
+        msg = f"{x.classname()}: {columns[bad_col]} should be datetime64 or date type but got {df[columns[bad_col]].dtype}"
+
+        with pytest.raises(TypeError, match=msg):
             x.transform(df)
 
     @pytest.mark.parametrize(
@@ -426,7 +383,42 @@ class TestTransform:
 
         df = d.create_is_between_dates_df_2()
 
-        df["c"][0] = datetime.datetime(1989, 3, 1)
+        df["c"][0] = datetime.datetime(1989, 3, 1, tzinfo=datetime.timezone.utc)
 
         with pytest.warns(Warning, match="not all c are greater than or equal to a"):
             x.transform(df)
+
+    @pytest.mark.parametrize(
+        ("columns"),
+        [
+            ["a_date", "b_date", "c_date"],
+            ["a_date", "b_date", "c_datetime"],
+            ["a_date", "b_datetime", "c_datetime"],
+            ["a_datetime", "b_date", "c_date"],
+            ["a_datetime", "b_date", "c_datetime"],
+            ["a_datetime", "b_datetime", "c_date"],
+        ],
+    )
+    def test_output_different_date_dtypes(self, columns):
+        """Test the output of transform is as expected if both limits are exclusive."""
+        x = BetweenDatesTransformer(
+            column_lower=columns[0],
+            column_between=columns[1],
+            column_upper=columns[2],
+            new_column_name="e",
+            lower_inclusive=False,
+            upper_inclusive=False,
+        )
+
+        df = d.create_is_between_dates_df_3()
+        output = [False, False, True, True, False, False]
+        expected = df.copy()
+        expected["e"] = output
+
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=expected,
+            actual=df_transformed,
+            msg="BetweenDatesTransformer.transform results not as expected",
+        )

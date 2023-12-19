@@ -14,21 +14,6 @@ def concatenate_str():
 class TestStringConcatenator:
     """Tests for the StringConcatenator.__init__ method."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=StringConcatenator.__init__,
-            expected_arguments=["self", "columns", "new_column", "separator"],
-            expected_default_values=(
-                "new_column",
-                " ",
-            ),
-        )
-
-    def test_assert_inheritance(self, concatenate_str):
-        """Test StringConcatenator inherits from BaseTransformer."""
-        ta.classes.assert_inheritance(concatenate_str, tubular.base.BaseTransformer)
-
     def test_super_init_call(self, mocker):
         """Test that BaseTransformer.init us called as expected."""
         expected_call_args = {
@@ -83,14 +68,6 @@ class TestStringConcatenator:
 
 class TestTransform:
     """Tests for the StringConcatenator.transform method."""
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=StringConcatenator.transform,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
-        )
 
     def test_super_transform_called(self, mocker, concatenate_str):
         """Test that BaseTransformer.transform called."""

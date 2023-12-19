@@ -11,39 +11,6 @@ from tubular.nominal import GroupRareLevelsTransformer
 class TestInit:
     """Tests for GroupRareLevelsTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=GroupRareLevelsTransformer.__init__,
-            expected_arguments=[
-                "self",
-                "columns",
-                "cut_off_percent",
-                "weight",
-                "rare_level_name",
-                "record_rare_levels",
-            ],
-            expected_default_values=(None, 0.01, None, "rare", True),
-        )
-
-    def test_class_methods(self):
-        """Test that GroupRareLevelsTransformer has fit and transform methods."""
-        x = GroupRareLevelsTransformer()
-
-        ta.classes.test_object_method(obj=x, expected_method="fit", msg="fit")
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that NominalToIntegerTransformer inherits from BaseNominalTransformer."""
-        x = GroupRareLevelsTransformer()
-
-        ta.classes.assert_inheritance(x, tubular.nominal.BaseNominalTransformer)
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -90,7 +57,7 @@ class TestInit:
         ):
             GroupRareLevelsTransformer(weight=2)
 
-    def test_record_rare_levels_not_str_error(self):
+    def test_record_rare_levels_not_bool_error(self):
         """Test that an exception is raised if record_rare_levels is not a bool."""
         with pytest.raises(
             ValueError,
@@ -98,37 +65,17 @@ class TestInit:
         ):
             GroupRareLevelsTransformer(record_rare_levels=2)
 
-    def test_values_passed_in_init_set_to_attribute(self):
-        """Test that the values passed in init are saved in an attribute of the same name."""
-        x = GroupRareLevelsTransformer(
-            cut_off_percent=0.05,
-            weight="aaa",
-            rare_level_name="bbb",
-            record_rare_levels=False,
-        )
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "cut_off_percent": 0.05,
-                "weight": "aaa",
-                "rare_level_name": "bbb",
-                "record_rare_levels": False,
-            },
-            msg="Attributes for GroupRareLevelsTransformer set in init",
-        )
+    def test_unseen_levels_to_rare_not_bool_error(self):
+        """Test that an exception is raised if unseen_levels_to_rare is not a bool."""
+        with pytest.raises(
+            ValueError,
+            match="GroupRareLevelsTransformer: unseen_levels_to_rare must be a bool",
+        ):
+            GroupRareLevelsTransformer(unseen_levels_to_rare=2)
 
 
 class TestFit:
     """Tests for GroupRareLevelsTransformer.fit()."""
-
-    def test_arguments(self):
-        """Test that init fit expected arguments."""
-        ta.functions.test_function_arguments(
-            func=GroupRareLevelsTransformer.fit,
-            expected_arguments=["self", "X", "y"],
-            expected_default_values=(None,),
-        )
 
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseTransformer.fit."""
@@ -195,9 +142,9 @@ class TestFit:
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
-                "mapping_": {"b": ["a", np.NaN], "c": ["a", "c", "e"]},
+                "non_rare_levels": {"b": ["a", np.NaN], "c": ["a", "c", "e"]},
             },
-            msg="mapping_ attribute",
+            msg="non_rare_levels attribute",
         )
 
     def test_learnt_values_weight(self):
@@ -210,8 +157,8 @@ class TestFit:
 
         ta.classes.test_object_attributes(
             obj=x,
-            expected_attributes={"mapping_": {"b": ["a", np.NaN]}},
-            msg="mapping_ attribute",
+            expected_attributes={"non_rare_levels": {"b": ["a", np.NaN]}},
+            msg="non_rare_levels attribute",
         )
 
     def test_learnt_values_weight_2(self):
@@ -224,8 +171,8 @@ class TestFit:
 
         ta.classes.test_object_attributes(
             obj=x,
-            expected_attributes={"mapping_": {"c": ["f", "g"]}},
-            msg="mapping_ attribute",
+            expected_attributes={"non_rare_levels": {"c": ["f", "g"]}},
+            msg="non_rare_levels attribute",
         )
 
     def test_rare_level_name_not_diff_col_type(self):
@@ -247,6 +194,23 @@ class TestFit:
             x = GroupRareLevelsTransformer(columns=["c"])
 
             x.fit(df)
+
+    def test_training_data_levels_stored(self):
+        """Test that the levels present in the training data are stored if unseen_levels_to_rare is false"""
+        df = d.create_df_8()
+
+        expected_training_data_levels = {
+            "b": set(df["b"]),
+            "c": set(df["c"]),
+        }
+
+        x = GroupRareLevelsTransformer(columns=["b", "c"], unseen_levels_to_rare=False)
+        x.fit(df)
+        ta.equality.assert_equal_dispatch(
+            expected=expected_training_data_levels,
+            actual=x.training_data_levels,
+            msg="Training data values not correctly stored when unseen_levels_to_rare is false",
+        )
 
 
 class TestTransform:
@@ -288,13 +252,6 @@ class TestTransform:
 
         return df
 
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=GroupRareLevelsTransformer.transform,
-            expected_arguments=["self", "X"],
-        )
-
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""
         df = d.create_df_5()
@@ -303,7 +260,7 @@ class TestTransform:
 
         x.fit(df)
 
-        expected_call_args = {0: {"args": (["mapping_"],), "kwargs": {}}}
+        expected_call_args = {0: {"args": (["non_rare_levels"],), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
             mocker,
@@ -341,7 +298,7 @@ class TestTransform:
             x.transform(df)
 
     def test_learnt_values_not_modified(self):
-        """Test that the mapping_ from fit are not changed in transform."""
+        """Test that the non_rare_levels from fit are not changed in transform."""
         df = d.create_df_5()
 
         x = GroupRareLevelsTransformer(columns=["b", "c"])
@@ -355,8 +312,8 @@ class TestTransform:
         x2.transform(df)
 
         ta.equality.assert_equal_dispatch(
-            expected=x.mapping_,
-            actual=x2.mapping_,
+            expected=x.non_rare_levels,
+            actual=x2.non_rare_levels,
             msg="Non rare levels not changed in transform",
         )
 
@@ -369,7 +326,7 @@ class TestTransform:
         x = GroupRareLevelsTransformer(columns=["b", "c"], cut_off_percent=0.2)
 
         # set the mappging dict directly rather than fitting x on df so test works with decorators
-        x.mapping_ = {"b": ["a", np.NaN], "c": ["e", "c", "a"]}
+        x.non_rare_levels = {"b": ["a", np.NaN], "c": ["e", "c", "a"]}
 
         df_transformed = x.transform(df)
 
@@ -387,7 +344,7 @@ class TestTransform:
         x = GroupRareLevelsTransformer(columns=["b", "c"], cut_off_percent=0.2)
 
         # set the mappging dict directly rather than fitting x on df so test works with decorators
-        x.mapping_ = {"b": ["a", np.NaN], "c": ["e", "c", "a", np.NaN]}
+        x.non_rare_levels = {"b": ["a", np.NaN], "c": ["e", "c", "a", np.NaN]}
 
         one_row_df_transformed = x.transform(one_row_df)
 
@@ -410,7 +367,7 @@ class TestTransform:
         x = GroupRareLevelsTransformer(columns=["b", "c"], cut_off_percent=0.2)
 
         # set the mappging dict directly rather than fitting x on df so test works with decorators
-        x.mapping_ = {"b": ["a", np.NaN], "c": ["e", "c", "a", np.NaN]}
+        x.non_rare_levels = {"b": ["a", np.NaN], "c": ["e", "c", "a", np.NaN]}
 
         one_row_df_transformed = x.transform(one_row_df)
 
@@ -429,7 +386,7 @@ class TestTransform:
         x = GroupRareLevelsTransformer(columns=["b"], cut_off_percent=0.3, weight="a")
 
         # set the mappging dict directly rather than fitting x on df so test works with decorators
-        x.mapping_ = {"b": ["a", np.NaN]}
+        x.non_rare_levels = {"b": ["a", np.NaN]}
 
         df_transformed = x.transform(df)
 
@@ -453,3 +410,27 @@ class TestTransform:
         assert (
             pd.Series(label).dtype == df_2[col].dtypes
         ), "column type should be the same as label type"
+
+    def test_expected_output_unseen_levels_not_encoded(self):
+        """Test that unseen levels are not encoded when unseen_levels_to_rare is false"""
+
+        df = d.create_df_8()
+
+        expected = ["w", "w", "rare", "rare", "unseen_level"]
+
+        x = GroupRareLevelsTransformer(
+            columns=["b", "c"],
+            cut_off_percent=0.3,
+            unseen_levels_to_rare=False,
+        )
+        x.fit(df)
+
+        df["b"] = ["w", "w", "z", "y", "unseen_level"]
+
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=expected,
+            actual=list(df_transformed["b"]),
+            msg="Unseen levels are not left unchanged when unseen_levels_to_rare is set to false",
+        )

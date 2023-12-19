@@ -10,39 +10,6 @@ from tubular.capping import OutOfRangeNullTransformer
 class TestInit:
     """Tests for OutOfRangeNullTransformer.init()."""
 
-    def test_arguments(self):
-        """Test that init has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=OutOfRangeNullTransformer.__init__,
-            expected_arguments=[
-                "self",
-                "capping_values",
-                "quantiles",
-                "weights_column",
-            ],
-            expected_default_values=(None, None, None),
-        )
-
-    @pytest.mark.parametrize(
-        "method_name",
-        [("fit"), ("set_replacement_values")],
-    )
-    def test_class_methods(self, method_name):
-        """Test that OutOfRangeNullTransformer has transform fit and set_replacement_values methods."""
-        x = OutOfRangeNullTransformer(capping_values={"a": [1, 3]})
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method=method_name,
-            msg=method_name,
-        )
-
-    def test_inheritance(self):
-        """Test that OutOfRangeNullTransformer inherits from CappingTransformer."""
-        x = OutOfRangeNullTransformer(capping_values={"a": [1, 3]})
-
-        ta.classes.assert_inheritance(x, tubular.capping.CappingTransformer)
-
     @pytest.mark.parametrize(
         ("capping_values", "quantiles", "weights_column", "verbose", "copy"),
         [
@@ -115,14 +82,6 @@ class TestInit:
 class TestFit:
     """Tests for OutOfRangeNullTransformer.fit()."""
 
-    def test_arguments(self):
-        """Test that fit has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=OutOfRangeNullTransformer.fit,
-            expected_arguments=["self", "X", "y"],
-            expected_default_values=(None,),
-        )
-
     def test_super_fit_call(self, mocker):
         """Test the call to CappingTransformer.fit."""
         spy = mocker.spy(tubular.capping.CappingTransformer, "fit")
@@ -193,14 +152,6 @@ class TestFit:
 
 class TestSetReplacementValues:
     """Test for the OutOfRangeNullTransformer.set_replacement_values() method."""
-
-    def test_arguments(self):
-        """Test that set_replacement_values has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=OutOfRangeNullTransformer.set_replacement_values,
-            expected_arguments=["self"],
-            expected_default_values=None,
-        )
 
     @pytest.mark.parametrize(
         ("value_to_set", "expected_replacement_values"),

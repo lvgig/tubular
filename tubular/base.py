@@ -160,7 +160,10 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             raise ValueError(msg)
 
         if not (X.index == y.index).all():
-            warnings.warn(f"{self.classname()}: X and y do not have equal indexes")
+            warnings.warn(
+                f"{self.classname()}: X and y do not have equal indexes",
+                stacklevel=2,
+            )
 
         X_y = X.copy()
 
@@ -292,30 +295,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
                 raise ValueError(msg)
 
 
-class ReturnKeyDict(dict):
-    """Dict class that implements __missing__ method to return the key if it is not present in the dict
-    when looked up.
-
-    This is intended to be used in combination with the pd.Series.map function so that it does not
-    introduce nulls if a key is not found (which is the behaviour if used with a standard dict).
-    """
-
-    def __missing__(self, key):
-        """Function to return passed key.
-
-        Parameters
-        ----------
-        key : various
-            key to lookup from dict
-
-        Returns
-        -------
-        key : input key
-
-        """
-        return key
-
-
 class DataFrameMethodTransformer(BaseTransformer):
     """Tranformer that applies a pandas.DataFrame method.
 
@@ -369,7 +348,7 @@ class DataFrameMethodTransformer(BaseTransformer):
         new_column_name,
         pd_method_name,
         columns,
-        pd_method_kwargs={},
+        pd_method_kwargs=None,
         drop_original=False,
         **kwargs,
     ) -> None:
@@ -389,14 +368,17 @@ class DataFrameMethodTransformer(BaseTransformer):
             msg = f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
             raise TypeError(msg)
 
-        if type(pd_method_kwargs) is not dict:
-            msg = f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
-            raise TypeError(msg)
-
-        for i, k in enumerate(pd_method_kwargs.keys()):
-            if type(k) is not str:
-                msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
+        if pd_method_kwargs is None:
+            pd_method_kwargs = {}
+        else:
+            if type(pd_method_kwargs) is not dict:
+                msg = f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
                 raise TypeError(msg)
+
+            for i, k in enumerate(pd_method_kwargs.keys()):
+                if type(k) is not str:
+                    msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
+                    raise TypeError(msg)
 
         if type(drop_original) is not bool:
             msg = f"{self.classname()}: unexpected type ({type(drop_original)}) for drop_original, expecting bool"

@@ -9,23 +9,8 @@ from tubular.imputers import BaseImputer
 
 
 class TestInit:
-    """Tests for BaseImputer.init."""
-
-    def test_class_methods(self):
-        """Test that BaseImputer has transform method."""
-        x = BaseImputer()
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that BaseImputer inherits from BaseTransformer."""
-        x = BaseImputer()
-
-        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
+    """Tests for BaseImputer.init.
+    Currently nothing to test."""
 
 
 class TestTransform:
@@ -72,13 +57,6 @@ class TestTransform:
         df3["c"] = df3["c"].astype("category")
 
         return df3
-
-    def test_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=BaseImputer.transform,
-            expected_arguments=["self", "X"],
-        )
 
     @pytest.mark.parametrize(
         ("df", "expected"),

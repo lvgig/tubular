@@ -406,24 +406,136 @@ def create_datediff_test_df():
     return pd.DataFrame(
         {
             "a": [
-                datetime.datetime(1993, 9, 27, 11, 58, 58),
-                datetime.datetime(2000, 3, 19, 12, 59, 59),
-                datetime.datetime(2018, 11, 10, 11, 59, 59),
-                datetime.datetime(2018, 10, 10, 11, 59, 59),
-                datetime.datetime(2018, 10, 10, 11, 59, 59),
-                datetime.datetime(2018, 10, 10, 10, 59, 59),
-                datetime.datetime(2018, 12, 10, 11, 59, 59),
-                datetime.datetime(1985, 7, 23, 11, 59, 59),
+                datetime.datetime(
+                    1993,
+                    9,
+                    27,
+                    11,
+                    58,
+                    58,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2000,
+                    3,
+                    19,
+                    12,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2018,
+                    11,
+                    10,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2018,
+                    10,
+                    10,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2018,
+                    10,
+                    10,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2018,
+                    10,
+                    10,
+                    10,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2018,
+                    12,
+                    10,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    1985,
+                    7,
+                    23,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
             ],
             "b": [
-                datetime.datetime(2020, 5, 1, 12, 59, 59),
-                datetime.datetime(2019, 12, 25, 11, 58, 58),
-                datetime.datetime(2018, 11, 10, 11, 59, 59),
-                datetime.datetime(2018, 11, 10, 11, 59, 59),
-                datetime.datetime(2018, 9, 10, 9, 59, 59),
-                datetime.datetime(2015, 11, 10, 11, 59, 59),
-                datetime.datetime(2015, 11, 10, 12, 59, 59),
-                datetime.datetime(2015, 7, 23, 11, 59, 59),
+                datetime.datetime(2020, 5, 1, 12, 59, 59, tzinfo=datetime.timezone.utc),
+                datetime.datetime(
+                    2019,
+                    12,
+                    25,
+                    11,
+                    58,
+                    58,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2018,
+                    11,
+                    10,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2018,
+                    11,
+                    10,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(2018, 9, 10, 9, 59, 59, tzinfo=datetime.timezone.utc),
+                datetime.datetime(
+                    2015,
+                    11,
+                    10,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2015,
+                    11,
+                    10,
+                    12,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2015,
+                    7,
+                    23,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
             ],
         },
     )
@@ -434,12 +546,28 @@ def create_datediff_test_nulls_df():
     return pd.DataFrame(
         {
             "a": [
-                datetime.datetime(1993, 9, 27, 11, 58, 58),
+                datetime.datetime(
+                    1993,
+                    9,
+                    27,
+                    11,
+                    58,
+                    58,
+                    tzinfo=datetime.timezone.utc,
+                ),
                 np.NaN,
             ],
             "b": [
                 np.NaN,
-                datetime.datetime(2019, 12, 25, 11, 58, 58),
+                datetime.datetime(
+                    2019,
+                    12,
+                    25,
+                    11,
+                    58,
+                    58,
+                    tzinfo=datetime.timezone.utc,
+                ),
             ],
         },
         index=[0, 1],
@@ -469,28 +597,84 @@ def create_is_between_dates_df_2():
     return pd.DataFrame(
         {
             "a": [
-                datetime.datetime(1990, 2, 1),
-                datetime.datetime(1990, 2, 1),
-                datetime.datetime(1990, 2, 1),
-                datetime.datetime(1990, 2, 1),
-                datetime.datetime(1990, 2, 1),
-                datetime.datetime(1990, 2, 1),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
             ],
             "b": [
-                datetime.datetime(1990, 1, 20),
-                datetime.datetime(1990, 2, 1),
-                datetime.datetime(1990, 2, 2),
-                datetime.datetime(1990, 2, 6),
-                datetime.datetime(1990, 3, 1),
-                datetime.datetime(1990, 3, 2),
+                datetime.datetime(1990, 1, 20, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 2, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 6, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 2, tzinfo=datetime.timezone.utc),
             ],
             "c": [
-                datetime.datetime(1990, 3, 1),
-                datetime.datetime(1990, 3, 1),
-                datetime.datetime(1990, 3, 1),
-                datetime.datetime(1990, 3, 1),
-                datetime.datetime(1990, 3, 1),
-                datetime.datetime(1990, 3, 1),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+            ],
+        },
+    )
+
+
+def create_is_between_dates_df_3():
+    """Create df to use in IsBetweenDates tests. Contains 3 columns of 5 datatime values, covers edge cases, has mixed date data types."""
+    return pd.DataFrame(
+        {
+            "a_date": [
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+            ],
+            "b_date": [
+                datetime.datetime(1990, 1, 20, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 2, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 6, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 2, tzinfo=datetime.timezone.utc),
+            ],
+            "c_date": [
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+            ],
+            "a_datetime": [
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+            ],
+            "b_datetime": [
+                datetime.datetime(1990, 1, 20, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 2, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 2, 6, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 2, tzinfo=datetime.timezone.utc),
+            ],
+            "c_datetime": [
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
             ],
         },
     )
@@ -503,5 +687,484 @@ def create_downcast_df():
         {
             "a": [1, 2, 3, 4, 5],
             "b": [1.0, 2.0, 3.0, 4.0, 5.0],
+        },
+    )
+
+
+def create_date_diff_different_dtypes():
+    """Dataframe with different datetime formats"""
+    return pd.DataFrame(
+        {
+            "date_col_1": [
+                datetime.date(1993, 9, 27),
+                datetime.date(2000, 3, 19),
+                datetime.date(2018, 11, 10),
+                datetime.date(2018, 10, 10),
+                datetime.date(2018, 10, 10),
+                datetime.date(2018, 10, 10),
+                datetime.date(2018, 12, 10),
+                datetime.date(
+                    1985,
+                    7,
+                    23,
+                ),
+            ],
+            "date_col_2": [
+                datetime.date(2020, 5, 1),
+                datetime.date(2019, 12, 25),
+                datetime.date(2018, 11, 10),
+                datetime.date(2018, 11, 10),
+                datetime.date(2018, 9, 10),
+                datetime.date(2015, 11, 10),
+                datetime.date(2015, 11, 10),
+                datetime.date(2015, 7, 23),
+            ],
+            "datetime_col_1": [
+                datetime.datetime(1993, 9, 27, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2000, 3, 19, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2018, 11, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2018, 10, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2018, 10, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2018, 10, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2018, 12, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(
+                    1985,
+                    7,
+                    23,
+                    tzinfo=datetime.timezone.utc,
+                ),
+            ],
+            "datetime_col_2": [
+                datetime.datetime(2020, 5, 1, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2019, 12, 25, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2018, 11, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2018, 11, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2018, 9, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2015, 11, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2015, 11, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2015, 7, 23, tzinfo=datetime.timezone.utc),
+            ],
+        },
+    )
+
+
+def create_date_diff_different_dtypes_and_nans():
+    """Dataframe with different datetime formats with nans in the data"""
+    return pd.DataFrame(
+        {
+            "date_col_1": [
+                np.nan,
+                datetime.date(2000, 3, 19),
+                datetime.date(2018, 11, 10),
+                datetime.date(2018, 10, 10),
+                datetime.date(2018, 10, 10),
+                datetime.date(2018, 10, 10),
+                datetime.date(2018, 12, 10),
+                datetime.date(
+                    1985,
+                    7,
+                    23,
+                ),
+            ],
+            "date_col_2": [
+                datetime.date(2020, 5, 1),
+                datetime.date(2019, 12, 25),
+                datetime.date(2018, 11, 10),
+                datetime.date(2018, 11, 10),
+                datetime.date(2018, 9, 10),
+                datetime.date(2015, 11, 10),
+                datetime.date(2015, 11, 10),
+                datetime.date(2015, 7, 23),
+            ],
+            "datetime_col_1": [
+                datetime.datetime(1993, 9, 27, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2000, 3, 19, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2018, 11, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2018, 10, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2018, 10, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2018, 10, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2018, 12, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(
+                    1985,
+                    7,
+                    23,
+                    tzinfo=datetime.timezone.utc,
+                ),
+            ],
+            "datetime_col_2": [
+                np.nan,
+                datetime.datetime(2019, 12, 25, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2018, 11, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2018, 11, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2018, 9, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2015, 11, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2015, 11, 10, tzinfo=datetime.timezone.utc),
+                datetime.datetime(2015, 7, 23, tzinfo=datetime.timezone.utc),
+            ],
+        },
+    )
+
+
+def expected_date_diff_df_1():
+    """Expected output for test_expected_output_drop_cols_true."""
+    return pd.DataFrame(
+        {
+            "c": [
+                26,
+                19,
+                0,
+                0,
+                0,
+                -2,
+                -3,
+                30,
+            ],
+        },
+    )
+
+
+def expected_date_diff_df_2():
+    """Expected output for test_expected_output_drop_cols_true."""
+    return pd.DataFrame(
+        {
+            "c": [
+                np.nan,
+                19,
+                0,
+                0,
+                0,
+                -2,
+                -3,
+                30,
+            ],
+        },
+    )
+
+
+def create_date_diff_incorrect_dtypes():
+    """Dataframe with different datetime formats"""
+    return pd.DataFrame(
+        {
+            "date_col": [
+                datetime.date(1993, 9, 27),
+                datetime.date(2000, 3, 19),
+                datetime.date(2018, 11, 10),
+                datetime.date(2018, 10, 10),
+                datetime.date(2018, 10, 10),
+                datetime.date(2018, 10, 10),
+                datetime.date(2018, 12, 10),
+                datetime.date(
+                    1985,
+                    7,
+                    23,
+                ),
+            ],
+            "numeric_col": [
+                2,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+            ],
+            "string_col": [
+                "wowza",
+                "wowza",
+                "wowza",
+                "wowza",
+                "wowza",
+                "wowza",
+                "wowza",
+                "wowza",
+            ],
+            "bool_col": [
+                True,
+                True,
+                True,
+                True,
+                True,
+                False,
+                False,
+                False,
+            ],
+            "empty_col": [
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            ],
+        },
+    )
+
+
+def create_date_diff_different_dtypes_2():
+    """Expected output for test_expected_output_units_D."""
+    return pd.DataFrame(
+        {
+            "date_col_1": [
+                datetime.date(
+                    1993,
+                    9,
+                    27,
+                ),
+                datetime.date(
+                    2000,
+                    3,
+                    19,
+                ),
+                datetime.date(
+                    2018,
+                    11,
+                    10,
+                ),
+                datetime.date(
+                    2018,
+                    10,
+                    10,
+                ),
+                datetime.date(
+                    2018,
+                    10,
+                    10,
+                ),
+                datetime.date(
+                    2018,
+                    10,
+                    10,
+                ),
+                datetime.date(
+                    2018,
+                    12,
+                    10,
+                ),
+                datetime.date(
+                    1985,
+                    7,
+                    23,
+                ),
+            ],
+            "date_col_2": [
+                datetime.date(
+                    2020,
+                    5,
+                    1,
+                ),
+                datetime.date(
+                    2019,
+                    12,
+                    25,
+                ),
+                datetime.date(
+                    2018,
+                    11,
+                    10,
+                ),
+                datetime.date(
+                    2018,
+                    11,
+                    10,
+                ),
+                datetime.date(
+                    2018,
+                    9,
+                    10,
+                ),
+                datetime.date(
+                    2015,
+                    11,
+                    10,
+                ),
+                datetime.date(
+                    2015,
+                    11,
+                    10,
+                ),
+                datetime.date(
+                    2015,
+                    7,
+                    23,
+                ),
+            ],
+            "datetime_col_1": [
+                datetime.datetime(
+                    1993,
+                    9,
+                    27,
+                    11,
+                    58,
+                    58,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2000,
+                    3,
+                    19,
+                    12,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2018,
+                    11,
+                    10,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2018,
+                    10,
+                    10,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2018,
+                    10,
+                    10,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2018,
+                    10,
+                    10,
+                    10,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2018,
+                    12,
+                    10,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    1985,
+                    7,
+                    23,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+            ],
+            "datetime_col_2": [
+                datetime.datetime(
+                    2020,
+                    5,
+                    1,
+                    12,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2019,
+                    12,
+                    25,
+                    11,
+                    58,
+                    58,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2018,
+                    11,
+                    10,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2018,
+                    11,
+                    10,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2018,
+                    9,
+                    10,
+                    9,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2015,
+                    11,
+                    10,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2015,
+                    11,
+                    10,
+                    12,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+                datetime.datetime(
+                    2015,
+                    7,
+                    23,
+                    11,
+                    59,
+                    59,
+                    tzinfo=datetime.timezone.utc,
+                ),
+            ],
+        },
+    )
+
+
+def expected_date_diff_df_3():
+    return pd.DataFrame(
+        {
+            "datetime output": [
+                9713.042372685186,
+                7219.957627314815,
+                0.0,
+                31.0,
+                -30.083333333333332,
+                -1064.9583333333333,
+                -1125.9583333333333,
+                10957.0,
+            ],
+            "dates output": [
+                9713.0,
+                7220.0,
+                0.0,
+                31.0,
+                -30.0,
+                -1065.0,
+                -1126.0,
+                10957.0,
+            ],
         },
     )

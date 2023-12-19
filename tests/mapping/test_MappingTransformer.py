@@ -11,29 +11,11 @@ from pandas.api.types import (
 
 import tests.test_data as d
 import tubular
-from tubular.base import ReturnKeyDict
 from tubular.mapping import MappingTransformer
 
 
 class TestInit:
     """Tests for MappingTransformer.init()."""
-
-    def test_class_methods(self):
-        """Test that MappingTransformer has transform method."""
-        x = MappingTransformer(mappings={"a": {"a": 1}})
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
-        )
-
-    def test_inheritance(self):
-        """Test that MappingTransformer inherits from BaseMappingTransformer and BaseMappingTransformMixin."""
-        x = MappingTransformer(mappings={"a": {"a": 1}})
-
-        ta.classes.assert_inheritance(x, tubular.mapping.BaseMappingTransformer)
-        ta.classes.assert_inheritance(x, tubular.mapping.BaseMappingTransformMixin)
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseMappingTransformer.init."""
@@ -50,7 +32,7 @@ class TestInit:
         call_kwargs = call_args[1]
 
         expected_kwargs = {
-            "mappings": {"a": ReturnKeyDict({"a": 1})},
+            "mappings": {"a": {"a": 1}},
             "verbose": True,
             "copy": True,
         }
@@ -64,28 +46,6 @@ class TestInit:
         assert (
             expected_pos_args == call_pos_args
         ), "unexpected positional args in BaseMappingTransformer.__init__ call"
-
-    def test_mapping_arg_conversion(self):
-        """Test that sub dict in mappings arg are converted into ReturnKeyDict objects."""
-        mappings = {
-            "a": {"a": 1, "b": 2},
-            "b": {1: 4.5, 2: 3.1},
-            "c": {False: None, True: 1},
-        }
-
-        expected_mappings = {
-            "a": ReturnKeyDict(mappings["a"]),
-            "b": ReturnKeyDict(mappings["b"]),
-            "c": ReturnKeyDict(mappings["c"]),
-        }
-
-        x = MappingTransformer(mappings=mappings)
-
-        ta.equality.assert_equal_dispatch(
-            expected_mappings,
-            x.mappings,
-            "mappings attribute not correctly converted sub dicts to ReturnKeyDict",
-        )
 
     def test_mapping_non_dict_item_error(self):
         """Test an exception is raised if mappings contains non-dict values."""
@@ -203,8 +163,8 @@ class TestTransform:
         }
 
         preserve_original_value_mapping = {
-            "a": ReturnKeyDict(mapping["a"]),
-            "b": ReturnKeyDict(mapping["b"]),
+            "a": dict(mapping["a"]),
+            "b": dict(mapping["b"]),
         }
 
         x = MappingTransformer(mappings=mapping)

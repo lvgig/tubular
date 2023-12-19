@@ -37,23 +37,6 @@ class TestExtractDatetimeInfoInit:
 
         ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
 
-    def test_arguments(self):
-        """Test that init has the expected arguments."""
-        default_include = [
-            "timeofday",
-            "timeofmonth",
-            "timeofyear",
-            "dayofweek",
-        ]
-        ta.functions.test_function_arguments(
-            func=DatetimeInfoExtractor.__init__,
-            expected_arguments=["self", "columns", "include", "datetime_mappings"],
-            expected_default_values=(
-                default_include,
-                {},
-            ),
-        )
-
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
@@ -89,21 +72,6 @@ class TestExtractDatetimeInfoInit:
                 },
             },
             msg="Attributes for ExtractDatetimeInfo set in init",
-        )
-
-    def test_class_methods(self):
-        """Test that DatetimeInfoExtractor has fit and transform methods."""
-        x = DatetimeInfoExtractor(columns=["a"])
-
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="_map_values",
-            msg="_map_values",
-        )
-        ta.classes.test_object_method(
-            obj=x,
-            expected_method="transform",
-            msg="transform",
         )
 
     @pytest.mark.parametrize("incorrect_type_include", [2, 3.0, "invalid", "dayofweek"])
@@ -229,15 +197,6 @@ class TestExtractDatetimeInfoInit:
 
 
 class TestMapValues:
-    def test_arguments(self):
-        """Test that identify_timeofday has the expected arguments."""
-
-    ta.functions.test_function_arguments(
-        func=DatetimeInfoExtractor._map_values,
-        expected_arguments=["self", "value", "interval"],
-        expected_default_values=None,
-    )
-
     @pytest.mark.parametrize("incorrect_type_input", ["2", [1, 2]])
     def test_incorrect_type_input(self, incorrect_type_input, timeofday_extractor):
         """Test that an error is raised if input is the wrong type."""
@@ -364,14 +323,6 @@ class TestMapValues:
 
 
 class TestTransform:
-    def test_arguments(self):
-        """Test that init has the expected arguments."""
-        ta.functions.test_function_arguments(
-            func=DatetimeInfoExtractor.transform,
-            expected_arguments=["self", "X"],
-            expected_default_values=None,
-        )
-
     def test_super_transform_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         df = d.create_date_test_df()
@@ -395,17 +346,41 @@ class TestTransform:
 
             x.transform(df)
 
-    def test_non_datetime_column(self):
-        """Test that error is raised if input columns do not contain datetime values."""
-        df = d.create_df_1()  # Mix of int values
+    @pytest.mark.parametrize(
+        ("columns"),
+        [
+            ["numeric_col"],
+            ["string_col"],
+            ["bool_col"],
+            ["empty_col"],
+        ],
+    )
+    def test_input_data_check_column_errors(self, columns):
+        """Check that errors are raised on a variety of different non datatypes"""
+        x = DatetimeInfoExtractor(columns=columns)
 
-        x = DatetimeInfoExtractor(columns=["a"], include=["dayofweek"])
+        df = d.create_date_diff_incorrect_dtypes()
 
-        with pytest.raises(
-            TypeError,
-            match="values in {} should be datetime".format("a"),
-        ):
+        msg = f"{x.classname()}: {columns[0]} should be datetime64 or date type but got {df[columns[0]].dtype}"
+
+        with pytest.raises(TypeError, match=msg):
             x.transform(df)
+
+    def test_cast_to_date_warning(self):
+        "Test that transform raises a warning if column is date but not datetime"
+
+        x = DatetimeInfoExtractor(columns="date_col_1")
+
+        column = "date_col_1"
+
+        msg = f"""
+                    {x.classname()}: temporarily cast {column} from datetime64 to date before transforming in order to apply the datetime method.
+
+                    This will artificially increase the precision of each data point in the column. Original column not changed.
+                    """
+
+        with pytest.warns(UserWarning, match=msg):
+            x.transform(d.create_date_diff_different_dtypes())
 
     def test_correct_col_returned(self):
         """Test that the added column is correct."""
@@ -452,11 +427,47 @@ class TestTransform:
 
         assert mocked_map_values.call_count == 32
 
-    def test_correct_df_returned(self):
+    def test_correct_df_returned_datetime_input(self):
         """Test that correct df is returned after transformation."""
         df = d.create_date_test_df()
         df.loc[0, "b"] = np.nan
         df = df.astype("datetime64[ns]")
+
+        x = DatetimeInfoExtractor(columns=["b"], include=["timeofmonth", "timeofyear"])
+        transformed = x.transform(df)
+
+        expected = df.copy()
+        expected["b_timeofmonth"] = [
+            np.nan,
+            "end",
+            "start",
+            "start",
+            "start",
+            "start",
+            "start",
+            "end",
+        ]
+        expected["b_timeofyear"] = [
+            np.nan,
+            "winter",
+            "autumn",
+            "autumn",
+            "autumn",
+            "autumn",
+            "autumn",
+            "summer",
+        ]
+
+        ta.equality.assert_frame_equal_msg(
+            transformed,
+            expected,
+            "incorrect dataframe returned",
+        )
+
+    def test_correct_df_returned_date_input(self):
+        """Test that correct df is returned after transformation."""
+        df = d.create_date_test_df()
+        df.loc[0, "b"] = np.nan
 
         x = DatetimeInfoExtractor(columns=["b"], include=["timeofmonth", "timeofyear"])
         transformed = x.transform(df)
