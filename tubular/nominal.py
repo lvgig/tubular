@@ -239,7 +239,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         Cut off percentage (either in terms of number of rows or sum of weight) for a given
         nominal level to be considered rare.
 
-    mapping_ : dict
+    non_rare_levels : dict
         Created in fit. A dict of non-rare levels (i.e. levels with more than cut_off_percent weight or rows)
         that is used to identify rare levels in transform.
 
@@ -314,7 +314,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
     def fit(self, X, y=None):
         """Records non-rare levels for categorical variables.
 
-        When transform is called, only levels records in mapping_ during fit will remain
+        When transform is called, only levels records in non_rare_levels during fit will remain
         unchanged - all other levels will be grouped. If record_rare_levels is True then the
         rare levels will also be recorded.
 
@@ -342,7 +342,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
             msg = f"{self.classname()}: weight {self.weight} not in X"
             raise ValueError(msg)
 
-        self.mapping_ = {}
+        self.non_rare_levels = {}
 
         if self.record_rare_levels:
             self.rare_levels_record_ = {}
@@ -351,11 +351,11 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
             for c in self.columns:
                 col_percents = X[c].value_counts(dropna=False) / X.shape[0]
 
-                self.mapping_[c] = list(
+                self.non_rare_levels[c] = list(
                     col_percents.loc[col_percents >= self.cut_off_percent].index.values,
                 )
 
-                self.mapping_[c] = sorted(self.mapping_[c], key=str)
+                self.non_rare_levels[c] = sorted(self.non_rare_levels[c], key=str)
 
                 if self.record_rare_levels:
                     self.rare_levels_record_[c] = list(
@@ -380,13 +380,13 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
                 cols_w_percents = cols_w_percents / X[self.weight].sum()
 
-                self.mapping_[c] = list(
+                self.non_rare_levels[c] = list(
                     cols_w_percents.loc[
                         cols_w_percents >= self.cut_off_percent
                     ].index.values,
                 )
 
-                self.mapping_[c] = sorted(self.mapping_[c], key=str)
+                self.non_rare_levels[c] = sorted(self.non_rare_levels[c], key=str)
 
                 if self.record_rare_levels:
                     self.rare_levels_record_[c] = list(
@@ -423,13 +423,13 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         """
         X = BaseNominalTransformer.transform(self, X)
 
-        self.check_is_fitted(["mapping_"])
+        self.check_is_fitted(["non_rare_levels"])
 
         if not self.unseen_levels_to_rare:
             for c in self.columns:
                 unseen_vals = set(X[c]) - set(self.training_data_levels[c])
                 for unseen_val in unseen_vals:
-                    self.mapping_[c].append(unseen_val)
+                    self.non_rare_levels[c].append(unseen_val)
 
         for c in self.columns:
             # for categorical dtypes have to set new category for the impute values first
@@ -442,7 +442,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
                 X[c] = pd.Series(
                     data=np.where(
-                        X[c].isin(self.mapping_[c]),
+                        X[c].isin(self.non_rare_levels[c]),
                         X[c],
                         self.rare_level_name,
                     ),
@@ -452,7 +452,10 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
             else:
                 # using np.where converts np.NaN to str value if only one row of data frame is passed
                 # instead, using pd.where(), if condition true, keep original value, else replace with self.rare_level_name
-                X[c] = X[c].where(X[c].isin(self.mapping_[c]), self.rare_level_name)
+                X[c] = X[c].where(
+                    X[c].isin(self.non_rare_levels[c]),
+                    self.rare_level_name,
+                )
 
         return X
 
