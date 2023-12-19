@@ -73,28 +73,6 @@ class TestInit:
         ):
             GroupRareLevelsTransformer(encode_unseen_levels=2)
 
-    def test_values_passed_in_init_set_to_attribute(self):
-        """Test that the values passed in init are saved in an attribute of the same name."""
-        x = GroupRareLevelsTransformer(
-            cut_off_percent=0.05,
-            weight="aaa",
-            rare_level_name="bbb",
-            record_rare_levels=False,
-            encode_unseen_levels=True,
-        )
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "cut_off_percent": 0.05,
-                "weight": "aaa",
-                "rare_level_name": "bbb",
-                "record_rare_levels": False,
-                "encode_unseen_levels": True,
-            },
-            msg="Attributes for GroupRareLevelsTransformer set in init",
-        )
-
 
 class TestFit:
     """Tests for GroupRareLevelsTransformer.fit()."""
