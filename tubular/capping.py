@@ -104,7 +104,7 @@ class CappingTransformer(BaseTransformer):
 
     def check_capping_values_dict(
         self,
-        capping_values_dict: dict[str, list[int | float]],
+        capping_values_dict: dict[str, list[int | float | None]],
         dict_name: str,
     ) -> None:
         """Performs checks on a dictionary passed to ."""
