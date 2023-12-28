@@ -56,7 +56,7 @@ class SeriesStrMethodTransformer(BaseTransformer):
         new_column_name: str,
         pd_method_name: str,
         columns: str,
-        pd_method_kwargs: dict | None = None,
+        pd_method_kwargs: dict[str, object] | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         if type(columns) is list and len(columns) > 1:
