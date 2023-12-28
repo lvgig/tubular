@@ -17,7 +17,7 @@ class BaseDateTransformer(BaseTransformer):
     Transformer with date data checks needed by all transformers taking dates as input data.
     """
 
-    def _generate_is_datetime64_dict(self, X):
+    def _generate_is_datetime64_dict(self, X: pd.DataFrame) -> None:
         """
         Function to generate a dictionary attribute storing the result of pd.api.types.is_datetime64_any_dtype()
         for each column in self.columns to avoid repeated calls to this function.
@@ -28,7 +28,7 @@ class BaseDateTransformer(BaseTransformer):
         for col in self.columns:
             self._is_datetime64_dict[col] = pd.api.types.is_datetime64_any_dtype(X[col])
 
-    def check_columns_are_date_or_datetime(self, X):
+    def check_columns_are_date_or_datetime(self, X: pd.DataFrame) -> None:
         "Raise a type error if a column to be operated on is not a datetime.datetime or datetime.date object"
 
         self._generate_is_datetime64_dict(X)
@@ -41,7 +41,7 @@ class BaseDateTransformer(BaseTransformer):
                 msg = f"{self.classname()}: {col} should be datetime64 or date type but got {X[col].dtype}"
                 raise TypeError(msg)
 
-    def cast_columns_to_datetime(self, X):
+    def cast_columns_to_datetime(self, X: pd.DataFrame) -> pd.DataFrame:
         """
         Check whether columns are datetime64 or date type. If not, an error will be raised. If one is datetime.date
         it will be cast to datetime64.
@@ -66,7 +66,7 @@ class BaseDateTransformer(BaseTransformer):
 
         return temp
 
-    def _cast_non_matching_columns(self, temp, column_A_name, column_B_name):
+    def _cast_non_matching_columns(self, temp: pd.DataFrame, column_A_name: str, column_B_name: str) -> pd.DataFrame:
         """
         Helper function that asymetrically compares column A to column B and casts column B to match column A. This will need calling twice.
 
@@ -95,7 +95,7 @@ class BaseDateTransformer(BaseTransformer):
 
         return temp
 
-    def match_column_dtypes(self, X):
+    def match_column_dtypes(self, X: pd.DataFrame) -> pd.DataFrame:
         """
         Check the dtype of the two columns to be compared by the transformer. If one is datetime.date and one is
         datetime.datetime, the datetime.datetime column will be cast to datetime.date.
