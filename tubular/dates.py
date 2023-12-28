@@ -399,7 +399,7 @@ class SeriesDtMethodTransformer(BaseTransformer):
         new_column_name: str,
         pd_method_name: str,
         column: str,
-        pd_method_kwargs: dict | None = None,
+        pd_method_kwargs: dict[str, Any] | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         if type(column) is not str:
