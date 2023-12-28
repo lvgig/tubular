@@ -170,7 +170,7 @@ class CutTransformer(BaseTransformer):
         self,
         column: str,
         new_column_name: str,
-        cut_kwargs: dict | None = None,
+        cut_kwargs: dict[str, object] | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         if type(column) is not str:
@@ -274,7 +274,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         pd_method_name: str,
         columns: list[str],
         new_column_name: str,
-        pd_method_kwargs: dict | None = None,
+        pd_method_kwargs: dict[str, object] | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         """Performs input checks not done in either DataFrameMethodTransformer.__init__ or BaseTransformer.__init__."""
@@ -360,7 +360,7 @@ class ScalingTransformer(BaseTransformer):
         self,
         columns: str | list[str] | None,
         scaler_type: str,
-        scaler_kwargs: dict | None = None,
+        scaler_kwargs: dict[str, object] | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         if scaler_kwargs is None:
