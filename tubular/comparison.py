@@ -1,11 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import pandas as pd  # noqa: TCH002
 
 from tubular.base import BaseTransformer
-
-if TYPE_CHECKING:
-    import pandas as pd
 
 
 class EqualityChecker(BaseTransformer):
