@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import datetime
 import warnings
-from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -289,7 +288,7 @@ class ToDatetimeTransformer(BaseTransformer):
         self,
         column: str,
         new_column_name: str,
-        to_datetime_kwargs: dict[str, Any] | None = None,
+        to_datetime_kwargs: dict[str, object] | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         if type(column) is not str:
@@ -399,7 +398,7 @@ class SeriesDtMethodTransformer(BaseTransformer):
         new_column_name: str,
         pd_method_name: str,
         column: str,
-        pd_method_kwargs: dict[str, Any] | None = None,
+        pd_method_kwargs: dict[str, object] | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         if type(column) is not str:
