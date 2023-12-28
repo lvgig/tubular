@@ -5,7 +5,6 @@ from. These transformers contain key checks to be applied in all cases.
 from __future__ import annotations
 
 import warnings
-from typing import Any
 
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -356,7 +355,7 @@ class DataFrameMethodTransformer(BaseTransformer):
         new_column_name: list[str] | str,
         pd_method_name: str,
         columns: list[str] | str | None,
-        pd_method_kwargs: dict[str, Any] | None = None,
+        pd_method_kwargs: dict[str, object] | None = None,
         drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
