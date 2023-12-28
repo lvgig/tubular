@@ -135,7 +135,7 @@ class TestTransform:
 
         expected_call_args = {
             0: {
-                "args": (d.create_df_9()["a"],),
+                "args": (d.create_df_9()["a"].to_numpy(),),
                 "kwargs": {"bins": 3, "right": False, "precision": 2},
             },
         }

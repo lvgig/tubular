@@ -217,7 +217,7 @@ class CutTransformer(BaseTransformer):
             msg = f"{self.classname()}: {self.columns[0]} should be a numeric dtype but got {X[self.columns[0]].dtype}"
             raise TypeError(msg)
 
-        X[self.new_column_name] = pd.cut(X[self.columns[0]], **self.cut_kwargs)
+        X[self.new_column_name] = pd.cut(X[self.columns[0]].to_numpy(), **self.cut_kwargs)
 
         return X
 
