@@ -303,30 +303,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
                 raise ValueError(msg)
 
 
-class ReturnKeyDict(dict):
-    """Dict class that implements __missing__ method to return the key if it is not present in the dict
-    when looked up.
-
-    This is intended to be used in combination with the pd.Series.map function so that it does not
-    introduce nulls if a key is not found (which is the behaviour if used with a standard dict).
-    """
-
-    def __missing__(self, key):  # noqa: ANN001, ANN204
-        """Function to return passed key.
-
-        Parameters
-        ----------
-        key : various
-            key to lookup from dict
-
-        Returns
-        -------
-        key : input key
-
-        """
-        return key
-
-
 class DataFrameMethodTransformer(BaseTransformer):
     """Tranformer that applies a pandas.DataFrame method.
 

@@ -233,6 +233,9 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         Care should be taken if working with nominal variables with many levels as this could potentially
         result in many being stored in this attribute.
 
+    unseen_levels_to_rare : bool, default = True
+        If True, unseen levels in new data will be passed to rare, if set to false they will be left unchanged.
+
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
 
@@ -242,7 +245,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         Cut off percentage (either in terms of number of rows or sum of weight) for a given
         nominal level to be considered rare.
 
-    mapping_ : dict
+    non_rare_levels : dict
         Created in fit. A dict of non-rare levels (i.e. levels with more than cut_off_percent weight or rows)
         that is used to identify rare levels in transform.
 
@@ -263,6 +266,13 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         Name of weights columns to use if cut_off_percent should be in terms of sum of weight
         not number of rows.
 
+    unseen_levels_to_rare : bool
+        If True, unseen levels in new data will be passed to rare, if set to false they will be left unchanged.
+
+    training_data_levels : dict[set]
+        Dictionary containing the set of values present in the training data for each column in self.columns. It
+        will only exist in if unseen_levels_to_rare is set to False.
+
     """
 
     def __init__(
@@ -272,6 +282,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         weight: str | None = None,
         rare_level_name: str | list[str] | None = "rare",
         record_rare_levels: bool = True,
+        unseen_levels_to_rare: bool = True,
         **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
@@ -300,10 +311,16 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
         self.record_rare_levels = record_rare_levels
 
+        if not isinstance(unseen_levels_to_rare, bool):
+            msg = f"{self.classname()}: unseen_levels_to_rare must be a bool"
+            raise ValueError(msg)
+
+        self.unseen_levels_to_rare = unseen_levels_to_rare
+
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Records non-rare levels for categorical variables.
 
-        When transform is called, only levels records in mapping_ during fit will remain
+        When transform is called, only levels records in non_rare_levels during fit will remain
         unchanged - all other levels will be grouped. If record_rare_levels is True then the
         rare levels will also be recorded.
 
@@ -331,7 +348,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
             msg = f"{self.classname()}: weight {self.weight} not in X"
             raise ValueError(msg)
 
-        self.mapping_ = {}
+        self.non_rare_levels = {}
 
         if self.record_rare_levels:
             self.rare_levels_record_ = {}
@@ -340,11 +357,11 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
             for c in self.columns:
                 col_percents = X[c].value_counts(dropna=False) / X.shape[0]
 
-                self.mapping_[c] = list(
+                self.non_rare_levels[c] = list(
                     col_percents.loc[col_percents >= self.cut_off_percent].index.values,
                 )
 
-                self.mapping_[c] = sorted(self.mapping_[c], key=str)
+                self.non_rare_levels[c] = sorted(self.non_rare_levels[c], key=str)
 
                 if self.record_rare_levels:
                     self.rare_levels_record_[c] = list(
@@ -369,13 +386,13 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
                 cols_w_percents = cols_w_percents / X[self.weight].sum()
 
-                self.mapping_[c] = list(
+                self.non_rare_levels[c] = list(
                     cols_w_percents.loc[
                         cols_w_percents >= self.cut_off_percent
                     ].index.values,
                 )
 
-                self.mapping_[c] = sorted(self.mapping_[c], key=str)
+                self.non_rare_levels[c] = sorted(self.non_rare_levels[c], key=str)
 
                 if self.record_rare_levels:
                     self.rare_levels_record_[c] = list(
@@ -388,6 +405,11 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                         self.rare_levels_record_[c],
                         key=str,
                     )
+
+        if not self.unseen_levels_to_rare:
+            self.training_data_levels = {}
+            for c in self.columns:
+                self.training_data_levels[c] = set(X[c])
 
         return self
 
@@ -407,7 +429,13 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         """
         X = BaseNominalTransformer.transform(self, X)
 
-        self.check_is_fitted(["mapping_"])
+        self.check_is_fitted(["non_rare_levels"])
+
+        if not self.unseen_levels_to_rare:
+            for c in self.columns:
+                unseen_vals = set(X[c]) - set(self.training_data_levels[c])
+                for unseen_val in unseen_vals:
+                    self.non_rare_levels[c].append(unseen_val)
 
         for c in self.columns:
             # for categorical dtypes have to set new category for the impute values first
@@ -420,7 +448,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
                 X[c] = pd.Series(
                     data=np.where(
-                        X[c].isin(self.mapping_[c]),
+                        X[c].isin(self.non_rare_levels[c]),
                         X[c],
                         self.rare_level_name,
                     ),
@@ -430,12 +458,15 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
             else:
                 # using np.where converts np.NaN to str value if only one row of data frame is passed
                 # instead, using pd.where(), if condition true, keep original value, else replace with self.rare_level_name
-                X[c] = X[c].where(X[c].isin(self.mapping_[c]), self.rare_level_name)
+                X[c] = X[c].where(
+                    X[c].isin(self.non_rare_levels[c]),
+                    self.rare_level_name,
+                )
 
         return X
 
 
-class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin):
+class MeanResponseTransformer(BaseNominalTransformer):
     """Transformer to apply mean response encoding. This converts categorical variables to
     numeric by mapping levels to the mean response for that level.
 
@@ -447,7 +478,7 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
     to n * len(columns) new columns, of with names of the form {column}_{response_level}. The
     original columns will be removed from the dataframe. This functionality is controlled using
     the 'level' parameter. Note that the above only works for a n > 1 level categorical response.
-    Do not use 'level' parameter for a n > 1 level numerical response. In this case, use the standard
+    Do not use 'level' parameter for a n = 1 level numerical response. In this case, use the standard
     mean response transformer without the 'level' parameter.
 
     If a categorical variable contains null values these will not be transformed.
@@ -503,8 +534,8 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
         Only created in the mutli-level case. Generated from level, list of all the response levels to encode against.
 
     mappings : dict
-        Created in fit. Dict of key (column names) value (mapping of categorical levels to numeric,
-        mean response values) pairs.
+        Created in fit. A nested Dict of {column names : column specific mapping dictionary} pairs.  Column
+        specific mapping dictionaries contain {initial value : mapped value} pairs.
 
     mapped_columns : list
         Only created in the multi-level case. A list of the new columns produced by encoded the columns in self.columns
@@ -762,6 +793,24 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
 
         return self
 
+    def map_imputation_values(self, X):
+        """maps columns defined by self.columns in X according the the corresponding mapping dictionary contained in self.mappings
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data to with catgeorical variable columns to transform.
+
+        Returns
+        -------
+        X : pd.DataFrame
+            input dataframe with mappings applied
+        """
+        for c in self.columns:
+            X[c] = X[c].map(self.mappings[c])
+
+        return X
+
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform method to apply mean response encoding stored in the mappings attribute to
         each column in the columns attribute.
@@ -798,12 +847,14 @@ class MeanResponseTransformer(BaseNominalTransformer, BaseMappingTransformMixin)
             for c in self.columns:
                 # finding rows with values not in the keys of mappings dictionary
                 unseen_indices[c] = X[~X[c].isin(self.mappings[c].keys())].index
-            X = BaseMappingTransformMixin.transform(self, X)
+            X = super().transform(X)
+            X = self.map_imputation_values(X)
             for c in self.columns:
                 X.loc[unseen_indices[c], c] = self.unseen_levels_encoding_dict[c]
         else:
             self.check_mappable_rows(X)
-            X = BaseMappingTransformMixin.transform(self, X)
+            X = super().transform(X)
+            X = self.map_imputation_values(X)
 
         if self.level:
             # Setting self.columns back so that the transformer object is unchanged after transform is called

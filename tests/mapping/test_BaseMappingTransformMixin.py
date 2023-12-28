@@ -60,9 +60,9 @@ class TestTransform:
         ):
             x.transform(df)
 
-    def test_pd_series_map_call(self, mocker):
-        """Test the call to pd.Series.map."""
-        spy = mocker.spy(pd.Series, "map")
+    def test_pd_series_replace_call(self, mocker):
+        """Test the call to pd.Series.replace."""
+        spy = mocker.spy(pd.Series, "replace")
 
         df = d.create_df_1()
 
@@ -77,21 +77,29 @@ class TestTransform:
 
         x.transform(df)
 
-        assert spy.call_count == 2, "unexpected number of calls to pd.Series.map"
+        assert spy.call_count == 2, "unexpected number of calls to pd.Series.replace"
 
         call_args = spy.call_args_list[0]
 
         call_pos_arg = call_args[0]
         call_kwargs = call_args[1]
 
-        assert call_kwargs == {}
+        # not totally sure where this kwarg is injected from but regex=False is the
+        # desired default behaviour for Series.replace in this case so leaving for now.
+        # Likely to do with the way DataFrame.replace is implemented.
+        assert call_kwargs == {"regex": False}
 
-        expected_pos_args = (df["a"], mapping["a"])
+        # pd.Series.replace separates dict into to replace and value lists
+        expected_pos_args = (
+            df["a"],
+            [1, 2, 3, 4, 5, 6],
+            ["a", "b", "c", "d", "e", "f"],
+        )
 
         ta.equality.assert_equal_dispatch(
             expected_pos_args,
             call_pos_arg,
-            "positional args in first pd.Series.map call not correct",
+            "positional args in first pd.Series.replace call not correct",
         )
 
         call_args = spy.call_args_list[1]
@@ -99,12 +107,17 @@ class TestTransform:
         call_pos_arg = call_args[0]
         call_kwargs = call_args[1]
 
-        assert call_kwargs == {}
+        assert call_kwargs == {"regex": False}
 
-        expected_pos_args = (df["b"], mapping["b"])
+        # pd.Series.replace separates dict into to replace and value lists
+        expected_pos_args = (
+            df["b"],
+            ["a", "b", "c", "d", "e", "f"],
+            [1, 2, 3, 4, 5, 6],
+        )
 
         ta.equality.assert_equal_dispatch(
             expected_pos_args,
             call_pos_arg,
-            "positional args in second pd.Series.map call not correct",
+            "positional args in second pd.Series.replace call not correct",
         )
