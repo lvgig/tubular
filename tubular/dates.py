@@ -67,7 +67,10 @@ class BaseDateTransformer(BaseTransformer):
         return temp
 
     def _cast_non_matching_columns(
-        self, temp: pd.DataFrame, column_A_name: str, column_B_name: str
+        self,
+        temp: pd.DataFrame,
+        column_A_name: str,
+        column_B_name: str,
     ) -> pd.DataFrame:
         """
         Helper function that asymetrically compares column A to column B and casts column B to match column A. This will need calling twice.

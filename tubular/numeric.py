@@ -218,7 +218,8 @@ class CutTransformer(BaseTransformer):
             raise TypeError(msg)
 
         X[self.new_column_name] = pd.cut(
-            X[self.columns[0]].to_numpy(), **self.cut_kwargs
+            X[self.columns[0]].to_numpy(),
+            **self.cut_kwargs,
         )
 
         return X
