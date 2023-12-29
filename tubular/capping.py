@@ -457,7 +457,7 @@ class OutOfRangeNullTransformer(CappingTransformer):
     def __init__(
         self,
         capping_values: dict[str, list[int | float | None]] | None = None,
-        quantiles: dict[str, list[int | float | None]] | None = None,
+        quantiles: dict[str, list[int | float]] | None = None,
         weights_column: str | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
