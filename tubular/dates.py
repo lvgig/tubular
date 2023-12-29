@@ -163,8 +163,9 @@ class DateDiffLeapYearTransformer(BaseDateTransformer):
     columns : list
         List containing column names for transformation in format [column_lower, column_upper]
 
-    new_column_name : str
-        Column name for the year column calculated in the transform method.
+    new_column_name : str, default = None
+        Name given to calculated datediff column. If None then {column_upper}_{column_lower}_datediff
+        will be used.
 
     drop_cols : bool
         Indicator whether to drop old columns during transform method.
@@ -175,8 +176,8 @@ class DateDiffLeapYearTransformer(BaseDateTransformer):
         self,
         column_lower: str,
         column_upper: str,
-        new_column_name: str,
         drop_cols: bool,
+        new_column_name: str | None = None,
         missing_replacement: int | float | str | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
@@ -188,9 +189,15 @@ class DateDiffLeapYearTransformer(BaseDateTransformer):
             msg = f"{self.classname()}: column_upper should be a str"
             raise TypeError(msg)
 
-        if not isinstance(new_column_name, str):
-            msg = f"{self.classname()}: new_column_name should be a str"
-            raise TypeError(msg)
+        if new_column_name is not None:
+            if not isinstance(new_column_name, str):
+                msg = f"{self.classname()}: new_column_name should be a str"
+                raise TypeError(msg)
+
+            self.new_column_name = new_column_name
+
+        else:
+            self.new_column_name = f"{column_upper}_{column_lower}_datediff"
 
         if not isinstance(drop_cols, bool):
             msg = f"{self.classname()}: drop_cols should be a bool"
@@ -204,7 +211,6 @@ class DateDiffLeapYearTransformer(BaseDateTransformer):
 
         super().__init__(columns=[column_lower, column_upper], **kwargs)
 
-        self.new_column_name = new_column_name
         self.drop_cols = drop_cols
         self.missing_replacement = missing_replacement
 
