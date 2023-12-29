@@ -1,4 +1,5 @@
 """This module contains transformers that apply encodings to nominal columns."""
+from __future__ import annotations
 
 import warnings
 
@@ -18,7 +19,7 @@ class BaseNominalTransformer(BaseTransformer):
     object and categorical columns from X, if the columns attribute is not set by the user.
     """
 
-    def columns_set_or_check(self, X):
+    def columns_set_or_check(self, X: pd.DataFrame) -> None:
         """Function to check or set columns attribute.
 
         If the columns attribute is None then set it to all object and category columns in X. Otherwise run the
@@ -44,7 +45,7 @@ class BaseNominalTransformer(BaseTransformer):
         else:
             self.columns_check(X)
 
-    def check_mappable_rows(self, X):
+    def check_mappable_rows(self, X: pd.DataFrame) -> None:
         """Method to check that all the rows to apply the transformer to are able to be
         mapped according to the values in the mappings dict.
 
@@ -99,7 +100,12 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
 
     """
 
-    def __init__(self, columns=None, start_encoding=0, **kwargs):
+    def __init__(
+        self,
+        columns: str | list[str] | None = None,
+        start_encoding: int = 0,
+        **kwargs: dict[str, bool],
+    ) -> None:
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
 
         if not isinstance(start_encoding, int):
@@ -108,7 +114,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
 
         self.start_encoding = start_encoding
 
-    def fit(self, X, y=None):
+    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Creates mapping between nominal levels and integer values for categorical variables.
 
         Parameters
@@ -133,7 +139,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
 
         return self
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform method to apply integer encoding stored in the mappings attribute to
         each column in the columns attribute.
 
@@ -156,7 +162,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
 
         return BaseMappingTransformMixin.transform(self, X)
 
-    def inverse_transform(self, X):
+    def inverse_transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Converts integer values back to categorical / nominal values. Does the inverse of the transform method.
 
         Parameters
@@ -271,14 +277,14 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
     def __init__(
         self,
-        columns=None,
-        cut_off_percent=0.01,
-        weight=None,
-        rare_level_name="rare",
-        record_rare_levels=True,
+        columns: str | list[str] | None = None,
+        cut_off_percent: float = 0.01,
+        weight: str | None = None,
+        rare_level_name: str | list[str] | None = "rare",
+        record_rare_levels: bool = True,
         unseen_levels_to_rare: bool = True,
-        **kwargs,
-    ):
+        **kwargs: dict[str, bool],
+    ) -> None:
         super().__init__(columns=columns, **kwargs)
 
         if not isinstance(cut_off_percent, float):
@@ -311,7 +317,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
         self.unseen_levels_to_rare = unseen_levels_to_rare
 
-    def fit(self, X, y=None):
+    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Records non-rare levels for categorical variables.
 
         When transform is called, only levels records in non_rare_levels during fit will remain
@@ -407,7 +413,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
 
         return self
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Grouped rare levels together into a new 'rare' level.
 
         Parameters
@@ -547,13 +553,13 @@ class MeanResponseTransformer(BaseNominalTransformer):
 
     def __init__(
         self,
-        columns=None,
-        weights_column=None,
-        prior=0,
-        level=None,
-        unseen_level_handling=None,
-        **kwargs,
-    ):
+        columns: str | list[str] | None = None,
+        weights_column: str | None = None,
+        prior: int = 0,
+        level: str | list | None = None,
+        unseen_level_handling: str | int | float | None = None,
+        **kwargs: dict[str, bool],
+    ) -> None:
         if weights_column is not None and type(weights_column) is not str:
             msg = f"{self.classname()}: weights_column should be a str"
             raise TypeError(msg)
@@ -585,7 +591,11 @@ class MeanResponseTransformer(BaseNominalTransformer):
 
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
 
-    def _prior_regularisation(self, target_means, cat_freq):
+    def _prior_regularisation(
+        self,
+        target_means: pd.Series,
+        cat_freq: str,
+    ) -> pd.Series:
         """Regularise encoding values by pushing encodings of infrequent categories towards the global mean.  If prior is zero this will return target_means unaltered.
 
         Parameters
@@ -608,7 +618,12 @@ class MeanResponseTransformer(BaseNominalTransformer):
             + self.global_mean * self.prior
         ).divide(cat_freq + self.prior, axis="index")
 
-    def _fit_binary_response(self, X, y, columns):
+    def _fit_binary_response(
+        self,
+        X: pd.DataFrame,
+        y: pd.Series,
+        columns: list[str],
+    ) -> None:
         """Function to learn the MRE mappings for a given binary or continuous response.
 
         Parameters
@@ -678,7 +693,7 @@ class MeanResponseTransformer(BaseNominalTransformer):
                     group_weight,
                 ).to_dict()
 
-    def fit(self, X, y):
+    def fit(self, X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
         """Identify mapping of categorical levels to mean response values.
 
         If the user specified the weights_column arg in when initialising the transformer
@@ -778,7 +793,7 @@ class MeanResponseTransformer(BaseNominalTransformer):
 
         return self
 
-    def map_imputation_values(self, X):
+    def map_imputation_values(self, X: pd.DataFrame) -> pd.DataFrame:
         """maps columns defined by self.columns in X according the the corresponding mapping dictionary contained in self.mappings
 
         Parameters
@@ -796,7 +811,7 @@ class MeanResponseTransformer(BaseNominalTransformer):
 
         return X
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform method to apply mean response encoding stored in the mappings attribute to
         each column in the columns attribute.
 
@@ -880,7 +895,12 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
 
     """
 
-    def __init__(self, columns=None, weights_column=None, **kwargs):
+    def __init__(
+        self,
+        columns: str | list[str] | None = None,
+        weights_column: str | None = None,
+        **kwargs: dict[str, bool],
+    ) -> None:
         if weights_column is not None and type(weights_column) is not str:
             msg = f"{self.classname()}: weights_column should be a str"
             raise TypeError(msg)
@@ -889,7 +909,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
 
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
 
-    def fit(self, X, y):
+    def fit(self, X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
         """Identify mapping of categorical levels to rank-ordered integer values by target-mean in ascending order.
 
         If the user specified the weights_column arg in when initialising the transformer
@@ -967,7 +987,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
 
         return self
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform method to apply ordinal encoding stored in the mappings attribute to
         each column in the columns attribute. This maps categorical levels to rank-ordered integer values by target-mean in ascending order.
 
@@ -998,8 +1018,9 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
     Parameters
     ----------
-    columns : str or list of strings, default = None
-        Names of columns to transform
+    columns : str or list of strings or None, default = None
+        Names of columns to transform. If the default of None is supplied all object and category
+        columns in X are used.
 
     separator : str
         Used to create dummy column names, the name will take
@@ -1029,13 +1050,13 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
     def __init__(
         self,
-        columns=None,
-        separator="_",
-        drop_original=False,
-        copy=True,
-        verbose=False,
-        **kwargs,
-    ):
+        columns: str | list[str] | None = None,
+        separator: str = "_",
+        drop_original: bool = False,
+        copy: bool = True,
+        verbose: bool = False,
+        **kwargs: dict[str, bool],
+    ) -> None:
         BaseNominalTransformer.__init__(
             self,
             columns=columns,
@@ -1050,7 +1071,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         self.separator = separator
         self.drop_original = drop_original
 
-    def fit(self, X, y=None):
+    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Gets list of levels for each column to be transformed. This defines which dummy columns
         will be created in transform.
 
@@ -1087,7 +1108,11 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         return self
 
-    def _get_feature_names(self, input_features, **kwargs):
+    def _get_feature_names(
+        self,
+        input_features: list[str],
+        **kwargs: dict[str, bool],
+    ) -> list[str]:
         """Function to access the get_feature_names attribute of the scikit learn attribute. Will return the output columns of the OHE transformer.
 
         In scikit learn 1.0 "get_feature_names" was deprecated and then replaced with "get_feature_names_out" in version 1.2. The logic in this
@@ -1119,7 +1144,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         return input_columns
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Create new dummy columns from categorical fields.
 
         Parameters

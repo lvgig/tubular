@@ -1,9 +1,10 @@
 """This module contains a transformer that applies capping to numeric columns."""
 
+from __future__ import annotations
+
 import datetime
 import itertools
 import warnings
-from typing import List, Union
 
 import numpy as np
 import pandas as pd
@@ -16,7 +17,7 @@ class BaseDateTransformer(BaseTransformer):
     Transformer with date data checks needed by all transformers taking dates as input data.
     """
 
-    def _generate_is_datetime64_dict(self, X):
+    def _generate_is_datetime64_dict(self, X: pd.DataFrame) -> None:
         """
         Function to generate a dictionary attribute storing the result of pd.api.types.is_datetime64_any_dtype()
         for each column in self.columns to avoid repeated calls to this function.
@@ -27,7 +28,7 @@ class BaseDateTransformer(BaseTransformer):
         for col in self.columns:
             self._is_datetime64_dict[col] = pd.api.types.is_datetime64_any_dtype(X[col])
 
-    def check_columns_are_date_or_datetime(self, X):
+    def check_columns_are_date_or_datetime(self, X: pd.DataFrame) -> None:
         "Raise a type error if a column to be operated on is not a datetime.datetime or datetime.date object"
 
         self._generate_is_datetime64_dict(X)
@@ -40,7 +41,7 @@ class BaseDateTransformer(BaseTransformer):
                 msg = f"{self.classname()}: {col} should be datetime64 or date type but got {X[col].dtype}"
                 raise TypeError(msg)
 
-    def cast_columns_to_datetime(self, X):
+    def cast_columns_to_datetime(self, X: pd.DataFrame) -> pd.DataFrame:
         """
         Check whether columns are datetime64 or date type. If not, an error will be raised. If one is datetime.date
         it will be cast to datetime64.
@@ -65,7 +66,12 @@ class BaseDateTransformer(BaseTransformer):
 
         return temp
 
-    def _cast_non_matching_columns(self, temp, column_A_name, column_B_name):
+    def _cast_non_matching_columns(
+        self,
+        temp: pd.DataFrame,
+        column_A_name: str,
+        column_B_name: str,
+    ) -> pd.DataFrame:
         """
         Helper function that asymetrically compares column A to column B and casts column B to match column A. This will need calling twice.
 
@@ -94,7 +100,7 @@ class BaseDateTransformer(BaseTransformer):
 
         return temp
 
-    def match_column_dtypes(self, X):
+    def match_column_dtypes(self, X: pd.DataFrame) -> pd.DataFrame:
         """
         Check the dtype of the two columns to be compared by the transformer. If one is datetime.date and one is
         datetime.datetime, the datetime.datetime column will be cast to datetime.date.
@@ -157,8 +163,9 @@ class DateDiffLeapYearTransformer(BaseDateTransformer):
     columns : list
         List containing column names for transformation in format [column_lower, column_upper]
 
-    new_column_name : str
-        Column name for the year column calculated in the transform method.
+    new_column_name : str, default = None
+        Name given to calculated datediff column. If None then {column_upper}_{column_lower}_datediff
+        will be used.
 
     drop_cols : bool
         Indicator whether to drop old columns during transform method.
@@ -167,12 +174,12 @@ class DateDiffLeapYearTransformer(BaseDateTransformer):
 
     def __init__(
         self,
-        column_lower,
-        column_upper,
-        new_column_name,
-        drop_cols,
-        missing_replacement=None,
-        **kwargs,
+        column_lower: str,
+        column_upper: str,
+        drop_cols: bool,
+        new_column_name: str | None = None,
+        missing_replacement: int | float | str | None = None,
+        **kwargs: dict[str, bool],
     ) -> None:
         if not isinstance(column_lower, str):
             msg = f"{self.classname()}: column_lower should be a str"
@@ -182,9 +189,15 @@ class DateDiffLeapYearTransformer(BaseDateTransformer):
             msg = f"{self.classname()}: column_upper should be a str"
             raise TypeError(msg)
 
-        if not isinstance(new_column_name, str):
-            msg = f"{self.classname()}: new_column_name should be a str"
-            raise TypeError(msg)
+        if new_column_name is not None:
+            if not isinstance(new_column_name, str):
+                msg = f"{self.classname()}: new_column_name should be a str"
+                raise TypeError(msg)
+
+            self.new_column_name = new_column_name
+
+        else:
+            self.new_column_name = f"{column_upper}_{column_lower}_datediff"
 
         if not isinstance(drop_cols, bool):
             msg = f"{self.classname()}: drop_cols should be a bool"
@@ -198,7 +211,6 @@ class DateDiffLeapYearTransformer(BaseDateTransformer):
 
         super().__init__(columns=[column_lower, column_upper], **kwargs)
 
-        self.new_column_name = new_column_name
         self.drop_cols = drop_cols
         self.missing_replacement = missing_replacement
 
@@ -207,7 +219,7 @@ class DateDiffLeapYearTransformer(BaseDateTransformer):
         self.column_lower = column_lower
         self.column_upper = column_upper
 
-    def calculate_age(self, row):
+    def calculate_age(self, row: pd.Series) -> int:
         """Function to calculate age from two date columns in a pd.DataFrame.
 
         This function, although slower than the np.timedelta64 solution (or something
@@ -247,7 +259,7 @@ class DateDiffLeapYearTransformer(BaseDateTransformer):
 
         return age
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Calculate year gap between the two provided columns.
 
         New column is created under the 'new_column_name', and optionally removes the
@@ -298,12 +310,12 @@ class DateDifferenceTransformer(BaseDateTransformer):
 
     def __init__(
         self,
-        column_lower,
-        column_upper,
-        new_column_name=None,
-        units="D",
-        copy=True,
-        verbose=False,
+        column_lower: str,
+        column_upper: str,
+        new_column_name: str | None = None,
+        units: str = "D",
+        copy: bool = True,
+        verbose: bool = False,
     ) -> None:
         if type(column_lower) is not str:
             msg = f"{self.classname()}: column_lower must be a str"
@@ -349,7 +361,7 @@ class DateDifferenceTransformer(BaseDateTransformer):
         self.column_lower = column_lower
         self.column_upper = column_upper
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Calculate the difference between the given fields in the specified units.
 
         Parameters
@@ -393,10 +405,10 @@ class ToDatetimeTransformer(BaseTransformer):
 
     def __init__(
         self,
-        column,
-        new_column_name,
-        to_datetime_kwargs=None,
-        **kwargs,
+        column: str,
+        new_column_name: str,
+        to_datetime_kwargs: dict[str, object] | None = None,
+        **kwargs: dict[str, bool],
     ) -> None:
         if type(column) is not str:
             msg = f"{self.classname()}: column should be a single str giving the column to transform to datetime"
@@ -427,7 +439,7 @@ class ToDatetimeTransformer(BaseTransformer):
 
         super().__init__(columns=[column], **kwargs)
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Convert specified column to datetime using pd.to_datetime.
 
         Parameters
@@ -502,11 +514,11 @@ class SeriesDtMethodTransformer(BaseDateTransformer):
 
     def __init__(
         self,
-        new_column_name,
-        pd_method_name,
-        column,
-        pd_method_kwargs=None,
-        **kwargs,
+        new_column_name: str,
+        pd_method_name: str,
+        column: str,
+        pd_method_kwargs: dict[str, object] | None = None,
+        **kwargs: dict[str, bool],
     ) -> None:
         if type(column) is not str:
             msg = f"{self.classname()}: column should be a str but got {type(column)}"
@@ -558,7 +570,7 @@ class SeriesDtMethodTransformer(BaseDateTransformer):
         # Here only as a fix to allow string representation of transformer.
         self.column = column
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform specific column on input pandas.DataFrame (X) using the given pandas.Series.dt method and
         assign the output back to column in X.
 
@@ -658,13 +670,13 @@ class BetweenDatesTransformer(BaseDateTransformer):
 
     def __init__(
         self,
-        column_lower,
-        column_between,
-        column_upper,
-        new_column_name,
-        lower_inclusive=True,
-        upper_inclusive=True,
-        **kwargs,
+        column_lower: str,
+        column_between: str,
+        column_upper: str,
+        new_column_name: str,
+        lower_inclusive: bool = True,
+        upper_inclusive: bool = True,
+        **kwargs: dict[str, bool],
     ) -> None:
         if type(column_lower) is not str:
             msg = f"{self.classname()}: column_lower should be str"
@@ -702,7 +714,7 @@ class BetweenDatesTransformer(BaseDateTransformer):
         self.column_upper = column_upper
         self.column_between = column_between
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform - creates column indicating if middle date is between the other two.
 
         If not all column_lower values are less than or equal to column_upper when transform is run
@@ -818,10 +830,13 @@ class DatetimeInfoExtractor(BaseDateTransformer):
 
     def __init__(
         self,
-        columns,
-        include=None,
-        datetime_mappings=None,
-        **kwargs,
+        columns: str | list[str],
+        include: str | list[str] | None = None,
+        datetime_mappings: dict[
+            str,
+        ]
+        | None = None,
+        **kwargs: dict[str, bool],
     ) -> None:
         if include is None:
             include = ["timeofday", "timeofmonth", "timeofyear", "dayofweek"]
@@ -952,7 +967,7 @@ class DatetimeInfoExtractor(BaseDateTransformer):
         else:
             self.dayofweek_mapping = {}
 
-    def _map_values(self, value, interval: str):
+    def _map_values(self, value: int | float, interval: str) -> str:
         """Method to apply mappings for a specified interval ("timeofday", "timeofmonth", "timeofyear" or "dayofweek")
         from corresponding mapping attribute to a single value.
 
@@ -1002,7 +1017,7 @@ class DatetimeInfoExtractor(BaseDateTransformer):
 
         return mappings[interval][value]
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform - Extracts new features from datetime variables.
 
         Parameters
@@ -1089,10 +1104,10 @@ class DatetimeSinusoidCalculator(BaseDateTransformer):
 
     def __init__(
         self,
-        columns: Union[str, List[str]],
-        method: Union[str, List[str]],
-        units: Union[str, dict],
-        period: Union[int, float, dict, dict] = 2 * np.pi,
+        columns: str | list[str],
+        method: str | list[str],
+        units: str | dict,
+        period: int | float | dict = 2 * np.pi,
     ) -> None:
         super().__init__(columns, copy=True)
 

@@ -1,4 +1,6 @@
-import pandas as pd
+from __future__ import annotations
+
+import pandas as pd  # noqa: TCH002
 
 from tubular.base import BaseTransformer
 
@@ -27,7 +29,7 @@ class EqualityChecker(BaseTransformer):
         columns: list,
         new_col_name: str,
         drop_original: bool = False,
-        **kwargs,
+        **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
