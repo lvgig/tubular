@@ -1018,8 +1018,9 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
     Parameters
     ----------
-    columns : str or list of strings, default = None
-        Names of columns to transform
+    columns : str or list of strings or None, default = None
+        Names of columns to transform. If the default of None is supplied all object and category
+        columns in X are used.
 
     separator : str
         Used to create dummy column names, the name will take

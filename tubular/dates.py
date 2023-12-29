@@ -1107,7 +1107,7 @@ class DatetimeSinusoidCalculator(BaseDateTransformer):
         columns: str | list[str],
         method: str | list[str],
         units: str | dict,
-        period: int | float | dict | dict = 2 * np.pi,
+        period: int | float | dict = 2 * np.pi,
     ) -> None:
         super().__init__(columns, copy=True)
 
