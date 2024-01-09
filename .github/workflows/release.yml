@@ -18,9 +18,9 @@ jobs:
           python-version: "3.8"
       - name: "Build Package"
         run: |
-        python setup.py sdist bdist_wheel
-        pip install twine 
-        twine check dist/* 
+          python setup.py sdist bdist_wheel
+          pip install twine 
+          twine check dist/* 
 
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
