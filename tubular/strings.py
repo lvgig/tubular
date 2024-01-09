@@ -1,5 +1,7 @@
 """This module contains transformers that apply string functions."""
 
+from __future__ import annotations
+
 import pandas as pd
 
 from tubular.base import BaseTransformer
@@ -51,11 +53,11 @@ class SeriesStrMethodTransformer(BaseTransformer):
 
     def __init__(
         self,
-        new_column_name,
-        pd_method_name,
-        columns,
-        pd_method_kwargs=None,
-        **kwargs,
+        new_column_name: str,
+        pd_method_name: str,
+        columns: str,
+        pd_method_kwargs: dict[str, object] | None = None,
+        **kwargs: dict[str, bool],
     ) -> None:
         if type(columns) is list and len(columns) > 1:
             msg = f"{self.classname()}: columns arg should contain only 1 column name but got {len(columns)}"
@@ -95,7 +97,7 @@ class SeriesStrMethodTransformer(BaseTransformer):
             msg = f'{self.classname()}: error accessing "str.{pd_method_name}" method on pd.Series object - pd_method_name should be a pd.Series.str method'
             raise AttributeError(msg) from err
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform specific column on input pandas.DataFrame (X) using the given pandas.Series.str method and
         assign the output back to column in X.
 
@@ -136,7 +138,12 @@ class StringConcatenator(BaseTransformer):
         Separator for the new string value
     """
 
-    def __init__(self, columns, new_column="new_column", separator=" ") -> None:
+    def __init__(
+        self,
+        columns: str | list[str],
+        new_column: str = "new_column",
+        separator: str = " ",
+    ) -> None:
         super().__init__(columns=columns, copy=True)
 
         if not isinstance(new_column, str):
@@ -151,7 +158,7 @@ class StringConcatenator(BaseTransformer):
 
         self.separator = separator
 
-    def transform(self, X):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Combine data from specified columns, of mixed datatypes, into a new column containing one string.
 
         Parameters

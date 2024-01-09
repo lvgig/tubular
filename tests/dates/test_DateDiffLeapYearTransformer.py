@@ -167,6 +167,25 @@ class TestInit:
             msg="Attributes for DateDiffLeapYearTransformer set in init",
         )
 
+    def test_inputs_set_to_attribute_name_not_set(self):
+        """Test that the value passed for new_column_new_column_name and units are saved in attributes of the same new_column_name."""
+        x = DateDiffLeapYearTransformer(
+            column_lower="dummy_1",
+            column_upper="dummy_2",
+            drop_cols=True,
+        )
+
+        ta.classes.test_object_attributes(
+            obj=x,
+            expected_attributes={
+                "column_lower": "dummy_1",
+                "column_upper": "dummy_2",
+                "columns": ["dummy_1", "dummy_2"],
+                "new_column_name": "dummy_2_dummy_1_datediff",
+            },
+            msg="Attributes for DateDifferenceTransformer set in init",
+        )
+
 
 class TestTransform:
     """Tests for DateDiffLeapYearTransformer.transform()."""

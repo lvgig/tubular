@@ -19,7 +19,7 @@ with open(VERSION_FILE) as version_file:
         raise RuntimeError(msg)
 
 
-def list_reqs(fname="requirements.txt"):
+def list_reqs(fname: str = "requirements.txt") -> list:
     with open(fname) as fd:
         return fd.read().splitlines()
 
