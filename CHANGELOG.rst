@@ -15,6 +15,7 @@ Subsections for each version can be one of the following;
 - ``Security`` in case of vulnerabilities.
 
 Each individual change should have a link to the pull request after the description of the change.
+
 1.1.1 (2024-01-09)
 ------------------
 
