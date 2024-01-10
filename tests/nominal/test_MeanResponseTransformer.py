@@ -1023,6 +1023,19 @@ class TestTransform:
         ):
             x.transform(df)
 
+    def test_not_dataframe_error_raised(self):
+
+        df = d.create_MeanResponseTransformer_test_df()
+
+        x = MeanResponseTransformer(columns="b")
+        x.fit(df, df["a"])
+
+        with pytest.raises(
+            TypeError,
+            match=f"{x.classname()}: X should be a pd.DataFrame",
+        ):
+            x.transform(X=[1, 2, 3, 4, 5, 6])
+
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
         df = d.create_MeanResponseTransformer_test_df()
