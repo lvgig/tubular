@@ -1006,6 +1006,8 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
             Transformed data with levels mapped to ordinal encoded values for categorical variables.
 
         """
+        X = super().transform(X)
+
         self.check_mappable_rows(X)
 
         return BaseMappingTransformMixin.transform(self, X)
