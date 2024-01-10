@@ -12,15 +12,15 @@ jobs:
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.8"
-      - name: "Build Package"
-        run: |
-          python setup.py sdist bdist_wheel
-          pip install twine 
-          twine check dist/* 
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v4
+      with:
+        python-version: "3.8"
+    - name: "Build Package"
+      run: |
+        python setup.py sdist bdist_wheel
+        pip install twine 
+        twine check dist/* 
 
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
