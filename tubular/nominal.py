@@ -158,6 +158,8 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
             Transformed input X with levels mapped accoriding to mappings dict.
 
         """
+        X = super().transform(X)
+
         self.check_mappable_rows(X)
 
         return BaseMappingTransformMixin.transform(self, X)
