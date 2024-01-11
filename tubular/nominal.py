@@ -158,7 +158,8 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
             Transformed input X with levels mapped accoriding to mappings dict.
 
         """
-        X = super().transform(X)
+
+        super(BaseNominalTransformer, self).columns_check(X)
 
         self.check_mappable_rows(X)
 
@@ -1008,7 +1009,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
             Transformed data with levels mapped to ordinal encoded values for categorical variables.
 
         """
-        X = super().transform(X)
+        super(BaseNominalTransformer, self).columns_check(X)
 
         self.check_mappable_rows(X)
 
