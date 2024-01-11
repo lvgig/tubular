@@ -22,6 +22,7 @@ Each individual change should have a link to the pull request after the descript
 Added
 ^^^^^
 - added type hints `#128 <https://github.com/lvgig/tubular/pull/128>`_
+- added some error handling to transform method of nominal transformers  `#162 <https://github.com/lvgig/tubular/pull/162>`_
 
 1.1.0 (2023-12-19)
 ------------------
