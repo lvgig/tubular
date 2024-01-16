@@ -1,4 +1,6 @@
-on: workflow_dispatch
+on:
+  release:
+    types: [published]
     
 jobs:
   pypi-publish:
@@ -22,7 +24,3 @@ jobs:
 
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-    - name: Github Release  
-      uses: softprops/action-gh-release@v1  
-      with:  
-        files: dist/*
