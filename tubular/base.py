@@ -21,7 +21,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
     Parameters
     ----------
-    columns : None or list or str, default = None
+    columns : None or list or str
         Columns to apply the transformer to. If a str is passed this is put into a list. Value passed
         in columns is saved in the columns attribute on the object.
 
@@ -33,9 +33,9 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
     Attributes
     ----------
-    columns : list or None
+    columns : list
         Either a list of str values giving which columns in a input pandas.DataFrame the transformer
-        will be applied to - or None.
+        will be applied to.
 
     copy : bool
         Should X be copied before tansforms are applied?
@@ -54,7 +54,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
     def __init__(
         self,
-        columns: list[str] | str = None,
+        columns: list[str] | str,
         copy: bool = True,
         verbose: bool = False,
     ) -> None:
@@ -69,29 +69,25 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         if self.verbose:
             print("BaseTransformer.__init__() called")
 
-        if columns is None:
-            self.columns = None
+        # make sure columns is a single str or list of strs
+        if isinstance(columns, str):
+            self.columns = [columns]
+
+        elif isinstance(columns, list):
+            if not len(columns) > 0:
+                msg = f"{self.classname()}: columns has no values"
+                raise ValueError(msg)
+
+            for c in columns:
+                if not isinstance(c, str):
+                    msg = f"{self.classname()}: each element of columns should be a single (string) column name"
+                    raise TypeError(msg)
+
+            self.columns = columns
 
         else:
-            # make sure columns is a single str or list of strs
-            if isinstance(columns, str):
-                self.columns = [columns]
-
-            elif isinstance(columns, list):
-                if not len(columns) > 0:
-                    msg = f"{self.classname()}: columns has no values"
-                    raise ValueError(msg)
-
-                for c in columns:
-                    if not isinstance(c, str):
-                        msg = f"{self.classname()}: each element of columns should be a single (string) column name"
-                        raise TypeError(msg)
-
-                self.columns = columns
-
-            else:
-                msg = f"{self.classname()}: columns must be a string or list with the columns to be pre-processed (if specified)"
-                raise TypeError(msg)
+            msg = f"{self.classname()}: columns must be a string or list with the columns to be pre-processed (if specified)"
+            raise TypeError(msg)
 
         if not isinstance(copy, bool):
             msg = f"{self.classname()}: copy must be a bool"
@@ -235,10 +231,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             msg = f"{self.classname()}: X should be a pd.DataFrame"
             raise TypeError(msg)
 
-        if self.columns is None:
-            msg = f"{self.classname()}: columns not set"
-            raise ValueError(msg)
-
         if not isinstance(self.columns, list):
             msg = f"{self.classname()}: self.columns should be a list"
             raise TypeError(msg)
@@ -248,6 +240,8 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
                 raise ValueError(f"{self.classname()}: variable " + c + " is not in X")
 
     def columns_set_or_check(self, X: pd.DataFrame) -> None:
+        # TODO delete this method eventually but it will break a lot transformers
+
         """Function to check or set columns attribute.
 
         If the columns attribute is None then set it to all columns in X. Otherwise run the columns_check method.
@@ -258,15 +252,8 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             Data to check columns are in.
 
         """
-        if not isinstance(X, pd.DataFrame):
-            msg = f"{self.classname()}: X should be a pd.DataFrame"
-            raise TypeError(msg)
 
-        if self.columns is None:
-            self.columns = list(X.columns.values)
-
-        else:
-            self.columns_check(X)
+        self.columns_check(X)
 
     @staticmethod
     def check_weights_column(X: pd.DataFrame, weights_column: str) -> None:
