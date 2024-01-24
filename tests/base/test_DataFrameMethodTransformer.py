@@ -29,7 +29,7 @@ class TestInit:
             expected_call_args,
         ):
             DataFrameMethodTransformer(
-                new_column_name="a",
+                new_column_names="a",
                 pd_method_name="sum",
                 columns=["b", "c"],
                 copy=False,
@@ -43,27 +43,27 @@ class TestInit:
             match=r"DataFrameMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_name, expecting str",
         ):
             DataFrameMethodTransformer(
-                new_column_name="a",
+                new_column_names="a",
                 pd_method_name=1,
                 columns=["b", "c"],
             )
 
         with pytest.raises(
             TypeError,
-            match=r"DataFrameMethodTransformer: unexpected type \(\<class 'float'\>\) for new_column_name, must be str or list of strings",
+            match=r"DataFrameMethodTransformer: unexpected type \(\<class 'float'\>\) for new_column_names, must be str or list of strings",
         ):
             DataFrameMethodTransformer(
-                new_column_name=1.0,
+                new_column_names=1.0,
                 pd_method_name="sum",
                 columns=["b", "c"],
             )
 
         with pytest.raises(
             TypeError,
-            match=r"DataFrameMethodTransformer: if new_column_name is a list, all elements must be strings but got \<class 'float'\> in position 1",
+            match=r"DataFrameMethodTransformer: if new_column_names is a list, all elements must be strings but got \<class 'float'\> in position 1",
         ):
             DataFrameMethodTransformer(
-                new_column_name=["a", 1.0],
+                new_column_names=["a", 1.0],
                 pd_method_name="sum",
                 columns=["b", "c"],
             )
@@ -73,7 +73,7 @@ class TestInit:
             match=r"""DataFrameMethodTransformer: pd_method_kwargs should be a dict but got type \<class 'int'\>""",
         ):
             DataFrameMethodTransformer(
-                new_column_name=["a", "b"],
+                new_column_names=["a", "b"],
                 pd_method_name="sum",
                 columns=["b", "c"],
                 pd_method_kwargs=1,
@@ -84,7 +84,7 @@ class TestInit:
             match=r"""DataFrameMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_kwargs key in position 1, must be str""",
         ):
             DataFrameMethodTransformer(
-                new_column_name=["a", "b"],
+                new_column_names=["a", "b"],
                 pd_method_name="sum",
                 columns=["b", "c"],
                 pd_method_kwargs={"a": 1, 2: "b"},
@@ -95,7 +95,7 @@ class TestInit:
             match=r"DataFrameMethodTransformer: unexpected type \(\<class 'int'\>\) for drop_original, expecting bool",
         ):
             DataFrameMethodTransformer(
-                new_column_name="a",
+                new_column_names="a",
                 pd_method_name="sum",
                 columns=["b", "c"],
                 drop_original=30,
@@ -108,15 +108,15 @@ class TestInit:
             match="""DataFrameMethodTransformer: error accessing "b" method on pd.DataFrame object - pd_method_name should be a pd.DataFrame method""",
         ):
             DataFrameMethodTransformer(
-                new_column_name="a",
+                new_column_names="a",
                 pd_method_name="b",
                 columns=["b", "c"],
             )
 
     def test_attributes_set(self):
-        """Test that the values passed for new_column_name, pd_method_name are saved to attributes on the object."""
+        """Test that the values passed for new_column_names, pd_method_name are saved to attributes on the object."""
         x = DataFrameMethodTransformer(
-            new_column_name="a",
+            new_column_names="a",
             pd_method_name="sum",
             columns=["b", "c"],
             drop_original=True,
@@ -125,7 +125,7 @@ class TestInit:
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
-                "new_column_name": "a",
+                "new_column_names": "a",
                 "pd_method_name": "sum",
                 "drop_original": True,
             },
@@ -140,7 +140,7 @@ class TestInit:
             ),
         ):
             DataFrameMethodTransformer(
-                new_column_name="a",
+                new_column_names="a",
                 pd_method_name="sum",
                 columns=["b", "c"],
                 drop_original=True,
@@ -179,7 +179,7 @@ class TestTransform:
         df = d.create_df_3()
 
         x = DataFrameMethodTransformer(
-            new_column_name="d",
+            new_column_names="d",
             pd_method_name="sum",
             columns=["b", "c"],
         )
@@ -201,7 +201,7 @@ class TestTransform:
     def test_expected_output_single_columns_assignment(self, df, expected):
         """Test a single column output from transform gives expected results."""
         x = DataFrameMethodTransformer(
-            new_column_name="d",
+            new_column_names="d",
             pd_method_name="sum",
             columns=["b", "c"],
             pd_method_kwargs={"axis": 1},
@@ -222,7 +222,7 @@ class TestTransform:
     def test_expected_output_multi_columns_assignment(self, df, expected):
         """Test a multiple column output from transform gives expected results."""
         x = DataFrameMethodTransformer(
-            new_column_name=["d", "e"],
+            new_column_names=["d", "e"],
             pd_method_name="div",
             columns=["b", "c"],
             pd_method_kwargs={"other": 2},
@@ -237,7 +237,7 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        ("df", "new_column_name", "pd_method_name", "columns", "pd_method_kwargs"),
+        ("df", "new_column_names", "pd_method_name", "columns", "pd_method_kwargs"),
         [
             (d.create_df_3(), ["d", "e"], "div", ["b", "c"], {"other": 2}),
             (d.create_df_3(), "d", "sum", ["b", "c"], {"axis": 1}),
@@ -251,7 +251,7 @@ class TestTransform:
         self,
         mocker,
         df,
-        new_column_name,
+        new_column_names,
         pd_method_name,
         columns,
         pd_method_kwargs,
@@ -260,7 +260,7 @@ class TestTransform:
         spy = mocker.spy(pd.DataFrame, pd_method_name)
 
         x = DataFrameMethodTransformer(
-            new_column_name=new_column_name,
+            new_column_names=new_column_names,
             pd_method_name=pd_method_name,
             columns=columns,
             pd_method_kwargs=pd_method_kwargs,
@@ -292,7 +292,7 @@ class TestTransform:
         df = d.create_df_3()
 
         x = DataFrameMethodTransformer(
-            new_column_name="a_b_sum",
+            new_column_names="a_b_sum",
             pd_method_name="sum",
             columns=["a", "b"],
             drop_original=True,
@@ -311,7 +311,7 @@ class TestTransform:
         df = d.create_df_3()
 
         x = DataFrameMethodTransformer(
-            new_column_name="a_b_sum",
+            new_column_names="a_b_sum",
             pd_method_name="sum",
             columns=["a", "b"],
             drop_original=False,

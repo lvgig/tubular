@@ -303,7 +303,7 @@ class DataFrameMethodTransformer(BaseTransformer):
 
     Parameters
     ----------
-    new_column_name : str or list of str
+    new_column_names : str or list of str
         The name of the column or columns to be assigned to the output of running the
         pandas method in transform.
 
@@ -328,7 +328,7 @@ class DataFrameMethodTransformer(BaseTransformer):
 
     Attributes
     ----------
-    new_column_name : str or list of str
+    new_column_names : str or list of str
         The name of the column or columns to be assigned to the output of running the
         pandas method in transform.
 
@@ -339,7 +339,7 @@ class DataFrameMethodTransformer(BaseTransformer):
 
     def __init__(
         self,
-        new_column_name: list[str] | str,
+        new_column_names: list[str] | str,
         pd_method_name: str,
         columns: list[str] | str | None,
         pd_method_kwargs: dict[str, object] | None = None,
@@ -348,14 +348,14 @@ class DataFrameMethodTransformer(BaseTransformer):
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
-        if type(new_column_name) is list:
-            for i, item in enumerate(new_column_name):
+        if type(new_column_names) is list:
+            for i, item in enumerate(new_column_names):
                 if type(item) is not str:
-                    msg = f"{self.classname()}: if new_column_name is a list, all elements must be strings but got {type(item)} in position {i}"
+                    msg = f"{self.classname()}: if new_column_names is a list, all elements must be strings but got {type(item)} in position {i}"
                     raise TypeError(msg)
 
-        elif type(new_column_name) is not str:
-            msg = f"{self.classname()}: unexpected type ({type(new_column_name)}) for new_column_name, must be str or list of strings"
+        elif type(new_column_names) is not str:
+            msg = f"{self.classname()}: unexpected type ({type(new_column_names)}) for new_column_names, must be str or list of strings"
             raise TypeError(msg)
 
         if type(pd_method_name) is not str:
@@ -378,7 +378,7 @@ class DataFrameMethodTransformer(BaseTransformer):
             msg = f"{self.classname()}: unexpected type ({type(drop_original)}) for drop_original, expecting bool"
             raise TypeError(msg)
 
-        self.new_column_name = new_column_name
+        self.new_column_names = new_column_names
         self.pd_method_name = pd_method_name
         self.pd_method_kwargs = pd_method_kwargs
         self.drop_original = drop_original
@@ -405,13 +405,13 @@ class DataFrameMethodTransformer(BaseTransformer):
         Returns
         -------
         X : pd.DataFrame
-            Input X with additional column or columns (self.new_column_name) added. These contain the output of
+            Input X with additional column or columns (self.new_column_names) added. These contain the output of
             running the pandas DataFrame method.
 
         """
         X = super().transform(X)
 
-        X[self.new_column_name] = getattr(X[self.columns], self.pd_method_name)(
+        X[self.new_column_names] = getattr(X[self.columns], self.pd_method_name)(
             **self.pd_method_kwargs,
         )
 
