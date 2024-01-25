@@ -99,8 +99,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         """Base transformer fit method, checks X and y types. Currently only pandas DataFrames are allowed for X
         and DataFrames or Series for y.
 
-        Fit calls the columns_set_or_check method which will set the columns attribute to all columns in X, if it
-        is None.
+        Fit calls the columns_check method which will check that the columns attribute is set and all values are present in X
 
         Parameters
         ----------
@@ -114,7 +113,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         if self.verbose:
             print("BaseTransformer.fit() called")
 
-        self.columns_set_or_check(X)
+        self.columns_check(X)
 
         if not X.shape[0] > 0:
             msg = f"{self.classname()}: X has no rows; {X.shape}"
@@ -238,22 +237,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         for c in self.columns:
             if c not in X.columns.to_numpy():
                 raise ValueError(f"{self.classname()}: variable " + c + " is not in X")
-
-    def columns_set_or_check(self, X: pd.DataFrame) -> None:
-        # TODO delete this method eventually but it will break a lot transformers
-
-        """Function to check or set columns attribute.
-
-        If the columns attribute is None then set it to all columns in X. Otherwise run the columns_check method.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            Data to check columns are in.
-
-        """
-
-        self.columns_check(X)
 
     @staticmethod
     def check_weights_column(X: pd.DataFrame, weights_column: str) -> None:

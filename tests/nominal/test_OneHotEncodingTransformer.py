@@ -103,22 +103,6 @@ class TestInit:
 class TestFit:
     """Tests for OneHotEncodingTransformer.fit()."""
 
-    def test_columns_set_or_check_called(self, mocker):
-        """Test that fit calls BaseNominalTransformer.columns_set_or_check."""
-        df = d.create_df_1()
-
-        x = OneHotEncodingTransformer(columns="b")
-
-        expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.nominal.BaseNominalTransformer,
-            "columns_set_or_check",
-            expected_call_args,
-        ):
-            x.fit(df)
-
     def test_base_nominal_transformer_fit_called(self, mocker):
         """Test that fit calls BaseNominalTransformer.fit."""
         expected_keyword_args = {"X": d.create_df_1(), "y": None}
