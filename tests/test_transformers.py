@@ -15,6 +15,7 @@ import tubular.base as base
 
 str_lst_classes_to_test = [
     "BaseTransformer",
+    "DataFrameMethodTransformer",
 ]
 
 
@@ -29,7 +30,7 @@ def get_all_classes():
     ]
 
     for _importer, modname, _ispkg in pkgutil.walk_packages(
-        path=[root],  # prefix = "tubular.tubular."
+        path=[root],
     ):
         mod_parts = modname.split(".")
         if any(part in modules_to_ignore for part in mod_parts) or "_" in modname:
@@ -68,8 +69,8 @@ def minimal_attribute_dict():
             "columns": ["a"],
         },
         "DataFrameMethodTransformer": {
-            "columns": ["b"],
-            "new_column_name": "a",
+            "columns": ["a", "c"],
+            "new_column_names": "f",
             "pd_method_name": "sum",
         },
         "CappingTransformer": {
@@ -507,11 +508,11 @@ class TestTransform:
 
         x = x.fit(df, df["c"])
 
-        df = pd.DataFrame(columns=["a"])
+        df = pd.DataFrame(columns=["a", "b", "c"])
 
         with pytest.raises(
             ValueError,
-            match=re.escape(f"{transformer_name}: X has no rows; (0, 1)"),
+            match=re.escape(f"{transformer_name}: X has no rows; (0, 3)"),
         ):
             x.transform(df)
 
