@@ -560,7 +560,7 @@ class MeanResponseTransformer(BaseNominalTransformer):
         weights_column: str | None = None,
         prior: int = 0,
         level: str | list | None = None,
-        unseen_level_handling: str | int | float | None = None,
+        unseen_level_handling: str | float | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         if weights_column is not None and type(weights_column) is not str:

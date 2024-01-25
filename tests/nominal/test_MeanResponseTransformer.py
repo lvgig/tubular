@@ -1024,7 +1024,6 @@ class TestTransform:
             x.transform(df)
 
     def test_not_dataframe_error_raised(self):
-
         df = d.create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(columns="b")
