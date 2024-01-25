@@ -254,16 +254,15 @@ class TestInit:
         minimal_attribute_dict,
     ):
         """Test an error is raised if verbose is not specified as a bool."""
-        # TODO remove once arguments are made more consistent across the package
-        if "verbose" in inspect.getfullargspec(transformer).args:
-            with pytest.raises(
-                TypeError,
-                match=f"{transformer_name}: verbose must be a bool",
-            ):
-                transformer(
-                    verbose=non_bool,
-                    **minimal_attribute_dict[transformer_name],
-                )
+
+        with pytest.raises(
+            TypeError,
+            match=f"{transformer_name}: verbose must be a bool",
+        ):
+            transformer(
+                verbose=non_bool,
+                **minimal_attribute_dict[transformer_name],
+            )
 
     @pytest.mark.parametrize("non_bool", [1, "True", {"a": 1}, [1, 2], None])
     @pytest.mark.parametrize("transformer_name, transformer", get_classes_to_test())
