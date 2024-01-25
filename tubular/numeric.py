@@ -56,7 +56,6 @@ class LogTransformer(BaseTransformer):
         The suffix to add onto the end of column names for new columns.
 
     """
-
     def __init__(
         self,
         columns: str | list[str] | None,
