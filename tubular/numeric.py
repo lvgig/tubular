@@ -56,6 +56,7 @@ class LogTransformer(BaseTransformer):
         The suffix to add onto the end of column names for new columns.
 
     """
+
     def __init__(
         self,
         columns: str | list[str] | None,
@@ -270,6 +271,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         Dictionary of method kwargs to be passed to pandas.DataFrame method.
 
     """
+
     def __init__(
         self,
         pd_method_name: str,
