@@ -32,7 +32,7 @@ jobs:
     - name: Format with ruff
       if: always()
       run: |
-        ruff format --diff
+        ruff format . --diff
 
     - name: Test with pytest
       if: always()
