@@ -271,7 +271,6 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         Dictionary of method kwargs to be passed to pandas.DataFrame method.
 
     """
-
     def __init__(
         self,
         pd_method_name: str,
