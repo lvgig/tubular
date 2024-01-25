@@ -29,6 +29,11 @@ jobs:
       with:
         version: 0.1.6
 
+    - name: Format with ruff
+      if: always()
+      run: |
+        ruff format --diff
+
     - name: Test with pytest
       if: always()
       run: |
