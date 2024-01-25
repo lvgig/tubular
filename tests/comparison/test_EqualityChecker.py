@@ -48,14 +48,18 @@ class TestInit:
             not example_transformer.drop_original
         ), "unexpected value set to drop_original atttribute"
 
-    @pytest.mark.parametrize("test_input_col_type", ["a", None])
-    def test_type_error_for_columns(self, test_input_col_type):
-        """Checks that an error is raised if wrong data type for argument:columns."""
+    def test_type_error_for_columns(self):
+        """
+        Checks that an error is raised if wrong data type for argument:columns.
+
+        This is distinct from the BaseTransformer columns in put check as equality checker will only work
+        with columns as a list, not a string.
+        """
         with pytest.raises(
             TypeError,
             match="columns should be list",
         ):
-            EqualityChecker(columns=test_input_col_type, new_col_name="d")
+            EqualityChecker(columns="a", new_col_name="d")
 
     @pytest.mark.parametrize("test_input_col", [["b", "b", "b"], ["a"]])
     def test_value_error_for_columns(self, test_input_col):

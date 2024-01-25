@@ -16,8 +16,8 @@ class TestCheckMappableRows:
         """Test an exception is raised if non-mappable rows are present in X."""
         df = d.create_df_1()
 
-        x = BaseNominalTransformer()
-        x.columns = ["a", "b"]
+        x = BaseNominalTransformer(columns=["a", "b"])
+
         x.mappings = {
             "a": {1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7},
             "b": {"a": 1, "c": 2, "d": 3, "e": 4, "f": 5},

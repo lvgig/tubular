@@ -10,36 +10,6 @@ from tubular.nominal import OrdinalEncoderTransformer
 class TestInit:
     """Tests for OrdinalEncoderTransformer.init()."""
 
-    def test_super_init_called(self, mocker):
-        """Test that init calls BaseNominalTransformer.__init__."""
-        spy = mocker.spy(tubular.nominal.BaseNominalTransformer, "__init__")
-
-        x = OrdinalEncoderTransformer(columns=None, verbose=True, copy=True)
-
-        assert (
-            spy.call_count == 1
-        ), "unexpected number of calls to BaseTransformer.__init__"
-
-        call_args = spy.call_args_list[0]
-        call_pos_args = call_args[0]
-        call_kwargs = call_args[1]
-
-        expected_kwargs = {"columns": None, "verbose": True, "copy": True}
-
-        assert (
-            call_kwargs == expected_kwargs
-        ), "unexpected kwargs in BaseTransformer.__init__ call"
-
-        expected_pos_args = (x,)
-
-        assert (
-            len(call_pos_args) == 1
-        ), "unexpected # positional args in BaseTransformer.__init__ call"
-
-        assert (
-            expected_pos_args == call_pos_args
-        ), "unexpected positional args in BaseTransformer.__init__ call"
-
     def test_weights_column_not_str_error(self):
         """Test that an exception is raised if weights_column is not a str."""
         with pytest.raises(
@@ -47,16 +17,6 @@ class TestInit:
             match="OrdinalEncoderTransformer: weights_column should be a str",
         ):
             OrdinalEncoderTransformer(weights_column=1)
-
-    def test_values_passed_in_init_set_to_attribute(self):
-        """Test that the values passed in init are saved in an attribute of the same name."""
-        x = OrdinalEncoderTransformer(weights_column="aaa")
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={"weights_column": "aaa"},
-            msg="Attributes for OrdinalEncoderTransformer set in init",
-        )
 
 
 class TestFit:

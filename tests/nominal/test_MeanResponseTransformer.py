@@ -72,36 +72,6 @@ def learnt_unseen_levels_encoding_dict_arbitrary():
 class TestInit:
     """Tests for MeanResponseTransformer.init()."""
 
-    def test_super_init_called(self, mocker):
-        """Test that init calls BaseTransformer.init."""
-        spy = mocker.spy(tubular.base.BaseTransformer, "__init__")
-
-        x = MeanResponseTransformer(columns=None, verbose=True, copy=True)
-
-        assert (
-            spy.call_count == 1
-        ), "unexpected number of calls to BaseTransformer.__init__"
-
-        call_args = spy.call_args_list[0]
-        call_pos_args = call_args[0]
-        call_kwargs = call_args[1]
-
-        expected_kwargs = {"columns": None, "verbose": True, "copy": True}
-
-        assert (
-            call_kwargs == expected_kwargs
-        ), "unexpected kwargs in BaseTransformer.__init__ call"
-
-        expected_pos_args = (x,)
-
-        assert (
-            len(call_pos_args) == 1
-        ), "unexpected # positional args in BaseTransformer.__init__ call"
-
-        assert (
-            expected_pos_args == call_pos_args
-        ), "unexpected positional args in BaseTransformer.__init__ call"
-
     def test_weights_column_not_str_error(self):
         """Test that an exception is raised if weights_column is not a str."""
         with pytest.raises(
@@ -136,26 +106,6 @@ class TestInit:
         ):
             MeanResponseTransformer(unseen_level_handling="AAA")
 
-    def test_values_passed_in_init_set_to_attribute(self):
-        """Test that the values passed in init are saved in an attribute of the same name."""
-        x = MeanResponseTransformer(
-            weights_column="aaa",
-            prior=1,
-            level="any",
-            unseen_level_handling="Mean",
-        )
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "weights_column": "aaa",
-                "prior": 1,
-                "level": "any",
-                "unseen_level_handling": "Mean",
-            },
-            msg="Attributes for MeanResponseTransformer set in init",
-        )
-
 
 class Test_prior_regularisation:
     "tests for _prior_regularisation method."
@@ -164,7 +114,7 @@ class Test_prior_regularisation:
         """Test that _prior_regularisation calls BaseTransformer.check_is_fitted."""
         expected_call_args = {0: {"args": (["global_mean"],), "kwargs": {}}}
 
-        x = MeanResponseTransformer()
+        x = MeanResponseTransformer(columns="a")
 
         x.fit(pd.DataFrame({"a": ["1", "2"]}), pd.Series([2, 3]))
 

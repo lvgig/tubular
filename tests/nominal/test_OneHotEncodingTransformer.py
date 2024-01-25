@@ -44,60 +44,7 @@ class TestInit:
             call_pos_args[0] is x
         ), f"Unexpected positional arg (self) in BaseNominalTransformer.__init__ call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
 
-    def test_one_hot_encoder_init_called(self, mocker):
-        """Test that init calls OneHotEncoder.init.
-
-        Again not using ta.functions.assert_function_call for this as it does not handle self being passed to OneHotEncoder.init
-        """
-        expected_keyword_args = {"sparse": False, "handle_unknown": "ignore"}
-
-        mocker.patch("sklearn.preprocessing.OneHotEncoder.__init__")
-
-        x = OneHotEncodingTransformer(
-            columns=None,
-            verbose=True,
-            copy=True,
-            separator="x",
-            drop_original=True,
-        )
-
-        assert (
-            sklearn.preprocessing.OneHotEncoder.__init__.call_count == 1
-        ), f"Not enough calls to OneHotEncoder.__init__ -\n  Expected: 1\n  Actual: {sklearn.preprocessing.OneHotEncoder.__init__.call_count}"
-
-        call_args = sklearn.preprocessing.OneHotEncoder.__init__.call_args_list[0]
-        call_pos_args = call_args[0]
-        call_kwargs = call_args[1]
-
-        ta.equality.assert_equal_dispatch(
-            expected=expected_keyword_args,
-            actual=call_kwargs,
-            msg="kwargs for OneHotEncoder.__init__ in OneHotEncodingTransformer.init",
-        )
-
-        assert (
-            len(call_pos_args) == 1
-        ), f"Unepxected number of positional args in OneHotEncoder.__init__ call -\n  Expected: 1\n  Actual: {len(call_pos_args)}"
-
-        assert (
-            call_pos_args[0] is x
-        ), f"Unexpected positional arg (self) in OneHotEncoder.__init__ call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
-
-    def test_values_passed_in_init_set_to_attribute(self):
-        """Test that the values passed in init are saved in an attribute of the same name."""
-        x = OneHotEncodingTransformer(
-            columns=None,
-            verbose=True,
-            copy=True,
-            separator="x",
-            drop_original=True,
-        )
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={"separator": "x", "drop_original": True},
-            msg="Attributes for OneHotEncodingTransformer set in init",
-        )
+    # TODO replace type checks left by deleting one hot encoder init call test
 
 
 class TestFit:
@@ -482,7 +429,7 @@ class TestTransform:
         df_train = d.create_df_7()
         df_test = d.create_df_8()
 
-        x = OneHotEncodingTransformer(verbose=True)
+        x = OneHotEncodingTransformer(columns=["a", "b", "c"], verbose=True)
 
         x.fit(df_train)
 
@@ -532,7 +479,7 @@ class TestTransform:
         """Test OneHotEncodingTransformer.transform keeps original columns when specified."""
         df = d.create_df_7()
 
-        x = OneHotEncodingTransformer(drop_original=False)
+        x = OneHotEncodingTransformer(columns=["a", "b", "c"], drop_original=False)
 
         x.fit(df)
 

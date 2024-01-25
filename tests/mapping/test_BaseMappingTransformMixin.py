@@ -2,7 +2,6 @@ import pandas as pd
 import test_aide as ta
 
 import tests.test_data as d
-import tubular
 from tubular.mapping import BaseMappingTransformMixin
 
 
@@ -14,52 +13,7 @@ class TestInit:
 class TestTransform:
     """Tests for BaseMappingTransformMixin.transform()."""
 
-    def test_check_is_fitted_call(self, mocker):
-        """Test the call to check_is_fitted."""
-        df = d.create_df_1()
-
-        mapping = {
-            "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
-            "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
-        }
-
-        x = BaseMappingTransformMixin()
-        x.columns = ["a", "b"]
-        x.mappings = mapping
-
-        expected_call_args = {0: {"args": (["mappings"],), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "check_is_fitted",
-            expected_call_args,
-        ):
-            x.transform(df)
-
-    def test_super_transform_call(self, mocker):
-        """Test the call to BaseTransformer.transform."""
-        df = d.create_df_1()
-
-        mapping = {
-            "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
-            "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
-        }
-
-        x = BaseMappingTransformMixin()
-        x.columns = ["a", "b"]
-        x.mappings = mapping
-
-        expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-        ):
-            x.transform(df)
-
+    # TODO replace this with a behaviour test
     def test_pd_series_replace_call(self, mocker):
         """Test the call to pd.Series.replace."""
         spy = mocker.spy(pd.Series, "replace")
@@ -71,8 +25,8 @@ class TestTransform:
             "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
         }
 
-        x = BaseMappingTransformMixin()
-        x.columns = ["a", "b"]
+        x = BaseMappingTransformMixin(columns=["a", "b"])
+
         x.mappings = mapping
 
         x.transform(df)
