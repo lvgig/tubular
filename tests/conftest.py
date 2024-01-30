@@ -1,6 +1,41 @@
+import inspect
+import pkgutil
+from importlib import import_module
+from pathlib import Path
+
 import pytest
 
-pytest.fixture()
+import tubular.base as base
+
+
+def get_all_classes():
+    root = str(Path(__file__).parent.parent)
+
+    all_classes = []
+    modules_to_ignore = [
+        "tests",
+        "conftest",
+        "setup",
+    ]
+
+    for _importer, modname, _ispkg in pkgutil.walk_packages(
+        path=[root],
+    ):
+        mod_parts = modname.split(".")
+        if any(part in modules_to_ignore for part in mod_parts) or "_" in modname:
+            continue
+        module = import_module(modname)
+        classes = inspect.getmembers(module, inspect.isclass)
+
+        classes = [
+            (name, transformer)
+            for name, transformer in classes
+            if issubclass(transformer, base.BaseTransformer)
+        ]
+
+        all_classes.extend(classes)
+
+    return set(all_classes)
 
 
 @pytest.fixture()
@@ -13,6 +48,9 @@ def minimal_attribute_dict():
             "columns": ["a", "c"],
             "new_column_names": "f",
             "pd_method_name": "sum",
+        },
+        "BaseDateTransformer": {
+            "columns": ["a"],
         },
         "CappingTransformer": {
             "capping_values": {"a": [0.1, 0.2]},
@@ -58,7 +96,7 @@ def minimal_attribute_dict():
             "units": "month",
         },
         "BaseImputer": {
-            "columns": None,
+            "columns": ["a"],
         },
         "ArbitraryImputer": {
             "columns": ["a"],
@@ -83,7 +121,7 @@ def minimal_attribute_dict():
             "mappings": {"a": {1: 2, 3: 4}},
         },
         "BaseMappingTransformMixin": {
-            "columns": None,
+            "columns": ["a"],
         },
         "MappingTransformer": {
             "mappings": {"a": {1: 2, 3: 4}},
@@ -109,7 +147,7 @@ def minimal_attribute_dict():
             "dtype": str,
         },
         "BaseNominalTransformer": {
-            "columns": None,
+            "columns": ["a"],
         },
         "NominalToIntegerTransformer": {
             "columns": ["b"],
@@ -161,3 +199,13 @@ def minimal_attribute_dict():
             "new_column": "c",
         },
     }
+
+
+@pytest.fixture()
+def instantiated_transformers(minimal_attribute_dict):
+    return {x[0]: x[1](**minimal_attribute_dict[x[0]]) for x in get_all_classes()}
+
+
+@pytest.fixture()
+def uninstantiated_transformers():
+    return {x[0]: x[1] for x in get_all_classes()}
