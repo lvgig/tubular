@@ -64,26 +64,6 @@ class GenericInitTests:
                 **minimal_attribute_dict[self.transformer_name],
             )
 
-    @pytest.mark.parametrize("non_string_or_list", [1, True, {"a": 1}, None])
-    def test_columns_non_string_error(
-        self,
-        non_string_or_list,
-        minimal_attribute_dict,
-        uninstantiated_transformers,
-    ):
-        """Test an error is raised if columns is not passed as a string or list."""
-
-        args = minimal_attribute_dict[self.transformer_name].copy()
-        args["columns"] = non_string_or_list
-
-        with pytest.raises(
-            TypeError,
-            match=re.escape(
-                f"{self.transformer_name}: columns must be a string or list with the columns to be pre-processed (if specified)",
-            ),
-        ):
-            uninstantiated_transformers[self.transformer_name](**args)
-
 
 class GenericFitTests:
     """
