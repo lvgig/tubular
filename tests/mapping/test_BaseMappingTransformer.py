@@ -19,7 +19,7 @@ class BaseMappingTransformerInitTests(ColumnsFromDictInitTests):
         """Test that an exception is raised if mappings is a dict but with no keys."""
         with pytest.raises(
             ValueError,
-            match="BaseMappingTransformer: mappings has no values",
+            match=f"{self.transformer_name}: mappings has no values",
         ):
             uninstantiated_transformers[self.transformer_name](mappings={})
 
@@ -27,7 +27,7 @@ class BaseMappingTransformerInitTests(ColumnsFromDictInitTests):
         """Test that an exception is raised if mappings contains non-dict items."""
         with pytest.raises(
             ValueError,
-            match="BaseMappingTransformer: values in mappings dictionary should be dictionaries",
+            match=f"{self.transformer_name}: values in mappings dictionary should be dictionaries",
         ):
             uninstantiated_transformers[self.transformer_name](
                 mappings={"a": {"a": 1}, "b": 1},
@@ -37,21 +37,9 @@ class BaseMappingTransformerInitTests(ColumnsFromDictInitTests):
         """Test that an exception is raised if mappings is not a dict."""
         with pytest.raises(
             ValueError,
-            match="BaseMappingTransformer: mappings must be a dictionary",
+            match=f"{self.transformer_name}: mappings must be a dictionary",
         ):
             uninstantiated_transformers[self.transformer_name](mappings=())
-
-    def test_mappings_set_to_attribute(self, uninstantiated_transformers):
-        """Test that the value passed for mappings is saved in an attribute of the same name."""
-        value = {"a": {"a": 1}, "b": {"a": 1}}
-
-        x = uninstantiated_transformers[self.transformer_name](mappings=value)
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={"mappings": value},
-            msg="Attributes for BaseMappingTransformer set in init",
-        )
 
 
 class BaseMappingTransformerTransformerTests:
@@ -97,7 +85,7 @@ class BaseMappingTransformerTransformerTests:
         ta.equality.assert_equal_dispatch(
             expected=mapping,
             actual=x.mappings,
-            msg="BaseMappingTransformer.transform has changed self.mappings unexpectedly",
+            msg=f"{self.transformer_name}.transform has changed self.mappings unexpectedly",
         )
 
 

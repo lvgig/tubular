@@ -1,29 +1,76 @@
+import re
+
 import pandas as pd
+import pytest
 import test_aide as ta
 
 import tests.test_data as d
+from tests.base_tests import (
+    GenericFitTests,
+    OtherBaseBehaviourTests,
+)
+from tests.specific_column_type_tests import ColumnStrListInitTests
 from tubular.mapping import BaseMappingTransformMixin
 
+### Note there are no tests that need inheriting from this file as the only difference is an expected transform output
 
-class TestInit:
-    """Tests for BaseMappingTransformMixin.init().
-    Currently nothing to test."""
+
+@pytest.fixture()
+def mapping():
+    return {
+        "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
+        "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
+    }
+
+
+class TestInit(ColumnStrListInitTests):
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseMappingTransformMixin"
+
+
+class TestFit(GenericFitTests):
+    """Generic tests for transformer.fit()"""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseMappingTransformMixin"
 
 
 class TestTransform:
-    """Tests for BaseMappingTransformMixin.transform()."""
+    """
+    Tests for BaseMappingTransformMixin.transform().
 
-    # TODO replace this with a behaviour test
-    def test_pd_series_replace_call(self, mocker):
-        """Test the call to pd.Series.replace."""
-        spy = mocker.spy(pd.Series, "replace")
+    Because this is a Mixin transformer it is not appropriate to inherit the generic transform tests.
+    """
+
+    def test_expected_output(self, mapping):
+        """Test that X is returned from transform."""
 
         df = d.create_df_1()
 
-        mapping = {
-            "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
-            "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
-        }
+        expected = pd.DataFrame(
+            {
+                "a": ["a", "b", "c", "d", "e", "f"],
+                "b": [1, 2, 3, 4, 5, 6],
+            },
+        )
+
+        x = BaseMappingTransformMixin(columns=["a", "b"])
+
+        x.mappings = mapping
+
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=expected,
+            actual=df_transformed,
+            msg="BaseMappingTransformMixin from transform",
+        )
+
+    def test_mappings_unchanged(self, mapping):
+        """Test that mappings is unchanged in transform."""
+        df = d.create_df_1()
 
         x = BaseMappingTransformMixin(columns=["a", "b"])
 
@@ -31,47 +78,68 @@ class TestTransform:
 
         x.transform(df)
 
-        assert spy.call_count == 2, "unexpected number of calls to pd.Series.replace"
-
-        call_args = spy.call_args_list[0]
-
-        call_pos_arg = call_args[0]
-        call_kwargs = call_args[1]
-
-        # not totally sure where this kwarg is injected from but regex=False is the
-        # desired default behaviour for Series.replace in this case so leaving for now.
-        # Likely to do with the way DataFrame.replace is implemented.
-        assert call_kwargs == {"regex": False}
-
-        # pd.Series.replace separates dict into to replace and value lists
-        expected_pos_args = (
-            df["a"],
-            [1, 2, 3, 4, 5, 6],
-            ["a", "b", "c", "d", "e", "f"],
-        )
-
         ta.equality.assert_equal_dispatch(
-            expected_pos_args,
-            call_pos_arg,
-            "positional args in first pd.Series.replace call not correct",
+            expected=mapping,
+            actual=x.mappings,
+            msg="BaseMappingTransformer.transform has changed self.mappings unexpectedly",
         )
 
-        call_args = spy.call_args_list[1]
+    @pytest.mark.parametrize("non_df", [1, True, "a", [1, 2], {"a": 1}, None])
+    def test_non_pd_type_error(
+        self,
+        non_df,
+        mapping,
+    ):
+        """Test that an error is raised in transform is X is not a pd.DataFrame."""
 
-        call_pos_arg = call_args[0]
-        call_kwargs = call_args[1]
+        df = d.create_df_10()
 
-        assert call_kwargs == {"regex": False}
+        x = BaseMappingTransformMixin(columns=["a"])
 
-        # pd.Series.replace separates dict into to replace and value lists
-        expected_pos_args = (
-            df["b"],
-            ["a", "b", "c", "d", "e", "f"],
-            [1, 2, 3, 4, 5, 6],
-        )
+        x.mappings = mapping
 
-        ta.equality.assert_equal_dispatch(
-            expected_pos_args,
-            call_pos_arg,
-            "positional args in second pd.Series.replace call not correct",
-        )
+        x_fitted = x.fit(df, df["c"])
+
+        with pytest.raises(
+            TypeError,
+            match="BaseMappingTransformMixin: X should be a pd.DataFrame",
+        ):
+            x_fitted.transform(X=non_df)
+
+    def test_copy_returned(self, mapping):
+        """Test check that a copy is returned if copy is set to True"""
+        df = d.create_df_10()
+
+        x = BaseMappingTransformMixin(columns=["a"])
+
+        x.mappings = mapping
+
+        x = x.fit(df, df["c"])
+
+        df_transformed = x.transform(df)
+
+        assert df_transformed is not df
+
+    def test_no_rows_error(self, mapping):
+        """Test an error is raised if X has no rows."""
+        df = d.create_df_10()
+
+        x = BaseMappingTransformMixin(columns=["a"])
+
+        x.mappings = mapping
+
+        x = x.fit(df, df["c"])
+
+        df = pd.DataFrame(columns=["a", "b", "c"])
+
+        with pytest.raises(
+            ValueError,
+            match=re.escape("BaseMappingTransformMixin: X has no rows; (0, 3)"),
+        ):
+            x.transform(df)
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseMappingTransformMixin"
