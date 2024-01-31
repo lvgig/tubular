@@ -108,6 +108,12 @@ class TestTransform(BaseMappingTransformerTransformTests):
 
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "BaseMappingTransformer"

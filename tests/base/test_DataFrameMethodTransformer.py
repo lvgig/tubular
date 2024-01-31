@@ -6,11 +6,21 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
+from tests.base_tests import (
+    GenericFitTests,
+    GenericTransformTests,
+    OtherBaseBehaviourTests,
+)
+from tests.specific_column_type_tests import ColumnStrListInitTests
 from tubular.base import DataFrameMethodTransformer
 
 
-class TestInit:
+class TestInit(ColumnStrListInitTests):
     """Tests for DataFrameMethodTransformer.init()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DataFrameMethodTransformer"
 
     @pytest.mark.parametrize("not_dictionary", ["a", [1, 2], True, 1.5])
     def test_exception_raised_pd_method_kwargs_not_dict(self, not_dictionary):
@@ -95,8 +105,20 @@ class TestInit:
             )
 
 
-class TestTransform:
+class TestFit(GenericFitTests):
+    """Generic tests for transformer.fit()"""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DataFrameMethodTransformer"
+
+
+class TestTransform(GenericTransformTests):
     """Tests for DataFrameMethodTransformer.transform()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DataFrameMethodTransformer"
 
     def expected_df_1():
         """Expected output of test_expected_output_single_columns_assignment."""
@@ -200,3 +222,15 @@ class TestTransform:
         assert ("a" in df_transformed.columns.to_numpy()) and (
             "b" in df_transformed.columns.to_numpy()
         ), "original columns not kept"
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseTransformer"
