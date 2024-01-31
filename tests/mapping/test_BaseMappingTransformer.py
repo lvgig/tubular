@@ -4,6 +4,7 @@ import test_aide as ta
 import tests.test_data as d
 from tests.base_tests import GenericFitTests, OtherBaseBehaviourTests
 from tests.specific_column_type_tests import ColumnsFromDictInitTests
+from tubular.mapping import BaseMappingTransformer
 
 
 # The first part of this file builds out the tests for BaseMappingTransformer so that they can be
@@ -42,32 +43,11 @@ class BaseMappingTransformerInitTests(ColumnsFromDictInitTests):
             uninstantiated_transformers[self.transformer_name](mappings=())
 
 
-class BaseMappingTransformerTransformerTests:
+class BaseMappingTransformerTransformTests:
     """
     Tests for the transform method on MappingTransformer.
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
-
-    @pytest.mark.parametrize(
-        ("df", "expected"),
-        ta.pandas.adjusted_dataframe_params(d.create_df_1(), d.create_df_1()),
-    )
-    def test_X_returned(self, df, expected, uninstantiated_transformers):
-        """Test that X is returned from transform."""
-        mapping = {
-            "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
-            "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
-        }
-
-        x = uninstantiated_transformers[self.transformer_name](mappings=mapping)
-
-        df_transformed = x.transform(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="Check X returned from transform",
-        )
 
     def test_mappings_unchanged(self, uninstantiated_transformers):
         """Test that mappings is unchanged in transform."""
@@ -92,12 +72,6 @@ class BaseMappingTransformerTransformerTests:
 ### Running the BaseMappingTransformerTestSuite
 
 
-class TestInit(BaseMappingTransformerInitTests):
-    @classmethod
-    def setup_class(cls):
-        cls.transformer_name = "BaseMappingTransformer"
-
-
 class TestFit(GenericFitTests):
     """Generic tests for transformer.fit()"""
 
@@ -106,10 +80,31 @@ class TestFit(GenericFitTests):
         cls.transformer_name = "BaseMappingTransformer"
 
 
-class TestTransform(BaseMappingTransformerTransformerTests):
+class TestTransform(BaseMappingTransformerTransformTests):
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "BaseMappingTransformer"
+
+    @pytest.mark.parametrize(
+        ("df", "expected"),
+        ta.pandas.adjusted_dataframe_params(d.create_df_1(), d.create_df_1()),
+    )
+    def test_X_returned(self, df, expected, uninstantiated_transformers):
+        """Test that X is returned from transform."""
+        mapping = {
+            "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
+            "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
+        }
+
+        x = BaseMappingTransformer(mappings=mapping)
+
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=expected,
+            actual=df_transformed,
+            msg="Check X returned from transform",
+        )
 
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):

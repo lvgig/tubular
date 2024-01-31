@@ -135,14 +135,6 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
 
     """
 
-    def __init__(self, mappings: dict[str, dict], **kwargs: dict[str, bool]) -> None:
-        for k, v in mappings.items():
-            if not isinstance(v, dict):
-                msg = f"{self.classname()}: each item in mappings should be a dict but got type {type(v)} for key {k}"
-                raise TypeError(msg)
-
-        BaseMappingTransformer.__init__(self, mappings=mappings, **kwargs)
-
     def transform(
         self,
         X: pd.DataFrame,
