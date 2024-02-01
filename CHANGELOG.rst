@@ -16,6 +16,10 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+Changed
+^^^^^^^
+- pre-commit to run with ruff v0.1.6 
+
 1.1.1 (2024-01-18)
 ------------------
 

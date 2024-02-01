@@ -230,7 +230,6 @@ class TestTransform:
             x.transform(df)
 
     def test_not_dataframe_error_raised(self):
-
         df = d.create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns="b")

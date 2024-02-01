@@ -30,13 +30,12 @@ jobs:
     - name: Lint with ruff
       uses: chartboost/ruff-action@v1
       with:
-        version: 0.0.275
+        version: 0.1.6
 
-    - name: Lint with black
+    - name: Format with ruff
       if: always()
       run: |
-        black --version
-        black --check .
+        ruff format . --diff
 
     - name: Test with pytest
       if: always()

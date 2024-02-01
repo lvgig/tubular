@@ -63,8 +63,8 @@ class CappingTransformer(BaseTransformer):
 
     def __init__(
         self,
-        capping_values: dict[str, list[int | float | None]] | None = None,
-        quantiles: dict[str, list[int | float]] | None = None,
+        capping_values: dict[str, list[float | None]] | None = None,
+        quantiles: dict[str, list[float]] | None = None,
         weights_column: str | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
@@ -104,7 +104,7 @@ class CappingTransformer(BaseTransformer):
 
     def check_capping_values_dict(
         self,
-        capping_values_dict: dict[str, list[int | float | None]],
+        capping_values_dict: dict[str, list[float | None]],
         dict_name: str,
     ) -> None:
         """Performs checks on a dictionary passed to ."""
@@ -196,7 +196,7 @@ class CappingTransformer(BaseTransformer):
         values: pd.Series | np.array,
         quantiles: list[float],
         sample_weight: pd.Series | np.array | None = None,
-    ) -> list[int | float]:
+    ) -> list[float]:
         """Method to call the weighted_quantile method and prepare the outputs.
 
         If there are no None values in the supplied quantiles then the outputs from weighted_quantile
@@ -246,7 +246,7 @@ class CappingTransformer(BaseTransformer):
         values: pd.Series | np.array,
         quantiles: list[float],
         sample_weight: pd.Series | np.array | None = None,
-    ) -> list[int | float]:
+    ) -> list[float]:
         """Method to calculate weighted quantiles.
 
         This method is adapted from the "Completely vectorized numpy solution" answer from user
@@ -456,8 +456,8 @@ class OutOfRangeNullTransformer(CappingTransformer):
 
     def __init__(
         self,
-        capping_values: dict[str, list[int | float | None]] | None = None,
-        quantiles: dict[str, list[int | float]] | None = None,
+        capping_values: dict[str, list[float | None]] | None = None,
+        quantiles: dict[str, list[float]] | None = None,
         weights_column: str | None = None,
         **kwargs: dict[str, bool],
     ) -> None:

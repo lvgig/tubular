@@ -35,7 +35,7 @@ class TestSetColumnDtypeInit:
 
     @pytest.mark.parametrize(
         "invalid_dtype",
-        ["STRING", "misc_invalid", "np.int", int()],
+        ["STRING", "misc_invalid", "np.int", 0],
     )
     def test_invalid_dtype_error(self, invalid_dtype):
         msg = f"SetColumnDtype: data type '{invalid_dtype}' not understood as a valid dtype"

@@ -62,7 +62,7 @@ class ArbitraryImputer(BaseImputer):
 
     def __init__(
         self,
-        impute_value: int | float | str,
+        impute_value: float | str,
         columns: str | list[str] | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
