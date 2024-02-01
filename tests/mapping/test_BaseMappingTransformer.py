@@ -72,6 +72,14 @@ class BaseMappingTransformerTransformTests:
 ### Running the BaseMappingTransformerTestSuite
 
 
+class TestInit(BaseMappingTransformerInitTests):
+    """Tests for BaseMappingTransformer.init()"""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseMappingTransformer"
+
+
 class TestFit(GenericFitTests):
     """Generic tests for transformer.fit()"""
 
