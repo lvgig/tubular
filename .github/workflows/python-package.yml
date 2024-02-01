@@ -38,6 +38,7 @@ jobs:
     - name: Test with pytest
       if: always()
       run: |
+        pytest --version
         pytest . --cov=tubular/ --cov-report=html --cov-config=.coveragerc
 
     - name: Upload coverage pytest html test results to github
