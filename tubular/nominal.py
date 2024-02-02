@@ -766,33 +766,24 @@ class MeanResponseTransformer(BaseNominalTransformer):
             self._fit_binary_response(X, y, self.columns)
             self.encoded_feature_columns = self.columns
 
-        if self.unseen_level_handling == "Mean":
-            for c in self.encoded_feature_columns:
-                self.unseen_levels_encoding_dict[c] = (
-                    X_temp[c].map(self.mappings[c]).mean()
-                )
-
-        elif self.unseen_level_handling == "Median":
-            for c in self.encoded_feature_columns:
-                self.unseen_levels_encoding_dict[c] = (
-                    X_temp[c].map(self.mappings[c]).median()
-                )
-
-        elif self.unseen_level_handling == "Lowest":
-            for c in self.encoded_feature_columns:
-                self.unseen_levels_encoding_dict[c] = (
-                    X_temp[c].map(self.mappings[c]).min()
-                )
-
-        elif self.unseen_level_handling == "Highest":
-            for c in self.encoded_feature_columns:
-                self.unseen_levels_encoding_dict[c] = (
-                    X_temp[c].map(self.mappings[c]).max()
-                )
-
-        elif isinstance(self.unseen_level_handling, (int, float)):
+        if isinstance(self.unseen_level_handling, (int, float)):
             for c in self.encoded_feature_columns:
                 self.unseen_levels_encoding_dict[c] = float(self.unseen_level_handling)
+        else:
+            for c in self.encoded_feature_columns:
+                X_temp[c] = X_temp[c].map(self.mappings[c]).astype(float)
+
+                if self.unseen_level_handling == "Mean":
+                    self.unseen_levels_encoding_dict[c] = X_temp[c].mean()
+
+                if self.unseen_level_handling == "Median":
+                    self.unseen_levels_encoding_dict[c] = X_temp[c].median()
+
+                if self.unseen_level_handling == "Lowest":
+                    self.unseen_levels_encoding_dict[c] = X_temp[c].min()
+
+                if self.unseen_level_handling == "Highest":
+                    self.unseen_levels_encoding_dict[c] = X_temp[c].max()
 
         return self
 
@@ -810,7 +801,7 @@ class MeanResponseTransformer(BaseNominalTransformer):
             input dataframe with mappings applied
         """
         for c in self.columns:
-            X[c] = X[c].map(self.mappings[c])
+            X[c] = X[c].map(self.mappings[c]).astype(float)
 
         return X
 

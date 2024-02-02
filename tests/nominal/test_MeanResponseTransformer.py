@@ -1,3 +1,5 @@
+from itertools import product
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -11,12 +13,25 @@ from tubular.nominal import MeanResponseTransformer
 
 @pytest.fixture()
 def learnt_mapping_dict():
-    return {
+    full_dict = {}
+
+    b_dict = {
         "b": {"a": 1.0, "b": 2.0, "c": 3.0, "d": 4.0, "e": 5.0, "f": 6.0},
         "b_blue": {"a": 1.0, "b": 1.0, "c": 0.0, "d": 0.0, "e": 0.0, "f": 0.0},
         "b_yellow": {"a": 0.0, "b": 0.0, "c": 1.0, "d": 1.0, "e": 0.0, "f": 0.0},
         "b_green": {"a": 0.0, "b": 0.0, "c": 0.0, "d": 0.0, "e": 1.0, "f": 1.0},
     }
+
+    # c matches b, but is categorical
+    c_dict = {
+        "c" + suffix: b_dict["b" + suffix]
+        for suffix in ["", "_blue", "_yellow", "_green"]
+    }
+
+    full_dict.update(b_dict)
+    full_dict.update(c_dict)
+
+    return full_dict
 
 
 @pytest.fixture()
@@ -199,10 +214,13 @@ class Test_prior_regularisation:
         assert_series_equal(expected, output)
 
     def test_output2(self):
-        "Test output of method."
+        "Test output of method - for category dtype"
         x = MeanResponseTransformer(columns="a", prior=0)
 
-        x.fit(X=pd.DataFrame({"a": [1, 2]}), y=pd.Series([2, 3]))
+        df = pd.DataFrame({"a": ["a", "b"]})
+        df["a"] = df["a"].astype("category")
+
+        x.fit(X=df, y=pd.Series([2, 3]))
 
         expected1 = (1 * 1) / (1)
 
@@ -354,8 +372,9 @@ class TestFit:
     ):
         "Test that the mapping dictionary created in fit has the correct keys and values."
         df = d.create_MeanResponseTransformer_test_df()
+        columns = ["b", "c"]
         x = MeanResponseTransformer(
-            columns=["b"],
+            columns=columns,
             level=level,
             unseen_level_handling=unseen_level_handling,
         )
@@ -364,15 +383,16 @@ class TestFit:
         if level:
             if level == "all":
                 assert set(x.mapped_columns) == {
-                    "b_blue",
-                    "b_yellow",
-                    "b_green",
+                    prefix + "_" + suffix
+                    for prefix, suffix in product(
+                        columns,
+                        df[target_column].unique().tolist(),
+                    )
                 }, "Stored mapped columns are not as expected"
 
             else:
                 assert set(x.mapped_columns) == {
-                    "b_blue",
-                    "b_yellow",
+                    prefix + "_" + suffix for prefix, suffix in product(columns, level)
                 }, "Stored mapped columns are not as expected"
 
             for column in x.mapped_columns:
@@ -381,7 +401,7 @@ class TestFit:
                 assert actual == expected
 
         else:
-            assert x.columns == ["b"], "Columns attribute changed in fit"
+            assert x.columns == columns, "Columns attribute changed in fit"
 
             for column in x.columns:
                 actual = x.mappings[column]
@@ -1024,7 +1044,6 @@ class TestTransform:
             x.transform(df)
 
     def test_not_dataframe_error_raised(self):
-
         df = d.create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(columns="b")
@@ -1086,7 +1105,8 @@ class TestTransform:
     )
     def test_expected_output_binary_response(self, df, expected):
         """Test that the output is expected from transform with a binary response."""
-        x = MeanResponseTransformer(columns=["b", "d", "f"])
+        columns = ["b", "d", "f"]
+        x = MeanResponseTransformer(columns=columns)
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
         x.mappings = {
@@ -1096,6 +1116,9 @@ class TestTransform:
         }
 
         df_transformed = x.transform(df)
+
+        for col in columns:
+            expected[col] = expected[col].astype(float)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
@@ -1112,16 +1135,29 @@ class TestTransform:
     )
     def test_expected_output_one_multi_level(self, df, expected):
         """Test that the output is expected from transform with a multi-level response and one level selected."""
-        x = MeanResponseTransformer(columns=["b", "f"], level=["blue"])
+        columns = ["b", "f"]
+        level = ["blue"]
+        x = MeanResponseTransformer(columns=columns, level=level)
+
+        for col in [
+            prefix + "_" + suffix for prefix, suffix in product(columns, level)
+        ]:
+            expected[col] = expected[col].astype(float)
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
         x.mappings = {
             "b_blue": {"a": 1, "b": 1, "c": 0, "d": 0, "e": 0, "f": 0},
             "f_blue": {False: 2 / 3, True: 0},
         }
-        x.response_levels = ["blue"]
+        x.response_levels = level
         x.mapped_columns = list(x.mappings.keys())
         df_transformed = x.transform(df)
+
+        for col in [
+            prefix + "_" + suffix
+            for prefix, suffix in product(columns, x.response_levels)
+        ]:
+            expected[col] = expected[col].astype(float)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
@@ -1139,7 +1175,8 @@ class TestTransform:
     )
     def test_expected_output_all_levels(self, df, expected):
         """Test that the output is expected from transform for a multi-level response and all levels selected."""
-        x = MeanResponseTransformer(columns=["b", "f"], level="all")
+        columns = ["b", "f"]
+        x = MeanResponseTransformer(columns=columns, level="all")
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
         x.mappings = {
@@ -1155,8 +1192,11 @@ class TestTransform:
         x.mapped_columns = list(x.mappings.keys())
         df_transformed = x.transform(df)
 
-        print(df_transformed)
-        print(expected)
+        for col in [
+            prefix + "_" + suffix
+            for prefix, suffix in product(columns, x.response_levels)
+        ]:
+            expected[col] = expected[col].astype(float)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
@@ -1194,14 +1234,19 @@ class TestTransform:
         """Test that the output is expected from transform with a single level response with unseen levels in data with
         unseen_level_handling set to 'Mean'.
         """
+        columns = ["b", "d", "f"]
+        target = "a"
         x = MeanResponseTransformer(
-            columns=["b", "d", "f"],
+            columns=columns,
             unseen_level_handling="Mean",
         )
 
         initial_df = d.create_MeanResponseTransformer_test_df()
-        x.fit(initial_df, initial_df["a"])
+        x.fit(initial_df, initial_df[target])
         df_transformed = x.transform(df)
+
+        for col in columns:
+            expected[col] = expected[col].astype(float)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
@@ -1224,14 +1269,19 @@ class TestTransform:
         """Test that the output is expected from transform with a single level response with unseen levels in data
         with unseen_level_handling set to 'Median'.
         """
+        columns = ["b", "d", "f"]
+        target = "a"
         x = MeanResponseTransformer(
-            columns=["b", "d", "f"],
+            columns=columns,
             unseen_level_handling="Median",
         )
 
         initial_df = d.create_MeanResponseTransformer_test_df()
-        x.fit(initial_df, initial_df["a"])
+        x.fit(initial_df, initial_df[target])
         df_transformed = x.transform(df)
+
+        for col in columns:
+            expected[col] = expected[col].astype(float)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
@@ -1254,14 +1304,19 @@ class TestTransform:
         """Test that the output is expected from transform with a single level response with unseen levels in data
         with unseen_level_handling set to 'Lowest'.
         """
+        columns = ["b", "d", "f"]
+        target = "a"
         x = MeanResponseTransformer(
-            columns=["b", "d", "f"],
+            columns=columns,
             unseen_level_handling="Lowest",
         )
 
         initial_df = d.create_MeanResponseTransformer_test_df()
-        x.fit(initial_df, initial_df["a"])
+        x.fit(initial_df, initial_df[target])
         df_transformed = x.transform(df)
+
+        for col in columns:
+            expected[col] = expected[col].astype(float)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
@@ -1284,14 +1339,19 @@ class TestTransform:
         """Test that the output is expected from transform with a single level response with unseen levels in data
         with unseen_level_handling set to 'Highest'.
         """
+        columns = ["b", "d", "f"]
+        target = "a"
         x = MeanResponseTransformer(
             columns=["b", "d", "f"],
             unseen_level_handling="Highest",
         )
 
         initial_df = d.create_MeanResponseTransformer_test_df()
-        x.fit(initial_df, initial_df["a"])
+        x.fit(initial_df, initial_df[target])
         df_transformed = x.transform(df)
+
+        for col in columns:
+            expected[col] = expected[col].astype(float)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
@@ -1314,11 +1374,16 @@ class TestTransform:
         """Test that the output is expected from transform with a single level response with unseen levels in data
         with unseen_level_handling set to an arbitrary int/float value'.
         """
-        x = MeanResponseTransformer(columns=["b", "d", "f"], unseen_level_handling=21.6)
+        columns = ["b", "d", "f"]
+        target = "a"
+        x = MeanResponseTransformer(columns=columns, unseen_level_handling=21.6)
 
         initial_df = d.create_MeanResponseTransformer_test_df()
-        x.fit(initial_df, initial_df["a"])
+        x.fit(initial_df, initial_df[target])
         df_transformed = x.transform(df)
+
+        for col in columns:
+            expected[col] = expected[col].astype(float)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
@@ -1335,11 +1400,18 @@ class TestTransform:
     )
     def test_expected_output_one_multi_level_unseen_levels(self, df, expected):
         """Test that the output is expected from transform with a multi-level response and unseen levels and one level selected."""
+        columns = ["b", "f"]
+        level = ["blue"]
         x = MeanResponseTransformer(
-            columns=["b", "f"],
-            level=["blue"],
+            columns=columns,
+            level=level,
             unseen_level_handling="Mean",
         )
+
+        for col in [
+            prefix + "_" + suffix for prefix, suffix in product(columns, level)
+        ]:
+            expected[col] = expected[col].astype(float)
 
         initial_df = d.create_MeanResponseTransformer_test_df()
         x.fit(initial_df, initial_df["multi_level_response"])
@@ -1360,15 +1432,23 @@ class TestTransform:
     )
     def test_expected_output_all_multi_level_unseen_levels(self, df, expected):
         """Test that the output is expected from transform with a multi-level response and unseen levels and all level selected."""
+        columns = ["b", "f"]
+        target = "multi_level_response"
         x = MeanResponseTransformer(
-            columns=["b", "f"],
+            columns=columns,
             level="all",
             unseen_level_handling="Highest",
         )
 
         initial_df = d.create_MeanResponseTransformer_test_df()
-        x.fit(initial_df, initial_df["multi_level_response"])
+        x.fit(initial_df, initial_df[target])
         df_transformed = x.transform(df)
+
+        for col in [
+            prefix + "_" + suffix
+            for prefix, suffix in product(columns, initial_df[target].unique().tolist())
+        ]:
+            expected[col] = expected[col].astype(float)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
