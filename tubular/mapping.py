@@ -169,6 +169,9 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
             Transformed input X with levels mapped accoriding to mappings dict.
 
         """
+
+        X = BaseTransformer.transform(self, X)
+
         mapped_columns = self.mappings.keys()
         original_dtypes = X[mapped_columns].dtypes
 

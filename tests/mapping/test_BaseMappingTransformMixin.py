@@ -6,10 +6,11 @@ import test_aide as ta
 
 import tests.test_data as d
 from tests.base_tests import (
+    ColumnStrListInitTests,
     GenericFitTests,
+    GenericTransformTests,
     OtherBaseBehaviourTests,
 )
-from tests.specific_column_type_tests import ColumnStrListInitTests
 from tubular.mapping import BaseMappingTransformMixin
 
 ### Note there are no tests that need inheriting from this file as the only difference is an expected transform output
@@ -37,7 +38,7 @@ class TestFit(GenericFitTests):
         cls.transformer_name = "BaseMappingTransformMixin"
 
 
-class TestTransform:
+class TestTransform(GenericTransformTests):
     """
     Tests for BaseMappingTransformMixin.transform().
 

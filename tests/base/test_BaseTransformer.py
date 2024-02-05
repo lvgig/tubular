@@ -3,11 +3,11 @@ import test_aide as ta
 
 import tests.test_data as d
 from tests.base_tests import (
+    ColumnStrListInitTests,
     GenericFitTests,
     GenericTransformTests,
     OtherBaseBehaviourTests,
 )
-from tests.specific_column_type_tests import ColumnStrListInitTests
 from tubular.base import BaseTransformer
 
 

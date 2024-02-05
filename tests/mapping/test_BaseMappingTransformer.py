@@ -2,8 +2,12 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
-from tests.base_tests import GenericFitTests, OtherBaseBehaviourTests
-from tests.specific_column_type_tests import ColumnsFromDictInitTests
+from tests.base_tests import (
+    ColumnsFromDictInitTests,
+    GenericFitTests,
+    GenericTransformTests,
+    OtherBaseBehaviourTests,
+)
 from tubular.mapping import BaseMappingTransformer
 
 
@@ -43,7 +47,7 @@ class BaseMappingTransformerInitTests(ColumnsFromDictInitTests):
             uninstantiated_transformers[self.transformer_name](mappings=())
 
 
-class BaseMappingTransformerTransformTests:
+class BaseMappingTransformerTransformTests(GenericTransformTests):
     """
     Tests for the transform method on MappingTransformer.
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
