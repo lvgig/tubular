@@ -234,26 +234,21 @@ class TestTransform:
         ):
             x.transform(df)
 
-    @pytest.mark.parametrize(
-        ("mapping", "input_col_name", "input_col_type"),
-        [
-            ({"a": {1: True, 6: False}}, "a", "int64"),
-        ],
-    )
     def test_unexpected_dtype_change_warning_suppressed(
         self,
-        mapping,
-        input_col_name,
-        input_col_type,
+        recwarn,
     ):
         df = d.create_df_1()
 
+        mapping = {"a": {1: True, 6: False}}
+
         x = MappingTransformer(mappings=mapping)
 
-        with pytest.warns(None) as warnings_record:
-            x.transform(df, suppress_dtype_warning=True)
+        x.transform(df, suppress_dtype_warning=True)
 
-            assert len(warnings_record) == 0
+        assert (
+            len(recwarn) == 0
+        ), "MappingTransformer: warning raised for dtype change with supress_dtype_warning=True"
 
     def test_category_dtype_is_conserved(self):
         """This is a separate test due to the behaviour of category dtypes.
