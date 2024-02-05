@@ -20,7 +20,7 @@ Each individual change should have a link to the pull request after the descript
 ------------------
 Added
 ^^^^^
-- Update OneHotEncodingTransformer to default to returning int8 columns
+- Update OneHotEncodingTransformer to default to returning int8 columns https://github.com/lvgig/tubular/pull/175
 
 1.1.1 (2024-01-18)
 ------------------
