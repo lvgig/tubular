@@ -16,6 +16,13 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+1.1.2 (2024-02-07)
+------------------
+
+Added
+^^^^^
+- Updated NullIndicator to return int8 columns `#173 https://github.com/lvgig/tubular/pull/173`_
+
 1.1.1 (2024-01-18)
 ------------------
 
