@@ -21,7 +21,7 @@ Each individual change should have a link to the pull request after the descript
 
 Added
 ^^^^^
-- Updated MeanResponseTransformer to coerce return to float (useful behaviour for category type features) https://github.com/lvgig/tubular/pull/174
+- Updated MeanResponseTransformer to coerce return to float (useful behaviour for category type features) `#174 <https://github.com/lvgig/tubular/pull/174>`_
 
 1.1.1 (2024-01-18)
 ------------------
