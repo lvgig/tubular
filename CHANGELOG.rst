@@ -16,6 +16,12 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+1.1.2 (2024-02-7)
+------------------
+Added
+^^^^^
+- Update OneHotEncodingTransformer to default to returning int8 columns
+
 1.1.1 (2024-01-18)
 ------------------
 
