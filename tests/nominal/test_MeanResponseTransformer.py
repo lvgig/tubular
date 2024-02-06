@@ -213,12 +213,16 @@ class Test_prior_regularisation:
 
         assert_series_equal(expected, output)
 
-    def test_output2(self):
-        "Test output of method - for category dtype"
+    @pytest.mark.parametrize(
+        "dtype",
+        ["object", "category"],
+    )
+    def test_output2(self, dtype):
+        "Test output of method - for category and object dtypes"
         x = MeanResponseTransformer(columns="a", prior=0)
 
         df = pd.DataFrame({"a": ["a", "b"]})
-        df["a"] = df["a"].astype("category")
+        df["a"] = df["a"].astype(dtype)
 
         x.fit(X=df, y=pd.Series([2, 3]))
 
