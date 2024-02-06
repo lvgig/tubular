@@ -1060,6 +1060,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         drop_original: bool = False,
         copy: bool = True,
         verbose: bool = False,
+        dtype: np.int8 = np.int8,
         **kwargs: dict[str, bool],
     ) -> None:
         BaseNominalTransformer.__init__(
@@ -1070,7 +1071,13 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         )
 
         # Set attributes for scikit-learn'S OneHotEncoder
-        OneHotEncoder.__init__(self, sparse=False, handle_unknown="ignore", **kwargs)
+        OneHotEncoder.__init__(
+            self,
+            sparse=False,
+            handle_unknown="ignore",
+            dtype=dtype,
+            **kwargs,
+        )
 
         # Set other class attrributes
         self.separator = separator

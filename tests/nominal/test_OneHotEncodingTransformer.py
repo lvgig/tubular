@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import pytest
 import sklearn
@@ -49,7 +50,11 @@ class TestInit:
 
         Again not using ta.functions.assert_function_call for this as it does not handle self being passed to OneHotEncoder.init
         """
-        expected_keyword_args = {"sparse": False, "handle_unknown": "ignore"}
+        expected_keyword_args = {
+            "sparse": False,
+            "handle_unknown": "ignore",
+            "dtype": np.int8,
+        }
 
         mocker.patch("sklearn.preprocessing.OneHotEncoder.__init__")
 
@@ -435,11 +440,19 @@ class TestTransform:
         Also tests that OneHotEncodingTransformer.transform does not modify unrelated columns.
         """
         # transformer is fit on the whole dataset separately from the input df to work with the decorators
+        columns = ["b"]
         df_train = d.create_df_7()
-        x = OneHotEncodingTransformer(columns="b")
+        x = OneHotEncodingTransformer(columns=columns)
         x.fit(df_train)
 
         df_transformed = x.transform(df_test)
+
+        for col in [
+            column + f"_{value}"
+            for column in columns
+            for value in df_train[column].unique().tolist()
+        ]:
+            expected[col] = expected[col].astype(np.int8)
 
         ta.equality.assert_frame_equal_msg(
             expected=expected,
@@ -513,10 +526,18 @@ class TestTransform:
         """Test OneHotEncodingTransformer.transform encodes unseen categories correctly (all 0s)."""
         # transformer is fit on the whole dataset separately from the input df to work with the decorators
         df_train = d.create_df_7()
-        x = OneHotEncodingTransformer(columns=["a", "b", "c"], verbose=False)
+        columns = ["a", "b", "c"]
+        x = OneHotEncodingTransformer(columns=columns, verbose=False)
         x.fit(df_train)
 
         df_transformed = x.transform(df_test)
+
+        for col in [
+            column + f"_{value}"
+            for column in columns
+            for value in df_train[column].unique().tolist()
+        ]:
+            expected[col] = expected[col].astype(np.int8)
 
         ta.equality.assert_equal_dispatch(
             expected=expected,
