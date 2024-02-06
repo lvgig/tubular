@@ -398,11 +398,10 @@ class TestFit:
         ("level", "target_column", "unseen_level_handling"),
         [
             (None, "a", "Mean"),
-            ("all", "multi_level_response", 32),
-            (["yellow", "blue"], "multi_level_response", "Highest"),
+            (None, "a", "Lowest"),
         ],
     )
-    def test_correct_mappings_stored(
+    def test_correct_mappings_stored_numeric_response(
         self,
         learnt_mapping_dict,
         level,
@@ -419,39 +418,59 @@ class TestFit:
         )
         x.fit(df, df[target_column])
 
-        if level:
-            if level == "all":
-                expected_created_cols = {
-                    prefix + "_" + suffix
-                    for prefix, suffix in product(
-                        columns,
-                        df[target_column].unique().tolist(),
-                    )
-                }
-                assert (
-                    set(x.mapped_columns) == expected_created_cols
-                ), "Stored mapped columns are not as expected"
+        assert x.columns == columns, "Columns attribute changed in fit"
 
-            else:
-                expected_created_cols = {
-                    prefix + "_" + suffix for prefix, suffix in product(columns, level)
-                }
-                assert (
-                    set(x.mapped_columns) == expected_created_cols
-                ), "Stored mapped columns are not as expected"
+        for column in x.columns:
+            actual = x.mappings[column]
+            expected = learnt_mapping_dict[column]
+            assert actual == expected
 
-            for column in x.mapped_columns:
-                actual = x.mappings[column]
-                expected = learnt_mapping_dict[column]
-                assert actual == expected
+    @pytest.mark.parametrize(
+        ("level", "target_column", "unseen_level_handling"),
+        [
+            (["blue"], "multi_level_response", "Median"),
+            ("all", "multi_level_response", 32),
+            (["yellow", "blue"], "multi_level_response", "Highest"),
+        ],
+    )
+    def test_correct_mappings_stored_categorical_response(
+        self,
+        learnt_mapping_dict,
+        level,
+        target_column,
+        unseen_level_handling,
+    ):
+        "Test that the mapping dictionary created in fit has the correct keys and values."
+        df = d.create_MeanResponseTransformer_test_df()
+        columns = ["b", "c"]
+        x = MeanResponseTransformer(
+            columns=columns,
+            level=level,
+            unseen_level_handling=unseen_level_handling,
+        )
+        x.fit(df, df[target_column])
+
+        if level == "all":
+            expected_created_cols = {
+                prefix + "_" + suffix
+                for prefix, suffix in product(
+                    columns,
+                    df[target_column].unique().tolist(),
+                )
+            }
 
         else:
-            assert x.columns == columns, "Columns attribute changed in fit"
+            expected_created_cols = {
+                prefix + "_" + suffix for prefix, suffix in product(columns, level)
+            }
+        assert (
+            set(x.mapped_columns) == expected_created_cols
+        ), "Stored mapped columns are not as expected"
 
-            for column in x.columns:
-                actual = x.mappings[column]
-                expected = learnt_mapping_dict[column]
-                assert actual == expected
+        for column in x.mapped_columns:
+            actual = x.mappings[column]
+            expected = learnt_mapping_dict[column]
+            assert actual == expected
 
     @pytest.mark.parametrize(
         ("level", "target_column", "unseen_level_handling"),
