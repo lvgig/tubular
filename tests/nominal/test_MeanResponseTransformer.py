@@ -36,52 +36,71 @@ def learnt_mapping_dict():
 
 @pytest.fixture()
 def learnt_unseen_levels_encoding_dict_mean():
-    return {
+    return_dict = {
         "b": (1.0 + 2.0 + 3.0 + 4.0 + 5.0 + 6.0) / 6,
         "b_blue": (1.0 + 1.0 + 0.0 + 0.0 + 0.0 + 0.0) / 6,
         "b_yellow": (0.0 + 0.0 + 1.0 + 1.0 + 0.0 + 0.0) / 6,
         "b_green": (0.0 + 0.0 + 0.0 + 0.0 + 1.0 + 1.0) / 6,
     }
 
+    for key in return_dict:
+        return_dict[key] = np.float32(return_dict[key])
+    return return_dict
+
 
 @pytest.fixture()
 def learnt_unseen_levels_encoding_dict_median():
-    return {
+    return_dict = {
         "b": (3.0 + 4.0) / 2,
         "b_blue": (0.0 + 0.0) / 2,
         "b_yellow": (0.0 + 0.0) / 2,
         "b_green": (0.0 + 0.0) / 2,
     }
 
+    for key in return_dict:
+        return_dict[key] = np.float32(return_dict[key])
+    return return_dict
+
 
 @pytest.fixture()
 def learnt_unseen_levels_encoding_dict_highest():
-    return {
+    return_dict = {
         "b": 6.0,
         "b_blue": 1.0,
         "b_yellow": 1.0,
         "b_green": 1.0,
     }
+    for key in return_dict:
+        return_dict[key] = np.float32(return_dict[key])
+    return return_dict
 
 
 @pytest.fixture()
 def learnt_unseen_levels_encoding_dict_lowest():
-    return {
+
+    return_dict = {
         "b": 1.0,
         "b_blue": 0.0,
         "b_yellow": 0.0,
         "b_green": 0.0,
     }
 
+    for key in return_dict:
+        return_dict[key] = np.float32(return_dict[key])
+    return return_dict
+
 
 @pytest.fixture()
 def learnt_unseen_levels_encoding_dict_arbitrary():
-    return {
+    return_dict = {
         "b": 22.0,
         "b_blue": 22.0,
         "b_yellow": 22.0,
         "b_green": 22.0,
     }
+    for key in return_dict:
+        return_dict[key] = np.float32(return_dict[key])
+    return return_dict
 
 
 class TestInit:
@@ -151,6 +170,14 @@ class TestInit:
         ):
             MeanResponseTransformer(unseen_level_handling="AAA")
 
+    def test_return_type_handling_incorrect_value_error(self):
+        """Test that an exception is raised if return_type is an incorrect value."""
+        with pytest.raises(
+            ValueError,
+            match="return_type should be one of: 'float64', 'float32'",
+        ):
+            MeanResponseTransformer(return_type="int")
+
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that the values passed in init are saved in an attribute of the same name."""
         x = MeanResponseTransformer(
@@ -158,6 +185,7 @@ class TestInit:
             prior=1,
             level="any",
             unseen_level_handling="Mean",
+            return_type="float32",
         )
 
         ta.classes.test_object_attributes(
@@ -167,6 +195,8 @@ class TestInit:
                 "prior": 1,
                 "level": "any",
                 "unseen_level_handling": "Mean",
+                "return_type": "float32",
+                "cast_method": np.float32,
             },
             msg="Attributes for MeanResponseTransformer set in init",
         )
@@ -214,12 +244,17 @@ class Test_prior_regularisation:
         assert_series_equal(expected, output)
 
     @pytest.mark.parametrize(
-        "dtype",
-        ["object", "category"],
+        ("dtype", "return_type"),
+        [
+            ("object", "float64"),
+            ("object", "float32"),
+            ("category", "float64"),
+            ("category", "float32"),
+        ],
     )
-    def test_output2(self, dtype):
+    def test_output2(self, dtype, return_type):
         "Test output of method - for category and object dtypes"
-        x = MeanResponseTransformer(columns="a", prior=0)
+        x = MeanResponseTransformer(columns="a", prior=0, return_type=return_type)
 
         df = pd.DataFrame({"a": ["a", "b"]})
         df["a"] = df["a"].astype(dtype)
@@ -518,14 +553,22 @@ class TestFitBinaryResponse:
 
         x._fit_binary_response(df, df["a"], x.columns)
 
+        expected_mappings = {
+            "b": {"a": 1.0, "b": 2.0, "c": 3.0, "d": 4.0, "e": 5.0, "f": 6.0},
+            "d": {1: 1.0, 2: 2.0, 3: 3.0, 4: 4.0, 5: 5.0, 6: 6.0},
+            "f": {False: 2.0, True: 5.0},
+        }
+
+        for key in expected_mappings:
+            for value in expected_mappings[key]:
+                expected_mappings[key][value] = x.cast_method(
+                    expected_mappings[key][value],
+                )
+
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
-                "mappings": {
-                    "b": {"a": 1.0, "b": 2.0, "c": 3.0, "d": 4.0, "e": 5.0, "f": 6.0},
-                    "d": {1: 1.0, 2: 2.0, 3: 3.0, 4: 4.0, 5: 5.0, 6: 6.0},
-                    "f": {False: 2.0, True: 5.0},
-                },
+                "mappings": expected_mappings,
                 "global_mean": np.float64(3.5),
             },
             msg="mappings attribute",
@@ -541,28 +584,35 @@ class TestFitBinaryResponse:
 
         x._fit_binary_response(df, df["a"], x.columns)
 
+        expected_mappings = {
+            "b": {
+                "a": 37 / 12,
+                "b": 13 / 4,
+                "c": 41 / 12,
+                "d": 43 / 12,
+                "e": 15 / 4,
+                "f": 47 / 12,
+            },
+            "d": {
+                1: 37 / 12,
+                2: 13 / 4,
+                3: 41 / 12,
+                4: 43 / 12,
+                5: 15 / 4,
+                6: 47 / 12,
+            },
+            "f": {False: 47 / 16, True: 65 / 16},
+        }
+        for key in expected_mappings:
+            for value in expected_mappings[key]:
+                expected_mappings[key][value] = x.cast_method(
+                    expected_mappings[key][value],
+                )
+
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
-                "mappings": {
-                    "b": {
-                        "a": 37 / 12,
-                        "b": 13 / 4,
-                        "c": 41 / 12,
-                        "d": 43 / 12,
-                        "e": 15 / 4,
-                        "f": 47 / 12,
-                    },
-                    "d": {
-                        1: 37 / 12,
-                        2: 13 / 4,
-                        3: 41 / 12,
-                        4: 43 / 12,
-                        5: 15 / 4,
-                        6: 47 / 12,
-                    },
-                    "f": {False: 47 / 16, True: 65 / 16},
-                },
+                "mappings": expected_mappings,
                 "global_mean": np.float64(3.5),
             },
             msg="mappings attribute",
@@ -578,14 +628,22 @@ class TestFitBinaryResponse:
 
         x._fit_binary_response(df, df["a"], x.columns)
 
+        expected_mappings = {
+            "b": {"a": 1.0, "b": 2.0, "c": 3.0, "d": 4.0, "e": 5.0, "f": 6.0},
+            "d": {1: 1.0, 2: 2.0, 3: 3.0, 4: 4.0, 5: 5.0, 6: 6.0},
+            "f": {False: 14 / 6, True: 77 / 15},
+        }
+
+        for key in expected_mappings:
+            for value in expected_mappings[key]:
+                expected_mappings[key][value] = x.cast_method(
+                    expected_mappings[key][value],
+                )
+
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
-                "mappings": {
-                    "b": {"a": 1.0, "b": 2.0, "c": 3.0, "d": 4.0, "e": 5.0, "f": 6.0},
-                    "d": {1: 1.0, 2: 2.0, 3: 3.0, 4: 4.0, 5: 5.0, 6: 6.0},
-                    "f": {False: 14 / 6, True: 77 / 15},
-                },
+                "mappings": expected_mappings,
             },
             msg="mappings attribute",
         )
@@ -606,13 +664,20 @@ class TestFitBinaryResponse:
 
         x._fit_binary_response(df, df["a"], x.columns)
 
+        expected_mappings = {
+            "d": {1: 7 / 2, 2: 11 / 3, 3: 23 / 6, 4: 4.0, 5: 30 / 7, 6: 32 / 7},
+            "f": {False: 13 / 4, True: 50 / 11},
+        }
+        for key in expected_mappings:
+            for value in expected_mappings[key]:
+                expected_mappings[key][value] = x.cast_method(
+                    expected_mappings[key][value],
+                )
+
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
-                "mappings": {
-                    "d": {1: 7 / 2, 2: 11 / 3, 3: 23 / 6, 4: 4.0, 5: 30 / 7, 6: 32 / 7},
-                    "f": {False: 13 / 4, True: 50 / 11},
-                },
+                "mappings": expected_mappings,
                 "global_mean": np.float64(4.0),
             },
             msg="mappings attribute",
@@ -1128,7 +1193,7 @@ class TestTransform:
         df_transformed = x.transform(df)
 
         for col in columns:
-            expected[col] = expected[col].astype(float)
+            expected[col] = expected[col].astype(x.return_type)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
@@ -1153,7 +1218,7 @@ class TestTransform:
         x = MeanResponseTransformer(columns=columns, level=level)
 
         for col in expected_created_cols:
-            expected[col] = expected[col].astype(float)
+            expected[col] = expected[col].astype(x.return_type)
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
         x.mappings = {
@@ -1169,7 +1234,7 @@ class TestTransform:
         ]
 
         for col in new_expected_created_cols:
-            expected[col] = expected[col].astype(float)
+            expected[col] = expected[col].astype(x.return_type)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
@@ -1209,7 +1274,7 @@ class TestTransform:
         ]
 
         for col in expected_created_cols:
-            expected[col] = expected[col].astype(float)
+            expected[col] = expected[col].astype(x.return_type)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
@@ -1259,7 +1324,7 @@ class TestTransform:
         df_transformed = x.transform(df)
 
         for col in columns:
-            expected[col] = expected[col].astype(float)
+            expected[col] = expected[col].astype(x.return_type)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
@@ -1294,7 +1359,7 @@ class TestTransform:
         df_transformed = x.transform(df)
 
         for col in columns:
-            expected[col] = expected[col].astype(float)
+            expected[col] = expected[col].astype(x.return_type)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
@@ -1329,7 +1394,7 @@ class TestTransform:
         df_transformed = x.transform(df)
 
         for col in columns:
-            expected[col] = expected[col].astype(float)
+            expected[col] = expected[col].astype(x.return_type)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
@@ -1364,7 +1429,7 @@ class TestTransform:
         df_transformed = x.transform(df)
 
         for col in columns:
-            expected[col] = expected[col].astype(float)
+            expected[col] = expected[col].astype(x.return_type)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
@@ -1396,7 +1461,7 @@ class TestTransform:
         df_transformed = x.transform(df)
 
         for col in columns:
-            expected[col] = expected[col].astype(float)
+            expected[col] = expected[col].astype(x.return_type)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
@@ -1425,7 +1490,7 @@ class TestTransform:
         )
 
         for col in expected_created_cols:
-            expected[col] = expected[col].astype(float)
+            expected[col] = expected[col].astype(x.return_type)
 
         initial_df = d.create_MeanResponseTransformer_test_df()
         x.fit(initial_df, initial_df["multi_level_response"])
@@ -1463,7 +1528,7 @@ class TestTransform:
         df_transformed = x.transform(df)
 
         for col in expected_created_cols:
-            expected[col] = expected[col].astype(float)
+            expected[col] = expected[col].astype(x.return_type)
 
         ta.equality.assert_frame_equal_msg(
             actual=df_transformed,
@@ -1486,3 +1551,53 @@ class TestTransform:
             match="MeanResponseTransformer: nulls would be introduced into column b from levels not present in mapping",
         ):
             x.transform(df)
+
+    @pytest.mark.parametrize(
+        "prior, level, target, unseen_level_handling",
+        [
+            (5, "all", "c", "Mean"),
+            (100, ["a", "b"], "c", "Lowest"),
+            (1, None, "a", "Highest"),
+            (0, None, "a", "Median"),
+        ],
+    )
+    def test_return_type_can_be_changed(
+        self,
+        prior,
+        level,
+        target,
+        unseen_level_handling,
+    ):
+        "Test that output return types are controlled by return_type param, this defaults to float32 so test float64 here"
+
+        df = d.create_MeanResponseTransformer_test_df()
+
+        columns = ["b", "d", "f"]
+        x = MeanResponseTransformer(
+            columns=columns,
+            return_type="float64",
+            prior=prior,
+            unseen_level_handling=unseen_level_handling,
+            level=level,
+        )
+
+        x.fit(df, df[target])
+
+        output_df = x.transform(df)
+
+        if target == "c":
+            actual_levels = df[target].unique().tolist() if level == "all" else level
+            expected_created_cols = [
+                prefix + "_" + suffix
+                for prefix, suffix in product(columns, actual_levels)
+            ]
+
+        else:
+            expected_created_cols = columns
+
+        for col in expected_created_cols:
+            expected_type = x.return_type
+            actual_type = output_df[col].dtype.name
+            assert (
+                actual_type == expected_type
+            ), f"{x.classname} should output columns with type determine by the return_type param, expected {expected_type} but got {actual_type}"
