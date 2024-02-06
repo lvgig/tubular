@@ -469,6 +469,6 @@ class NullIndicator(BaseTransformer):
         X = super().transform(X)
 
         for c in self.columns:
-            X[f"{c}_nulls"] = X[c].isna().astype(int)
+            X[f"{c}_nulls"] = X[c].isna().astype(np.int8)
 
         return X

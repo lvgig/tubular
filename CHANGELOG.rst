@@ -21,10 +21,10 @@ Each individual change should have a link to the pull request after the descript
 
 Added
 ^^^^^
+- Updated NullIndicator to return int8 columns `#173 https://github.com/lvgig/tubular/pull/173`_
+- Update OneHotEncodingTransformer to default to returning int8 columns `#175 <https://github.com/lvgig/tubular/pull/175>`_
 - Updated MeanResponseTransformer to coerce return to float (useful behaviour for category type features) `#174 <https://github.com/lvgig/tubular/pull/174>`_
 
-1.2.0 (2024-01-18)
-------------------
 
 Added
 ^^^^^
