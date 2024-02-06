@@ -23,7 +23,7 @@ Added
 ^^^^^
 - Updated MeanResponseTransformer to coerce return to float (useful behaviour for category type features) `#174 <https://github.com/lvgig/tubular/pull/174>`_
 
-1.1.1 (2024-01-18)
+1.2.0 (2024-01-18)
 ------------------
 
 Added
