@@ -22,7 +22,7 @@ def learnt_mapping_dict():
         "b_green": {"a": 0.0, "b": 0.0, "c": 0.0, "d": 0.0, "e": 1.0, "f": 1.0},
     }
 
-    # c matches b, but is categorical
+    # c matches b, but is categorical (see test_data.create_MeanResponseTransformer_test_df)
     c_dict = {
         "c" + suffix: b_dict["b" + suffix]
         for suffix in ["", "_blue", "_yellow", "_green"]
