@@ -227,7 +227,7 @@ class TestTransform:
         df["c"] = pd.Series(
             ["a", "a", "c", "c", "e", "e", "rare", "rare", "rare", "rare"],
             dtype=pd.CategoricalDtype(
-                categories=["a", "c", "e", "f", "g", "h", "rare"],
+                categories=["a", "c", "e", "rare"],
                 ordered=False,
             ),
         )
@@ -361,9 +361,6 @@ class TestTransform:
         one_row_df = pd.DataFrame({"b": [np.nan], "c": [np.NaN]})
         one_row_df["c"] = one_row_df["c"].astype("category")
 
-        # add rare as a category in dataframe
-        one_row_df["c"] = one_row_df["c"].cat.add_categories("rare")
-
         x = GroupRareLevelsTransformer(columns=["b", "c"], cut_off_percent=0.2)
 
         # set the mappging dict directly rather than fitting x on df so test works with decorators
@@ -371,9 +368,12 @@ class TestTransform:
 
         one_row_df_transformed = x.transform(one_row_df)
 
+        expected_df = one_row_df.copy()
+        expected_df["c"] = expected_df["c"].cat.add_categories(x.rare_level_name)
+
         ta.equality.assert_frame_equal_msg(
             actual=one_row_df_transformed,
-            expected=one_row_df,
+            expected=expected_df,
             msg_tag="Unexpected values in GroupRareLevelsTransformer.transform",
         )
 
@@ -434,3 +434,28 @@ class TestTransform:
             actual=list(df_transformed["b"]),
             msg="Unseen levels are not left unchanged when unseen_levels_to_rare is set to false",
         )
+
+    def test_rare_categories_forgotten(self):
+        "test that for category dtype, categories encoded as rare are forgotten by series"
+
+        df = d.create_df_8()
+
+        column = "c"
+
+        x = GroupRareLevelsTransformer(
+            columns=column,
+            cut_off_percent=0.25,
+        )
+
+        expected_removed_cats = ["c", "b"]
+
+        x.fit(df)
+
+        output_df = x.transform(df)
+
+        output_categories = output_df[column].dtype.categories
+
+        for cat in expected_removed_cats:
+            assert (
+                cat not in output_categories
+            ), f"{x.classname} output columns should forget rare encoded categories, expected {cat} to be forgotten from column {column}"
