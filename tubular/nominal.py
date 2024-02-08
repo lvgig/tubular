@@ -445,10 +445,11 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
             # for categorical dtypes have to set new category for the impute values first
             # and convert back to the categorical type, other it will convert to object
             if "category" in X[c].dtype.name:
+
+                categories_before = X[c].dtype.categories
+
                 if self.rare_level_name not in X[c].cat.categories:
                     X[c] = X[c].cat.add_categories(self.rare_level_name)
-
-                dtype_before = X[c].dtype
 
                 X[c] = pd.Series(
                     data=np.where(
@@ -457,7 +458,18 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                         self.rare_level_name,
                     ),
                     index=X.index,
-                ).astype(dtype_before)
+                )
+
+                X[c] = pd.Categorical(
+                    X[c],
+                    categories=categories_before.tolist() + [self.rare_level_name],
+                )
+                rare_categories = [
+                    category
+                    for category in categories_before
+                    if category not in self.non_rare_levels[c]
+                ]
+                X[c] = X[c].cat.remove_categories(rare_categories)
 
             else:
                 # using np.where converts np.NaN to str value if only one row of data frame is passed

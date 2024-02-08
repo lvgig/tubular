@@ -16,13 +16,18 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+1.2.1 (XXXX-XX-XX)
+------------------
+Added
+^^^^^
+- Updated GroupRareLevelsTransformer so that when working with category dtypes it forgets categories encoded as rare
+
 1.2.0 (2024-02-06)
 ------------------
 Added
 ^^^^^
 - Update OneHotEncodingTransformer to default to returning int8 columns `#175 <https://github.com/lvgig/tubular/pull/175>`_
 - Updated NullIndicator to return int8 columns `#173 https://github.com/lvgig/tubular/pull/173`_
-- Update OneHotEncodingTransformer to default to returning int8 columns `#175 <https://github.com/lvgig/tubular/pull/175>`_
 - Updated MeanResponseTransformer to coerce return to float (useful behaviour for category type features) `#174 <https://github.com/lvgig/tubular/pull/174>`_
 
 1.1.1 (2024-01-18)
