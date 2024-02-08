@@ -20,7 +20,7 @@ Each individual change should have a link to the pull request after the descript
 ------------------
 Added
 ^^^^^
-- Updated GroupRareLevelsTransformer so that when working with category dtypes it forgets categories encoded as rare `#177 https://github.com/lvgig/tubular/pull/177`_
+- Updated GroupRareLevelsTransformer so that when working with category dtypes it forgets categories encoded as rare (this is wanted behaviour as these categories are no longer present in the data) `#177 https://github.com/lvgig/tubular/pull/177`_
 
 1.2.0 (2024-02-06)
 ------------------
