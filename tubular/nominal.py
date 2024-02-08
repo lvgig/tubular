@@ -460,16 +460,16 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                     index=X.index,
                 )
 
-                X[c] = pd.Categorical(
-                    X[c],
-                    categories=categories_before.tolist() + [self.rare_level_name],
-                )
-                rare_categories = [
+                remaining_categories = [
                     category
                     for category in categories_before
-                    if category not in self.non_rare_levels[c]
+                    if category in self.non_rare_levels[c]
                 ]
-                X[c] = X[c].cat.remove_categories(rare_categories)
+
+                X[c] = pd.Categorical(
+                    X[c],
+                    categories=remaining_categories + [self.rare_level_name],
+                )
 
             else:
                 # using np.where converts np.NaN to str value if only one row of data frame is passed
