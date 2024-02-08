@@ -16,11 +16,11 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
-1.2.1 (XXXX-XX-XX)
+1.2.1 (2024-02-08)
 ------------------
 Added
 ^^^^^
-- Updated GroupRareLevelsTransformer so that when working with category dtypes it forgets categories encoded as rare
+- Updated GroupRareLevelsTransformer so that when working with category dtypes it forgets categories encoded as rare `#177 https://github.com/lvgig/tubular/pull/177`_
 
 1.2.0 (2024-02-06)
 ------------------
