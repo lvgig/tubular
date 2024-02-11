@@ -96,8 +96,8 @@ class TestTransform:
         """Expected output of test_expected_output_2."""
         df = d.create_df_3()
 
-        df["a_new_col"] = np.log(df["a"] + 1)
-        df["b_new_col"] = np.log(df["b"] + 1)
+        df["a_new_col"] = np.log1p(df["a"])
+        df["b_new_col"] = np.log1p(df["b"])
 
         return df.drop(columns=["a", "b"])
 
@@ -114,8 +114,8 @@ class TestTransform:
         """Expected output of test_expected_output_4."""
         df = d.create_df_3()
 
-        df["a_new_col"] = np.log(df["a"] + 1)
-        df["b_new_col"] = np.log(df["b"] + 1)
+        df["a_new_col"] = np.log1p(df["a"])
+        df["b_new_col"] = np.log1p(df["b"])
 
         return df
 
