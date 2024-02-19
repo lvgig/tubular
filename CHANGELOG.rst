@@ -16,6 +16,37 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+1.3.0 (unreleased)
+------------------
+Added
+^^^^^
+- Inheritable tests for generic base behaviours for base transformer in `base_tests.py`, with fixtures to allow for this in `conftest.py`
+
+Changed
+^^^^^^^
+- Moved BaseTransformer, DataFrameMethodTransformer, BaseMappingTransformer, BaseMappingTransformerMixin and Mapping Transformer over to the new testing framework.
+- Refactored MappingTransformer by removing redundant init method.
+
+Removed
+^^^^^^^
+- Functionality for BaseTransformer (and thus all transformers) to take `None` as an option for columns. This behaviour was inconsistently implemented across transformers. Rather than extending to all we decided to remove 
+this functionality. This required updating a lot of test files.
+- The `columns_set_or_check()` method from BaseTransformer. With the above change it was no longer necessary. Subsequent updates to nominal transformers and their tests were required.
+
+1.2.1 (2024-02-08)
+------------------
+Added
+^^^^^
+- Updated GroupRareLevelsTransformer so that when working with category dtypes it forgets categories encoded as rare (this is wanted behaviour as these categories are no longer present in the data) `#177 https://github.com/lvgig/tubular/pull/177`_
+
+1.2.0 (2024-02-06)
+------------------
+Added
+^^^^^
+- Update OneHotEncodingTransformer to default to returning int8 columns `#175 <https://github.com/lvgig/tubular/pull/175>`_
+- Updated NullIndicator to return int8 columns `#173 https://github.com/lvgig/tubular/pull/173`_
+- Updated MeanResponseTransformer to coerce return to float (useful behaviour for category type features) `#174 <https://github.com/lvgig/tubular/pull/174>`_
+
 1.1.1 (2024-01-18)
 ------------------
 
