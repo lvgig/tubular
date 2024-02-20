@@ -451,7 +451,7 @@ class TestCheckWeightsColumn:
 
     def test_weight_null_error(self):
         """Test an error is raised if weight col is null."""
-        X = pd.DataFrame({"a": [1, 2], "b": [np.NaN, 0]})
+        X = pd.DataFrame({"a": [1, 2], "b": [np.nan, 0]})
 
         with pytest.raises(ValueError, match="weight column must be non-null"):
             BaseTransformer.check_weights_column(X, "b")

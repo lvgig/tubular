@@ -165,9 +165,9 @@ class TestTransform:
         """Expected output for test_nulls_imputed_correctly."""
         df = pd.DataFrame(
             {
-                "a": [1, 2, 3, 4, 5, 6, np.NaN],
-                "b": [1, 2, 3, np.NaN, 7, 8, 9],
-                "c": [np.NaN, 1, 2, 3, -4, -5, -6],
+                "a": [1, 2, 3, 4, 5, 6, np.nan],
+                "b": [1, 2, 3, np.nan, 7, 8, 9],
+                "c": [np.nan, 1, 2, 3, -4, -5, -6],
             },
         )
 
@@ -180,9 +180,9 @@ class TestTransform:
         """Expected output for test_nulls_imputed_correctly_2."""
         df = pd.DataFrame(
             {
-                "a": [1, 2, 3, 4, 5, 6, np.NaN],
-                "b": [1, 2, 3, np.NaN, 7, 8, 9],
-                "c": [np.NaN, 1, 2, 3, -4, -5, -6],
+                "a": [1, 2, 3, 4, 5, 6, np.nan],
+                "b": [1, 2, 3, np.nan, 7, 8, 9],
+                "c": [np.nan, 1, 2, 3, -4, -5, -6],
             },
         )
 

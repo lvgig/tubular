@@ -31,7 +31,7 @@ class TestCalculateAge:
 
     def test_null_replacement(self):
         """Test correct value is replaced using null_replacement."""
-        row = pd.Series({"a": np.NaN, "b": np.NaN})
+        row = pd.Series({"a": np.nan, "b": np.nan})
         date_transformer = DateDiffLeapYearTransformer(
             column_lower="a",
             column_upper="b",
@@ -253,10 +253,10 @@ class TestTransform:
         return pd.DataFrame(
             {
                 "a": [
-                    np.NaN,
+                    np.nan,
                 ],
                 "b": [
-                    np.NaN,
+                    np.nan,
                 ],
                 "c": [None],
             },
