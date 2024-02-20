@@ -33,6 +33,7 @@ Removed
 this functionality. This required updating a lot of test files.
 - The `columns_set_or_check()` method from BaseTransformer. With the above change it was no longer necessary. Subsequent updates to nominal transformers and their tests were required.
 
+
 1.2.1 (2024-02-08)
 ------------------
 Added

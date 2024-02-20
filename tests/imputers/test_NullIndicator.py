@@ -63,9 +63,13 @@ class TestTransform:
     )
     def test_null_indicator_columns_correct(self, df, expected):
         """Test that the created indicator column is correct - and unrelated columns are unchanged."""
-        x = NullIndicator(columns=["b", "c"])
+        columns = ["b", "c"]
+        x = NullIndicator(columns=columns)
 
         df_transformed = x.transform(df)
+
+        for col in [column + "_nulls" for column in columns]:
+            expected[col] = expected[col].astype(np.int8)
 
         ta.equality.assert_equal_dispatch(
             expected=expected,

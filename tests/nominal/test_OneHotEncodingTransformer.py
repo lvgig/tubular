@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import pytest
 import sklearn
@@ -45,7 +46,48 @@ class TestInit:
         ), f"Unexpected positional arg (self) in BaseNominalTransformer.__init__ call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
 
     # TODO replace type checks left by deleting one hot encoder init call test
+    def test_one_hot_encoder_init_called(self, mocker):
+        """Test that init calls OneHotEncoder.init.
 
+        Again not using ta.functions.assert_function_call for this as it does not handle self being passed to OneHotEncoder.init
+        """
+        expected_keyword_args = {
+            "sparse": False,
+            "handle_unknown": "ignore",
+            "dtype": np.int8,
+        }
+
+        mocker.patch("sklearn.preprocessing.OneHotEncoder.__init__")
+
+        x = OneHotEncodingTransformer(
+            columns=None,
+            verbose=True,
+            copy=True,
+            separator="x",
+            drop_original=True,
+        )
+
+        assert (
+            sklearn.preprocessing.OneHotEncoder.__init__.call_count == 1
+        ), f"Not enough calls to OneHotEncoder.__init__ -\n  Expected: 1\n  Actual: {sklearn.preprocessing.OneHotEncoder.__init__.call_count}"
+
+        call_args = sklearn.preprocessing.OneHotEncoder.__init__.call_args_list[0]
+        call_pos_args = call_args[0]
+        call_kwargs = call_args[1]
+
+        ta.equality.assert_equal_dispatch(
+            expected=expected_keyword_args,
+            actual=call_kwargs,
+            msg="kwargs for OneHotEncoder.__init__ in OneHotEncodingTransformer.init",
+        )
+
+        assert (
+            len(call_pos_args) == 1
+        ), f"Unepxected number of positional args in OneHotEncoder.__init__ call -\n  Expected: 1\n  Actual: {len(call_pos_args)}"
+
+        assert (
+            call_pos_args[0] is x
+        ), f"Unexpected positional arg (self) in OneHotEncoder.__init__ call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
 
 class TestFit:
     """Tests for OneHotEncodingTransformer.fit()."""
@@ -366,11 +408,19 @@ class TestTransform:
         Also tests that OneHotEncodingTransformer.transform does not modify unrelated columns.
         """
         # transformer is fit on the whole dataset separately from the input df to work with the decorators
+        columns = ["b"]
         df_train = d.create_df_7()
-        x = OneHotEncodingTransformer(columns="b")
+        x = OneHotEncodingTransformer(columns=columns)
         x.fit(df_train)
 
         df_transformed = x.transform(df_test)
+
+        for col in [
+            column + f"_{value}"
+            for column in columns
+            for value in df_train[column].unique().tolist()
+        ]:
+            expected[col] = expected[col].astype(np.int8)
 
         ta.equality.assert_frame_equal_msg(
             expected=expected,
@@ -444,10 +494,18 @@ class TestTransform:
         """Test OneHotEncodingTransformer.transform encodes unseen categories correctly (all 0s)."""
         # transformer is fit on the whole dataset separately from the input df to work with the decorators
         df_train = d.create_df_7()
-        x = OneHotEncodingTransformer(columns=["a", "b", "c"], verbose=False)
+        columns = ["a", "b", "c"]
+        x = OneHotEncodingTransformer(columns=columns, verbose=False)
         x.fit(df_train)
 
         df_transformed = x.transform(df_test)
+
+        for col in [
+            column + f"_{value}"
+            for column in columns
+            for value in df_train[column].unique().tolist()
+        ]:
+            expected[col] = expected[col].astype(np.int8)
 
         ta.equality.assert_equal_dispatch(
             expected=expected,

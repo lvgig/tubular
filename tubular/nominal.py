@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import warnings
+from typing import Literal
 
 import numpy as np
 import pandas as pd
@@ -413,10 +414,11 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
             # for categorical dtypes have to set new category for the impute values first
             # and convert back to the categorical type, other it will convert to object
             if "category" in X[c].dtype.name:
+
+                categories_before = X[c].dtype.categories
+
                 if self.rare_level_name not in X[c].cat.categories:
                     X[c] = X[c].cat.add_categories(self.rare_level_name)
-
-                dtype_before = X[c].dtype
 
                 X[c] = pd.Series(
                     data=np.where(
@@ -425,7 +427,18 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                         self.rare_level_name,
                     ),
                     index=X.index,
-                ).astype(dtype_before)
+                )
+
+                remaining_categories = [
+                    category
+                    for category in categories_before
+                    if category in self.non_rare_levels[c]
+                ]
+
+                X[c] = pd.Categorical(
+                    X[c],
+                    categories=remaining_categories + [self.rare_level_name],
+                )
 
             else:
                 # using np.where converts np.NaN to str value if only one row of data frame is passed
@@ -482,6 +495,9 @@ class MeanResponseTransformer(BaseNominalTransformer):
         in order to encode unseen levels in each categorical column with the mean, median etc. of
         each column. One can also pass an arbitrary int/float value to use for encoding unseen levels.
 
+    return_type: Literal['float32', 'float64']
+        What type to cast return column as, consider exploring float32 to save memory. Defaults to float32.
+
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
 
@@ -520,6 +536,11 @@ class MeanResponseTransformer(BaseNominalTransformer):
     unseen_levels_encoding_dict: dict
         Dict containing the values (based on chosen unseen_level_handling) derived from the encoded columns to use when handling unseen levels in data passed to transform method.
 
+    return_type: Literal['float32', 'float64']
+        What type to cast return column as. Defaults to float32.
+
+    cast_method: Literal[np.float32, np,float64]
+        Store the casting method associated to return_type
 
     """
 
@@ -530,6 +551,7 @@ class MeanResponseTransformer(BaseNominalTransformer):
         prior: int = 0,
         level: str | list | None = None,
         unseen_level_handling: str | int | float | None = None,
+        return_type: Literal["float32", "float64"] = "float32",
         **kwargs: dict[str, bool],
     ) -> None:
         if weights_column is not None and type(weights_column) is not str:
@@ -555,10 +577,19 @@ class MeanResponseTransformer(BaseNominalTransformer):
             msg = f"{self.classname()}: unseen_level_handling should be the option: Mean, Median, Lowest, Highest or an arbitrary int/float value"
             raise ValueError(msg)
 
+        if return_type not in ["float64", "float32"]:
+            msg = f"{self.classname()}: return_type should be one of: 'float64', 'float32'"
+            raise ValueError(msg)
+
         self.weights_column = weights_column
         self.prior = prior
         self.level = level
         self.unseen_level_handling = unseen_level_handling
+        self.return_type = return_type
+        if return_type == "float64":
+            self.cast_method = np.float64
+        else:
+            self.cast_method = np.float32
         # TODO: set default prior to None and refactor to only use prior regularisation when it is set?
 
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
@@ -665,6 +696,10 @@ class MeanResponseTransformer(BaseNominalTransformer):
                     group_weight,
                 ).to_dict()
 
+            # to_dict changes types
+            for key in self.mappings[c]:
+                self.mappings[c][key] = self.cast_method(self.mappings[c][key])
+
     def fit(self, X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
         """Identify mapping of categorical levels to mean response values.
 
@@ -735,33 +770,27 @@ class MeanResponseTransformer(BaseNominalTransformer):
             self._fit_binary_response(X, y, self.columns)
             self.encoded_feature_columns = self.columns
 
-        if self.unseen_level_handling == "Mean":
+        if isinstance(self.unseen_level_handling, (int, float)):
             for c in self.encoded_feature_columns:
-                self.unseen_levels_encoding_dict[c] = (
-                    X_temp[c].map(self.mappings[c]).mean()
+                self.unseen_levels_encoding_dict[c] = self.cast_method(
+                    self.unseen_level_handling,
                 )
 
-        elif self.unseen_level_handling == "Median":
+        else:
             for c in self.encoded_feature_columns:
-                self.unseen_levels_encoding_dict[c] = (
-                    X_temp[c].map(self.mappings[c]).median()
-                )
+                X_temp[c] = X_temp[c].map(self.mappings[c]).astype(self.return_type)
 
-        elif self.unseen_level_handling == "Lowest":
-            for c in self.encoded_feature_columns:
-                self.unseen_levels_encoding_dict[c] = (
-                    X_temp[c].map(self.mappings[c]).min()
-                )
+                if self.unseen_level_handling == "Mean":
+                    self.unseen_levels_encoding_dict[c] = X_temp[c].mean()
 
-        elif self.unseen_level_handling == "Highest":
-            for c in self.encoded_feature_columns:
-                self.unseen_levels_encoding_dict[c] = (
-                    X_temp[c].map(self.mappings[c]).max()
-                )
+                if self.unseen_level_handling == "Median":
+                    self.unseen_levels_encoding_dict[c] = X_temp[c].median()
 
-        elif isinstance(self.unseen_level_handling, (int, float)):
-            for c in self.encoded_feature_columns:
-                self.unseen_levels_encoding_dict[c] = float(self.unseen_level_handling)
+                if self.unseen_level_handling == "Lowest":
+                    self.unseen_levels_encoding_dict[c] = X_temp[c].min()
+
+                if self.unseen_level_handling == "Highest":
+                    self.unseen_levels_encoding_dict[c] = X_temp[c].max()
 
         return self
 
@@ -779,7 +808,7 @@ class MeanResponseTransformer(BaseNominalTransformer):
             input dataframe with mappings applied
         """
         for c in self.columns:
-            X[c] = X[c].map(self.mappings[c])
+            X[c] = X[c].map(self.mappings[c]).astype(self.return_type)
 
         return X
 
@@ -1029,6 +1058,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         drop_original: bool = False,
         copy: bool = True,
         verbose: bool = False,
+        dtype: np.int8 = np.int8,
         **kwargs: dict[str, bool],
     ) -> None:
         BaseNominalTransformer.__init__(
@@ -1039,7 +1069,13 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         )
 
         # Set attributes for scikit-learn'S OneHotEncoder
-        OneHotEncoder.__init__(self, sparse=False, handle_unknown="ignore", **kwargs)
+        OneHotEncoder.__init__(
+            self,
+            sparse=False,
+            handle_unknown="ignore",
+            dtype=dtype,
+            **kwargs,
+        )
 
         # Set other class attrributes
         self.separator = separator
