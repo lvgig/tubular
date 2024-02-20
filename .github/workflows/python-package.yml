@@ -32,11 +32,10 @@ jobs:
       with:
         version: 0.2.2
 
-    - name: Lint with black
-      if: always()
+    - name: Check formatting with ruff
       run: |
-        black --version
-        black --check .
+        ruff format --diff .
+        ruff format --check .
 
     - name: Test with pytest
       if: always()
