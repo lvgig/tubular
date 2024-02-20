@@ -258,7 +258,7 @@ class TestTransform:
         df = d.create_df_1()
         df["b"] = df["b"].astype("category")
 
-        mapping = mapping = {"b": {"a": "aaa", "b": "bbb"}}
+        mapping = {"b": {"a": "aaa", "b": "bbb"}}
 
         x = MappingTransformer(mappings=mapping)
         df = x.transform(df)
