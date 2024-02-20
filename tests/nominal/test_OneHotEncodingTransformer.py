@@ -60,7 +60,7 @@ class TestInit:
         mocker.patch("sklearn.preprocessing.OneHotEncoder.__init__")
 
         x = OneHotEncodingTransformer(
-            columns=None,
+            columns=["a"],
             verbose=True,
             copy=True,
             separator="x",
@@ -88,6 +88,7 @@ class TestInit:
         assert (
             call_pos_args[0] is x
         ), f"Unexpected positional arg (self) in OneHotEncoder.__init__ call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
+
 
 class TestFit:
     """Tests for OneHotEncodingTransformer.fit()."""

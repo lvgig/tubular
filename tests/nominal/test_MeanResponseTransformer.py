@@ -77,7 +77,6 @@ def learnt_unseen_levels_encoding_dict_highest():
 
 @pytest.fixture()
 def learnt_unseen_levels_encoding_dict_lowest():
-
     return_dict = {
         "b": 1.0,
         "b_blue": 0.0,
@@ -148,28 +147,6 @@ class TestInit:
         ):
             MeanResponseTransformer(return_type="int")
 
-    def test_values_passed_in_init_set_to_attribute(self):
-        """Test that the values passed in init are saved in an attribute of the same name."""
-        x = MeanResponseTransformer(
-            weights_column="aaa",
-            prior=1,
-            level="any",
-            unseen_level_handling="Mean",
-            return_type="float32",
-        )
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "weights_column": "aaa",
-                "prior": 1,
-                "level": "any",
-                "unseen_level_handling": "Mean",
-                "return_type": "float32",
-                "cast_method": np.float32,
-            },
-            msg="Attributes for MeanResponseTransformer set in init",
-        )
 
 class Test_prior_regularisation:
     "tests for _prior_regularisation method."

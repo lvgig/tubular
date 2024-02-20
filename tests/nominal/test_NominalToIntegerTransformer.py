@@ -137,7 +137,6 @@ class TestTransform:
             x.transform(df)
 
     def test_not_dataframe_error_raised(self):
-
         df = d.create_df_1()
 
         x = NominalToIntegerTransformer(columns=["a", "b"])
