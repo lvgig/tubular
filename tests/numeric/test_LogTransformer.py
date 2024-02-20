@@ -135,6 +135,27 @@ class TestTransform:
 
         return df.drop("a", axis=1)
 
+    def test_log1p(self):
+        """Test that log1p is working as intended."""
+        df = pd.DataFrame(
+            {
+                "a": [0.00001, 0.00002, 0.00003],
+                "b": [0.00004, 0.00005, 0.00006],
+            },
+        )
+        expected = pd.DataFrame(
+            {
+                "a_log": [9.999950e-06, 1.999980e-05, 2.999955e-05],
+                "b_log": [3.99992000e-05, 4.99987500e-05, 5.99982001e-05],
+            },
+        )
+        log_transformer = LogTransformer(
+            columns=["a", "b"],
+            add_1=True,
+        )
+        actual = log_transformer.transform(df)
+        pd.testing.assert_frame_equal(actual, expected)
+
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
         df = d.create_df_3()
