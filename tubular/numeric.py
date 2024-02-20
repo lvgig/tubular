@@ -122,10 +122,10 @@ class LogTransformer(BaseTransformer):
                 raise ValueError(msg)
 
             if self.base is None:
-                X[new_column_names] = np.log(X[self.columns] + 1)
+                X[new_column_names] = np.log1p(X[self.columns])
 
             else:
-                X[new_column_names] = np.log(X[self.columns] + 1) / np.log(self.base)
+                X[new_column_names] = np.log1p(X[self.columns]) / np.log(self.base)
 
         else:
             if (X[self.columns] <= 0).sum().sum() > 0:
