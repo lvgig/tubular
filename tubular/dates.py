@@ -831,10 +831,7 @@ class DatetimeInfoExtractor(BaseDateTransformer):
         self,
         columns: str | list[str],
         include: str | list[str] | None = None,
-        datetime_mappings: dict[
-            str,
-        ]
-        | None = None,
+        datetime_mappings: dict[str,] | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         if include is None:
