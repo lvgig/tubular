@@ -284,7 +284,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         if pd_method_kwargs is None:
             pd_method_kwargs = {"axis": 0}
         else:
-            if "axis" not in pd_method_kwargs.keys():
+            if "axis" not in pd_method_kwargs:
                 msg = f'{self.classname()}: pd_method_kwargs must contain an entry "axis" set to 0 or 1'
                 raise ValueError(msg)
             if pd_method_kwargs["axis"] not in [0, 1]:
