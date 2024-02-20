@@ -142,7 +142,7 @@ class TestFit:
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
-                "non_rare_levels": {"b": ["a", np.NaN], "c": ["a", "c", "e"]},
+                "non_rare_levels": {"b": ["a", np.nan], "c": ["a", "c", "e"]},
             },
             msg="non_rare_levels attribute",
         )
@@ -157,7 +157,7 @@ class TestFit:
 
         ta.classes.test_object_attributes(
             obj=x,
-            expected_attributes={"non_rare_levels": {"b": ["a", np.NaN]}},
+            expected_attributes={"non_rare_levels": {"b": ["a", np.nan]}},
             msg="non_rare_levels attribute",
         )
 
@@ -218,10 +218,10 @@ class TestTransform:
 
     def expected_df_1():
         """Expected output for test_expected_output_no_weight."""
-        df = pd.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.NaN]})
+        df = pd.DataFrame({"a": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.nan]})
 
         df["b"] = pd.Series(
-            ["a", "a", "a", "rare", "rare", "rare", "rare", np.NaN, np.NaN, np.NaN],
+            ["a", "a", "a", "rare", "rare", "rare", "rare", np.nan, np.nan, np.nan],
         )
 
         df["c"] = pd.Series(
@@ -238,16 +238,16 @@ class TestTransform:
         """Expected output for test_expected_output_weight."""
         df = pd.DataFrame(
             {
-                "a": [2, 2, 2, 2, np.NaN, 2, 2, 2, 3, 3],
-                "b": ["a", "a", "a", "d", "e", "f", "g", np.NaN, np.NaN, np.NaN],
-                "c": ["a", "b", "c", "d", "f", "f", "f", "g", "g", np.NaN],
+                "a": [2, 2, 2, 2, np.nan, 2, 2, 2, 3, 3],
+                "b": ["a", "a", "a", "d", "e", "f", "g", np.nan, np.nan, np.nan],
+                "c": ["a", "b", "c", "d", "f", "f", "f", "g", "g", np.nan],
             },
         )
 
         df["c"] = df["c"].astype("category")
 
         df["b"] = pd.Series(
-            ["a", "a", "a", "rare", "rare", "rare", "rare", np.NaN, np.NaN, np.NaN],
+            ["a", "a", "a", "rare", "rare", "rare", "rare", np.nan, np.nan, np.nan],
         )
 
         return df
@@ -326,7 +326,7 @@ class TestTransform:
         x = GroupRareLevelsTransformer(columns=["b", "c"], cut_off_percent=0.2)
 
         # set the mappging dict directly rather than fitting x on df so test works with decorators
-        x.non_rare_levels = {"b": ["a", np.NaN], "c": ["e", "c", "a"]}
+        x.non_rare_levels = {"b": ["a", np.nan], "c": ["e", "c", "a"]}
 
         df_transformed = x.transform(df)
 
@@ -340,11 +340,11 @@ class TestTransform:
         """Test output from a single row transform with np.NaN value remains the same,
         the type is perserved if using existing dataframe, so need to create a new dataframe.
         """
-        one_row_df = pd.DataFrame({"b": [np.nan], "c": [np.NaN]})
+        one_row_df = pd.DataFrame({"b": [np.nan], "c": [np.nan]})
         x = GroupRareLevelsTransformer(columns=["b", "c"], cut_off_percent=0.2)
 
         # set the mappging dict directly rather than fitting x on df so test works with decorators
-        x.non_rare_levels = {"b": ["a", np.NaN], "c": ["e", "c", "a", np.NaN]}
+        x.non_rare_levels = {"b": ["a", np.nan], "c": ["e", "c", "a", np.nan]}
 
         one_row_df_transformed = x.transform(one_row_df)
 
@@ -358,13 +358,13 @@ class TestTransform:
         """Test output from a single row transform with np.NaN value remains the same, when column is type category,
         the type is perserved if using existing dataframe, so need to create a new dataframe.
         """
-        one_row_df = pd.DataFrame({"b": [np.nan], "c": [np.NaN]})
+        one_row_df = pd.DataFrame({"b": [np.nan], "c": [np.nan]})
         one_row_df["c"] = one_row_df["c"].astype("category")
 
         x = GroupRareLevelsTransformer(columns=["b", "c"], cut_off_percent=0.2)
 
         # set the mappging dict directly rather than fitting x on df so test works with decorators
-        x.non_rare_levels = {"b": ["a", np.NaN], "c": ["e", "c", "a", np.NaN]}
+        x.non_rare_levels = {"b": ["a", np.nan], "c": ["e", "c", "a", np.nan]}
 
         one_row_df_transformed = x.transform(one_row_df)
 
@@ -386,7 +386,7 @@ class TestTransform:
         x = GroupRareLevelsTransformer(columns=["b"], cut_off_percent=0.3, weight="a")
 
         # set the mappging dict directly rather than fitting x on df so test works with decorators
-        x.non_rare_levels = {"b": ["a", np.NaN]}
+        x.non_rare_levels = {"b": ["a", np.nan]}
 
         df_transformed = x.transform(df)
 

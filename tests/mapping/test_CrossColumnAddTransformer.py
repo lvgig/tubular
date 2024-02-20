@@ -81,9 +81,9 @@ class TestTransform:
         """Expected output from test_multiple_mappings_expected_output."""
         df = pd.DataFrame(
             {
-                "a": [4.1, 5.1, 4.1, 4, 8, 10.2, 7, 8, 9, np.NaN],
-                "b": ["a", "a", "a", "d", "e", "f", "g", np.NaN, np.NaN, np.NaN],
-                "c": ["a", "a", "c", "c", "e", "e", "f", "g", "h", np.NaN],
+                "a": [4.1, 5.1, 4.1, 4, 8, 10.2, 7, 8, 9, np.nan],
+                "b": ["a", "a", "a", "d", "e", "f", "g", np.nan, np.nan, np.nan],
+                "c": ["a", "a", "c", "c", "e", "e", "f", "g", "h", np.nan],
             },
         )
 

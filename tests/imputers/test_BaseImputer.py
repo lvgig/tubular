@@ -20,8 +20,8 @@ class TestTransform:
         df = pd.DataFrame(
             {
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
-                "b": ["a", "b", "c", "d", "e", "f", np.NaN],
-                "c": ["a", "b", "c", "d", "e", "f", np.NaN],
+                "b": ["a", "b", "c", "d", "e", "f", np.nan],
+                "c": ["a", "b", "c", "d", "e", "f", np.nan],
             },
         )
 
@@ -33,9 +33,9 @@ class TestTransform:
         """Expected output of test_expected_output_2."""
         df2 = pd.DataFrame(
             {
-                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.nan],
                 "b": ["a", "b", "c", "d", "e", "f", "g"],
-                "c": ["a", "b", "c", "d", "e", "f", np.NaN],
+                "c": ["a", "b", "c", "d", "e", "f", np.nan],
             },
         )
 
@@ -47,7 +47,7 @@ class TestTransform:
         """Expected output of test_expected_output_3."""
         df3 = pd.DataFrame(
             {
-                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.nan],
                 "b": ["a", "b", "c", "d", "e", "f", "g"],
                 "c": ["a", "b", "c", "d", "e", "f", "f"],
             },

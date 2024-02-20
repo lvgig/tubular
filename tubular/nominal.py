@@ -355,7 +355,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                 # nulls are excluded from pandas groupby; https://github.com/pandas-dev/pandas/issues/3729
                 # so add them back in
                 if cols_w_percents.sum() < X[self.weight].sum():
-                    cols_w_percents[np.NaN] = X.loc[X[c].isna(), self.weight].sum()
+                    cols_w_percents[np.nan] = X.loc[X[c].isna(), self.weight].sum()
 
                 cols_w_percents = cols_w_percents / X[self.weight].sum()
 

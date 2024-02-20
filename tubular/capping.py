@@ -478,7 +478,7 @@ class OutOfRangeNullTransformer(CappingTransformer):
         """
         for k, replacements_list in self._replacement_values.items():
             null_replacements_list = [
-                np.NaN if replace_value is not None else None
+                np.nan if replace_value is not None else None
                 for replace_value in replacements_list
             ]
 

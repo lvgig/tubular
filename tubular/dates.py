@@ -882,7 +882,7 @@ class DatetimeInfoExtractor(BaseDateTransformer):
             timeofday_mapping = self.datetime_mappings["timeofday"]
         elif "timeofday" in include:  # Choose default mapping
             timeofday_mapping = {
-                "night": range(0, 6),  # Midnight - 6am
+                "night": range(6),  # Midnight - 6am
                 "morning": range(6, 12),  # 6am - Noon
                 "afternoon": range(12, 18),  # Noon - 6pm
                 "evening": range(18, 24),  # 6pm - Midnight
@@ -892,7 +892,7 @@ class DatetimeInfoExtractor(BaseDateTransformer):
             timeofmonth_mapping = self.datetime_mappings["timeofmonth"]
         elif "timeofmonth" in include:  # Choose default mapping
             timeofmonth_mapping = {
-                "start": range(0, 11),
+                "start": range(11),
                 "middle": range(11, 21),
                 "end": range(21, 32),
             }

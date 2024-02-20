@@ -59,7 +59,7 @@ class TestExtractDatetimeInfoInit:
         x = DatetimeInfoExtractor(
             columns=["a"],
             include=["timeofmonth", "timeofday"],
-            datetime_mappings={"timeofday": {"am": range(0, 12), "pm": range(12, 24)}},
+            datetime_mappings={"timeofday": {"am": range(12), "pm": range(12, 24)}},
         )
 
         ta.classes.test_object_attributes(
@@ -68,7 +68,7 @@ class TestExtractDatetimeInfoInit:
                 "columns": ["a"],
                 "include": ["timeofmonth", "timeofday"],
                 "datetime_mappings": {
-                    "timeofday": {"am": range(0, 12), "pm": range(12, 24)},
+                    "timeofday": {"am": range(12), "pm": range(12, 24)},
                 },
             },
             msg="Attributes for ExtractDatetimeInfo set in init",
