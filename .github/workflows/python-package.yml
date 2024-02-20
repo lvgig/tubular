@@ -30,7 +30,7 @@ jobs:
     - name: Lint with ruff
       uses: chartboost/ruff-action@v1
       with:
-        version: 0.0.275
+        version: 0.2.2
 
     - name: Lint with black
       if: always()
