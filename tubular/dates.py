@@ -281,7 +281,7 @@ class DateDiffLeapYearTransformer(BaseDateTransformer):
 
         X = super().transform(X)
 
-        X[self.new_column_name] = X.apply(lambda x: self.calculate_age(x), axis=1)
+        X[self.new_column_name] = X.apply(self.calculate_age, axis=1)
 
         if self.drop_cols:
             X = X.drop(self.columns, axis=1)
