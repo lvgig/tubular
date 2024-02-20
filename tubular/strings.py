@@ -175,7 +175,7 @@ class StringConcatenator(BaseTransformer):
         X = super().transform(X)
 
         X[self.new_column] = (
-            X[self.columns].astype(str).apply(lambda x: self.separator.join(x), axis=1)
+            X[self.columns].astype(str).apply(self.separator.join, axis=1)
         )
 
         return X
