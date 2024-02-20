@@ -143,6 +143,7 @@ class TestTransform:
                 "b": [0.00004, 0.00005, 0.00006],
             },
         )
+        # Values created using np.log1p() of original df
         expected = pd.DataFrame(
             {
                 "a_log": [9.999950e-06, 1.999980e-05, 2.999955e-05],
