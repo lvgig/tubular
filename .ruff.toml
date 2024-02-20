@@ -29,6 +29,7 @@ lint.select = [
     "Q",
     "RET",
     "RSE",
+    "S", # Bandit
     "SIM",
     "SLOT",
     "T10",
@@ -65,4 +66,4 @@ target-version = "py38"
 # Ignore `E402` (import violations) in all `__init__.py` file.
 [lint.per-file-ignores]
 "__init__.py" = ["E402", "F401"]
-"tests/*" = ["ANN"]
+"tests/*" = ["ANN", "S101"]

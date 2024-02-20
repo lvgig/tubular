@@ -48,18 +48,3 @@ jobs:
       with:
         name: coverage-html-pytest-results
         path: htmlcov
-
-    - name: Run Bandit tests
-      if: always()
-      run: |
-        bandit -c "bandit.yml" -r tubular -f html -o bandit-test-results.html
-
-    - name: Upload bandit test results
-      if: always()
-      uses: actions/upload-artifact@v2
-      with:
-        name: bandit-results
-        path: bandit-test-results.html
-
-
-
