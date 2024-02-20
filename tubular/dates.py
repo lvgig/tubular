@@ -178,7 +178,7 @@ class DateDiffLeapYearTransformer(BaseDateTransformer):
         column_upper: str,
         drop_cols: bool,
         new_column_name: str | None = None,
-        missing_replacement: int | float | str | None = None,
+        missing_replacement: float | str | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         if not isinstance(column_lower, str):
@@ -967,7 +967,7 @@ class DatetimeInfoExtractor(BaseDateTransformer):
         else:
             self.dayofweek_mapping = {}
 
-    def _map_values(self, value: int | float, interval: str) -> str:
+    def _map_values(self, value: float, interval: str) -> str:
         """Method to apply mappings for a specified interval ("timeofday", "timeofmonth", "timeofyear" or "dayofweek")
         from corresponding mapping attribute to a single value.
 
@@ -1107,7 +1107,7 @@ class DatetimeSinusoidCalculator(BaseDateTransformer):
         columns: str | list[str],
         method: str | list[str],
         units: str | dict,
-        period: int | float | dict = 2 * np.pi,
+        period: float | dict = 2 * np.pi,
     ) -> None:
         super().__init__(columns, copy=True)
 

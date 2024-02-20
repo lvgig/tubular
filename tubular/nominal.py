@@ -581,7 +581,7 @@ class MeanResponseTransformer(BaseNominalTransformer):
         weights_column: str | None = None,
         prior: int = 0,
         level: str | list | None = None,
-        unseen_level_handling: str | int | float | None = None,
+        unseen_level_handling: str | float | None = None,
         return_type: Literal["float32", "float64"] = "float32",
         **kwargs: dict[str, bool],
     ) -> None:

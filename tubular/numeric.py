@@ -60,7 +60,7 @@ class LogTransformer(BaseTransformer):
     def __init__(
         self,
         columns: str | list[str] | None,
-        base: float | int | None = None,
+        base: float | None = None,
         add_1: bool = False,
         drop: bool = True,
         suffix: str = "log",
