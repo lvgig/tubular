@@ -77,7 +77,6 @@ def learnt_unseen_levels_encoding_dict_highest():
 
 @pytest.fixture()
 def learnt_unseen_levels_encoding_dict_lowest():
-
     return_dict = {
         "b": 1.0,
         "b_blue": 0.0,

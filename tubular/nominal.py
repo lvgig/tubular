@@ -445,7 +445,6 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
             # for categorical dtypes have to set new category for the impute values first
             # and convert back to the categorical type, other it will convert to object
             if "category" in X[c].dtype.name:
-
                 categories_before = X[c].dtype.categories
 
                 if self.rare_level_name not in X[c].cat.categories:
