@@ -32,7 +32,7 @@ class TestInit:
             TypeError,
             match="weight should be str or None",
         ):
-            MedianImputer(columns=None, weight=weight)
+            MedianImputer(columns=["s"], weight=weight)
 
 
 class TestFit:

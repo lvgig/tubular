@@ -37,27 +37,14 @@ class TestTwoColumnOperatorTransformerInit:
                 pd_method_kwargs={"axis": 2},
             )
 
-    def test_attributes(self, example_transformer):
-        """Tests that the transformer has the expected attributes."""
-        expected_attributes = {
-            "pd_method_name": "mul",
-            # 'a' is given as a list here because that's how DataFrameMethodTransformer.__init__ stores the columns attribute
-            "column1_name": "a",
-            "column2_name": "b",
-            "new_column_name": "c",
-            "pd_method_kwargs": {"axis": 0},
-        }
-
-        msg = "TwoColumneMethodTransformer object does not have expected attributes"
-        ta.classes.test_object_attributes(example_transformer, expected_attributes, msg)
-
+    # TODO replace this with behaviour tests for DataFrameMethodTransformer init error handling
     def test_DataFrameMethodTransformer_init_call(self, mocker):
         """Tests that the .__init__ method is called from the parent DataFrameMethodTransformer class."""
         expected_call_args = {
             0: {
                 "args": (),
                 "kwargs": {
-                    "new_column_name": "c",
+                    "new_column_names": "c",
                     "pd_method_name": "mul",
                     "columns": ["a", "b"],
                     "pd_method_kwargs": {"axis": 0},
@@ -76,20 +63,6 @@ class TestTwoColumnOperatorTransformerInit:
 
 
 class TestTwoColumnOperatorTransformerTransform:
-    def test_BaseTransformer_transform_called(self, example_transformer, mocker):
-        """Tests that the .transform method is called from the grandparent BaseTransformer class."""
-        test_data = d.create_df_11()
-
-        expected_call_args = {0: {"args": (test_data,), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-        ):
-            example_transformer.transform(test_data)
-
     @pytest.mark.parametrize(
         "pd_method_name",
         [

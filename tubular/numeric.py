@@ -301,7 +301,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         # call DataFrameMethodTransformer.__init__
         # This class will inherit all the below attributes from DataFrameMethodTransformer
         super().__init__(
-            new_column_name=new_column_name,
+            new_column_names=new_column_name,
             pd_method_name=pd_method_name,
             columns=columns,
             pd_method_kwargs=pd_method_kwargs,
@@ -328,7 +328,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
             msg = f"{self.classname()}: input columns in X must contain only numeric values"
             raise TypeError(msg)
 
-        X[self.new_column_name] = getattr(X[[self.column1_name]], self.pd_method_name)(
+        X[self.new_column_names] = getattr(X[[self.column1_name]], self.pd_method_name)(
             X[self.column2_name],
             **self.pd_method_kwargs,
         )

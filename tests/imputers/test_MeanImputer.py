@@ -32,7 +32,7 @@ class TestInit:
             TypeError,
             match="weight should be str or None",
         ):
-            MeanImputer(columns=None, weight=weight)
+            MeanImputer(columns=["s"], weight=weight)
 
 
 class TestFit:

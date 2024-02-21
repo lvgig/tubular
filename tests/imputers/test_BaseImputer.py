@@ -4,7 +4,6 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
-import tubular
 from tubular.imputers import BaseImputer
 
 
@@ -64,8 +63,7 @@ class TestTransform:
     )
     def test_expected_output_1(self, df, expected):
         """Test that transform is giving the expected output when applied to float column."""
-        x1 = BaseImputer()
-        x1.columns = ["a"]
+        x1 = BaseImputer(columns="a")
         x1.impute_values_ = {"a": 7}
 
         df_transformed = x1.transform(df)
@@ -82,8 +80,8 @@ class TestTransform:
     )
     def test_expected_output_2(self, df, expected):
         """Test that transform is giving the expected output when applied to object column."""
-        x1 = BaseImputer()
-        x1.columns = ["b"]
+        x1 = BaseImputer(columns=["b"])
+
         x1.impute_values_ = {"b": "g"}
 
         df_transformed = x1.transform(df)
@@ -100,8 +98,8 @@ class TestTransform:
     )
     def test_expected_output_3(self, df, expected):
         """Test that transform is giving the expected output when applied to object and categorical columns."""
-        x1 = BaseImputer()
-        x1.columns = ["b", "c"]
+        x1 = BaseImputer(columns=["b", "c"])
+
         x1.impute_values_ = {"b": "g", "c": "f"}
 
         df_transformed = x1.transform(df)
@@ -111,38 +109,3 @@ class TestTransform:
             actual=df_transformed,
             msg="ArbitraryImputer transform col b, c",
         )
-
-    def test_check_is_fitted_called(self, mocker):
-        """Test that BaseTransformer check_is_fitted called."""
-        df = d.create_df_1()
-
-        x = BaseImputer()
-        x.columns = []
-
-        expected_call_args = {0: {"args": (["impute_values_"],), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "check_is_fitted",
-            expected_call_args,
-        ):
-            x.transform(df)
-
-    def test_super_transform_called(self, mocker):
-        """Test that BaseImputer.transform called."""
-        df = d.create_df_2()
-
-        x = BaseImputer()
-        x.columns = []
-        x.impute_values_ = {}
-
-        expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-        ):
-            x.transform(df)

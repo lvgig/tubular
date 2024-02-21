@@ -21,7 +21,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
     Parameters
     ----------
-    columns : None or list or str, default = None
+    columns : None or list or str
         Columns to apply the transformer to. If a str is passed this is put into a list. Value passed
         in columns is saved in the columns attribute on the object.
 
@@ -33,9 +33,9 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
     Attributes
     ----------
-    columns : list or None
+    columns : list
         Either a list of str values giving which columns in a input pandas.DataFrame the transformer
-        will be applied to - or None.
+        will be applied to.
 
     copy : bool
         Should X be copied before tansforms are applied?
@@ -54,7 +54,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
     def __init__(
         self,
-        columns: list[str] | str = None,
+        columns: list[str] | str,
         copy: bool = True,
         verbose: bool = False,
     ) -> None:
@@ -69,29 +69,25 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         if self.verbose:
             print("BaseTransformer.__init__() called")
 
-        if columns is None:
-            self.columns = None
+        # make sure columns is a single str or list of strs
+        if isinstance(columns, str):
+            self.columns = [columns]
+
+        elif isinstance(columns, list):
+            if not len(columns) > 0:
+                msg = f"{self.classname()}: columns has no values"
+                raise ValueError(msg)
+
+            for c in columns:
+                if not isinstance(c, str):
+                    msg = f"{self.classname()}: each element of columns should be a single (string) column name"
+                    raise TypeError(msg)
+
+            self.columns = columns
 
         else:
-            # make sure columns is a single str or list of strs
-            if isinstance(columns, str):
-                self.columns = [columns]
-
-            elif isinstance(columns, list):
-                if not len(columns) > 0:
-                    msg = f"{self.classname()}: columns has no values"
-                    raise ValueError(msg)
-
-                for c in columns:
-                    if not isinstance(c, str):
-                        msg = f"{self.classname()}: each element of columns should be a single (string) column name"
-                        raise TypeError(msg)
-
-                self.columns = columns
-
-            else:
-                msg = f"{self.classname()}: columns must be a string or list with the columns to be pre-processed (if specified)"
-                raise TypeError(msg)
+            msg = f"{self.classname()}: columns must be a string or list with the columns to be pre-processed (if specified)"
+            raise TypeError(msg)
 
         if not isinstance(copy, bool):
             msg = f"{self.classname()}: copy must be a bool"
@@ -103,8 +99,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         """Base transformer fit method, checks X and y types. Currently only pandas DataFrames are allowed for X
         and DataFrames or Series for y.
 
-        Fit calls the columns_set_or_check method which will set the columns attribute to all columns in X, if it
-        is None.
+        Fit calls the columns_check method which will check that the columns attribute is set and all values are present in X
 
         Parameters
         ----------
@@ -118,7 +113,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         if self.verbose:
             print("BaseTransformer.fit() called")
 
-        self.columns_set_or_check(X)
+        self.columns_check(X)
 
         if not X.shape[0] > 0:
             msg = f"{self.classname()}: X has no rows; {X.shape}"
@@ -235,10 +230,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             msg = f"{self.classname()}: X should be a pd.DataFrame"
             raise TypeError(msg)
 
-        if self.columns is None:
-            msg = f"{self.classname()}: columns not set"
-            raise ValueError(msg)
-
         if not isinstance(self.columns, list):
             msg = f"{self.classname()}: self.columns should be a list"
             raise TypeError(msg)
@@ -246,27 +237,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         for c in self.columns:
             if c not in X.columns.to_numpy():
                 raise ValueError(f"{self.classname()}: variable " + c + " is not in X")
-
-    def columns_set_or_check(self, X: pd.DataFrame) -> None:
-        """Function to check or set columns attribute.
-
-        If the columns attribute is None then set it to all columns in X. Otherwise run the columns_check method.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            Data to check columns are in.
-
-        """
-        if not isinstance(X, pd.DataFrame):
-            msg = f"{self.classname()}: X should be a pd.DataFrame"
-            raise TypeError(msg)
-
-        if self.columns is None:
-            self.columns = list(X.columns.values)
-
-        else:
-            self.columns_check(X)
 
     @staticmethod
     def check_weights_column(X: pd.DataFrame, weights_column: str) -> None:
@@ -316,7 +286,7 @@ class DataFrameMethodTransformer(BaseTransformer):
 
     Parameters
     ----------
-    new_column_name : str or list of str
+    new_column_names : str or list of str
         The name of the column or columns to be assigned to the output of running the
         pandas method in transform.
 
@@ -341,7 +311,7 @@ class DataFrameMethodTransformer(BaseTransformer):
 
     Attributes
     ----------
-    new_column_name : str or list of str
+    new_column_names : str or list of str
         The name of the column or columns to be assigned to the output of running the
         pandas method in transform.
 
@@ -352,7 +322,7 @@ class DataFrameMethodTransformer(BaseTransformer):
 
     def __init__(
         self,
-        new_column_name: list[str] | str,
+        new_column_names: list[str] | str,
         pd_method_name: str,
         columns: list[str] | str | None,
         pd_method_kwargs: dict[str, object] | None = None,
@@ -361,14 +331,14 @@ class DataFrameMethodTransformer(BaseTransformer):
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
-        if type(new_column_name) is list:
-            for i, item in enumerate(new_column_name):
+        if type(new_column_names) is list:
+            for i, item in enumerate(new_column_names):
                 if type(item) is not str:
-                    msg = f"{self.classname()}: if new_column_name is a list, all elements must be strings but got {type(item)} in position {i}"
+                    msg = f"{self.classname()}: if new_column_names is a list, all elements must be strings but got {type(item)} in position {i}"
                     raise TypeError(msg)
 
-        elif type(new_column_name) is not str:
-            msg = f"{self.classname()}: unexpected type ({type(new_column_name)}) for new_column_name, must be str or list of strings"
+        elif type(new_column_names) is not str:
+            msg = f"{self.classname()}: unexpected type ({type(new_column_names)}) for new_column_names, must be str or list of strings"
             raise TypeError(msg)
 
         if type(pd_method_name) is not str:
@@ -391,7 +361,7 @@ class DataFrameMethodTransformer(BaseTransformer):
             msg = f"{self.classname()}: unexpected type ({type(drop_original)}) for drop_original, expecting bool"
             raise TypeError(msg)
 
-        self.new_column_name = new_column_name
+        self.new_column_names = new_column_names
         self.pd_method_name = pd_method_name
         self.pd_method_kwargs = pd_method_kwargs
         self.drop_original = drop_original
@@ -418,13 +388,13 @@ class DataFrameMethodTransformer(BaseTransformer):
         Returns
         -------
         X : pd.DataFrame
-            Input X with additional column or columns (self.new_column_name) added. These contain the output of
+            Input X with additional column or columns (self.new_column_names) added. These contain the output of
             running the pandas DataFrame method.
 
         """
         X = super().transform(X)
 
-        X[self.new_column_name] = getattr(X[self.columns], self.pd_method_name)(
+        X[self.new_column_names] = getattr(X[self.columns], self.pd_method_name)(
             **self.pd_method_kwargs,
         )
 

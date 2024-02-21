@@ -31,7 +31,7 @@ class TestInit:
             ValueError,
             match="GroupRareLevelsTransformer: cut_off_percent must be a float",
         ):
-            GroupRareLevelsTransformer(cut_off_percent="a")
+            GroupRareLevelsTransformer(columns="a", cut_off_percent="a")
 
     def test_cut_off_percent_negative_error(self):
         """Test that an exception is raised if cut_off_percent is negative."""
@@ -39,7 +39,7 @@ class TestInit:
             ValueError,
             match="GroupRareLevelsTransformer: cut_off_percent must be > 0 and < 1",
         ):
-            GroupRareLevelsTransformer(cut_off_percent=-1.0)
+            GroupRareLevelsTransformer(columns="a", cut_off_percent=-1.0)
 
     def test_cut_off_percent_gt_one_error(self):
         """Test that an exception is raised if cut_off_percent is greater than 1."""
@@ -47,7 +47,7 @@ class TestInit:
             ValueError,
             match="GroupRareLevelsTransformer: cut_off_percent must be > 0 and < 1",
         ):
-            GroupRareLevelsTransformer(cut_off_percent=2.0)
+            GroupRareLevelsTransformer(columns="a", cut_off_percent=2.0)
 
     def test_weight_not_str_error(self):
         """Test that an exception is raised if weight is not a str, if supplied."""
@@ -55,7 +55,7 @@ class TestInit:
             ValueError,
             match="GroupRareLevelsTransformer: weight should be a single column",
         ):
-            GroupRareLevelsTransformer(weight=2)
+            GroupRareLevelsTransformer(columns="a", weight=2)
 
     def test_record_rare_levels_not_bool_error(self):
         """Test that an exception is raised if record_rare_levels is not a bool."""
@@ -63,7 +63,7 @@ class TestInit:
             ValueError,
             match="GroupRareLevelsTransformer: record_rare_levels must be a bool",
         ):
-            GroupRareLevelsTransformer(record_rare_levels=2)
+            GroupRareLevelsTransformer(columns="a", record_rare_levels=2)
 
     def test_unseen_levels_to_rare_not_bool_error(self):
         """Test that an exception is raised if unseen_levels_to_rare is not a bool."""
@@ -71,7 +71,7 @@ class TestInit:
             ValueError,
             match="GroupRareLevelsTransformer: unseen_levels_to_rare must be a bool",
         ):
-            GroupRareLevelsTransformer(unseen_levels_to_rare=2)
+            GroupRareLevelsTransformer(columns="a", unseen_levels_to_rare=2)
 
 
 class TestFit:

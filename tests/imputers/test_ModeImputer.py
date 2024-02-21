@@ -32,7 +32,7 @@ class TestInit:
             ValueError,
             match="ModeImputer: weight should be a string or None",
         ):
-            ModeImputer(columns=None, weight=weight)
+            ModeImputer(columns=["s"], weight=weight)
 
 
 class TestFit:

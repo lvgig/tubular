@@ -13,38 +13,7 @@ from tubular.mapping import BaseMappingTransformMixin
 
 
 class BaseNominalTransformer(BaseTransformer):
-    """Base Transformer extension for nominal transformers.
-
-    Contains columns_set_or_check method which overrides the columns_set_or_check method in BaseTransformer if given
-    primacy in inheritance. The difference being that BaseNominalTransformer's columns_set_or_check only selects
-    object and categorical columns from X, if the columns attribute is not set by the user.
-    """
-
-    def columns_set_or_check(self, X: pd.DataFrame) -> None:
-        """Function to check or set columns attribute.
-
-        If the columns attribute is None then set it to all object and category columns in X. Otherwise run the
-        columns_check method.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            Data to check columns are in.
-
-        """
-        if self.columns is None:
-            columns = [
-                c for c in X.columns if X[c].dtype.name in ["object", "category"]
-            ]
-
-            if not len(columns) > 0:
-                msg = f"{self.classname()}: no object or category columns in X"
-                raise ValueError(msg)
-
-            self.columns = columns
-
-        else:
-            self.columns_check(X)
+    """Base Transformer extension for nominal transformers."""
 
     def check_mappable_rows(self, X: pd.DataFrame) -> None:
         """Method to check that all the rows to apply the transformer to are able to be
@@ -445,7 +414,6 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
             # for categorical dtypes have to set new category for the impute values first
             # and convert back to the categorical type, other it will convert to object
             if "category" in X[c].dtype.name:
-
                 categories_before = X[c].dtype.categories
 
                 if self.rare_level_name not in X[c].cat.categories:

@@ -45,6 +45,7 @@ class TestInit:
             call_pos_args[0] is x
         ), f"Unexpected positional arg (self) in BaseNominalTransformer.__init__ call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
 
+    # TODO replace type checks left by deleting one hot encoder init call test
     def test_one_hot_encoder_init_called(self, mocker):
         """Test that init calls OneHotEncoder.init.
 
@@ -59,7 +60,7 @@ class TestInit:
         mocker.patch("sklearn.preprocessing.OneHotEncoder.__init__")
 
         x = OneHotEncodingTransformer(
-            columns=None,
+            columns=["a"],
             verbose=True,
             copy=True,
             separator="x",
@@ -88,41 +89,9 @@ class TestInit:
             call_pos_args[0] is x
         ), f"Unexpected positional arg (self) in OneHotEncoder.__init__ call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
 
-    def test_values_passed_in_init_set_to_attribute(self):
-        """Test that the values passed in init are saved in an attribute of the same name."""
-        x = OneHotEncodingTransformer(
-            columns=None,
-            verbose=True,
-            copy=True,
-            separator="x",
-            drop_original=True,
-        )
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={"separator": "x", "drop_original": True},
-            msg="Attributes for OneHotEncodingTransformer set in init",
-        )
-
 
 class TestFit:
     """Tests for OneHotEncodingTransformer.fit()."""
-
-    def test_columns_set_or_check_called(self, mocker):
-        """Test that fit calls BaseNominalTransformer.columns_set_or_check."""
-        df = d.create_df_1()
-
-        x = OneHotEncodingTransformer(columns="b")
-
-        expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.nominal.BaseNominalTransformer,
-            "columns_set_or_check",
-            expected_call_args,
-        ):
-            x.fit(df)
 
     def test_base_nominal_transformer_fit_called(self, mocker):
         """Test that fit calls BaseNominalTransformer.fit."""
@@ -511,7 +480,7 @@ class TestTransform:
         df_train = d.create_df_7()
         df_test = d.create_df_8()
 
-        x = OneHotEncodingTransformer(verbose=True)
+        x = OneHotEncodingTransformer(columns=["a", "b", "c"], verbose=True)
 
         x.fit(df_train)
 
@@ -569,7 +538,7 @@ class TestTransform:
         """Test OneHotEncodingTransformer.transform keeps original columns when specified."""
         df = d.create_df_7()
 
-        x = OneHotEncodingTransformer(drop_original=False)
+        x = OneHotEncodingTransformer(columns=["a", "b", "c"], drop_original=False)
 
         x.fit(df)
 

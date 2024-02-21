@@ -116,7 +116,6 @@ class BaseDateTransformer(BaseTransformer):
         temp = X[self.columns].copy()
 
         for column_one_name, column_two_name in itertools.permutations(self.columns):
-
             temp = self._cast_non_matching_columns(
                 temp,
                 column_one_name,
