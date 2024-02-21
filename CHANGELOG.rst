@@ -38,14 +38,14 @@ this functionality. This required updating a lot of test files.
 ------------------
 Added
 ^^^^^
-- Updated GroupRareLevelsTransformer so that when working with category dtypes it forgets categories encoded as rare (this is wanted behaviour as these categories are no longer present in the data) `#177 https://github.com/lvgig/tubular/pull/177`_
+- Updated GroupRareLevelsTransformer so that when working with category dtypes it forgets categories encoded as rare (this is wanted behaviour as these categories are no longer present in the data) `<#177 https://github.com/lvgig/tubular/pull/177>`_
 
 1.2.0 (2024-02-06)
 ------------------
 Added
 ^^^^^
 - Update OneHotEncodingTransformer to default to returning int8 columns `#175 <https://github.com/lvgig/tubular/pull/175>`_
-- Updated NullIndicator to return int8 columns `#173 https://github.com/lvgig/tubular/pull/173`_
+- Updated NullIndicator to return int8 columns `<#173 https://github.com/lvgig/tubular/pull/173>`_
 - Updated MeanResponseTransformer to coerce return to float (useful behaviour for category type features) `#174 <https://github.com/lvgig/tubular/pull/174>`_
 
 1.1.1 (2024-01-18)
