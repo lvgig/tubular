@@ -16,6 +16,7 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+
 1.3.0 (unreleased)
 ------------------
 Added
@@ -33,6 +34,17 @@ Removed
 this functionality. This required updating a lot of test files.
 - The `columns_set_or_check()` method from BaseTransformer. With the above change it was no longer necessary. Subsequent updates to nominal transformers and their tests were required.
 
+
+1.2.2 (2024-02-20)
+------------------
+Added
+^^^^^
+- Created unit test for checking if log1p is working and well conditioned for small x `#178 <https://github.com/lvgig/tubular/pull/178>`_
+
+Changed
+^^^^^^^
+- Changed LogTransformer to use log1p(x) instead of log(x+1) `#178 <https://github.com/lvgig/tubular/pull/178>`_
+- Changed unit tests using log(x+1) to log1p(x) `#178 <https://github.com/lvgig/tubular/pull/178>`_
 
 1.2.1 (2024-02-08)
 ------------------
