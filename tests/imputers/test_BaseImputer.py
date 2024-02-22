@@ -14,6 +14,22 @@ from tests.base_tests import (
 from tubular.imputers import BaseImputer
 
 
+class BaseImputerTransformTests(GenericTransformTests):
+    def test_not_fitted_error_raised(self):
+        df = pd.DataFrame(
+            {
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
+                "b": ["a", "b", "c", "d", "e", "f", np.NaN],
+                "c": ["a", "b", "c", "d", "e", "f", np.NaN],
+            },
+        )
+
+        x = BaseImputer(columns=["b", "c"])
+
+        with pytest.raises(NotFittedError):
+            x.transform(df)
+
+
 class TestInit(ColumnStrListInitTests):
     """Generic tests for transformer.init()."""
 
@@ -30,7 +46,7 @@ class TestFit(GenericFitTests):
         cls.transformer_name = "BaseTransformer"
 
 
-class TestTransform(GenericTransformTests):
+class TestTransform(BaseImputerTransformTests):
     """Tests for BaseImputer.transform."""
 
     @classmethod
@@ -131,20 +147,6 @@ class TestTransform(GenericTransformTests):
             actual=df_transformed,
             msg="ArbitraryImputer transform col b, c",
         )
-
-    def test_not_fitted_error_raised(self):
-        df = pd.DataFrame(
-            {
-                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
-                "b": ["a", "b", "c", "d", "e", "f", np.NaN],
-                "c": ["a", "b", "c", "d", "e", "f", np.NaN],
-            },
-        )
-
-        x = BaseImputer(columns=["b", "c"])
-
-        with pytest.raises(NotFittedError):
-            x.transform(df)
 
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
