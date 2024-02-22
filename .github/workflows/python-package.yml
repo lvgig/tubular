@@ -36,9 +36,14 @@ jobs:
 
       - name: Test with pytest
         if: always()
-        run: |
-          source ${{ matrix.python-version }}/bin/activate
-          pytest . --cov=tubular/ --cov-report=html --cov-config=.coveragerc
+        uses: pavelzw/pytest-action@v2
+        with:
+           verbose: true
+           emoji: true
+           job-summary: true
+           custom-arguments: '--cov=tubular/ --cov-report=html --cov-config=.coveragerc'
+           click-to-expand: true
+           report-title: '${{ matrix.python-version }} Test Report'
 
       - name: Upload coverage pytest html test results to github
         if: always()
