@@ -34,6 +34,12 @@ Removed
 this functionality. This required updating a lot of test files.
 - The `columns_set_or_check()` method from BaseTransformer. With the above change it was no longer necessary. Subsequent updates to nominal transformers and their tests were required.
 
+1.2.3 (2024-02-23)
+------------------
+Added
+^^^^^
+- Split existing input check into two better defined checks for TwoColumnOperatorTransformer `#144 <https://github.com/lvgig/tubular/issues/144>`_
+- Created unit tests for checking column type and size `#144 <https://github.com/lvgig/tubular/issues/144>`_
 
 1.2.2 (2024-02-20)
 ------------------

@@ -19,6 +19,27 @@ def example_transformer():
 class TestTwoColumnOperatorTransformerInit:
     """Tests for TwoColumnMethodTransformer.__init__()."""
 
+    def test_column_type_error(self):
+        """Checks that an error is raised if the column type is not a list."""
+        with pytest.raises(
+            TypeError,
+            match="columns must be a list containing two column names",
+        ):
+            TwoColumnOperatorTransformer(
+                "mul",
+                "a, b",
+                "c",
+                pd_method_kwargs={"axis": 1},
+            )
+
+    def test_column_size_error(self):
+        """Checks that the column is of length 2."""
+        with pytest.raises(
+            ValueError,
+            match="columns must be a list containing two column names",
+        ):
+            TwoColumnOperatorTransformer("mul", [], "c", pd_method_kwargs={"axis": 1})
+
     def test_axis_not_present_error(self):
         """Checks that an error is raised if no axis element present in pd_method_kwargs dict."""
         with pytest.raises(
