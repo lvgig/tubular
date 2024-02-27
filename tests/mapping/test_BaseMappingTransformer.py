@@ -73,7 +73,7 @@ class BaseMappingTransformerTransformTests(GenericTransformTests):
         )
 
 
-### Running the BaseMappingTransformerTestSuite
+# Running the BaseMappingTransformerTestSuite
 
 
 class TestInit(BaseMappingTransformerInitTests):
