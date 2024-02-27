@@ -1070,7 +1070,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         # Set attributes for scikit-learn'S OneHotEncoder
         OneHotEncoder.__init__(
             self,
-            sparse=False,
+            sparse_output=False,
             handle_unknown="ignore",
             dtype=dtype,
             **kwargs,
