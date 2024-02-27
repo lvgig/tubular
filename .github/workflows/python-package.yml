@@ -70,7 +70,7 @@ jobs:
         - name: Install ruff
           run: |
             python -m pip install uv
-            uv venv -p 38 ruff
+            uv venv -p 3.8 ruff
             source ruff/bin/activate
             uv pip install -r requirements-dev.txt
           
