@@ -38,8 +38,8 @@ this functionality. This required updating a lot of test files.
 ------------------
 Added
 ^^^^^
-- Split existing input check into two better defined checks for TwoColumnOperatorTransformer `#144 <https://github.com/lvgig/tubular/issues/144>`_
-- Created unit tests for checking column type and size `#144 <https://github.com/lvgig/tubular/issues/144>`_
+- Split existing input check into two better defined checks for TwoColumnOperatorTransformer `#183 <https://github.com/lvgig/tubular/pull/183>`_
+- Created unit tests for checking column type and size `#183 <https://github.com/lvgig/tubular/pull/183>`_
 
 1.2.2 (2024-02-20)
 ------------------
