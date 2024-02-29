@@ -38,7 +38,12 @@ class TestTwoColumnOperatorTransformerInit:
             ValueError,
             match="columns must be a list containing two column names",
         ):
-            TwoColumnOperatorTransformer("mul", [], "c", pd_method_kwargs={"axis": 1})
+            TwoColumnOperatorTransformer(
+                "mul",
+                ["a"],
+                "c",
+                pd_method_kwargs={"axis": 1},
+            )
 
     def test_axis_not_present_error(self):
         """Checks that an error is raised if no axis element present in pd_method_kwargs dict."""
