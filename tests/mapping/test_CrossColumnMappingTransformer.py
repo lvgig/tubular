@@ -5,34 +5,21 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
-import tubular
+from tests.mapping.test_BaseMappingTransformer import (
+    BaseMappingTransformerInitTests,
+    BaseMappingTransformerTransformTests,
+    GenericFitTests,
+    OtherBaseBehaviourTests,
+)
 from tubular.mapping import CrossColumnMappingTransformer
 
 
-class TestInit:
+class TestInit(BaseMappingTransformerInitTests):
     """Tests for CrossColumnMappingTransformer.init()."""
 
-    def test_super_init_called(self, mocker):
-        """Test that init calls BaseMappingTransformer.init."""
-        expected_call_args = {
-            0: {
-                "args": (),
-                "kwargs": {"mappings": {"a": {"a": 1}}, "verbose": True, "copy": True},
-            },
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.mapping.BaseMappingTransformer,
-            "__init__",
-            expected_call_args,
-        ):
-            CrossColumnMappingTransformer(
-                mappings={"a": {"a": 1}},
-                adjust_column="b",
-                verbose=True,
-                copy=True,
-            )
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "CrossColumnMappingTransformer"
 
     def test_adjust_columns_non_string_error(self):
         """Test that an exception is raised if adjust_column is not a string."""
@@ -53,21 +40,21 @@ class TestInit:
                 adjust_column="c",
             )
 
-    def test_adjust_column_set_to_attribute(self):
-        """Test that the value passed for adjust_column is saved in an attribute of the same name."""
-        value = "b"
 
-        x = CrossColumnMappingTransformer(mappings={"a": {"a": 1}}, adjust_column=value)
+class TestFit(GenericFitTests):
+    """Generic tests for CrossColumnMappingTransformer.fit()"""
 
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={"adjust_column": value},
-            msg="Attributes for CrossColumnMappingTransformer set in init",
-        )
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "CrossColumnMappingTransformer"
 
 
-class TestTransform:
+class TestTransform(BaseMappingTransformerTransformTests):
     """Tests for the transform method on CrossColumnMappingTransformer."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "CrossColumnMappingTransformer"
 
     def expected_df_1():
         """Expected output for test_expected_output."""
@@ -90,43 +77,6 @@ class TestTransform:
                 "c": ["cc", "dd", "bb", "cc", "cc"],
             },
         )
-
-    def test_check_is_fitted_call(self, mocker):
-        """Test the call to check_is_fitted."""
-        df = d.create_df_1()
-
-        mapping = {"a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"}}
-
-        x = CrossColumnMappingTransformer(mappings=mapping, adjust_column="b")
-
-        expected_call_args = {0: {"args": (["adjust_column"],), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "check_is_fitted",
-            expected_call_args,
-        ):
-            x.transform(df)
-
-    def test_super_transform_call(self, mocker):
-        """Test the call to BaseMappingTransformer.transform."""
-        df = d.create_df_1()
-
-        mapping = {"a": {1: "aa", 2: "bb", 3: "cc", 4: "dd", 5: "ee", 6: "ff"}}
-
-        x = CrossColumnMappingTransformer(mappings=mapping, adjust_column="b")
-
-        expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.mapping.BaseMappingTransformer,
-            "transform",
-            expected_call_args,
-            return_value=d.create_df_1(),
-        ):
-            x.transform(df)
 
     def test_adjust_col_not_in_x_error(self):
         """Test that an exception is raised if the adjust_column is not present in the dataframe."""
@@ -214,3 +164,15 @@ class TestTransform:
             actual=x.mappings,
             msg="CrossColumnMappingTransformer.transform has changed self.mappings unexpectedly",
         )
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "CrossColumnMappingTransformer"

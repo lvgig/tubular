@@ -267,7 +267,7 @@ class GenericFitTests:
 
 class GenericTransformTests:
     """
-    Generic tests for transformer.fit().
+    Generic tests for transformer.transform().
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
