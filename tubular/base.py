@@ -12,6 +12,8 @@ from sklearn.utils.validation import check_is_fitted
 
 from tubular._version import __version__
 
+pd.options.mode.copy_on_write = True
+
 
 class BaseTransformer(TransformerMixin, BaseEstimator):
     """Base tranformer class which all other transformers in the package inherit from.

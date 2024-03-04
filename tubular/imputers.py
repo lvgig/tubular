@@ -9,8 +9,6 @@ import pandas as pd
 
 from tubular.base import BaseTransformer
 
-pd.options.mode.copy_on_write = True
-
 
 class BaseImputer(BaseTransformer):
     """Base imputer class containing standard transform method that will use pd.Series.fillna with the

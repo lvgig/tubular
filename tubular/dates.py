@@ -11,8 +11,6 @@ import pandas as pd
 
 from tubular.base import BaseTransformer
 
-pd.options.mode.copy_on_write = True
-
 
 class BaseDateTransformer(BaseTransformer):
     """
