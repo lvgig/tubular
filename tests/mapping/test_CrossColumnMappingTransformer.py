@@ -19,6 +19,8 @@ class TestInit(BaseMappingTransformerInitTests):
 
     @classmethod
     def setup_class(cls):
+        """Defines which transformer look up in conftest.py fixtures for inherited tests.
+        setup_class is called by pytest at class level before all test methods are called."""
         cls.transformer_name = "CrossColumnMappingTransformer"
 
     def test_adjust_columns_non_string_error(self):
