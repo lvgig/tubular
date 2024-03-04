@@ -9,6 +9,8 @@ import pandas as pd
 
 from tubular.base import BaseTransformer
 
+pd.options.mode.copy_on_write = True
+
 
 class BaseImputer(BaseTransformer):
     """Base imputer class containing standard transform method that will use pd.Series.fillna with the
@@ -183,11 +185,11 @@ class MedianImputer(BaseImputer):
         if self.weight is not None:
             super().check_weights_column(X, self.weight)
 
-            temp = X.copy()
+            # temp = X
 
             for c in self.columns:
                 # filter out null rows so their weight doesn't influence calc
-                filtered = temp[temp[c].notna()]
+                filtered = X[X[c].notna()]
 
                 # first sort df by column to be imputed (order of weight column shouldn't matter for median)
                 filtered = filtered.sort_values(c)

@@ -11,6 +11,8 @@ import pandas as pd
 
 from tubular.base import BaseTransformer
 
+pd.options.mode.copy_on_write = True
+
 
 class BaseDateTransformer(BaseTransformer):
     """
@@ -49,7 +51,7 @@ class BaseDateTransformer(BaseTransformer):
 
         self.check_columns_are_date_or_datetime(X)
 
-        temp = X[self.columns].copy()
+        temp = X[self.columns]
 
         for column in self.columns:
             if not self._is_datetime64_dict[column]:
@@ -113,7 +115,7 @@ class BaseDateTransformer(BaseTransformer):
 
         self.check_columns_are_date_or_datetime(X)
 
-        temp = X[self.columns].copy()
+        temp = X[self.columns]
 
         for column_one_name, column_two_name in itertools.permutations(self.columns):
             temp = self._cast_non_matching_columns(

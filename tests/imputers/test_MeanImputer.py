@@ -172,7 +172,7 @@ class TestTransform:
         )
 
         for col in ["a", "b", "c"]:
-            df[col].loc[df[col].isna()] = df[col].mean()
+            df.loc[df[col].isna(), col] = df[col].mean()
 
         return df
 
@@ -187,7 +187,7 @@ class TestTransform:
         )
 
         for col in ["a"]:
-            df[col].loc[df[col].isna()] = df[col].mean()
+            df.loc[df[col].isna(), col] = df[col].mean()
 
         return df
 
@@ -196,7 +196,7 @@ class TestTransform:
         df = d.create_df_9()
 
         for col, value in zip(["a", "b"], [59 / 15, 42 / 18]):
-            df[col].loc[df[col].isna()] = value
+            df.loc[df[col].isna(), col] = value
 
         return df
 

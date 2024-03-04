@@ -11,6 +11,8 @@ from sklearn.preprocessing import OneHotEncoder
 from tubular.base import BaseTransformer
 from tubular.mapping import BaseMappingTransformMixin
 
+pd.options.mode.copy_on_write = True
+
 
 class BaseNominalTransformer(BaseTransformer):
     """Base Transformer extension for nominal transformers."""

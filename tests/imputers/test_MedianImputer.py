@@ -178,7 +178,7 @@ class TestTransform:
         )
 
         for col in ["a", "b", "c"]:
-            df[col].loc[df[col].isna()] = df[col].median()
+            df.loc[df[col].isna(), col] = df[col].median()
 
         return df
 
@@ -193,7 +193,7 @@ class TestTransform:
         )
 
         for col in ["a"]:
-            df[col].loc[df[col].isna()] = df[col].median()
+            df.loc[df[col].isna(), col] = df[col].median()
 
         return df
 
@@ -202,7 +202,7 @@ class TestTransform:
         df = d.create_df_9()
 
         for col in ["a"]:
-            df[col].loc[df[col].isna()] = 4
+            df.loc[df[col].isna(), col] = 4
 
         return df
 
