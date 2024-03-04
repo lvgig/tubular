@@ -15,12 +15,8 @@ from tests.base_tests import (
 from tubular.base import DataFrameMethodTransformer
 
 
-class TestInit(ColumnStrListInitTests):
-    """Tests for DataFrameMethodTransformer.init()."""
-
-    @classmethod
-    def setup_class(cls):
-        cls.transformer_name = "DataFrameMethodTransformer"
+class DataFrameMethodTransformerInitTests(ColumnStrListInitTests):
+    """Inheritable tests for DataFrameMethodTransformer.init()."""
 
     @pytest.mark.parametrize("not_dictionary", ["a", [1, 2], True, 1.5])
     def test_exception_raised_pd_method_kwargs_not_dict(self, not_dictionary):
@@ -103,6 +99,12 @@ class TestInit(ColumnStrListInitTests):
                 columns=["b", "c"],
                 drop_original=not_bool,
             )
+
+
+class TestInit(DataFrameMethodTransformerInitTests):
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DataFrameMethodTransformer"
 
 
 class TestFit(GenericFitTests):
