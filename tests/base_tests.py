@@ -21,25 +21,25 @@ class GenericInitTests:
     Note this class name deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
-    def test_print(self, instantiated_transformers):
+    def test_print(self, initialized_transformers):
         """Test that transformer can be printed.
         If an error is raised in this test it will not prevent the transformer from working correctly,
         but will stop other unit tests passing.
         """
 
-        print(instantiated_transformers[self.transformer_name])
+        print(initialized_transformers[self.transformer_name])
 
-    def test_clone(self, instantiated_transformers):
+    def test_clone(self, initialized_transformers):
         """Test that transformer can be used in sklearn.base.clone function."""
 
-        b.clone(instantiated_transformers[self.transformer_name])
+        b.clone(initialized_transformers[self.transformer_name])
 
     @pytest.mark.parametrize("non_bool", [1, "True", {"a": 1}, [1, 2], None])
     def test_verbose_non_bool_error(
         self,
         non_bool,
         minimal_attribute_dict,
-        uninstantiated_transformers,
+        uninitialized_transformers,
     ):
         """Test an error is raised if verbose is not specified as a bool."""
 
@@ -47,7 +47,7 @@ class GenericInitTests:
             TypeError,
             match=f"{self.transformer_name}: verbose must be a bool",
         ):
-            uninstantiated_transformers[self.transformer_name](
+            uninitialized_transformers[self.transformer_name](
                 verbose=non_bool,
                 **minimal_attribute_dict[self.transformer_name],
             )
@@ -57,7 +57,7 @@ class GenericInitTests:
         self,
         non_bool,
         minimal_attribute_dict,
-        uninstantiated_transformers,
+        uninitialized_transformers,
     ):
         """Test an error is raised if copy is not specified as a bool."""
 
@@ -65,7 +65,7 @@ class GenericInitTests:
             TypeError,
             match=f"{self.transformer_name}: copy must be a bool",
         ):
-            uninstantiated_transformers[self.transformer_name](
+            uninitialized_transformers[self.transformer_name](
                 copy=non_bool,
                 **minimal_attribute_dict[self.transformer_name],
             )
@@ -80,7 +80,7 @@ class ColumnStrListInitTests(GenericInitTests):
     def test_columns_empty_list_error(
         self,
         minimal_attribute_dict,
-        uninstantiated_transformers,
+        uninitialized_transformers,
     ):
         """Test an error is raised if columns is specified as an empty list."""
 
@@ -88,14 +88,14 @@ class ColumnStrListInitTests(GenericInitTests):
         args["columns"] = []
 
         with pytest.raises(ValueError):
-            uninstantiated_transformers[self.transformer_name](**args)
+            uninitialized_transformers[self.transformer_name](**args)
 
     @pytest.mark.parametrize("non_string", [1, True, {"a": 1}, [1, 2], None])
     def test_columns_list_element_error(
         self,
         non_string,
         minimal_attribute_dict,
-        uninstantiated_transformers,
+        uninitialized_transformers,
     ):
         """Test an error is raised if columns list contains non-string elements."""
 
@@ -108,14 +108,14 @@ class ColumnStrListInitTests(GenericInitTests):
                 f"{self.transformer_name}: each element of columns should be a single (string) column name",
             ),
         ):
-            uninstantiated_transformers[self.transformer_name](**args)
+            uninitialized_transformers[self.transformer_name](**args)
 
     @pytest.mark.parametrize("non_string_or_list", [1, True, {"a": 1}, None])
     def test_columns_non_string_or_list_error(
         self,
         non_string_or_list,
         minimal_attribute_dict,
-        uninstantiated_transformers,
+        uninitialized_transformers,
     ):
         """Test an error is raised if columns is not passed as a string or list."""
 
@@ -128,7 +128,7 @@ class ColumnStrListInitTests(GenericInitTests):
                 f"{self.transformer_name}: columns must be a string or list with the columns to be pre-processed (if specified)",
             ),
         ):
-            uninstantiated_transformers[self.transformer_name](**args)
+            uninitialized_transformers[self.transformer_name](**args)
 
 
 class ColumnsFromDictInitTests(GenericInitTests):
@@ -142,7 +142,7 @@ class ColumnsFromDictInitTests(GenericInitTests):
         self,
         non_string,
         minimal_attribute_dict,
-        uninstantiated_transformers,
+        uninitialized_transformers,
     ):
         """Test an error is raised if columns list contains non-string elements."""
 
@@ -155,7 +155,7 @@ class ColumnsFromDictInitTests(GenericInitTests):
                 f"{self.transformer_name}: each element of columns should be a single (string) column name",
             ),
         ):
-            uninstantiated_transformers[self.transformer_name](**args)
+            uninitialized_transformers[self.transformer_name](**args)
 
 
 class GenericFitTests:
@@ -166,13 +166,13 @@ class GenericFitTests:
 
     def test_fit_returns_self(
         self,
-        instantiated_transformers,
+        initialized_transformers,
     ):
         """Test fit returns self?."""
 
         df = d.create_numeric_df_1()
 
-        x = instantiated_transformers[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         x_fitted = x.fit(df, df["c"])
 
@@ -183,14 +183,14 @@ class GenericFitTests:
     @pytest.mark.parametrize("non_df", [1, True, "a", [1, 2], {"a": 1}, None])
     def test_X_non_df_error(
         self,
-        instantiated_transformers,
+        initialized_transformers,
         non_df,
     ):
         """Test an error is raised if X is not passed as a pd.DataFrame."""
 
         df = d.create_numeric_df_1()
 
-        x = instantiated_transformers[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         with pytest.raises(
             TypeError,
@@ -202,13 +202,13 @@ class GenericFitTests:
     def test_non_pd_type_error(
         self,
         non_series,
-        instantiated_transformers,
+        initialized_transformers,
     ):
         """Test an error is raised if y is not passed as a pd.Series."""
 
         df = d.create_numeric_df_1()
 
-        x = instantiated_transformers[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         with pytest.raises(
             TypeError,
@@ -218,11 +218,11 @@ class GenericFitTests:
 
     def test_X_no_rows_error(
         self,
-        instantiated_transformers,
+        initialized_transformers,
     ):
         """Test an error is raised if X has no rows."""
 
-        x = instantiated_transformers[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         df = pd.DataFrame(columns=["a", "b", "c"])
 
@@ -234,11 +234,11 @@ class GenericFitTests:
 
     def test_Y_no_rows_error(
         self,
-        instantiated_transformers,
+        initialized_transformers,
     ):
         """Test an error is raised if Y has no rows."""
 
-        x = instantiated_transformers[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         df = pd.DataFrame({"a": 1, "b": "wow", "c": np.nan}, index=[0])
 
@@ -251,7 +251,7 @@ class GenericFitTests:
     def test_unexpected_kwarg_error(
         self,
         minimal_attribute_dict,
-        uninstantiated_transformers,
+        uninitialized_transformers,
     ):
         with pytest.raises(
             TypeError,
@@ -259,7 +259,7 @@ class GenericFitTests:
                 "__init__() got an unexpected keyword argument 'unexpected_kwarg'",
             ),
         ):
-            uninstantiated_transformers[self.transformer_name](
+            uninitialized_transformers[self.transformer_name](
                 unexpected_kwarg="spanish inquisition",
                 **minimal_attribute_dict[self.transformer_name],
             )
@@ -267,7 +267,7 @@ class GenericFitTests:
 
 class GenericTransformTests:
     """
-    Generic tests for transformer.fit().
+    Generic tests for transformer.transform().
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
@@ -275,13 +275,13 @@ class GenericTransformTests:
     def test_non_pd_type_error(
         self,
         non_df,
-        instantiated_transformers,
+        initialized_transformers,
     ):
         """Test that an error is raised in transform is X is not a pd.DataFrame."""
 
         df = d.create_df_10()
 
-        x = instantiated_transformers[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         x_fitted = x.fit(df, df["c"])
 
@@ -291,11 +291,11 @@ class GenericTransformTests:
         ):
             x_fitted.transform(X=non_df)
 
-    def test_copy_returned(self, minimal_attribute_dict, uninstantiated_transformers):
+    def test_copy_returned(self, minimal_attribute_dict, uninitialized_transformers):
         """Test check that a copy is returned if copy is set to True"""
         df = d.create_df_10()
 
-        x = uninstantiated_transformers[self.transformer_name](
+        x = uninitialized_transformers[self.transformer_name](
             copy=True,
             **minimal_attribute_dict[self.transformer_name],
         )
@@ -306,11 +306,11 @@ class GenericTransformTests:
 
         assert df_transformed is not df
 
-    def test_no_rows_error(self, instantiated_transformers):
+    def test_no_rows_error(self, initialized_transformers):
         """Test an error is raised if X has no rows."""
         df = d.create_df_10()
 
-        x = instantiated_transformers[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         x = x.fit(df, df["c"])
 
@@ -331,11 +331,11 @@ class ColumnsCheckTests:
 
     def test_non_pd_df_error(
         self,
-        instantiated_transformers,
+        initialized_transformers,
     ):
         """Test an error is raised if X is not passed as a pd.DataFrame."""
 
-        x = instantiated_transformers[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         with pytest.raises(
             TypeError,
@@ -347,12 +347,12 @@ class ColumnsCheckTests:
     def test_columns_not_list_error(
         self,
         non_list,
-        instantiated_transformers,
+        initialized_transformers,
     ):
         """Test an error is raised if self.columns is not a list."""
         df = d.create_df_1()
 
-        x = instantiated_transformers[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         x.columns = non_list
 
@@ -364,12 +364,12 @@ class ColumnsCheckTests:
 
     def test_columns_not_in_X_error(
         self,
-        instantiated_transformers,
+        initialized_transformers,
     ):
         """Test an error is raised if self.columns contains a value not in X."""
         df = d.create_df_1()
 
-        x = instantiated_transformers[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         x.columns = ["a", "z"]
 
@@ -387,11 +387,11 @@ class CombineXYTests:
     def test_X_not_DataFrame_error(
         self,
         non_df,
-        instantiated_transformers,
+        initialized_transformers,
     ):
         """Test an exception is raised if X is not a pd.DataFrame."""
 
-        x = instantiated_transformers[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         with pytest.raises(
             TypeError,
@@ -403,11 +403,11 @@ class CombineXYTests:
     def test_y_not_Series_error(
         self,
         non_series,
-        instantiated_transformers,
+        initialized_transformers,
     ):
         """Test an exception is raised if y is not a pd.Series."""
 
-        x = instantiated_transformers[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         with pytest.raises(
             TypeError,
@@ -417,11 +417,11 @@ class CombineXYTests:
 
     def test_X_and_y_different_number_of_rows_error(
         self,
-        instantiated_transformers,
+        initialized_transformers,
     ):
         """Test an exception is raised if X and y have different numbers of rows."""
 
-        x = instantiated_transformers[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         with pytest.raises(
             ValueError,
@@ -433,11 +433,11 @@ class CombineXYTests:
 
     def test_X_and_y_different_indexes_warning(
         self,
-        instantiated_transformers,
+        initialized_transformers,
     ):
         """Test a warning is raised if X and y have different indexes, but the output is still X and y."""
 
-        x = instantiated_transformers[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         with pytest.warns(
             UserWarning,
@@ -450,10 +450,10 @@ class CombineXYTests:
 
     def test_output_same_indexes(
         self,
-        instantiated_transformers,
+        initialized_transformers,
     ):
         """Test output is correct if X and y have the same index."""
-        x = instantiated_transformers[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         result = x._combine_X_y(
             X=pd.DataFrame({"a": [1, 2]}, index=[1, 2]),
@@ -499,14 +499,14 @@ class CheckWeightsColumnTests:
         ]
 
     @pytest.mark.parametrize("df, error, col", get_df_error_combos())
-    def test_weight_not_in_X_error(self, df, error, col, uninstantiated_transformers):
+    def test_weight_not_in_X_error(self, df, error, col, uninitialized_transformers):
         """Test an error is raised if weight is not in X."""
 
         with pytest.raises(
             ValueError,
             match=error,
         ):
-            uninstantiated_transformers[self.transformer_name].check_weights_column(
+            uninitialized_transformers[self.transformer_name].check_weights_column(
                 df,
                 col,
             )
