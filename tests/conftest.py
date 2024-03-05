@@ -222,12 +222,12 @@ def minimal_attribute_dict():
 
 
 @pytest.fixture()
-def instantiated_transformers(minimal_attribute_dict):
+def initialized_transformers(minimal_attribute_dict):
     """dictionary of {transformer name : initiated transformer} pairs for all transformers"""
     return {x[0]: x[1](**minimal_attribute_dict[x[0]]) for x in get_all_classes()}
 
 
 @pytest.fixture()
-def uninstantiated_transformers():
+def uninitialized_transformers():
     """dictionary of {transformer name : uninitiated transformer} pairs for all transformers"""
     return {x[0]: x[1] for x in get_all_classes()}
