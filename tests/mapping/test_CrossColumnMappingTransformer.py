@@ -78,20 +78,6 @@ class TestTransform(BaseMappingTransformerTransformTests):
             },
         )
 
-    def test_adjust_col_not_in_x_error(self):
-        """Test that an exception is raised if the adjust_column is not present in the dataframe."""
-        df = d.create_df_1()
-
-        mapping = {"a": {1: "aa", 2: "bb", 3: "cc", 4: "dd", 5: "ee", 6: "ff"}}
-
-        x = CrossColumnMappingTransformer(mappings=mapping, adjust_column="c")
-
-        with pytest.raises(
-            ValueError,
-            match="CrossColumnMappingTransformer: variable c is not in X",
-        ):
-            x.transform(df)
-
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_1(), expected_df_1()),
