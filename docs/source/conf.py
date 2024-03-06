@@ -19,11 +19,11 @@ sys.path.insert(0, os.path.abspath("../../"))
 # -- Project information -----------------------------------------------------
 
 project = "tubular"
-copyright = "2021, LV GI Data Science Team"
+project_copyright = "2021, LV GI Data Science Team"
 author = "LV GI Data Science Team"
 
 # The full version, including alpha/beta/rc tags
-import tubular  # noqa
+import tubular  # noqa: E402
 
 release = tubular.__version__
 

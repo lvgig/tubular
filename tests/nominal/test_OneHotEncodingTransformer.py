@@ -45,50 +45,6 @@ class TestInit:
             call_pos_args[0] is x
         ), f"Unexpected positional arg (self) in BaseNominalTransformer.__init__ call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
 
-    # TODO replace type checks left by deleting one hot encoder init call test
-    def test_one_hot_encoder_init_called(self, mocker):
-        """Test that init calls OneHotEncoder.init.
-
-        Again not using ta.functions.assert_function_call for this as it does not handle self being passed to OneHotEncoder.init
-        """
-        expected_keyword_args = {
-            "sparse": False,
-            "handle_unknown": "ignore",
-            "dtype": np.int8,
-        }
-
-        mocker.patch("sklearn.preprocessing.OneHotEncoder.__init__")
-
-        x = OneHotEncodingTransformer(
-            columns=["a"],
-            verbose=True,
-            copy=True,
-            separator="x",
-            drop_original=True,
-        )
-
-        assert (
-            sklearn.preprocessing.OneHotEncoder.__init__.call_count == 1
-        ), f"Not enough calls to OneHotEncoder.__init__ -\n  Expected: 1\n  Actual: {sklearn.preprocessing.OneHotEncoder.__init__.call_count}"
-
-        call_args = sklearn.preprocessing.OneHotEncoder.__init__.call_args_list[0]
-        call_pos_args = call_args[0]
-        call_kwargs = call_args[1]
-
-        ta.equality.assert_equal_dispatch(
-            expected=expected_keyword_args,
-            actual=call_kwargs,
-            msg="kwargs for OneHotEncoder.__init__ in OneHotEncodingTransformer.init",
-        )
-
-        assert (
-            len(call_pos_args) == 1
-        ), f"Unepxected number of positional args in OneHotEncoder.__init__ call -\n  Expected: 1\n  Actual: {len(call_pos_args)}"
-
-        assert (
-            call_pos_args[0] is x
-        ), f"Unexpected positional arg (self) in OneHotEncoder.__init__ call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
-
 
 class TestFit:
     """Tests for OneHotEncodingTransformer.fit()."""

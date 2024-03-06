@@ -35,7 +35,7 @@ class TestSetColumnDtypeInit:
 
     @pytest.mark.parametrize(
         "invalid_dtype",
-        ["STRING", "misc_invalid", "np.int", int()],
+        ["STRING", "misc_invalid", "np.int", 0],
     )
     def test_invalid_dtype_error(self, invalid_dtype):
         msg = f"SetColumnDtype: data type '{invalid_dtype}' not understood as a valid dtype"
@@ -75,8 +75,8 @@ class TestSetColumnDtypeTransform:
         """Input dataframe from test_expected_output."""
         return pd.DataFrame(
             {
-                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],
-                "b": [1.0, 2.0, 3.0, np.NaN, 7.0, 8.0, 9.0],
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.nan],
+                "b": [1.0, 2.0, 3.0, np.nan, 7.0, 8.0, 9.0],
                 "c": [1.0, 1.0, 2.0, 3.0, -4.0, -5.0, -6.0],
                 "d": [1, 1, 2, 3, -4, -5, -6],
             },
@@ -86,8 +86,8 @@ class TestSetColumnDtypeTransform:
         """Expected output from test_expected_output."""
         return pd.DataFrame(
             {
-                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],
-                "b": [1.0, 2.0, 3.0, np.NaN, 7.0, 8.0, 9.0],
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.nan],
+                "b": [1.0, 2.0, 3.0, np.nan, 7.0, 8.0, 9.0],
                 "c": [1.0, 1.0, 2.0, 3.0, -4.0, -5.0, -6.0],
                 "d": [1.0, 1.0, 2.0, 3.0, -4.0, -5.0, -6.0],
             },

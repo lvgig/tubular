@@ -126,9 +126,9 @@ class TestTransform(GenericTransformTests):
         """Expected output of test_expected_output_single_columns_assignment."""
         return pd.DataFrame(
             {
-                "a": [1, 2, 3, 4, 5, 6, np.NaN],
-                "b": [1, 2, 3, np.NaN, 7, 8, 9],
-                "c": [np.NaN, 1, 2, 3, -4, -5, -6],
+                "a": [1, 2, 3, 4, 5, 6, np.nan],
+                "b": [1, 2, 3, np.nan, 7, 8, 9],
+                "c": [np.nan, 1, 2, 3, -4, -5, -6],
                 "d": [1.0, 3.0, 5.0, 3.0, 3.0, 3.0, 3.0],
             },
         )
@@ -137,11 +137,11 @@ class TestTransform(GenericTransformTests):
         """Expected output of test_expected_output_multi_columns_assignment."""
         return pd.DataFrame(
             {
-                "a": [1, 2, 3, 4, 5, 6, np.NaN],
-                "b": [1, 2, 3, np.NaN, 7, 8, 9],
-                "c": [np.NaN, 1, 2, 3, -4, -5, -6],
-                "d": [0.5, 1.0, 1.5, np.NaN, 3.5, 4.0, 4.5],
-                "e": [np.NaN, 0.5, 1.0, 1.5, -2.0, -2.5, -3.0],
+                "a": [1, 2, 3, 4, 5, 6, np.nan],
+                "b": [1, 2, 3, np.nan, 7, 8, 9],
+                "c": [np.nan, 1, 2, 3, -4, -5, -6],
+                "d": [0.5, 1.0, 1.5, np.nan, 3.5, 4.0, 4.5],
+                "e": [np.nan, 0.5, 1.0, 1.5, -2.0, -2.5, -3.0],
             },
         )
 

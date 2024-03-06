@@ -13,7 +13,7 @@ from tests.base_tests import (
 )
 from tubular.mapping import BaseMappingTransformMixin
 
-### Note there are no tests that need inheriting from this file as the only difference is an expected transform output
+# Note there are no tests that need inheriting from this file as the only difference is an expected transform output
 
 
 @pytest.fixture()

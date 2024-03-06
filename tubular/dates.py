@@ -177,7 +177,7 @@ class DateDiffLeapYearTransformer(BaseDateTransformer):
         column_upper: str,
         drop_cols: bool,
         new_column_name: str | None = None,
-        missing_replacement: int | float | str | None = None,
+        missing_replacement: float | str | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         if not isinstance(column_lower, str):
@@ -280,7 +280,7 @@ class DateDiffLeapYearTransformer(BaseDateTransformer):
 
         X = super().transform(X)
 
-        X[self.new_column_name] = X.apply(lambda x: self.calculate_age(x), axis=1)
+        X[self.new_column_name] = X.apply(self.calculate_age, axis=1)
 
         if self.drop_cols:
             X = X.drop(self.columns, axis=1)
@@ -831,10 +831,7 @@ class DatetimeInfoExtractor(BaseDateTransformer):
         self,
         columns: str | list[str],
         include: str | list[str] | None = None,
-        datetime_mappings: dict[
-            str,
-        ]
-        | None = None,
+        datetime_mappings: dict[str,] | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         if include is None:
@@ -882,7 +879,7 @@ class DatetimeInfoExtractor(BaseDateTransformer):
             timeofday_mapping = self.datetime_mappings["timeofday"]
         elif "timeofday" in include:  # Choose default mapping
             timeofday_mapping = {
-                "night": range(0, 6),  # Midnight - 6am
+                "night": range(6),  # Midnight - 6am
                 "morning": range(6, 12),  # 6am - Noon
                 "afternoon": range(12, 18),  # Noon - 6pm
                 "evening": range(18, 24),  # 6pm - Midnight
@@ -892,7 +889,7 @@ class DatetimeInfoExtractor(BaseDateTransformer):
             timeofmonth_mapping = self.datetime_mappings["timeofmonth"]
         elif "timeofmonth" in include:  # Choose default mapping
             timeofmonth_mapping = {
-                "start": range(0, 11),
+                "start": range(11),
                 "middle": range(11, 21),
                 "end": range(21, 32),
             }
@@ -966,7 +963,7 @@ class DatetimeInfoExtractor(BaseDateTransformer):
         else:
             self.dayofweek_mapping = {}
 
-    def _map_values(self, value: int | float, interval: str) -> str:
+    def _map_values(self, value: float, interval: str) -> str:
         """Method to apply mappings for a specified interval ("timeofday", "timeofmonth", "timeofyear" or "dayofweek")
         from corresponding mapping attribute to a single value.
 
@@ -1106,7 +1103,7 @@ class DatetimeSinusoidCalculator(BaseDateTransformer):
         columns: str | list[str],
         method: str | list[str],
         units: str | dict,
-        period: int | float | dict = 2 * np.pi,
+        period: float | dict = 2 * np.pi,
     ) -> None:
         super().__init__(columns, copy=True)
 

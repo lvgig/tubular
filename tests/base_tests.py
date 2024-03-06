@@ -492,7 +492,7 @@ class CheckWeightsColumnTests:
                 "b",
             ),
             (
-                pd.DataFrame({"a": [1, 2], "b": [np.NaN, 0]}),
+                pd.DataFrame({"a": [1, 2], "b": [np.nan, 0]}),
                 r"weight column must be non-null",
                 "b",
             ),
