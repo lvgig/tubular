@@ -169,7 +169,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
                 stacklevel=2,
             )
 
-        X_y = X.copy()
+        X_y = X[X.columns]
 
         X_y["_temporary_response"] = y.to_numpy()
 
@@ -196,8 +196,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         if self.verbose:
             print("BaseTransformer.transform() called")
 
-        if self.copy:
-            X = X.copy()
+        X = X[X.columns]
 
         if not X.shape[0] > 0:
             msg = f"{self.classname()}: X has no rows; {X.shape}"
