@@ -57,7 +57,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
     def __init__(
         self,
         columns: list[str] | str,
-        copy: bool = True,
+        copy: bool = None,
         verbose: bool = False,
     ) -> None:
         self.version_ = __version__
@@ -65,6 +65,14 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         if not isinstance(verbose, bool):
             msg = f"{self.classname()}: verbose must be a bool"
             raise TypeError(msg)
+
+        # Keyword argument `kwarg2` is going to be dropped completely.
+        if type(copy) is int:
+            warnings.warn(
+                "copy argument no longer used and will be deprecated in a future release",
+                DeprecationWarning,
+                stacklevel=2,
+            )
 
         self.verbose = verbose
 
@@ -89,10 +97,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         else:
             msg = f"{self.classname()}: columns must be a string or list with the columns to be pre-processed (if specified)"
-            raise TypeError(msg)
-
-        if not isinstance(copy, bool):
-            msg = f"{self.classname()}: copy must be a bool"
             raise TypeError(msg)
 
         self.copy = copy
@@ -196,13 +200,14 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         if self.verbose:
             print("BaseTransformer.transform() called")
 
-        X = X[X.columns]
+        # to prevent overwriting original dataframe
+        X_temp = X[X.columns]
 
         if not X.shape[0] > 0:
             msg = f"{self.classname()}: X has no rows; {X.shape}"
             raise ValueError(msg)
 
-        return X
+        return X_temp
 
     def check_is_fitted(self, attribute: str) -> None:
         """Check if particular attributes are on the object. This is useful to do before running transform to avoid

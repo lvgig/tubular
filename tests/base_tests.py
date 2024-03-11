@@ -52,24 +52,6 @@ class GenericInitTests:
                 **minimal_attribute_dict[self.transformer_name],
             )
 
-    @pytest.mark.parametrize("non_bool", [1, "True", {"a": 1}, [1, 2], None])
-    def test_copy_non_bool_error(
-        self,
-        non_bool,
-        minimal_attribute_dict,
-        uninstantiated_transformers,
-    ):
-        """Test an error is raised if copy is not specified as a bool."""
-
-        with pytest.raises(
-            TypeError,
-            match=f"{self.transformer_name}: copy must be a bool",
-        ):
-            uninstantiated_transformers[self.transformer_name](
-                copy=non_bool,
-                **minimal_attribute_dict[self.transformer_name],
-            )
-
 
 class ColumnStrListInitTests(GenericInitTests):
     """
