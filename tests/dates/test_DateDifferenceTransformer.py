@@ -20,7 +20,6 @@ class TestInit:
                 "args": (),
                 "kwargs": {
                     "columns": ["dummy_1", "dummy_2"],
-                    "copy": True,
                     "verbose": False,
                 },
             },
@@ -50,7 +49,6 @@ class TestInit:
                 column_upper="dummy_2",
                 new_column_name="dummy_3",
                 units="D",
-                copy=True,
                 verbose=False,
             )
 
@@ -65,7 +63,6 @@ class TestInit:
                 column_upper=123,
                 new_column_name="dummy_3",
                 units="D",
-                copy=True,
                 verbose=False,
             )
 
@@ -80,7 +77,6 @@ class TestInit:
                 column_upper="dummy_2",
                 new_column_name=123,
                 units="D",
-                copy=True,
                 verbose=False,
             )
 
@@ -95,7 +91,6 @@ class TestInit:
                 column_upper="dummy_2",
                 new_column_name="dummy_3",
                 units=123,
-                copy=True,
                 verbose=False,
             )
 
@@ -110,7 +105,6 @@ class TestInit:
                 column_upper="dummy_2",
                 new_column_name="dummy_3",
                 units="y",
-                copy=True,
                 verbose=False,
             )
 
@@ -121,7 +115,6 @@ class TestInit:
             column_upper="dummy_2",
             new_column_name="value_1",
             units="D",
-            copy=True,
             verbose=False,
         )
 
@@ -131,7 +124,6 @@ class TestInit:
                 "columns": ["dummy_1", "dummy_2"],
                 "new_column_name": "value_1",
                 "units": "D",
-                "copy": True,
                 "verbose": False,
             },
             msg="Attributes for DateDifferenceTransformer set in init",
@@ -143,7 +135,6 @@ class TestInit:
             column_lower="dummy_1",
             column_upper="dummy_2",
             units="D",
-            copy=True,
             verbose=False,
         )
 
@@ -155,7 +146,6 @@ class TestInit:
                 "columns": ["dummy_1", "dummy_2"],
                 "new_column_name": "dummy_2_dummy_1_datediff_D",
                 "units": "D",
-                "copy": True,
                 "verbose": False,
             },
             msg="Attributes for DateDifferenceTransformer set in init",
@@ -897,7 +887,6 @@ class TestTransform:
             column_upper="b",
             new_column_name="D",
             units="D",
-            copy=True,
             verbose=False,
         )
 
@@ -955,7 +944,6 @@ class TestTransform:
             column_upper="b",
             new_column_name="D",
             units="D",
-            copy=True,
             verbose=False,
         )
 
@@ -985,7 +973,6 @@ class TestTransform:
             column_upper="b",
             new_column_name="h",
             units="h",
-            copy=True,
             verbose=False,
         )
 
@@ -1015,7 +1002,6 @@ class TestTransform:
             column_upper="b",
             new_column_name="m",
             units="m",
-            copy=True,
             verbose=False,
         )
 
@@ -1045,7 +1031,6 @@ class TestTransform:
             column_upper="b",
             new_column_name="s",
             units="s",
-            copy=True,
             verbose=False,
         )
 
@@ -1071,7 +1056,6 @@ class TestTransform:
             column_upper="b",
             new_column_name="D",
             units="D",
-            copy=True,
             verbose=False,
         )
 
@@ -1100,7 +1084,6 @@ class TestTransform:
             column_upper=columns[1],
             new_column_name="D",
             units="D",
-            copy=True,
             verbose=False,
         )
 

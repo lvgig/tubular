@@ -35,7 +35,6 @@ class TestInit:
             quantiles=quantiles,
             weights_column=weights_column,
             verbose=verbose,
-            copy=copy,
         )
 
         assert (
@@ -55,7 +54,6 @@ class TestInit:
             "quantiles": quantiles,
             "weights_column": weights_column,
             "verbose": verbose,
-            "copy": copy,
         }
 
         assert (
@@ -75,7 +73,6 @@ class TestInit:
             OutOfRangeNullTransformer(
                 quantiles={"c": [0, 0.99], "d": [None, 0.01]},
                 verbose=True,
-                copy=True,
             )
 
 

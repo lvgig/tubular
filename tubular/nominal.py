@@ -1065,7 +1065,6 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         BaseNominalTransformer.__init__(
             self,
             columns=columns,
-            copy=copy,
             verbose=verbose,
         )
 

@@ -23,9 +23,7 @@ class TestDatetimeSinusoidCalculatorInit:
         expected_call_args = {
             0: {
                 "args": ("a",),
-                "kwargs": {
-                    "copy": True,
-                },
+                "kwargs": {},
             },
         }
 

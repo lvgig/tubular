@@ -353,7 +353,7 @@ class DateDifferenceTransformer(BaseDateTransformer):
         else:
             self.new_column_name = f"{column_upper}_{column_lower}_datediff_{units}"
 
-        super().__init__(columns=columns, copy=copy, verbose=verbose)
+        super().__init__(columns=columns, verbose=verbose)
 
         # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.
@@ -1108,7 +1108,7 @@ class DatetimeSinusoidCalculator(BaseDateTransformer):
         units: str | dict,
         period: int | float | dict = 2 * np.pi,
     ) -> None:
-        super().__init__(columns, copy=True)
+        super().__init__(columns)
 
         if not isinstance(method, str) and not isinstance(method, list):
             msg = "{}: method must be a string or list but got {}".format(

@@ -17,11 +17,11 @@ class TestInit:
 
         Note, not using ta.functions.assert_function_call for this as it does not handle self being passed to BaseNominalTransformer.init.
         """
-        expected_keyword_args = {"columns": None, "verbose": True, "copy": True}
+        expected_keyword_args = {"columns": None, "verbose": True}
 
         mocker.patch("tubular.nominal.BaseNominalTransformer.__init__")
 
-        x = OneHotEncodingTransformer(columns=None, verbose=True, copy=True)
+        x = OneHotEncodingTransformer(columns=None, verbose=True)
 
         assert (
             tubular.nominal.BaseNominalTransformer.__init__.call_count == 1
@@ -62,7 +62,6 @@ class TestInit:
         x = OneHotEncodingTransformer(
             columns=["a"],
             verbose=True,
-            copy=True,
             separator="x",
             drop_original=True,
         )

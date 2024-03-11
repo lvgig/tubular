@@ -14,7 +14,7 @@ class TestInit:
         expected_call_args = {
             0: {
                 "args": (),
-                "kwargs": {"columns": ["a", "b"], "verbose": False, "copy": False},
+                "kwargs": {"columns": ["a", "b"], "verbose": False},
             },
         }
 
@@ -24,7 +24,7 @@ class TestInit:
             "__init__",
             expected_call_args,
         ):
-            SetValueTransformer(columns=["a", "b"], value=1, verbose=False, copy=False)
+            SetValueTransformer(columns=["a", "b"], value=1, verbose=False)
 
     def test_value_attribute_set(self):
         """Test that the value passed in the value arg is set as an attribute of the same name."""

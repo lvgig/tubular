@@ -16,7 +16,7 @@ class TestInit:
         expected_call_args = {
             0: {
                 "args": (),
-                "kwargs": {"columns": ["a", "b", "c"], "verbose": False, "copy": True},
+                "kwargs": {"columns": ["a", "b", "c"], "verbose": False},
             },
         }
 
@@ -32,7 +32,6 @@ class TestInit:
                 column_upper="c",
                 new_column_name="d",
                 verbose=False,
-                copy=True,
             )
 
     def test_first_non_str_error(self):

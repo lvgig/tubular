@@ -17,7 +17,7 @@ class TestInit:
         expected_call_args = {
             0: {
                 "args": (),
-                "kwargs": {"mappings": {"a": {"a": 1}}, "verbose": True, "copy": True},
+                "kwargs": {"mappings": {"a": {"a": 1}}, "verbose": True},
             },
         }
 
@@ -31,7 +31,6 @@ class TestInit:
                 mappings={"a": {"a": 1}},
                 adjust_column="b",
                 verbose=True,
-                copy=True,
             )
 
     def test_adjust_columns_non_string_error(self):

@@ -19,7 +19,7 @@ class TestInit:
         expected_call_args = {
             0: {
                 "args": (),
-                "kwargs": {"columns": ["b", "c"], "verbose": True, "copy": False},
+                "kwargs": {"columns": ["b", "c"], "verbose": True},
             },
         }
 
@@ -33,7 +33,6 @@ class TestInit:
                 columns=["b", "c"],
                 min_degree=2,
                 max_degree=2,
-                copy=False,
                 verbose=True,
             )
 

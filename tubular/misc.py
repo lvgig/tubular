@@ -68,7 +68,7 @@ class SetColumnDtype(BaseTransformer):
     """
 
     def __init__(self, columns: str | list[str], dtype: type | str) -> None:
-        super().__init__(columns, copy=True)
+        super().__init__(columns)
 
         self.__validate_dtype(dtype)
 

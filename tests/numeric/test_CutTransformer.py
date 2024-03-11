@@ -18,7 +18,7 @@ class TestInit:
         expected_call_args = {
             0: {
                 "args": (),
-                "kwargs": {"columns": ["a"], "copy": True, "verbose": False},
+                "kwargs": {"columns": ["a"], "verbose": False},
             },
         }
 
@@ -28,7 +28,7 @@ class TestInit:
             "__init__",
             expected_call_args,
         ):
-            CutTransformer(column="a", new_column_name="b", verbose=False, copy=True)
+            CutTransformer(column="a", new_column_name="b", verbose=False)
 
     def test_column_type_error(self):
         """Test that an exception is raised if column is not a str."""

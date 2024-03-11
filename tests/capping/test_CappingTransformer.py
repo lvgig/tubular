@@ -47,7 +47,7 @@ class TestInit:
         expected_call_args = {
             0: {
                 "args": (),
-                "kwargs": {"columns": ["a", "b"], "verbose": True, "copy": True},
+                "kwargs": {"columns": ["a", "b"], "verbose": True},
             },
         }
 
@@ -60,7 +60,6 @@ class TestInit:
             CappingTransformer(
                 capping_values={"a": [1, 3], "b": [None, -1]},
                 verbose=True,
-                copy=True,
             )
 
     def test_super_init_called_quantiles(self, mocker):
@@ -68,7 +67,7 @@ class TestInit:
         expected_call_args = {
             0: {
                 "args": (),
-                "kwargs": {"columns": ["c", "d"], "verbose": True, "copy": True},
+                "kwargs": {"columns": ["c", "d"], "verbose": True},
             },
         }
 
@@ -81,7 +80,6 @@ class TestInit:
             CappingTransformer(
                 quantiles={"c": [0, 0.99], "d": [None, 0.01]},
                 verbose=True,
-                copy=True,
             )
 
     def test_check_capping_values_dict_called_quantiles(self, mocker):

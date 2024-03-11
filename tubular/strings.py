@@ -144,7 +144,7 @@ class StringConcatenator(BaseTransformer):
         new_column: str = "new_column",
         separator: str = " ",
     ) -> None:
-        super().__init__(columns=columns, copy=True)
+        super().__init__(columns=columns)
 
         if not isinstance(new_column, str):
             msg = f"{self.classname()}: new_column should be a str"

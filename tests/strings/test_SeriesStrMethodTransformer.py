@@ -15,7 +15,7 @@ class TestInit:
         expected_call_args = {
             0: {
                 "args": (),
-                "kwargs": {"columns": ["b"], "verbose": True, "copy": False},
+                "kwargs": {"columns": ["b"], "verbose": True},
             },
         }
 
@@ -29,7 +29,6 @@ class TestInit:
                 new_column_name="a",
                 pd_method_name="find",
                 columns=["b"],
-                copy=False,
                 verbose=True,
             )
 

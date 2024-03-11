@@ -19,7 +19,7 @@ class TestInit:
         expected_call_args = {
             0: {
                 "args": (),
-                "kwargs": {"columns": ["a", "b"], "verbose": False, "copy": False},
+                "kwargs": {"columns": ["a", "b"], "verbose": False},
             },
         }
 
@@ -33,7 +33,6 @@ class TestInit:
                 columns=["a", "b"],
                 new_col_name="d",
                 verbose=False,
-                copy=False,
             )
 
     def test_value_new_col_name(self, example_transformer):

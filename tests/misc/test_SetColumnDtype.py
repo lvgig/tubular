@@ -16,7 +16,7 @@ class TestSetColumnDtypeInit:
         expected_call_args = {
             0: {
                 "args": (["a"],),
-                "kwargs": {"copy": True},
+                "kwargs": {},
             },
         }
         with ta.functions.assert_function_call(
