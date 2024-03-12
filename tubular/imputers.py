@@ -183,8 +183,6 @@ class MedianImputer(BaseImputer):
         if self.weight is not None:
             super().check_weights_column(X, self.weight)
 
-            # temp = X
-
             for c in self.columns:
                 # filter out null rows so their weight doesn't influence calc
                 filtered = X[X[c].notna()]
