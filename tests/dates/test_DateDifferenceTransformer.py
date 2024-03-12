@@ -829,10 +829,10 @@ class TestTransform:
                         58,
                         tzinfo=datetime.timezone.utc,
                     ),
-                    np.NaN,
+                    np.nan,
                 ],
                 "b": [
-                    np.NaN,
+                    np.nan,
                     datetime.datetime(
                         2019,
                         12,
@@ -844,8 +844,8 @@ class TestTransform:
                     ),
                 ],
                 "D": [
-                    np.NaN,
-                    np.NaN,
+                    np.nan,
+                    np.nan,
                 ],
             },
             index=[0, 1],

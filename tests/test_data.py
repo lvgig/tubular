@@ -50,9 +50,9 @@ def create_df_2():
     """Create simple DataFrame to use in other tests."""
     df = pd.DataFrame(
         {
-            "a": [1, 2, 3, 4, 5, 6, np.NaN],
-            "b": ["a", "b", "c", "d", "e", "f", np.NaN],
-            "c": ["a", "b", "c", "d", "e", "f", np.NaN],
+            "a": [1, 2, 3, 4, 5, 6, np.nan],
+            "b": ["a", "b", "c", "d", "e", "f", np.nan],
+            "c": ["a", "b", "c", "d", "e", "f", np.nan],
         },
     )
 
@@ -65,9 +65,9 @@ def create_df_4():
     """Create simple DataFrame to use in other tests."""
     df = pd.DataFrame(
         {
-            "a": [1, 2, 3, 4, 5, 6, 7, np.NaN],
-            "b": ["a", "b", "c", "d", "e", "f", "g", np.NaN],
-            "c": ["a", "b", "c", "d", "e", "f", "g", np.NaN],
+            "a": [1, 2, 3, 4, 5, 6, 7, np.nan],
+            "b": ["a", "b", "c", "d", "e", "f", "g", np.nan],
+            "c": ["a", "b", "c", "d", "e", "f", "g", np.nan],
         },
     )
 
@@ -80,9 +80,9 @@ def create_df_3():
     """Create simple DataFrame to use in other tests."""
     return pd.DataFrame(
         {
-            "a": [1, 2, 3, 4, 5, 6, np.NaN],
-            "b": [1, 2, 3, np.NaN, 7, 8, 9],
-            "c": [np.NaN, 1, 2, 3, -4, -5, -6],
+            "a": [1, 2, 3, 4, 5, 6, np.nan],
+            "b": [1, 2, 3, np.nan, 7, 8, 9],
+            "c": [np.nan, 1, 2, 3, -4, -5, -6],
         },
     )
 
@@ -91,9 +91,9 @@ def create_df_5():
     """Create simple DataFrame to use in other tests."""
     df = pd.DataFrame(
         {
-            "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.NaN],
-            "b": ["a", "a", "a", "d", "e", "f", "g", np.NaN, np.NaN, np.NaN],
-            "c": ["a", "a", "c", "c", "e", "e", "f", "g", "h", np.NaN],
+            "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.nan],
+            "b": ["a", "a", "a", "d", "e", "f", "g", np.nan, np.nan, np.nan],
+            "c": ["a", "a", "c", "c", "e", "e", "f", "g", "h", np.nan],
         },
     )
 
@@ -106,9 +106,9 @@ def create_df_6():
     """Nulls in different positions to check summing weights by col with nulls."""
     df = pd.DataFrame(
         {
-            "a": [2, 2, 2, 2, np.NaN, 2, 2, 2, 3, 3],
-            "b": ["a", "a", "a", "d", "e", "f", "g", np.NaN, np.NaN, np.NaN],
-            "c": ["a", "b", "c", "d", "f", "f", "f", "g", "g", np.NaN],
+            "a": [2, 2, 2, 2, np.nan, 2, 2, 2, 3, 3],
+            "b": ["a", "a", "a", "d", "e", "f", "g", np.nan, np.nan, np.nan],
+            "c": ["a", "b", "c", "d", "f", "f", "f", "g", "g", np.nan],
         },
     )
 
@@ -163,8 +163,8 @@ def create_df_10():
     """Create simple DataFrame to use in other tests."""
     return pd.DataFrame(
         {
-            "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.NaN],
-            "b": ["a", "a", "a", "d", "e", "f", "g", np.NaN, np.NaN, np.NaN],
+            "a": [1, 2, 3, 4, 5, 6, 7, 8, 9, np.nan],
+            "b": ["a", "a", "a", "d", "e", "f", "g", np.nan, np.nan, np.nan],
             "c": [1, 1, 3, 4, 5, 6, 5, 8, 9, 50],
         },
     )
@@ -197,7 +197,7 @@ def create_large_null_df(n_col=1000):
     data_dict = {}
 
     for i in range(n_col):
-        data_dict["col_" + str(i)] = np.NaN
+        data_dict["col_" + str(i)] = np.nan
 
     return pd.DataFrame(data_dict, index=[0])
 
@@ -219,7 +219,7 @@ def create_large_half_null_df(n_col=1000):
     """
     data_dict = {}
 
-    col_values = [1.0, np.NaN]
+    col_values = [1.0, np.nan]
 
     for i in range(n_col):
         data_dict["col_" + str(i)] = col_values
@@ -391,10 +391,10 @@ def create_date_test_nulls_df():
     return pd.DataFrame(
         {
             "a": [
-                np.NaN,
+                np.nan,
             ],
             "b": [
-                np.NaN,
+                np.nan,
             ],
         },
         index=[0],
@@ -555,10 +555,10 @@ def create_datediff_test_nulls_df():
                     58,
                     tzinfo=datetime.timezone.utc,
                 ),
-                np.NaN,
+                np.nan,
             ],
             "b": [
-                np.NaN,
+                np.nan,
                 datetime.datetime(
                     2019,
                     12,
@@ -577,7 +577,7 @@ def create_datediff_test_nulls_df():
 def create_to_datetime_test_df():
     """Create DataFrame to be used in the ToDatetimeTransformer tests."""
     return pd.DataFrame(
-        {"a": [1950, 1960, 2000, 2001, np.NaN, 2010], "b": [1, 2, 3, 4, 5, np.NaN]},
+        {"a": [1950, 1960, 2000, 2001, np.nan, 2010], "b": [1, 2, 3, 4, 5, np.nan]},
     )
 
 

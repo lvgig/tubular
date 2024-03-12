@@ -155,10 +155,10 @@ class TestSetReplacementValues:
         [
             (
                 {"a": [0, 1], "b": [None, 1], "c": [3, None]},
-                {"a": [np.NaN, np.NaN], "b": [None, np.NaN], "c": [np.NaN, None]},
+                {"a": [np.nan, np.nan], "b": [None, np.nan], "c": [np.nan, None]},
             ),
             ({}, {}),
-            ({"a": [None, 0.1]}, {"a": [None, np.NaN]}),
+            ({"a": [None, 0.1]}, {"a": [None, np.nan]}),
         ],
     )
     def test_expected_replacement_values_set(

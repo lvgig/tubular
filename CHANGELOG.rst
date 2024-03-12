@@ -25,8 +25,10 @@ Added
 
 Changed
 ^^^^^^^
-- Moved BaseTransformer, DataFrameMethodTransformer, BaseMappingTransformer, BaseMappingTransformerMixin and Mapping Transformer over to the new testing framework.
+- Update DataFrameMethodTransformer tests to have inheritable init class that can be used by othe test files.
+- Moved BaseTransformer, DataFrameMethodTransformer, BaseMappingTransformer, BaseMappingTransformerMixin, CrossColumnMappingTransformer and Mapping Transformer over to the new testing framework.
 - Refactored MappingTransformer by removing redundant init method.
+- Updated tests for 
 
 Removed
 ^^^^^^^

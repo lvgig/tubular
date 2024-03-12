@@ -20,31 +20,55 @@ class BaseMappingTransformerInitTests(ColumnsFromDictInitTests):
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
-    def test_no_keys_dict_error(self, uninstantiated_transformers):
+    def test_no_keys_dict_error(
+        self,
+        uninitialized_transformers,
+        minimal_attribute_dict,
+    ):
         """Test that an exception is raised if mappings is a dict but with no keys."""
+
+        kwargs = minimal_attribute_dict[self.transformer_name]
+        kwargs["mappings"] = {}
+
         with pytest.raises(
             ValueError,
             match=f"{self.transformer_name}: mappings has no values",
         ):
-            uninstantiated_transformers[self.transformer_name](mappings={})
+            uninitialized_transformers[self.transformer_name](**kwargs)
 
-    def test_mappings_contains_non_dict_items_error(self, uninstantiated_transformers):
+    def test_mappings_contains_non_dict_items_error(
+        self,
+        uninitialized_transformers,
+        minimal_attribute_dict,
+    ):
         """Test that an exception is raised if mappings contains non-dict items."""
+
+        kwargs = minimal_attribute_dict[self.transformer_name]
+        kwargs["mappings"] = {"a": {"a": 1}, "b": 1}
+
         with pytest.raises(
             ValueError,
             match=f"{self.transformer_name}: values in mappings dictionary should be dictionaries",
         ):
-            uninstantiated_transformers[self.transformer_name](
-                mappings={"a": {"a": 1}, "b": 1},
+            uninitialized_transformers[self.transformer_name](
+                **kwargs,
             )
 
-    def test_mappings_not_dict_error(self, uninstantiated_transformers):
+    def test_mappings_not_dict_error(
+        self,
+        uninitialized_transformers,
+        minimal_attribute_dict,
+    ):
         """Test that an exception is raised if mappings is not a dict."""
+
+        kwargs = minimal_attribute_dict[self.transformer_name]
+        kwargs["mappings"] = ()
+
         with pytest.raises(
             ValueError,
             match=f"{self.transformer_name}: mappings must be a dictionary",
         ):
-            uninstantiated_transformers[self.transformer_name](mappings=())
+            uninitialized_transformers[self.transformer_name](**kwargs)
 
 
 class BaseMappingTransformerTransformTests(GenericTransformTests):
@@ -53,7 +77,7 @@ class BaseMappingTransformerTransformTests(GenericTransformTests):
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
-    def test_mappings_unchanged(self, uninstantiated_transformers):
+    def test_mappings_unchanged(self, uninitialized_transformers):
         """Test that mappings is unchanged in transform."""
         df = d.create_df_1()
 
@@ -62,7 +86,7 @@ class BaseMappingTransformerTransformTests(GenericTransformTests):
             "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
         }
 
-        x = uninstantiated_transformers[self.transformer_name](mappings=mapping)
+        x = uninitialized_transformers[self.transformer_name](mappings=mapping)
 
         x.transform(df)
 
@@ -73,7 +97,7 @@ class BaseMappingTransformerTransformTests(GenericTransformTests):
         )
 
 
-### Running the BaseMappingTransformerTestSuite
+# Running the BaseMappingTransformerTestSuite
 
 
 class TestInit(BaseMappingTransformerInitTests):
@@ -101,7 +125,7 @@ class TestTransform(BaseMappingTransformerTransformTests):
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_1(), d.create_df_1()),
     )
-    def test_X_returned(self, df, expected, uninstantiated_transformers):
+    def test_X_returned(self, df, expected, uninitialized_transformers):
         """Test that X is returned from transform."""
         mapping = {
             "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
