@@ -14,7 +14,6 @@ warnings.simplefilter(action="ignore")
 
 
 if __name__ == "__main__":
-
     print("***Use time function to inspect transform calls")
     pipe_1 = TubularPipelineGenerator()
     pipe_1 = pipe_1.generate_pipeline()

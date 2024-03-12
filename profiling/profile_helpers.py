@@ -1,10 +1,10 @@
-from typing import Dict, List
+from __future__ import annotations
 
 import numpy as np
 import pandas as pd
 
 
-def get_stats_dict(profile_results: List) -> List[Dict[str, float]]:
+def get_stats_dict(profile_results: list) -> list[dict[str, float]]:
     """extract dict of results from CProfile
 
     Args:
@@ -53,7 +53,7 @@ def get_stats_dict(profile_results: List) -> List[Dict[str, float]]:
     }
 
 
-def display_results(stats_dict: Dict[str, float], stat: str) -> pd.Series:
+def display_results(stats_dict: dict[str, float], stat: str) -> pd.Series:
     """produce sorted series of runtime info for given runtime statistic
 
     Args:
@@ -69,9 +69,9 @@ def display_results(stats_dict: Dict[str, float], stat: str) -> pd.Series:
 
 
 def add_perc_stats_to_dict(
-    stats_dict: Dict[str, float],
+    stats_dict: dict[str, float],
     overall_time: float,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """add info on percentage runtime to profiling dict
 
     Args:
@@ -91,7 +91,7 @@ def add_perc_stats_to_dict(
     return stats_dict
 
 
-def profiling_wrapper(profile_results: List, display_rows: int = 10) -> None:
+def profiling_wrapper(profile_results: list, display_rows: int = 10) -> None:
     """wrapper function to display key profiling info
 
     Args:
