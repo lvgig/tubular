@@ -7,6 +7,24 @@ import pytest
 
 import tubular.base as base
 
+"""
+How To Use This Testing Framework
+-----------------------------------
+
+Fixtures in this file are used in tests for shared behaviour which can be run on multiple transformers through inheritance.
+setup_class is defined in each test class to define cls.transformer_name as the name of the transformer being tested.
+
+Test methods for shared behaviour are defined in base_tests.py or child test classes which are themselves inherited.  The
+fixtures in this file can be used in these tests to access initiated/ uninitiated transformers and minimum attributes for
+intiatialization.
+
+Test classes which can import tests for shared behaviour inherit from an appropriate parent and define cls.transformer_name
+in setup_class so that these fixtures will retrieve the appropriate transformer instance. setup_class is called by pytest
+at a class level before its test methods are run https://docs.pytest.org/en/8.0.x/how-to/xunit_setup.html.
+
+New transformers will need to be added to minimal_attribute_dict.
+ """
+
 
 def get_all_classes():
     root = str(Path(__file__).parent.parent)
@@ -40,6 +58,8 @@ def get_all_classes():
 
 @pytest.fixture()
 def minimal_attribute_dict():
+    """defines minmal attributes (values) needed to initiate each transformer named (key).
+    New transformers need to be added here"""
     return {
         "BaseTransformer": {
             "columns": ["a"],
@@ -202,10 +222,12 @@ def minimal_attribute_dict():
 
 
 @pytest.fixture()
-def instantiated_transformers(minimal_attribute_dict):
+def initialized_transformers(minimal_attribute_dict):
+    """dictionary of {transformer name : initiated transformer} pairs for all transformers"""
     return {x[0]: x[1](**minimal_attribute_dict[x[0]]) for x in get_all_classes()}
 
 
 @pytest.fixture()
-def uninstantiated_transformers():
+def uninitialized_transformers():
+    """dictionary of {transformer name : uninitiated transformer} pairs for all transformers"""
     return {x[0]: x[1] for x in get_all_classes()}

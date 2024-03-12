@@ -61,9 +61,7 @@ class TestDatetimeSinusoidCalculatorInit:
         """Test that an exception is raised if units is not a str or a dict."""
         with pytest.raises(
             TypeError,
-            match="units must be a string or dict but got {}".format(
-                type(incorrect_type_units),
-            ),
+            match=f"units must be a string or dict but got {type(incorrect_type_units)}",
         ):
             DatetimeSinusoidCalculator(
                 "a",
@@ -195,9 +193,7 @@ class TestDatetimeSinusoidCalculatorInit:
 
         with pytest.raises(
             ValueError,
-            match='Invalid method {} supplied, should be "sin", "cos" or a list containing both'.format(
-                method,
-            ),
+            match=f'Invalid method {method} supplied, should be "sin", "cos" or a list containing both',
         ):
             DatetimeSinusoidCalculator(
                 "a",
@@ -222,10 +218,7 @@ class TestDatetimeSinusoidCalculatorInit:
         with pytest.raises(
             ValueError,
             match=re.escape(
-                "Invalid units {} supplied, should be in {}".format(
-                    units,
-                    valid_unit_list,
-                ),
+                f"Invalid units {units} supplied, should be in {valid_unit_list}",
             ),
         ):
             DatetimeSinusoidCalculator(

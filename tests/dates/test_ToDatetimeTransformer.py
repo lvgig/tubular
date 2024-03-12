@@ -104,8 +104,8 @@ class TestTransform:
         """Expected output for test_expected_output."""
         return pd.DataFrame(
             {
-                "a": [1950, 1960, 2000, 2001, np.NaN, 2010],
-                "b": [1, 2, 3, 4, 5, np.NaN],
+                "a": [1950, 1960, 2000, 2001, np.nan, 2010],
+                "b": [1, 2, 3, 4, 5, np.nan],
                 "a_Y": [
                     datetime.datetime(1950, 1, 1, tzinfo=datetime.timezone.utc),
                     datetime.datetime(1960, 1, 1, tzinfo=datetime.timezone.utc),

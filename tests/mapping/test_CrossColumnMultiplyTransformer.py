@@ -86,9 +86,9 @@ class TestTransform:
         """Expected output for test_multiple_mappings_ordered_dict."""
         df = pd.DataFrame(
             {
-                "a": [2.2, 4.4, 3.3, 4, 15, 21.6, 7, 8, 9, np.NaN],
-                "b": ["a", "a", "a", "d", "e", "f", "g", np.NaN, np.NaN, np.NaN],
-                "c": ["a", "a", "c", "c", "e", "e", "f", "g", "h", np.NaN],
+                "a": [2.2, 4.4, 3.3, 4, 15, 21.6, 7, 8, 9, np.nan],
+                "b": ["a", "a", "a", "d", "e", "f", "g", np.nan, np.nan, np.nan],
+                "c": ["a", "a", "c", "c", "e", "e", "f", "g", "h", np.nan],
             },
         )
 

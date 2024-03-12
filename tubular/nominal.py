@@ -357,7 +357,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
                 # nulls are excluded from pandas groupby; https://github.com/pandas-dev/pandas/issues/3729
                 # so add them back in
                 if cols_w_percents.sum() < X[self.weight].sum():
-                    cols_w_percents[np.NaN] = X.loc[X[c].isna(), self.weight].sum()
+                    cols_w_percents[np.nan] = X.loc[X[c].isna(), self.weight].sum()
 
                 cols_w_percents = cols_w_percents / X[self.weight].sum()
 
@@ -551,7 +551,7 @@ class MeanResponseTransformer(BaseNominalTransformer):
         weights_column: str | None = None,
         prior: int = 0,
         level: str | list | None = None,
-        unseen_level_handling: str | int | float | None = None,
+        unseen_level_handling: str | float | None = None,
         return_type: Literal["float32", "float64"] = "float32",
         **kwargs: dict[str, bool],
     ) -> None:
@@ -1071,7 +1071,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         # Set attributes for scikit-learn'S OneHotEncoder
         OneHotEncoder.__init__(
             self,
-            sparse=False,
+            sparse_output=False,
             handle_unknown="ignore",
             dtype=dtype,
             **kwargs,

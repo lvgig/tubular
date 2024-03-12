@@ -2,14 +2,14 @@ import re
 
 import setuptools
 
-with open("README.md") as fh:
+with open("README.md", encoding="utf-8") as fh:
     long_description = fh.read()
 
 # get version from _version.py file, from below
 # https://stackoverflow.com/questions/458550/standard-way-to-embed-version-into-python-package
 VERSION_FILE = "tubular/_version.py"
 VERSION_STR_RE = r"^__version__ = ['\"]([^'\"]*)['\"]"
-with open(VERSION_FILE) as version_file:
+with open(VERSION_FILE, encoding="utf-8") as version_file:
     version_file_str = version_file.read()
     mo = re.search(VERSION_STR_RE, version_file_str, re.M)
     if mo:
@@ -20,7 +20,7 @@ with open(VERSION_FILE) as version_file:
 
 
 def list_reqs(fname: str = "requirements.txt") -> list:
-    with open(fname) as fd:
+    with open(fname, encoding="utf-8") as fd:
         return fd.read().splitlines()
 
 

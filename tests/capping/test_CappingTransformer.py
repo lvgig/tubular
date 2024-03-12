@@ -232,7 +232,7 @@ class TestCheckCappingValuesDict:
                 dict_name="eee",
             )
 
-    @pytest.mark.parametrize("value", [(np.NaN), (np.inf), (-np.inf)])
+    @pytest.mark.parametrize("value", [(np.nan), (np.inf), (-np.inf)])
     def test_capping_value_nan_inf_error(self, value):
         """Test that an exception is raised if capping_values are np.nan or np.inf values."""
         x = CappingTransformer(capping_values={"a": [1, 3], "b": [None, 1]})
@@ -527,9 +527,9 @@ class TestTransform:
         """Expected output from test_expected_output_min_and_max."""
         return pd.DataFrame(
             {
-                "a": [2, 2, 3, 4, 5, 5, np.NaN],
-                "b": [1, 2, 3, np.NaN, 7, 7, 7],
-                "c": [np.NaN, 1, 2, 3, 0, 0, 0],
+                "a": [2, 2, 3, 4, 5, 5, np.nan],
+                "b": [1, 2, 3, np.nan, 7, 7, 7],
+                "c": [np.nan, 1, 2, 3, 0, 0, 0],
             },
         )
 
@@ -537,9 +537,9 @@ class TestTransform:
         """Expected output from test_expected_output_max."""
         df = pd.DataFrame(
             {
-                "a": [2, 2, 3, 4, 5, 6, 7, np.NaN],
-                "b": ["a", "b", "c", "d", "e", "f", "g", np.NaN],
-                "c": ["a", "b", "c", "d", "e", "f", "g", np.NaN],
+                "a": [2, 2, 3, 4, 5, 6, 7, np.nan],
+                "b": ["a", "b", "c", "d", "e", "f", "g", np.nan],
+                "c": ["a", "b", "c", "d", "e", "f", "g", np.nan],
             },
         )
 
@@ -784,7 +784,7 @@ class TestWeightedQuantile:
             ValueError,
             match="CappingTransformer: null values in sample weights",
         ):
-            x.weighted_quantile([2, 3, 4, 5], [0, 1], [3, np.NaN])
+            x.weighted_quantile([2, 3, 4, 5], [0, 1], [3, np.nan])
 
     def test_inf_values_in_weights_error(self):
         """Test that an exception is raised if there are inf values in sample_weight."""

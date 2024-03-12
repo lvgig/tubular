@@ -2,26 +2,64 @@ import numpy as np
 import pandas as pd
 import pytest
 import test_aide as ta
+from sklearn.exceptions import NotFittedError
 
 import tests.test_data as d
+from tests.base_tests import (
+    ColumnStrListInitTests,
+    GenericFitTests,
+    GenericTransformTests,
+    OtherBaseBehaviourTests,
+)
 from tubular.imputers import BaseImputer
 
 
-class TestInit:
-    """Tests for BaseImputer.init.
-    Currently nothing to test."""
+class BaseImputerTransformTests(GenericTransformTests):
+    def test_not_fitted_error_raised(self):
+        df = pd.DataFrame(
+            {
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
+                "b": ["a", "b", "c", "d", "e", "f", np.NaN],
+                "c": ["a", "b", "c", "d", "e", "f", np.NaN],
+            },
+        )
+
+        x = BaseImputer(columns=["b", "c"])
+
+        with pytest.raises(NotFittedError):
+            x.transform(df)
 
 
-class TestTransform:
+class TestInit(ColumnStrListInitTests):
+    """Generic tests for transformer.init()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseImputer"
+
+
+class TestFit(GenericFitTests):
+    """Generic tests for transformer.fit()"""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseTransformer"
+
+
+class TestTransform(BaseImputerTransformTests):
     """Tests for BaseImputer.transform."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseTransformer"
 
     def expected_df_1():
         """Expected output of test_expected_output_1."""
         df = pd.DataFrame(
             {
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
-                "b": ["a", "b", "c", "d", "e", "f", np.NaN],
-                "c": ["a", "b", "c", "d", "e", "f", np.NaN],
+                "b": ["a", "b", "c", "d", "e", "f", np.nan],
+                "c": ["a", "b", "c", "d", "e", "f", np.nan],
             },
         )
 
@@ -33,9 +71,9 @@ class TestTransform:
         """Expected output of test_expected_output_2."""
         df2 = pd.DataFrame(
             {
-                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.nan],
                 "b": ["a", "b", "c", "d", "e", "f", "g"],
-                "c": ["a", "b", "c", "d", "e", "f", np.NaN],
+                "c": ["a", "b", "c", "d", "e", "f", np.nan],
             },
         )
 
@@ -47,7 +85,7 @@ class TestTransform:
         """Expected output of test_expected_output_3."""
         df3 = pd.DataFrame(
             {
-                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.NaN],
+                "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.nan],
                 "b": ["a", "b", "c", "d", "e", "f", "g"],
                 "c": ["a", "b", "c", "d", "e", "f", "f"],
             },
@@ -109,3 +147,15 @@ class TestTransform:
             actual=df_transformed,
             msg="ArbitraryImputer transform col b, c",
         )
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseImputer"
