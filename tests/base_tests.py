@@ -52,6 +52,7 @@ class GenericInitTests:
                 **minimal_attribute_dict[self.transformer_name],
             )
 
+
 class ColumnStrListInitTests(GenericInitTests):
     """
     Tests for BaseTransformer.init() behaviour specific to when a transformer takes columns as string or list.

@@ -45,6 +45,7 @@ class TestInit:
             call_pos_args[0] is x
         ), f"Unexpected positional arg (self) in BaseNominalTransformer.__init__ call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
 
+
 class TestFit:
     """Tests for OneHotEncodingTransformer.fit()."""
 
