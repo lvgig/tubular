@@ -66,8 +66,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             msg = f"{self.classname()}: verbose must be a bool"
             raise TypeError(msg)
 
-        # Keyword argument `kwarg2` is going to be dropped completely.
-        if type(copy) is int:
+        if copy is not None:
             warnings.warn(
                 "copy argument no longer used and will be deprecated in a future release",
                 DeprecationWarning,
