@@ -93,11 +93,11 @@ class TestTransform:
 
         x = ArbitraryImputer(impute_value=1, columns=["a", "b", "c"])
 
-        # mock BaseImputer.transform so it does not run
+        # mock BaseImputer.transform to return a Dataframe so it does not run
         mocker.patch.object(
             tubular.imputers.BaseImputer,
             "transform",
-            return_value=1234,
+            return_value=df.copy(),
         )
 
         x.transform(df)
