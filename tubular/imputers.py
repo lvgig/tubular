@@ -113,18 +113,19 @@ class ArbitraryImputer(BaseImputer):
                 X[c] = X[c].cat.add_categories(
                     self.impute_value,
                 )  # add new category
-
-            dtype = X[c].dtype  # get the dtype of column
-
-            X[c] = (
-                X[c].fillna(self.impute_values_).astype(dtype)
-            )  # casting imputer value as same dtype
-
             self.impute_values_[
                 c
             ] = self.impute_value  # updating impute_values_ attribute
 
-        return super().transform(X)  # impute the values
+        # Calling the BaseImputer's transform method to impute the values
+        X_transformed = super().transform(X)
+
+        # casting imputer value as same dtype as original column
+        for c in self.columns:
+            dtype = X[c].dtype  # get the dtype of original column
+            X_transformed[c] = X_transformed[c].astype(dtype)
+
+        return X_transformed
 
 
 class MedianImputer(BaseImputer):
