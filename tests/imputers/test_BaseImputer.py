@@ -19,8 +19,8 @@ class BaseImputerTransformTests(GenericTransformTests):
         df = pd.DataFrame(
             {
                 "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
-                "b": ["a", "b", "c", "d", "e", "f", np.NaN],
-                "c": ["a", "b", "c", "d", "e", "f", np.NaN],
+                "b": ["a", "b", "c", "d", "e", "f", np.nan],
+                "c": ["a", "b", "c", "d", "e", "f", np.nan],
             },
         )
 
