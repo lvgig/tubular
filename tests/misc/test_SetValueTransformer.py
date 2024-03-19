@@ -14,7 +14,7 @@ class TestInit:
         expected_call_args = {
             0: {
                 "args": (),
-                "kwargs": {"columns": ["a", "b"], "verbose": False},
+                "kwargs": {"columns": ["a", "b"], "verbose": False, "copy": None},
             },
         }
 

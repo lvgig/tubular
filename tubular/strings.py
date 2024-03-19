@@ -56,6 +56,7 @@ class SeriesStrMethodTransformer(BaseTransformer):
         new_column_name: str,
         pd_method_name: str,
         columns: str,
+        copy: bool | None = None,
         pd_method_kwargs: dict[str, object] | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
@@ -63,7 +64,7 @@ class SeriesStrMethodTransformer(BaseTransformer):
             msg = f"{self.classname()}: columns arg should contain only 1 column name but got {len(columns)}"
             raise ValueError(msg)
 
-        super().__init__(columns=columns, **kwargs)
+        super().__init__(columns=columns, copy=copy, **kwargs)
 
         if type(new_column_name) is not str:
             msg = f"{self.classname()}: unexpected type ({type(new_column_name)}) for new_column_name, must be str"
