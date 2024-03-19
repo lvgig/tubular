@@ -28,7 +28,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         in columns is saved in the columns attribute on the object.
 
     copy : bool, default = True
-        Should X be copied before tansforms are applied?
+        Should X be copied before tansforms are applied? Copy argument no longer used and will be deprecated in a future release
 
     verbose : bool, default = False
         Should statements be printed when methods are run?
@@ -40,7 +40,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         will be applied to.
 
     copy : bool
-        Should X be copied before tansforms are applied?
+        Should X be copied before tansforms are applied? Copy argument no longer used and will be deprecated in a future release
 
     verbose : bool
         Print statements to show which methods are being run or not.
@@ -57,7 +57,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
     def __init__(
         self,
         columns: list[str] | str,
-        copy: bool = None,
+        copy: bool | None = None,
         verbose: bool = False,
     ) -> None:
         self.version_ = __version__

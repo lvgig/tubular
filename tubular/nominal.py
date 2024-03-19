@@ -1034,7 +1034,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         Should original columns be dropped after creating dummy fields?
 
     copy : bool, default = True
-        Should X be copied prior to transform?
+        Should X be copied prior to transform? Should X be copied prior to transform? Copy argument no longer used and will be deprecated in a future release
 
     verbose : bool, default = True
         Should warnings/checkmarks get displayed?
@@ -1057,7 +1057,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         columns: str | list[str] | None = None,
         separator: str = "_",
         drop_original: bool = False,
-        copy: bool = True,
+        copy: bool | None = None,
         verbose: bool = False,
         dtype: np.int8 = np.int8,
         **kwargs: dict[str, bool],
@@ -1066,6 +1066,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
             self,
             columns=columns,
             verbose=verbose,
+            copy=copy,
         )
 
         # Set attributes for scikit-learn'S OneHotEncoder

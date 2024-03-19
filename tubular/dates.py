@@ -303,7 +303,7 @@ class DateDifferenceTransformer(BaseDateTransformer):
     units : str, default = 'D'
         Numpy datetime units, accepted values are 'D', 'h', 'm', 's'
     copy : bool, default = True
-        Should X be copied prior to transform?
+        Should X be copied prior to transform? Copy argument no longer used and will be deprecated in a future release
     verbose: bool, default = False
     """
 
@@ -313,7 +313,7 @@ class DateDifferenceTransformer(BaseDateTransformer):
         column_upper: str,
         new_column_name: str | None = None,
         units: str = "D",
-        copy: bool = True,
+        copy: bool | None = None,
         verbose: bool = False,
     ) -> None:
         if type(column_lower) is not str:
@@ -353,7 +353,7 @@ class DateDifferenceTransformer(BaseDateTransformer):
         else:
             self.new_column_name = f"{column_upper}_{column_lower}_datediff_{units}"
 
-        super().__init__(columns=columns, verbose=verbose)
+        super().__init__(columns=columns, verbose=verbose, copy=copy)
 
         # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.

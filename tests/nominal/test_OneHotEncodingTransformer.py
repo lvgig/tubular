@@ -17,7 +17,7 @@ class TestInit:
 
         Note, not using ta.functions.assert_function_call for this as it does not handle self being passed to BaseNominalTransformer.init.
         """
-        expected_keyword_args = {"columns": None, "verbose": True}
+        expected_keyword_args = {"columns": None, "verbose": True, "copy": None}
 
         mocker.patch("tubular.nominal.BaseNominalTransformer.__init__")
 

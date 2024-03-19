@@ -21,6 +21,7 @@ class TestInit:
                 "kwargs": {
                     "columns": ["dummy_1", "dummy_2"],
                     "verbose": False,
+                    "copy": None,
                 },
             },
         }
