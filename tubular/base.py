@@ -196,13 +196,13 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             print("BaseTransformer.transform() called")
 
         # to prevent overwriting original dataframe
-        X_temp = X[X.columns]
+        X_view = X.iloc[:]
 
         if not X.shape[0] > 0:
             msg = f"{self.classname()}: X has no rows; {X.shape}"
             raise ValueError(msg)
 
-        return X_temp
+        return X_view
 
     def check_is_fitted(self, attribute: str) -> None:
         """Check if particular attributes are on the object. This is useful to do before running transform to avoid
