@@ -172,11 +172,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
                 stacklevel=2,
             )
 
-        X_y = X[X.columns]
-
-        X_y["_temporary_response"] = y.to_numpy()
-
-        return X_y
+        return X.assign(_temporary_response=y)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Base transformer transform method; checks X type (pandas DataFrame only) and copies data if requested.
