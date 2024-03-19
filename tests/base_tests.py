@@ -52,6 +52,15 @@ class GenericInitTests:
                 **minimal_attribute_dict[self.transformer_name],
             )
 
+    def test_copy_on_write(self, uninitialized_transformers):
+        """Test that pd.options.mode.copy_on_write is set to True."""
+
+        _ = uninitialized_transformers[self.transformer_name]
+
+        assert (
+            pd.options.mode.copy_on_write is True
+        ), f"copy_on_write is not set to True in {self.transformer_name}."
+
 
 class ColumnStrListInitTests(GenericInitTests):
     """
