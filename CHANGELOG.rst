@@ -29,6 +29,7 @@ Changed
 - Moved BaseTransformer, DataFrameMethodTransformer, BaseMappingTransformer, BaseMappingTransformerMixin, CrossColumnMappingTransformer and Mapping Transformer over to the new testing framework.
 - Refactored MappingTransformer by removing redundant init method.
 - Updated tests for 
+- Refactored ArbitraryImputer by removing redundant fillna call in transform method. This should increase tubular's efficiency and maintainability.
 
 Removed
 ^^^^^^^
