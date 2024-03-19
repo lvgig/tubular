@@ -42,7 +42,7 @@ class TestTransform(GenericTransformTests):
     """
     Tests for BaseMappingTransformMixin.transform().
 
-    Because this is a Mixin transformer it is not appropriate to inherit the generic transform tests.
+    Because this is a Mixin transformer it is not always appropriate to inherit the generic transform tests. A number of the tests below overwrite the tests in GenericTransformTests.
     """
 
     def test_expected_output(self, mapping):
