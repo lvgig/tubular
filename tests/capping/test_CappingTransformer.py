@@ -5,11 +5,20 @@ import test_aide as ta
 
 import tests.test_data as d
 import tubular
+from tests.base_tests import (
+    ColumnsFromDictInitTests,
+    GenericFitTests,
+    GenericTransformTests,
+)
 from tubular.capping import CappingTransformer
 
 
-class TestInit:
+class TestInit(ColumnsFromDictInitTests):
     """Tests for CappingTransformer.init()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "CappingTransformer"
 
     def test_capping_values_quantiles_both_none_error(self):
         """Test that an exception is raised if both capping_values and quantiles are passed as None."""
@@ -262,8 +271,12 @@ class TestCheckCappingValuesDict:
             )
 
 
-class TestFit:
+class TestFit(GenericFitTests):
     """Tests for CappingTransformer.fit()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "CappingTransformer"
 
     def test_quantiles_none_error(self):
         """Test that an exception is raised if quantiles is None when fit is run."""
@@ -522,8 +535,12 @@ class TestPrepareQuantiles:
         ), f"unexpected value returned from prepare_quantiles, expecting {results} but got {expected_results}"
 
 
-class TestTransform:
+class TestTransform(GenericTransformTests):
     """Tests for CappingTransformer.transform()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "CappingTransformer"
 
     def expected_df_1():
         """Expected output from test_expected_output_min_and_max."""

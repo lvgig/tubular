@@ -1,10 +1,12 @@
+import re
+
 import pytest
 import test_aide as ta
 
 import tests.test_data as d
 from tests.base_tests import (
-    ColumnsFromDictInitTests,
     GenericFitTests,
+    GenericInitTests,
     GenericTransformTests,
     OtherBaseBehaviourTests,
 )
@@ -14,11 +16,31 @@ from tubular.mapping import BaseMappingTransformer
 # The first part of this file builds out the tests for BaseMappingTransformer so that they can be
 # imported into other test files (by not starting the class name with Test)
 # The second part actually calls these tests (along with all other require tests) for the BaseMappingTransformer
-class BaseMappingTransformerInitTests(ColumnsFromDictInitTests):
+class BaseMappingTransformerInitTests(GenericInitTests):
     """
     Tests for BaseMappingTransformer.init().
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
+
+    @pytest.mark.parametrize("non_string", [1, True, None])
+    def test_columns_list_element_error(
+        self,
+        non_string,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test an error is raised if columns list contains non-string elements."""
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["mappings"][non_string] = {1: 2, 3: 4}
+
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                f"{self.transformer_name}: each element of columns should be a single (string) column name",
+            ),
+        ):
+            uninitialized_transformers[self.transformer_name](**args)
 
     def test_no_keys_dict_error(
         self,
