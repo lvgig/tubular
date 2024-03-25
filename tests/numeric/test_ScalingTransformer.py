@@ -58,12 +58,12 @@ class TestInit:
     @pytest.mark.parametrize(
         ("scaler_type", "scaler_type_str", "scaler_kwargs_value"),
         [
-            ("min_max", "MinMaxScaler", {"copy": False, "feature_range": (0.5, 1.5)}),
-            ("max_abs", "MaxAbsScaler", {"copy": False}),
+            ("min_max", "MinMaxScaler", {"feature_range": (0.5, 1.5)}),
+            ("max_abs", "MaxAbsScaler", {}),
             (
                 "standard",
                 "StandardScaler",
-                {"copy": False, "with_mean": True, "with_std": True},
+                {"with_mean": True, "with_std": True},
             ),
         ],
     )
@@ -105,7 +105,7 @@ class TestInit:
         expected_call_args = {
             0: {
                 "args": (),
-                "kwargs": {"columns": ["a", "b"], "copy": True, "verbose": False},
+                "kwargs": {"columns": ["a", "b"], "verbose": False},
             },
         }
 
@@ -118,7 +118,6 @@ class TestInit:
             ScalingTransformer(
                 columns=["a", "b"],
                 scaler_type="standard",
-                copy=True,
                 verbose=False,
             )
 
@@ -204,7 +203,7 @@ class TestFit:
         x = ScalingTransformer(
             columns=["b", "c"],
             scaler_type=scaler_type,
-            scaler_kwargs={"copy": True},
+            scaler_kwargs={},
         )
 
         mocked = mocker.patch(
@@ -269,7 +268,7 @@ class TestTransform:
         """Test the call to ScalingTransformer.check_numeric_columns."""
         df = d.create_df_2()
 
-        x = ScalingTransformer(columns=["a"], scaler_type="standard", copy=True)
+        x = ScalingTransformer(columns=["a"], scaler_type="standard")
 
         x.fit(df)
 
@@ -299,7 +298,7 @@ class TestTransform:
         x = ScalingTransformer(
             columns=["b", "c"],
             scaler_type=scaler_type,
-            scaler_kwargs={"copy": True},
+            scaler_kwargs={},
         )
 
         x.fit(df)
@@ -349,7 +348,7 @@ class TestTransform:
         x = ScalingTransformer(
             columns=["b", "c"],
             scaler_type=scaler_type,
-            scaler_kwargs={"copy": True},
+            scaler_kwargs={},
         )
 
         x.fit(df)
@@ -387,7 +386,7 @@ class TestTransform:
         x = ScalingTransformer(
             columns=columns,
             scaler_type=scaler_type,
-            scaler_kwargs={"copy": True},
+            scaler_kwargs={},
         )
 
         x.fit(df)

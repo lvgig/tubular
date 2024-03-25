@@ -12,6 +12,8 @@ from sklearn.utils.validation import check_is_fitted
 
 from tubular._version import __version__
 
+pd.options.mode.copy_on_write = True
+
 
 class BaseTransformer(TransformerMixin, BaseEstimator):
     """Base tranformer class which all other transformers in the package inherit from.
@@ -26,7 +28,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         in columns is saved in the columns attribute on the object.
 
     copy : bool, default = True
-        Should X be copied before tansforms are applied?
+        Should X be copied before tansforms are applied? Copy argument no longer used and will be deprecated in a future release
 
     verbose : bool, default = False
         Should statements be printed when methods are run?
@@ -38,7 +40,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         will be applied to.
 
     copy : bool
-        Should X be copied before tansforms are applied?
+        Should X be copied before tansforms are applied? Copy argument no longer used and will be deprecated in a future release
 
     verbose : bool
         Print statements to show which methods are being run or not.
@@ -55,7 +57,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
     def __init__(
         self,
         columns: list[str] | str,
-        copy: bool = True,
+        copy: bool | None = None,
         verbose: bool = False,
     ) -> None:
         self.version_ = __version__
@@ -63,6 +65,13 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         if not isinstance(verbose, bool):
             msg = f"{self.classname()}: verbose must be a bool"
             raise TypeError(msg)
+
+        if copy is not None:
+            warnings.warn(
+                "copy argument no longer used and will be deprecated in a future release",
+                DeprecationWarning,
+                stacklevel=2,
+            )
 
         self.verbose = verbose
 
@@ -87,10 +96,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         else:
             msg = f"{self.classname()}: columns must be a string or list with the columns to be pre-processed (if specified)"
-            raise TypeError(msg)
-
-        if not isinstance(copy, bool):
-            msg = f"{self.classname()}: copy must be a bool"
             raise TypeError(msg)
 
         self.copy = copy
@@ -167,11 +172,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
                 stacklevel=2,
             )
 
-        X_y = X.copy()
-
-        X_y["_temporary_response"] = y.to_numpy()
-
-        return X_y
+        return X.assign(_temporary_response=y)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Base transformer transform method; checks X type (pandas DataFrame only) and copies data if requested.
@@ -194,14 +195,14 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         if self.verbose:
             print("BaseTransformer.transform() called")
 
-        if self.copy:
-            X = X.copy()
+        # to prevent overwriting original dataframe
+        X_view = X.iloc[:]
 
         if not X.shape[0] > 0:
             msg = f"{self.classname()}: X has no rows; {X.shape}"
             raise ValueError(msg)
 
-        return X
+        return X_view
 
     def check_is_fitted(self, attribute: str) -> None:
         """Check if particular attributes are on the object. This is useful to do before running transform to avoid

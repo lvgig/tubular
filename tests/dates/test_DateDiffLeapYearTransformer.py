@@ -56,7 +56,6 @@ class TestInit:
                 "kwargs": {
                     "columns": ["dummy_1", "dummy_2"],
                     "verbose": True,
-                    "copy": True,
                 },
             },
         }
@@ -73,7 +72,6 @@ class TestInit:
                 new_column_name="dummy_3",
                 drop_cols=True,
                 verbose=True,
-                copy=True,
             )
 
     def test_column_lower_type_error(self):

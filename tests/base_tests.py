@@ -52,24 +52,6 @@ class GenericInitTests:
                 **minimal_attribute_dict[self.transformer_name],
             )
 
-    @pytest.mark.parametrize("non_bool", [1, "True", {"a": 1}, [1, 2], None])
-    def test_copy_non_bool_error(
-        self,
-        non_bool,
-        minimal_attribute_dict,
-        uninitialized_transformers,
-    ):
-        """Test an error is raised if copy is not specified as a bool."""
-
-        with pytest.raises(
-            TypeError,
-            match=f"{self.transformer_name}: copy must be a bool",
-        ):
-            uninitialized_transformers[self.transformer_name](
-                copy=non_bool,
-                **minimal_attribute_dict[self.transformer_name],
-            )
-
 
 class ColumnStrListInitTests(GenericInitTests):
     """
@@ -291,21 +273,6 @@ class GenericTransformTests:
         ):
             x_fitted.transform(X=non_df)
 
-    def test_copy_returned(self, minimal_attribute_dict, uninitialized_transformers):
-        """Test check that a copy is returned if copy is set to True"""
-        df = d.create_df_10()
-
-        x = uninitialized_transformers[self.transformer_name](
-            copy=True,
-            **minimal_attribute_dict[self.transformer_name],
-        )
-
-        x = x.fit(df, df["c"])
-
-        df_transformed = x.transform(df)
-
-        assert df_transformed is not df
-
     def test_no_rows_error(self, initialized_transformers):
         """Test an error is raised if X has no rows."""
         df = d.create_df_10()
@@ -321,6 +288,19 @@ class GenericTransformTests:
             match=re.escape(f"{self.transformer_name}: X has no rows; (0, 3)"),
         ):
             x.transform(df)
+
+    def test_original_df_not_updated(self, initialized_transformers):
+        """Test that the original dataframe is not transformed when transform method used."""
+
+        df = d.create_df_10()
+
+        x = initialized_transformers[self.transformer_name]
+
+        x = x.fit(df, df["c"])
+
+        _ = x.transform(df)
+
+        pd.testing.assert_frame_equal(df, d.create_df_10())
 
 
 class ColumnsCheckTests:

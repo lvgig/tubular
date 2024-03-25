@@ -13,7 +13,7 @@ class TestInit:
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
-            0: {"args": (), "kwargs": {"columns": "b", "verbose": True, "copy": False}},
+            0: {"args": (), "kwargs": {"columns": "b", "verbose": True}},
         }
 
         with ta.functions.assert_function_call(
@@ -26,7 +26,6 @@ class TestInit:
                 new_column_name="a",
                 pd_method_name="year",
                 column="b",
-                copy=False,
                 verbose=True,
             )
 

@@ -14,7 +14,7 @@ class TestInit:
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
-            0: {"args": (), "kwargs": {"columns": None, "verbose": True, "copy": True}},
+            0: {"args": (), "kwargs": {"columns": None, "verbose": True}},
         }
 
         with ta.functions.assert_function_call(
@@ -23,7 +23,7 @@ class TestInit:
             "__init__",
             expected_call_args,
         ):
-            MedianImputer(columns=None, verbose=True, copy=True)
+            MedianImputer(columns=None, verbose=True)
 
     @pytest.mark.parametrize("weight", (0, ["a"], {"a": 10}))
     def test_weight_arg_errors(self, weight):
@@ -178,7 +178,7 @@ class TestTransform:
         )
 
         for col in ["a", "b", "c"]:
-            df[col].loc[df[col].isna()] = df[col].median()
+            df.loc[df[col].isna(), col] = df[col].median()
 
         return df
 
@@ -193,7 +193,7 @@ class TestTransform:
         )
 
         for col in ["a"]:
-            df[col].loc[df[col].isna()] = df[col].median()
+            df.loc[df[col].isna(), col] = df[col].median()
 
         return df
 
@@ -202,7 +202,7 @@ class TestTransform:
         df = d.create_df_9()
 
         for col in ["a"]:
-            df[col].loc[df[col].isna()] = 4
+            df.loc[df[col].isna(), col] = 4
 
         return df
 

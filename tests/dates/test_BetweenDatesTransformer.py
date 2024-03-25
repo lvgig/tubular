@@ -16,7 +16,7 @@ class TestInit:
         expected_call_args = {
             0: {
                 "args": (),
-                "kwargs": {"columns": ["a", "b", "c"], "verbose": False, "copy": True},
+                "kwargs": {"columns": ["a", "b", "c"], "verbose": False},
             },
         }
 
@@ -32,7 +32,6 @@ class TestInit:
                 column_upper="c",
                 new_column_name="d",
                 verbose=False,
-                copy=True,
             )
 
     def test_first_non_str_error(self):
@@ -383,7 +382,7 @@ class TestTransform:
 
         df = d.create_is_between_dates_df_2()
 
-        df["c"][0] = datetime.datetime(1989, 3, 1, tzinfo=datetime.timezone.utc)
+        df.loc[0, "c"] = datetime.datetime(1989, 3, 1, tzinfo=datetime.timezone.utc)
 
         with pytest.warns(Warning, match="not all c are greater than or equal to a"):
             x.transform(df)

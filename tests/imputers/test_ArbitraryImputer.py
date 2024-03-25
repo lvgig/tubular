@@ -12,7 +12,7 @@ class TestInit:
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
-            0: {"args": (), "kwargs": {"columns": "a", "verbose": True, "copy": True}},
+            0: {"args": (), "kwargs": {"columns": "a", "verbose": True}},
         }
 
         with ta.functions.assert_function_call(
@@ -21,7 +21,7 @@ class TestInit:
             "__init__",
             expected_call_args,
         ):
-            ArbitraryImputer(impute_value=1, columns="a", verbose=True, copy=True)
+            ArbitraryImputer(impute_value=1, columns="a", verbose=True)
 
     def test_columns_none_error(self):
         """Test that an exception is raised if columns is passed as None."""

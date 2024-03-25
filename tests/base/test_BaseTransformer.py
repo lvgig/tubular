@@ -38,7 +38,7 @@ class TestTransform(GenericTransformTests):
     )
     def test_X_returned(self, df, expected):
         """Test that X is returned from transform."""
-        x = BaseTransformer(columns="a", copy=True)
+        x = BaseTransformer(columns="a")
 
         df_transformed = x.transform(X=df)
 
