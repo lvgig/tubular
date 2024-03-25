@@ -188,7 +188,8 @@ class MedianImputer(BaseImputer):
                 # filter out null rows so their weight doesn't influence calc
                 filtered = X[X[c].notna()]
 
-                if len(filtered) > 0:
+                # below algorithm only works for >2 non null values
+                if len(filtered) > 1:
                     # first sort df by column to be imputed (order of weight column shouldn't matter for median)
                     filtered = filtered.sort_values(c)
 
