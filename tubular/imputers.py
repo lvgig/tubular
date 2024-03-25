@@ -360,7 +360,18 @@ class ModeImputer(BaseImputer):
             super().check_weights_column(X, self.weight)
 
             for c in self.columns:
-                self.impute_values_[c] = X.groupby(c)[self.weight].sum().idxmax()
+                grouped = X.groupby(c)[self.weight].sum()
+
+                if grouped.isna().all():
+                    warnings.warn(
+                        f"ModeImputer: The Mode of column {c} is NaN.",
+                        stacklevel=2,
+                    )
+
+                    self.impute_values_[c] = np.nan
+
+                else:
+                    self.impute_values_[c] = grouped.idxmax()
 
         return self
 
