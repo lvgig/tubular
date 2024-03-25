@@ -49,7 +49,7 @@ class BaseDateTransformer(BaseTransformer):
 
         self.check_columns_are_date_or_datetime(X)
 
-        temp = X[self.columns].copy()
+        temp = X[self.columns]
 
         for column in self.columns:
             if not self._is_datetime64_dict[column]:
@@ -113,7 +113,7 @@ class BaseDateTransformer(BaseTransformer):
 
         self.check_columns_are_date_or_datetime(X)
 
-        temp = X[self.columns].copy()
+        temp = X[self.columns]
 
         for column_one_name, column_two_name in itertools.permutations(self.columns):
             temp = self._cast_non_matching_columns(
@@ -303,7 +303,7 @@ class DateDifferenceTransformer(BaseDateTransformer):
     units : str, default = 'D'
         Numpy datetime units, accepted values are 'D', 'h', 'm', 's'
     copy : bool, default = True
-        Should X be copied prior to transform?
+        Should X be copied prior to transform? Copy argument no longer used and will be deprecated in a future release
     verbose: bool, default = False
     """
 
@@ -313,7 +313,7 @@ class DateDifferenceTransformer(BaseDateTransformer):
         column_upper: str,
         new_column_name: str | None = None,
         units: str = "D",
-        copy: bool = True,
+        copy: bool | None = None,
         verbose: bool = False,
     ) -> None:
         if type(column_lower) is not str:
@@ -353,7 +353,7 @@ class DateDifferenceTransformer(BaseDateTransformer):
         else:
             self.new_column_name = f"{column_upper}_{column_lower}_datediff_{units}"
 
-        super().__init__(columns=columns, copy=copy, verbose=verbose)
+        super().__init__(columns=columns, verbose=verbose, copy=copy)
 
         # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.
@@ -1105,7 +1105,7 @@ class DatetimeSinusoidCalculator(BaseDateTransformer):
         units: str | dict,
         period: float | dict = 2 * np.pi,
     ) -> None:
-        super().__init__(columns, copy=True)
+        super().__init__(columns)
 
         if not isinstance(method, str) and not isinstance(method, list):
             msg = "{}: method must be a string or list but got {}".format(

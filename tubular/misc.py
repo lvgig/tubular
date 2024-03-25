@@ -27,11 +27,12 @@ class SetValueTransformer(BaseTransformer):
         self,
         columns: str | list[str],
         value: type,
+        copy: bool | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         self.value = value
 
-        super().__init__(columns=columns, **kwargs)
+        super().__init__(columns=columns, copy=copy, **kwargs)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Set columns to value.
@@ -68,7 +69,7 @@ class SetColumnDtype(BaseTransformer):
     """
 
     def __init__(self, columns: str | list[str], dtype: type | str) -> None:
-        super().__init__(columns, copy=True)
+        super().__init__(columns)
 
         self.__validate_dtype(dtype)
 

@@ -56,6 +56,7 @@ class SeriesStrMethodTransformer(BaseTransformer):
         new_column_name: str,
         pd_method_name: str,
         columns: str,
+        copy: bool | None = None,
         pd_method_kwargs: dict[str, object] | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
@@ -63,7 +64,7 @@ class SeriesStrMethodTransformer(BaseTransformer):
             msg = f"{self.classname()}: columns arg should contain only 1 column name but got {len(columns)}"
             raise ValueError(msg)
 
-        super().__init__(columns=columns, **kwargs)
+        super().__init__(columns=columns, copy=copy, **kwargs)
 
         if type(new_column_name) is not str:
             msg = f"{self.classname()}: unexpected type ({type(new_column_name)}) for new_column_name, must be str"
@@ -144,7 +145,7 @@ class StringConcatenator(BaseTransformer):
         new_column: str = "new_column",
         separator: str = " ",
     ) -> None:
-        super().__init__(columns=columns, copy=True)
+        super().__init__(columns=columns)
 
         if not isinstance(new_column, str):
             msg = f"{self.classname()}: new_column should be a str"

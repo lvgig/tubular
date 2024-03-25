@@ -40,7 +40,7 @@ class TestInit:
         expected_call_args = {
             0: {
                 "args": (),
-                "kwargs": {"columns": ["a", "b"], "verbose": True, "copy": True},
+                "kwargs": {"columns": ["a", "b"], "verbose": True},
             },
         }
 
@@ -56,7 +56,6 @@ class TestInit:
                 drop=True,
                 suffix="_new",
                 verbose=True,
-                copy=True,
             )
 
     def test_impute_values_set_to_attribute(self):
@@ -68,7 +67,6 @@ class TestInit:
             drop=False,
             suffix="new",
             verbose=True,
-            copy=True,
         )
 
         expected_attributes = {"base": 1, "add_1": True, "drop": False, "suffix": "new"}
