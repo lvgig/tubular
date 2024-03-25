@@ -73,8 +73,9 @@ class TestFit:
     def test_learnt_values(self):
         """Test that the impute values learnt during fit are expected."""
         df = d.create_df_3()
+        df["d"] = np.nan
 
-        x = MedianImputer(columns=["a", "b", "c"])
+        x = MedianImputer(columns=["a", "b", "c", "d"])
 
         x.fit(df)
 
@@ -85,6 +86,7 @@ class TestFit:
                     "a": df["a"].median(),
                     "b": df["b"].median(),
                     "c": df["c"].median(),
+                    "d": np.float64(np.nan),
                 },
             },
             msg="impute_values_ attribute",
@@ -93,15 +95,17 @@ class TestFit:
     def test_learnt_values_weighted(self):
         """Test that the impute values learnt during fit are expected - when using weights."""
         df = d.create_df_9()
+        df["d"] = np.nan
 
         df = pd.DataFrame(
             {
                 "a": [1, 2, 4, 6],
                 "c": [3, 2, 4, 6],
+                "d": np.nan,
             },
         )
 
-        x = MedianImputer(columns=["a"], weight="c")
+        x = MedianImputer(columns=["a", "d"], weight="c")
 
         x.fit(df)
 
@@ -110,6 +114,7 @@ class TestFit:
             expected_attributes={
                 "impute_values_": {
                     "a": np.int64(4),
+                    "d": np.nan,
                 },
             },
             msg="impute_values_ attribute",
