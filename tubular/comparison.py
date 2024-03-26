@@ -72,6 +72,7 @@ class EqualityChecker(BaseTransformer):
         X[self.new_col_name] = X[self.columns[0]] == X[self.columns[1]]
 
         if self.drop_original:
-            X = X.drop(self.columns, axis=1)
+            for col in self.columns:
+                del X[col]
 
         return X
