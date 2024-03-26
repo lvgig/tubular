@@ -859,7 +859,8 @@ class MeanResponseTransformer(BaseNominalTransformer):
         if self.level:
             # Setting self.columns back so that the transformer object is unchanged after transform is called
             self.columns = temp_columns
-            X = X.drop(columns=self.columns)
+            for col in self.columns:
+                del X[col]
 
         return X
 
@@ -1226,7 +1227,8 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
         # Drop original columns
         if self.drop_original:
-            X = X.drop(self.columns, axis=1)
+            for col in self.columns:
+                del X[col]
 
         # Concatenate original and new dummy fields
         return pd.concat((X, X_transformed), axis=1)

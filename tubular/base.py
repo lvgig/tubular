@@ -400,6 +400,7 @@ class DataFrameMethodTransformer(BaseTransformer):
         )
 
         if self.drop_original:
-            X = X.drop(self.columns, axis=1)
+            for col in self.columns:
+                del X[col]
 
         return X
