@@ -73,8 +73,9 @@ class TestFit:
     def test_learnt_values(self):
         """Test that the impute values learnt during fit are expected."""
         df = d.create_df_3()
+        df["d"] = np.nan
 
-        x = ModeImputer(columns=["a", "b", "c"])
+        x = ModeImputer(columns=["a", "b", "c", "d"])
 
         x.fit(df)
 
@@ -85,6 +86,7 @@ class TestFit:
                     "a": df["a"].mode()[0],
                     "b": df["b"].mode()[0],
                     "c": df["c"].mode()[0],
+                    "d": np.nan,
                 },
             },
             msg="impute_values_ attribute",
@@ -94,7 +96,9 @@ class TestFit:
         """Test that the impute values learnt during fit are expected when df is weighted."""
         df = d.create_weighted_imputers_test_df()
 
-        x = ModeImputer(columns=["a", "b", "c", "d"], weight="weight")
+        df["e"] = np.nan
+
+        x = ModeImputer(columns=["a", "b", "c", "d", "e"], weight="weight")
 
         x.fit(df)
 
@@ -106,6 +110,7 @@ class TestFit:
                     "b": "e",
                     "c": "f",
                     "d": np.float64(1.0),
+                    "e": np.nan,
                 },
             },
             msg="impute_values_ attribute",
@@ -165,17 +170,37 @@ class TestFit:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.row_by_row_params(
-            pd.DataFrame({"a": [np.nan, np.nan, np.nan], "b": [None, None, None]}),
+            pd.DataFrame(
+                {
+                    "a": [np.nan, np.nan, np.nan],
+                    "b": [None, None, None],
+                    "w": [1, 2, 3],
+                },
+            ),
             expected_df_nan(),
         )
         + ta.pandas.index_preserved_params(
-            pd.DataFrame({"a": [np.nan, np.nan, np.nan], "b": [None, None, None]}),
+            pd.DataFrame(
+                {
+                    "a": [np.nan, np.nan, np.nan],
+                    "b": [None, None, None],
+                    "w": [1, 2, 3],
+                },
+            ),
             expected_df_nan(),
         ),
     )
     def test_warning_mode_is_nan(self, df, expected):
-        """Test that warning is raised when mode is NaN."""
+        """Test that warning is raised when mode is NaN - with and without weights."""
         x = ModeImputer(columns=["a", "b"])
+
+        with pytest.warns(Warning, match="ModeImputer: The Mode of column a is NaN."):
+            x.fit(df)
+
+        with pytest.warns(Warning, match="ModeImputer: The Mode of column b is NaN."):
+            x.fit(df)
+
+        x = ModeImputer(columns=["a", "b"], weight="w")
 
         with pytest.warns(Warning, match="ModeImputer: The Mode of column a is NaN."):
             x.fit(df)
