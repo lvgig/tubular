@@ -32,7 +32,7 @@ class TestTwoColumnOperatorTransformerInit:
                 pd_method_kwargs={"axis": 1},
             )
 
-    def test_column_size_error(self):
+    def test_column_size_1_error(self):
         """Checks that the column is of length 2."""
         with pytest.raises(
             ValueError,
@@ -41,6 +41,19 @@ class TestTwoColumnOperatorTransformerInit:
             TwoColumnOperatorTransformer(
                 "mul",
                 ["a"],
+                "c",
+                pd_method_kwargs={"axis": 1},
+            )
+
+    def test_empty_list_error(self):
+        """Checks that the list is not empty"""
+        with pytest.raises(
+            ValueError,
+            match="columns must be a list containing two column names",
+        ):
+            TwoColumnOperatorTransformer(
+                "mul",
+                [],
                 "c",
                 pd_method_kwargs={"axis": 1},
             )
