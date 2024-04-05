@@ -2,39 +2,37 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
-import tubular
+from tests.base_tests import (
+    ColumnStrListInitTests,
+    GenericFitTests,
+    GenericTransformTests,
+    OtherBaseBehaviourTests,
+)
 from tubular.misc import SetValueTransformer
 
 
-class TestInit:
-    """Tests for the SetValueTransformer.__init__ method."""
+class TestInit(ColumnStrListInitTests):
+    """Generic tests for SetValueTransformer.init()."""
 
-    def test_super_init_call(self, mocker):
-        """Test that BaseTransformer.init us called as expected."""
-        expected_call_args = {
-            0: {
-                "args": (),
-                "kwargs": {"columns": ["a", "b"], "verbose": False, "copy": None},
-            },
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "__init__",
-            expected_call_args,
-        ):
-            SetValueTransformer(columns=["a", "b"], value=1, verbose=False)
-
-    def test_value_attribute_set(self):
-        """Test that the value passed in the value arg is set as an attribute of the same name."""
-        x = SetValueTransformer(columns=["a", "b"], value=1)
-
-        assert x.value == 1, "unexpected value set to value atttribute"
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "SetValueTransformer"
 
 
-class TestTransform:
-    """Tests for the SetValueTransformer.transform method."""
+class TestFit(GenericFitTests):
+    """Generic tests for SetValueTransformer.fit()"""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "SetValueTransformer"
+
+
+class TestTransform(GenericTransformTests):
+    """Tests for SetValueTransformer.transform."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "SetValueTransformer"
 
     def expected_df_1():
         """Expected output of test_value_set_in_transform."""
@@ -44,22 +42,6 @@ class TestTransform:
         df["b"] = "a"
 
         return df
-
-    def test_super_transform_called(self, mocker):
-        """Test that BaseTransformer.transform called."""
-        df = d.create_df_7()
-
-        x = SetValueTransformer(columns=["a", "b"], value=1)
-
-        expected_call_args = {0: {"args": (d.create_df_7(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-        ):
-            x.transform(df)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -76,3 +58,15 @@ class TestTransform:
             expected=expected,
             msg="incorrect value after SetValueTransformer transform",
         )
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for SetValueTransformer behaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "SetValueTransformer"
