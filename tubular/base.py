@@ -7,6 +7,9 @@ from __future__ import annotations
 import warnings
 
 import pandas as pd
+import narwhals as nw
+import polars as pl
+
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
@@ -100,7 +103,9 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         self.copy = copy
 
-    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> BaseTransformer:
+    def fit(self,
+            X: pd.DataFrame | pl.DataFrame | pl.LazyFrame | nw.DataFrame | nw.LazyFrame,
+            y: pd.Series | pl.Series | None = None) -> BaseTransformer:
         """Base transformer fit method, checks X and y types. Currently only pandas DataFrames are allowed for X
         and DataFrames or Series for y.
 
@@ -118,16 +123,18 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         if self.verbose:
             print("BaseTransformer.fit() called")
 
-        self.columns_check(X)
+        X_df = nw.from_native(X)
 
-        if not X.shape[0] > 0:
-            msg = f"{self.classname()}: X has no rows; {X.shape}"
+        self.columns_check(X_df)
+
+        if not X_df.shape[0] > 0:
+            msg = f"{self.classname()}: X has no rows; {X_df.shape}"
             raise ValueError(msg)
 
         if y is not None:
-            if not isinstance(y, pd.Series):
+            if not (isinstance(y, pd.Series) | isinstance(y, pl.Series)):
                 msg = (
-                    f"{self.classname()}: unexpected type for y, should be a pd.Series"
+                    f"{self.classname()}: unexpected type for y, should be a pd.Series or pl.Series"
                 )
                 raise TypeError(msg)
 
@@ -137,7 +144,9 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         return self
 
-    def _combine_X_y(self, X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
+    def _combine_X_y(self,
+                     X: pd.DataFrame | pl.DataFrame | pl.LazyFrame | nw.DataFrame | nw.LazyFrame,
+                     y: pd.Series | pl.Series) -> nw.DataFrame | nw.LazyFrame:
         """Combine X and y by adding a new column with the values of y to a copy of X.
 
         The new column response column will be called `_temporary_response`.
@@ -154,27 +163,15 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             Response variable.
 
         """
-        if not isinstance(X, pd.DataFrame):
-            msg = f"{self.classname()}: X should be a pd.DataFrame"
-            raise TypeError(msg)
 
-        if not isinstance(y, pd.Series):
-            msg = f"{self.classname()}: y should be a pd.Series"
-            raise TypeError(msg)
+        #TODO is tis method really needed?
+        X_df = nw.from_native(X)
 
-        if X.shape[0] != y.shape[0]:
-            msg = f"{self.classname()}: X and y have different numbers of rows ({X.shape[0]} vs {y.shape[0]})"
-            raise ValueError(msg)
+        return X_df.with_columns(pl.Series(name="_temporary_response", values=y))
 
-        if not (X.index == y.index).all():
-            warnings.warn(
-                f"{self.classname()}: X and y do not have equal indexes",
-                stacklevel=2,
-            )
-
-        return X.assign(_temporary_response=y)
-
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+    def transform(self,
+                  X: pd.DataFrame | pl.DataFrame | pl.LazyFrame | nw.DataFrame | nw.LazyFrame) ->\
+                  pd.DataFrame | pl.DataFrame | pl.LazyFrame:
         """Base transformer transform method; checks X type (pandas DataFrame only) and copies data if requested.
 
         Transform calls the columns_check method which will check columns in columns attribute are in X.
@@ -195,14 +192,11 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         if self.verbose:
             print("BaseTransformer.transform() called")
 
-        # to prevent overwriting original dataframe
-        X_view = X.iloc[:]
-
         if not X.shape[0] > 0:
             msg = f"{self.classname()}: X has no rows; {X.shape}"
             raise ValueError(msg)
 
-        return X_view
+        return X
 
     def check_is_fitted(self, attribute: str) -> None:
         """Check if particular attributes are on the object. This is useful to do before running transform to avoid
@@ -218,7 +212,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         """
         check_is_fitted(self, attribute)
 
-    def columns_check(self, X: pd.DataFrame) -> None:
+    def columns_check(self, X: pd.DataFrame | pl.DataFrame | pl.LazyFrame | nw.DataFrame | nw.LazyFrame) -> None:
         """Method to check that the columns attribute is set and all values are present in X.
 
         Parameters
@@ -227,20 +221,15 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             Data to check columns are in.
 
         """
-        if not isinstance(X, pd.DataFrame):
-            msg = f"{self.classname()}: X should be a pd.DataFrame"
-            raise TypeError(msg)
+        nw_frame = nw.from_native(X)
 
-        if not isinstance(self.columns, list):
-            msg = f"{self.classname()}: self.columns should be a list"
-            raise TypeError(msg)
-
-        for c in self.columns:
-            if c not in X.columns.to_numpy():
-                raise ValueError(f"{self.classname()}: variable " + c + " is not in X")
+        if not set(self.columns).issubset(nw_frame.columns):
+            disjoint_columns = list(set(nw_frame.columns) - set(self.columns))
+            raise ValueError(f"{self.classname()}: variable " +  ', '.join(disjoint_columns) + " is not in X")
 
     @staticmethod
-    def check_weights_column(X: pd.DataFrame, weights_column: str) -> None:
+    def check_weights_column(X: pd.DataFrame | pl.DataFrame | pl.LazyFrame | nw.DataFrame | nw.LazyFrame,
+                             weights_column: str) -> None:
         """Helper method for validating weights column in dataframe.
 
         Args:
@@ -249,28 +238,30 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             weights_column (str): name of weight column
 
         """
-        if weights_column is not None:
-            # check if given weight is in columns
-            if weights_column not in X.columns:
-                msg = f"weight col ({weights_column}) is not present in columns of data"
-                raise ValueError(msg)
+        # Cannot stay lazy
+        nw_frame = nw.DataFrame(X)
 
-            # check weight is numeric
+        if weights_column not in nw_frame.columns:
+          msg = f"weight col ({weights_column}) is not present in columns of data"
+          raise ValueError(msg)
 
-            if not pd.api.types.is_numeric_dtype(X[weights_column]):
-                msg = "weight column must be numeric."
-                raise ValueError(msg)
+        nw_numeric_types = [nw.Int64, nw.Int32, nw.Int16, nw.Int8,
+                            nw.UInt64, nw.UInt32, nw.UInt16, nw.UInt8,
+                            nw.Float64, nw.Float32]
 
-            # check weight is positive
+        if nw_frame[weights_column].dtype not in nw_numeric_types:
+            msg = "weight column must be numeric."
+            raise ValueError(msg)
 
-            if (X[weights_column] < 0).sum() != 0:
-                msg = "weight column must be positive"
-                raise ValueError(msg)
 
-            # check weight non-null
-            if X[weights_column].isna().sum() != 0:
-                msg = "weight column must be non-null"
-                raise ValueError(msg)
+        if (nw_frame[weights_column] < 0).sum() != 0:
+            msg = "weight column must be positive"
+            raise ValueError(msg)
+
+        # check weight non-null
+        if nw_frame[weights_column].is_null().sum() != 0:
+            msg = "weight column must be non-null"
+            raise ValueError(msg)
 
 
 class DataFrameMethodTransformer(BaseTransformer):

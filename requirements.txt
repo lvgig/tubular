@@ -1,2 +1,4 @@
 pandas>=1.5.0
 scikit-learn>=1.2.0
+narwhals==0.7.9
+polars>=0.20

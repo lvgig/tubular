@@ -6,3 +6,5 @@ pytest-mock>=3.5.1
 pytest-cov>=2.10.1
 pre-commit==2.15.0 
 ruff==0.2.2
+narwhals==0.7.9
+polars>=0.20
