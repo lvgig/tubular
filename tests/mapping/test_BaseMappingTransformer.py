@@ -29,9 +29,11 @@ class BaseMappingTransformerInitTests(GenericInitTests):
         minimal_attribute_dict,
         uninitialized_transformers,
     ):
-        """Test an error is raised if columns list contains non-string elements."""
+        """Test an error is raised if columns list contains non-string elements (note
+        columns is derived from mappings keys)."""
 
         args = minimal_attribute_dict[self.transformer_name].copy()
+        # mappings keys are fed into columns param
         args["mappings"][non_string] = {1: 2, 3: 4}
 
         with pytest.raises(
