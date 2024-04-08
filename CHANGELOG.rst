@@ -22,6 +22,8 @@ Each individual change should have a link to the pull request after the descript
 Added
 ^^^^^
 - Inheritable tests for generic base behaviours for base transformer in `base_tests.py`, with fixtures to allow for this in `conftest.py`
+- Split existing input check into two better defined checks for TwoColumnOperatorTransformer `#183 <https://github.com/lvgig/tubular/pull/183>`_
+- Created unit tests for checking column type and size `#183 <https://github.com/lvgig/tubular/pull/183>`_
 
 Changed
 ^^^^^^^
@@ -36,7 +38,6 @@ Removed
 - Functionality for BaseTransformer (and thus all transformers) to take `None` as an option for columns. This behaviour was inconsistently implemented across transformers. Rather than extending to all we decided to remove 
 this functionality. This required updating a lot of test files.
 - The `columns_set_or_check()` method from BaseTransformer. With the above change it was no longer necessary. Subsequent updates to nominal transformers and their tests were required.
-
 
 1.2.2 (2024-02-20)
 ------------------
