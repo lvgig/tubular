@@ -139,7 +139,8 @@ class LogTransformer(BaseTransformer):
                 X[new_column_names] = np.log(X[self.columns]) / np.log(self.base)
 
         if self.drop:
-            X = X.drop(self.columns, axis=1)
+            for col in self.columns:
+                del X[col]
 
         return X
 
