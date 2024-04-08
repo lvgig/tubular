@@ -4,71 +4,47 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
-import tubular
+from tests.base_tests import (
+    ColumnStrListInitTests,
+    GenericFitTests,
+    GenericTransformTests,
+    OtherBaseBehaviourTests,
+)
+from tests.imputers.test_BaseImputer import GenericImputerTransformTests
 from tubular.imputers import MedianImputer
 
 
-class TestInit:
-    """Tests for MedianImputer.init()."""
+class TestInit(ColumnStrListInitTests):
+    """Generic tests for transformer.init()."""
 
-    def test_super_init_called(self, mocker):
-        """Test that init calls BaseTransformer.init."""
-        expected_call_args = {
-            0: {"args": (), "kwargs": {"columns": None, "verbose": True}},
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "__init__",
-            expected_call_args,
-        ):
-            MedianImputer(columns=None, verbose=True)
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "MedianImputer"
 
     @pytest.mark.parametrize("weight", (0, ["a"], {"a": 10}))
-    def test_weight_arg_errors(self, weight):
+    def test_weight_arg_errors(
+        self,
+        uninitialized_transformers,
+        minimal_attribute_dict,
+        weight,
+    ):
         """Test that appropriate errors are throw for bad weight arg."""
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["weight"] = weight
+
         with pytest.raises(
             TypeError,
             match="weight should be str or None",
         ):
-            MedianImputer(columns=["s"], weight=weight)
+            uninitialized_transformers[self.transformer_name](**args)
 
 
-class TestFit:
-    """Tests for MedianImputer.fit()."""
+class TestFit(GenericFitTests):
+    """Generic tests for transformer.fit()"""
 
-    def test_super_fit_called(self, mocker):
-        """Test that fit calls BaseTransformer.fit."""
-        df = d.create_df_3()
-
-        x = MedianImputer(columns=["a", "b", "c"])
-
-        expected_call_args = {0: {"args": (d.create_df_3(), None), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "fit",
-            expected_call_args,
-        ):
-            x.fit(df)
-
-    def test_check_weights_column_called(self, mocker):
-        """Test that fit calls BaseTransformer.check_weights_column - when weights are used."""
-        df = d.create_df_9()
-
-        x = MedianImputer(columns=["a", "b"], weight="c")
-
-        expected_call_args = {0: {"args": (d.create_df_9(), "c"), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "check_weights_column",
-            expected_call_args,
-        ):
-            x.fit(df)
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "MedianImputer"
 
     def test_learnt_values(self):
         """Test that the impute values learnt during fit are expected."""
@@ -115,16 +91,6 @@ class TestFit:
             msg="impute_values_ attribute",
         )
 
-    def test_fit_returns_self(self):
-        """Test fit returns self?."""
-        df = d.create_df_1()
-
-        x = MedianImputer(columns="a")
-
-        x_fitted = x.fit(df)
-
-        assert x_fitted is x, "Returned value from MedianImputer.fit not as expected."
-
     def test_fit_returns_self_weighted(self):
         """Test fit returns self?."""
         df = d.create_df_9()
@@ -164,8 +130,12 @@ class TestFit:
         )
 
 
-class TestTransform:
-    """Tests for MedianImputer.transform()."""
+class TestTransform(GenericImputerTransformTests, GenericTransformTests):
+    """Tests for transformer.transform."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "MedianImputer"
 
     def expected_df_1():
         """Expected output for test_nulls_imputed_correctly."""
@@ -205,42 +175,6 @@ class TestTransform:
             df.loc[df[col].isna(), col] = 4
 
         return df
-
-    def test_check_is_fitted_called(self, mocker):
-        """Test that BaseTransformer check_is_fitted called."""
-        df = d.create_df_1()
-
-        x = MedianImputer(columns="a")
-
-        x.fit(df)
-
-        expected_call_args = {0: {"args": (["impute_values_"],), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "check_is_fitted",
-            expected_call_args,
-        ):
-            x.transform(df)
-
-    def test_super_transform_called(self, mocker):
-        """Test that BaseTransformer.transform called."""
-        df = d.create_df_1()
-
-        x = MedianImputer(columns="a")
-
-        x.fit(df)
-
-        expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-        ):
-            x.transform(df)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -302,24 +236,6 @@ class TestTransform:
             msg="Check nulls filled correctly in transform",
         )
 
-    def test_learnt_values_not_modified(self):
-        """Test that the impute_values_ from fit are not changed in transform."""
-        df = d.create_df_3()
-
-        x = MedianImputer(columns=["a", "b", "c"])
-
-        x.fit(df)
-
-        x2 = MedianImputer(columns=["a", "b", "c"])
-
-        x2.fit_transform(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=x.impute_values_,
-            actual=x2.impute_values_,
-            msg="Impute values not changed in transform",
-        )
-
     def test_learnt_values_not_modified_weights(self):
         """Test that the impute_values_ from fit are not changed in transform - when using weights."""
         df = d.create_df_9()
@@ -337,3 +253,14 @@ class TestTransform:
             actual=x2.impute_values_,
             msg="Impute values not changed in transform",
         )
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour behaviour outside the three standard methods.
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "MedianImputer"
