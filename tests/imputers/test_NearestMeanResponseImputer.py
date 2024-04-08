@@ -14,7 +14,7 @@ class TestInit:
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
-            0: {"args": (), "kwargs": {"columns": None, "verbose": True, "copy": True}},
+            0: {"args": (), "kwargs": {"columns": None, "verbose": True}},
         }
 
         with ta.functions.assert_function_call(
@@ -23,7 +23,7 @@ class TestInit:
             "__init__",
             expected_call_args,
         ):
-            NearestMeanResponseImputer(columns=None, verbose=True, copy=True)
+            NearestMeanResponseImputer(columns=None, verbose=True)
 
 
 class TestFit:

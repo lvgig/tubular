@@ -21,7 +21,6 @@ class TestInit:
                 "args": (),
                 "kwargs": {
                     "columns": ["a"],
-                    "copy": True,
                     "verbose": False,
                 },
             },
@@ -37,7 +36,6 @@ class TestInit:
                 column="a",
                 new_column_name="b",
                 verbose=False,
-                copy=True,
             )
 
     def test_column_type_error(self):

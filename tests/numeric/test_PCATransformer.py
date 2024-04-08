@@ -87,7 +87,7 @@ class TestInit:
         expected_call_args = {
             0: {
                 "args": (),
-                "kwargs": {"columns": ["a", "b"], "copy": True, "verbose": False},
+                "kwargs": {"columns": ["a", "b"], "verbose": False},
             },
         }
 
@@ -97,7 +97,7 @@ class TestInit:
             "__init__",
             expected_call_args,
         ):
-            PCATransformer(columns=["a", "b"], n_components=1, copy=True, verbose=False)
+            PCATransformer(columns=["a", "b"], n_components=1, verbose=False)
 
 
 class TestCheckNumericColumns:
@@ -326,7 +326,7 @@ class TestTransform:
         """Test the call to PCATransformer.check_numeric_columns."""
         df = d.create_numeric_df_1()
 
-        x = PCATransformer(columns=["a", "b"], copy=True)
+        x = PCATransformer(columns=["a", "b"])
 
         x.fit(df)
 

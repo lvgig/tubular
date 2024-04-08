@@ -14,7 +14,7 @@ class TestInit:
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
         expected_call_args = {
-            0: {"args": (), "kwargs": {"columns": None, "verbose": True, "copy": True}},
+            0: {"args": (), "kwargs": {"columns": None, "verbose": True}},
         }
 
         with ta.functions.assert_function_call(
@@ -23,7 +23,7 @@ class TestInit:
             "__init__",
             expected_call_args,
         ):
-            MeanImputer(columns=None, verbose=True, copy=True)
+            MeanImputer(columns=None, verbose=True)
 
     @pytest.mark.parametrize("weight", (0, ["a"], {"a": 10}))
     def test_weight_arg_errors(self, weight):
@@ -172,7 +172,7 @@ class TestTransform:
         )
 
         for col in ["a", "b", "c"]:
-            df[col].loc[df[col].isna()] = df[col].mean()
+            df.loc[df[col].isna(), col] = df[col].mean()
 
         return df
 
@@ -187,7 +187,7 @@ class TestTransform:
         )
 
         for col in ["a"]:
-            df[col].loc[df[col].isna()] = df[col].mean()
+            df.loc[df[col].isna(), col] = df[col].mean()
 
         return df
 
@@ -196,7 +196,7 @@ class TestTransform:
         df = d.create_df_9()
 
         for col, value in zip(["a", "b"], [59 / 15, 42 / 18]):
-            df[col].loc[df[col].isna()] = value
+            df.loc[df[col].isna(), col] = value
 
         return df
 
