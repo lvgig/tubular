@@ -145,6 +145,24 @@ class GenericImputerTransformTests:
             msg=f"Error from {self.transformer_name} transform col b, c",
         )
 
+    def test_learnt_values_not_modified(self, initialized_transformers):
+        """Test that the impute_values_ from fit are not changed in transform."""
+        df = d.create_df_3()
+
+        x = initialized_transformers[self.transformer_name]
+
+        x.fit(df)
+
+        x2 = initialized_transformers[self.transformer_name]
+
+        x2.fit_transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=x.impute_values_,
+            actual=x2.impute_values_,
+            msg="Impute values not changed in transform",
+        )
+
 
 class TestInit(ColumnStrListInitTests):
     """Generic tests for transformer.init()."""
@@ -160,6 +178,24 @@ class TestFit(GenericFitTests):
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "BaseImputer"
+
+    def test_fit_not_changing_data(
+        self,
+        initialized_transformers,
+    ):
+        """Test fit does not change X."""
+
+        df = d.create_df_1()
+
+        x = initialized_transformers[self.transformer_name]
+
+        x.fit(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=d.create_df_1(),
+            actual=df,
+            msg="Check X not changing during fit",
+        )
 
 
 class TestTransform(GenericImputerTransformTests):
