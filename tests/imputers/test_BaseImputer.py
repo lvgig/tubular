@@ -134,10 +134,15 @@ class GenericImputerTransformTests:
 
         x1.impute_values_ = {"b": "g", "c": "f"}
         x1.columns = ["b", "c"]
-        # bit of a hack to make this work nicely for arbitrary imputer
-        x1.impute_value = "f"
 
         df_transformed = x1.transform(df)
+
+        # arb imputer will add a new categorical level to cat columns,
+        # make sure expected takes this into account
+        if self.transformer_name == "ArbitraryImputer":
+            expected["c"] = expected["c"].cat.add_categories(
+                x1.impute_value,
+            )
 
         ta.equality.assert_equal_dispatch(
             expected=expected,
