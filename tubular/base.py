@@ -15,9 +15,6 @@ from sklearn.utils.validation import check_is_fitted
 
 from tubular._version import __version__
 
-pd.options.mode.copy_on_write = True
-
-
 class BaseTransformer(TransformerMixin, BaseEstimator):
     """Base tranformer class which all other transformers in the package inherit from.
 
@@ -123,12 +120,15 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         if self.verbose:
             print("BaseTransformer.fit() called")
 
-        X_df = nw.from_native(X)
+        if not (isinstance(X, nw.DataFrame) | isinstance(X, nw.LazyFrame)):
+            X = nw.from_native(X[:])  # [:] creates a view for pandas to prevent updates to original frame
 
-        self.columns_check(X_df)
+        if not set(self.columns).issubset(X.columns):
+            disjoint_columns = list(set(self.columns) - set(X.columns))
+            raise ValueError(f"{self.classname()}: variable " + ', '.join(disjoint_columns) + " is not in X")
 
-        if not X_df.shape[0] > 0:
-            msg = f"{self.classname()}: X has no rows; {X_df.shape}"
+        if not X.shape[0] > 0:
+            msg = f"{self.classname()}: X has no rows; {X.shape}"
             raise ValueError(msg)
 
         if y is not None:
@@ -145,7 +145,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         return self
 
     def _combine_X_y(self,
-                     X: pd.DataFrame | pl.DataFrame | pl.LazyFrame | nw.DataFrame | nw.LazyFrame,
+                     X: pd.DataFrame | pl.DataFrame | pl.LazyFrame,
                      y: pd.Series | pl.Series) -> nw.DataFrame | nw.LazyFrame:
         """Combine X and y by adding a new column with the values of y to a copy of X.
 
@@ -164,30 +164,31 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         """
 
-        #TODO is tis method really needed?
-        X_df = nw.from_native(X)
+        if not (isinstance(X, nw.DataFrame) | isinstance(X, nw.LazyFrame)):
+            X = nw.from_native(X[:])  # [:] creates a view for pandas frames to prevent updates to original frame
 
-        return X_df.with_columns(pl.Series(name="_temporary_response", values=y))
+        return X.with_columns(pl.Series(name="_temporary_response", values=y))
 
     def transform(self,
                   X: pd.DataFrame | pl.DataFrame | pl.LazyFrame | nw.DataFrame | nw.LazyFrame) ->\
-                  pd.DataFrame | pl.DataFrame | pl.LazyFrame:
+                  pd.DataFrame | pl.DataFrame | pl.LazyFrame | nw.DataFrame | nw.LazyFrame:
         """Base transformer transform method; checks X type (pandas DataFrame only) and copies data if requested.
 
-        Transform calls the columns_check method which will check columns in columns attribute are in X.
+        Transform will check that pre-specified columns for transform are present in X.
 
         Parameters
         ----------
-        X : pd.DataFrame
-            Data to transform with the transformer.
+        X : Dataframe to transform with the transformer.
 
         Returns
         -------
-        X : pd.DataFrame
-            Input X, copied if specified by user.
+        X : Input X, validated
 
         """
-        self.columns_check(X)
+
+        if not set(self.columns).issubset(X.columns):
+            disjoint_columns = list(set(self.columns) - set(X.columns))
+            raise ValueError(f"{self.classname()}: variable " + ', '.join(disjoint_columns) + " is not in X")
 
         if self.verbose:
             print("BaseTransformer.transform() called")
@@ -211,21 +212,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         """
         check_is_fitted(self, attribute)
-
-    def columns_check(self, X: pd.DataFrame | pl.DataFrame | pl.LazyFrame | nw.DataFrame | nw.LazyFrame) -> None:
-        """Method to check that the columns attribute is set and all values are present in X.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            Data to check columns are in.
-
-        """
-        nw_frame = nw.from_native(X)
-
-        if not set(self.columns).issubset(nw_frame.columns):
-            disjoint_columns = list(set(nw_frame.columns) - set(self.columns))
-            raise ValueError(f"{self.classname()}: variable " +  ', '.join(disjoint_columns) + " is not in X")
 
     @staticmethod
     def check_weights_column(X: pd.DataFrame | pl.DataFrame | pl.LazyFrame | nw.DataFrame | nw.LazyFrame,
