@@ -30,6 +30,7 @@ Changed
 - Refactored MappingTransformer by removing redundant init method.
 - Updated tests for 
 - Refactored ArbitraryImputer by removing redundant fillna call in transform method. This should increase tubular's efficiency and maintainability.
+- Refactored ArbitraryImputer and BaseImputer tests in new format.
 
 Removed
 ^^^^^^^
