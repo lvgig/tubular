@@ -147,18 +147,25 @@ class GenericImputerTransformTests:
 
     def test_learnt_values_not_modified(self, initialized_transformers):
         """Test that the impute_values_ from fit are not changed in transform."""
+
         df = d.create_df_3()
 
-        x = initialized_transformers[self.transformer_name]
+        x1 = initialized_transformers[self.transformer_name]
 
-        x.fit(df)
+        x1.impute_values_ = {"a": 7}
+        x1.columns = ["a"]
+
+        x1.fit(df)
 
         x2 = initialized_transformers[self.transformer_name]
+
+        x2.impute_values_ = {"a": 7}
+        x2.columns = ["a"]
 
         x2.fit_transform(df)
 
         ta.equality.assert_equal_dispatch(
-            expected=x.impute_values_,
+            expected=x1.impute_values_,
             actual=x2.impute_values_,
             msg="Impute values not changed in transform",
         )
