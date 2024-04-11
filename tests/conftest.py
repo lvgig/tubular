@@ -130,7 +130,6 @@ def minimal_attribute_dict():
         },
         "ModeImputer": {
             "columns": ["a"],
-            "weight": None,
         },
         "NearestMeanResponseImputer": {
             "columns": ["a"],

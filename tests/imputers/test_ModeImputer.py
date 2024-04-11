@@ -65,27 +65,6 @@ class TestFit(GenericFitTests):
             msg="impute_values_ attribute",
         )
 
-    def test_learnt_values_weighted_df(self):
-        """Test that the impute values learnt during fit are expected when df is weighted."""
-        df = d.create_weighted_imputers_test_df()
-
-        x = ModeImputer(columns=["a", "b", "c", "d"], weight="weight")
-
-        x.fit(df)
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "impute_values_": {
-                    "a": np.float64(5.0),
-                    "b": "e",
-                    "c": "f",
-                    "d": np.float64(1.0),
-                },
-            },
-            msg="impute_values_ attribute",
-        )
-
     def expected_df_nan():
         return pd.DataFrame({"a": ["NaN", "NaN", "NaN"], "b": [None, None, None]})
 
@@ -109,6 +88,51 @@ class TestFit(GenericFitTests):
 
         with pytest.warns(Warning, match="ModeImputer: The Mode of column b is NaN."):
             x.fit(df)
+
+    def test_learnt_values_weighted_df(self):
+        """Test that the impute values learnt during fit are expected when df is weighted."""
+        df = d.create_weighted_imputers_test_df()
+
+        x = ModeImputer(columns=["a", "b", "c", "d"], weight="weight")
+
+        x.fit(df)
+
+        ta.classes.test_object_attributes(
+            obj=x,
+            expected_attributes={
+                "impute_values_": {
+                    "a": np.float64(5.0),
+                    "b": "e",
+                    "c": "f",
+                    "d": np.float64(1.0),
+                },
+            },
+            msg="impute_values_ attribute",
+        )
+
+    def test_fit_returns_self_weighted(self):
+        """Test fit returns self?."""
+        df = d.create_df_9()
+
+        x = ModeImputer(columns="a", weight="c")
+
+        x_fitted = x.fit(df)
+
+        assert x_fitted is x, "Returned value from ModeImputer.fit not as expected."
+
+    def test_fit_not_changing_data_weighted(self):
+        """Test fit does not change X - when weights are used."""
+        df = d.create_df_9()
+
+        x = ModeImputer(columns="a", weight="c")
+
+        x.fit(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=d.create_df_9(),
+            actual=df,
+            msg="Check X not changing during fit",
+        )
 
 
 class TestTransform(GenericTransformTests, GenericImputerTransformTests):
