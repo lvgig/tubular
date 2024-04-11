@@ -151,9 +151,11 @@ class MedianImputer(BaseImputer):
 
     """
 
+    FITS = True
+
     def __init__(
         self,
-        columns: str | list[str] | None = None,
+        columns: str | list[str],
         weight: str | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
