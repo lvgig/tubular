@@ -87,6 +87,15 @@ class GenericImputerTransformTests:
 
         return df3
 
+    def expected_df_9():
+        """Expected output for test_nulls_imputed_correctly_weighted."""
+        df = d.create_df_9()
+
+        for col in ["a"]:
+            df.loc[df[col].isna(), col] = 6
+
+        return df
+
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_2(), expected_df_1()),

@@ -142,6 +142,52 @@ class TestTransform(GenericTransformTests, GenericImputerTransformTests):
     def setup_class(cls):
         cls.transformer_name = "ModeImputer"
 
+    @pytest.mark.parametrize(
+        ("df", "expected"),
+        ta.pandas.row_by_row_params(
+            d.create_df_9(),
+            GenericImputerTransformTests.expected_df_9(),
+        )
+        + ta.pandas.index_preserved_params(
+            d.create_df_9(),
+            GenericImputerTransformTests.expected_df_9(),
+        ),
+    )
+    def test_nulls_imputed_correctly_weighted(self, df, expected):
+        """Test missing values are filled with the correct values - and unrelated columns are not changed
+        (when weight is used).
+        """
+        x = ModeImputer(columns=["a"], weight="c")
+
+        # set the impute values dict directly rather than fitting x on df so test works with helpers
+        x.impute_values_ = {"a": 6}
+
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=expected,
+            actual=df_transformed,
+            msg="Check nulls filled correctly in transform",
+        )
+
+    def test_learnt_values_not_modified_weights(self):
+        """Test that the impute_values_ from fit are not changed in transform - when using weights."""
+        df = d.create_df_9()
+
+        x = ModeImputer(columns=["a", "b"], weight="c")
+
+        x.fit(df)
+
+        x2 = ModeImputer(columns=["a", "b"], weight="c")
+
+        x2.fit_transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=x.impute_values_,
+            actual=x2.impute_values_,
+            msg="Impute values not changed in transform",
+        )
+
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
     """
