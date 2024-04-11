@@ -142,15 +142,24 @@ class TestTransform(GenericTransformTests, GenericImputerTransformTests):
     def setup_class(cls):
         cls.transformer_name = "ModeImputer"
 
+    def expected_df_9():
+        """Expected output for test_nulls_imputed_correctly_weighted."""
+        df = d.create_df_9()
+
+        for col in ["a"]:
+            df.loc[df[col].isna(), col] = 6
+
+        return df
+
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.row_by_row_params(
             d.create_df_9(),
-            GenericImputerTransformTests.expected_df_9(),
+            expected_df_9(),
         )
         + ta.pandas.index_preserved_params(
             d.create_df_9(),
-            GenericImputerTransformTests.expected_df_9(),
+            expected_df_9(),
         ),
     )
     def test_nulls_imputed_correctly_weighted(self, df, expected):
