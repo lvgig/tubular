@@ -139,7 +139,8 @@ class LogTransformer(BaseTransformer):
                 X[new_column_names] = np.log(X[self.columns]) / np.log(self.base)
 
         if self.drop:
-            X = X.drop(self.columns, axis=1)
+            for col in self.columns:
+                del X[col]
 
         return X
 
@@ -291,7 +292,11 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
                 msg = f"{self.classname()}: pd_method_kwargs 'axis' must be 0 or 1"
                 raise ValueError(msg)
 
-        if type(columns) is not list and len(columns) != 2:
+        if type(columns) is not list:
+            msg = f"{self.classname()}: columns must be a list containing two column names but got {columns}"
+            raise TypeError(msg)
+
+        if len(columns) != 2:
             msg = f"{self.classname()}: columns must be a list containing two column names but got {columns}"
             raise ValueError(msg)
 

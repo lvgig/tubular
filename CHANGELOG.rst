@@ -22,6 +22,8 @@ Each individual change should have a link to the pull request after the descript
 Added
 ^^^^^
 - Inheritable tests for generic base behaviours for base transformer in `base_tests.py`, with fixtures to allow for this in `conftest.py`
+- Split existing input check into two better defined checks for TwoColumnOperatorTransformer `#183 <https://github.com/lvgig/tubular/pull/183>`_
+- Created unit tests for checking column type and size `#183 <https://github.com/lvgig/tubular/pull/183>`_
 
 Changed
 ^^^^^^^
@@ -30,13 +32,16 @@ Changed
 - Refactored MappingTransformer by removing redundant init method.
 - Updated tests for 
 - Refactored ArbitraryImputer by removing redundant fillna call in transform method. This should increase tubular's efficiency and maintainability.
+- Refactored ArbitraryImputer and BaseImputer tests in new format.
+- Refactored MedianImputer tests in new format.
+- Replaced occurrences of pd.Dataframe.drop() with del statement to speed up tubular. Note that no additional unit testing has been done for copy=False as this release is scheduled to remove copy. 
 
 Removed
 ^^^^^^^
 - Functionality for BaseTransformer (and thus all transformers) to take `None` as an option for columns. This behaviour was inconsistently implemented across transformers. Rather than extending to all we decided to remove 
 this functionality. This required updating a lot of test files.
 - The `columns_set_or_check()` method from BaseTransformer. With the above change it was no longer necessary. Subsequent updates to nominal transformers and their tests were required.
-
+- Set pd copy_on_write to True (will become default in pandas 3.0) which allowed the functionality of the copy method of the transformers to be dropped `#197 <https://github.com/lvgig/tubular/pull/197>`
 
 1.2.2 (2024-02-20)
 ------------------
