@@ -137,38 +137,8 @@ class TestTransform(GenericImputerTransformTests, GenericTransformTests):
     def setup_class(cls):
         cls.transformer_name = "MedianImputer"
 
-    def expected_df_1():
-        """Expected output for test_nulls_imputed_correctly."""
-        df = pd.DataFrame(
-            {
-                "a": [1, 2, 3, 4, 5, 6, np.nan],
-                "b": [1, 2, 3, np.nan, 7, 8, 9],
-                "c": [np.nan, 1, 2, 3, -4, -5, -6],
-            },
-        )
-
-        for col in ["a", "b", "c"]:
-            df.loc[df[col].isna(), col] = df[col].median()
-
-        return df
-
-    def expected_df_2():
-        """Expected output for test_nulls_imputed_correctly_2."""
-        df = pd.DataFrame(
-            {
-                "a": [1, 2, 3, 4, 5, 6, np.nan],
-                "b": [1, 2, 3, np.nan, 7, 8, 9],
-                "c": [np.nan, 1, 2, 3, -4, -5, -6],
-            },
-        )
-
-        for col in ["a"]:
-            df.loc[df[col].isna(), col] = df[col].median()
-
-        return df
-
-    def expected_df_3():
-        """Expected output for test_nulls_imputed_correctly_3."""
+    def expected_df_weights():
+        """Expected output for test_nulls_imputed_correctly_weights."""
         df = d.create_df_9()
 
         for col in ["a"]:
@@ -178,48 +148,10 @@ class TestTransform(GenericImputerTransformTests, GenericTransformTests):
 
     @pytest.mark.parametrize(
         ("df", "expected"),
-        ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
+        ta.pandas.row_by_row_params(d.create_df_9(), expected_df_weights())
+        + ta.pandas.index_preserved_params(d.create_df_9(), expected_df_weights()),
     )
-    def test_nulls_imputed_correctly(self, df, expected):
-        """Test missing values are filled with the correct values."""
-        x = MedianImputer(columns=["a", "b", "c"])
-
-        # set the impute values dict directly rather than fitting x on df so test works with helpers
-        x.impute_values_ = {"a": 3.5, "b": 5.0, "c": -1.5}
-
-        df_transformed = x.transform(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="Check nulls filled correctly in transform",
-        )
-
-    @pytest.mark.parametrize(
-        ("df", "expected"),
-        ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_2()),
-    )
-    def test_nulls_imputed_correctly_2(self, df, expected):
-        """Test missing values are filled with the correct values - and unrelated columns are not changed."""
-        x = MedianImputer(columns=["a"])
-
-        # set the impute values dict directly rather than fitting x on df so test works with helpers
-        x.impute_values_ = {"a": 3.5}
-
-        df_transformed = x.transform(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="Check nulls filled correctly in transform",
-        )
-
-    @pytest.mark.parametrize(
-        ("df", "expected"),
-        ta.pandas.row_by_row_params(d.create_df_9(), expected_df_3())
-        + ta.pandas.index_preserved_params(d.create_df_9(), expected_df_3()),
-    )
-    def test_nulls_imputed_correctly_3(self, df, expected):
+    def test_nulls_imputed_correctly_weights(self, df, expected):
         """Test missing values are filled with the correct values - and unrelated columns are not changed
         (when weight is used).
         """
