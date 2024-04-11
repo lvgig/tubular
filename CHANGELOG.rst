@@ -33,6 +33,7 @@ Changed
 - Updated tests for 
 - Refactored ArbitraryImputer by removing redundant fillna call in transform method. This should increase tubular's efficiency and maintainability.
 - Refactored ArbitraryImputer and BaseImputer tests in new format.
+- Refactored MedianImputer tests in new format.
 - Replaced occurrences of pd.Dataframe.drop() with del statement to speed up tubular. Note that no additional unit testing has been done for copy=False as this release is scheduled to remove copy. 
 
 Removed
