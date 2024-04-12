@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import sklearn.base as b
+import test_aide as ta
 
 import tests.test_data as d
 
@@ -161,6 +162,24 @@ class GenericFitTests:
         assert (
             x_fitted is x
         ), f"Returned value from {self.transformer_name}.fit not as expected."
+
+    def test_fit_not_changing_data(
+        self,
+        initialized_transformers,
+    ):
+        """Test fit does not change X."""
+
+        df = d.create_df_2()
+
+        x = initialized_transformers[self.transformer_name]
+
+        x.fit(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=d.create_df_2(),
+            actual=df,
+            msg="Check X not changing during fit",
+        )
 
     @pytest.mark.parametrize("non_df", [1, True, "a", [1, 2], {"a": 1}, None])
     def test_X_non_df_error(
