@@ -138,6 +138,8 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
                 )
                 raise TypeError(msg)
 
+            # TODO - are we free of the copy problem now?
+
             if not y.shape[0] > 0:
                 msg = f"{self.classname()}: y is empty; {y.shape}"
                 raise ValueError(msg)
@@ -146,7 +148,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
     def _combine_X_y(self,
                      X: pd.DataFrame | pl.DataFrame | pl.LazyFrame,
-                     y: pd.Series | pl.Series) -> nw.DataFrame | nw.LazyFrame:
+                     y: pd.Series | pl.Series) -> pd.DataFrame | pl.DataFrame | pl.LazyFrame:
         """Combine X and y by adding a new column with the values of y to a copy of X.
 
         The new column response column will be called `_temporary_response`.
@@ -167,7 +169,9 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         if not (isinstance(X, nw.DataFrame) | isinstance(X, nw.LazyFrame)):
             X = nw.from_native(X[:])  # [:] creates a view for pandas frames to prevent updates to original frame
 
-        return X.with_columns(pl.Series(name="_temporary_response", values=y))
+        y_assigned_to_X = X.with_columns(pl.Series(name="_temporary_response", values=y))
+
+        return nw.to_native(y_assigned_to_X)
 
     def transform(self,
                   X: pd.DataFrame | pl.DataFrame | pl.LazyFrame | nw.DataFrame | nw.LazyFrame) ->\
