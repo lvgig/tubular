@@ -149,6 +149,10 @@ def minimal_attribute_dict():
         "MappingTransformer": {
             "mappings": {"a": {1: 2, 3: 4}},
         },
+        "BaseCrossColumnMappingTransformer": {
+            "mappings": {"a": {1: 2, 3: 4}},
+            "adjust_column": "b",
+        },
         "CrossColumnMappingTransformer": {
             "mappings": {"a": {1: 2, 3: 4}},
             "adjust_column": "b",

@@ -1,4 +1,5 @@
 import re
+from collections import OrderedDict
 
 import pytest
 import test_aide as ta
@@ -101,7 +102,11 @@ class BaseMappingTransformerTransformTests(GenericTransformTests):
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
-    def test_mappings_unchanged(self, uninitialized_transformers):
+    def test_mappings_unchanged(
+        self,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
         """Test that mappings is unchanged in transform."""
         df = d.create_df_1()
 
@@ -110,7 +115,13 @@ class BaseMappingTransformerTransformTests(GenericTransformTests):
             "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
         }
 
-        x = uninitialized_transformers[self.transformer_name](mappings=mapping)
+        if self.transformer_name == "CrossColumnMappingTransformer":
+            mapping = OrderedDict(mapping)
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["mappings"] = mapping
+
+        x = uninitialized_transformers[self.transformer_name](**args)
 
         x.transform(df)
 

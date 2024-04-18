@@ -5,29 +5,20 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
-from tests.mapping.test_BaseMappingTransformer import (
-    BaseMappingTransformerInitTests,
-    BaseMappingTransformerTransformTests,
-    GenericFitTests,
-    OtherBaseBehaviourTests,
+from tests.base_tests import OtherBaseBehaviourTests
+from tests.mapping.test_BaseCrossColumnMappingTransformer import (
+    BaseCrossColumnMappingTransformerInitTests,
+    BaseCrossColumnMappingTransformerTransformTests,
 )
 from tubular.mapping import CrossColumnMappingTransformer
 
 
-class TestInit(BaseMappingTransformerInitTests):
+class TestInit(BaseCrossColumnMappingTransformerInitTests):
     """Tests for CrossColumnMappingTransformer.init()."""
 
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "CrossColumnMappingTransformer"
-
-    def test_adjust_columns_non_string_error(self):
-        """Test that an exception is raised if adjust_column is not a string."""
-        with pytest.raises(
-            TypeError,
-            match="CrossColumnMappingTransformer: adjust_column should be a string",
-        ):
-            CrossColumnMappingTransformer(mappings={"a": {"a": 1}}, adjust_column=1)
 
     def test_mappings_not_ordered_dict_error(self):
         """Test that an exception is raised if mappings is not an ordered dict if more than 1 mapping is defined ."""
@@ -41,15 +32,7 @@ class TestInit(BaseMappingTransformerInitTests):
             )
 
 
-class TestFit(GenericFitTests):
-    """Generic tests for CrossColumnMappingTransformer.fit()"""
-
-    @classmethod
-    def setup_class(cls):
-        cls.transformer_name = "CrossColumnMappingTransformer"
-
-
-class TestTransform(BaseMappingTransformerTransformTests):
+class TestTransform(BaseCrossColumnMappingTransformerTransformTests):
     """Tests for the transform method on CrossColumnMappingTransformer."""
 
     @classmethod
@@ -133,22 +116,6 @@ class TestTransform(BaseMappingTransformerTransformTests):
             actual=df_transformed,
             expected=expected,
             msg_tag="expected output from cross column mapping transformer",
-        )
-
-    def test_mappings_unchanged(self):
-        """Test that mappings is unchanged in transform."""
-        df = d.create_df_1()
-
-        mapping = {"a": {1: "aa", 2: "bb", 3: "cc", 4: "dd", 5: "ee", 6: "ff"}}
-
-        x = CrossColumnMappingTransformer(mappings=mapping, adjust_column="b")
-
-        x.transform(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=mapping,
-            actual=x.mappings,
-            msg="CrossColumnMappingTransformer.transform has changed self.mappings unexpectedly",
         )
 
 

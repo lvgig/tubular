@@ -217,7 +217,70 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
         return X
 
 
-class CrossColumnMappingTransformer(BaseMappingTransformer):
+class BaseCrossColumnMappingTransformer(BaseMappingTransformer):
+    """BaseMappingTransformer Extension for cross column mapping transformers.
+
+    Parameters
+    ----------
+    adjust_column : str
+        The column to be adjusted.
+
+    mappings : dict or OrderedDict
+        Dictionary containing adjustments. Exact structure will vary by child class.
+
+    **kwargs
+        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+
+    Attributes
+    ----------
+    adjust_column : str
+        Column containing the values to be adjusted.
+
+    mappings : dict
+        Dictionary of mappings for each column individually to be applied to the adjust_column.
+        The dict passed to mappings in init is set to the mappings attribute.
+
+    """
+
+    def __init__(
+        self,
+        adjust_column: str,
+        mappings: dict[str, dict],
+        **kwargs: dict[str, bool],
+    ) -> None:
+        super().__init__(mappings=mappings, **kwargs)
+
+        if not isinstance(adjust_column, str):
+            msg = f"{self.classname()}: adjust_column should be a string"
+            raise TypeError(msg)
+
+        self.adjust_column = adjust_column
+
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Checks X is valid for transform and calls parent transform
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data to apply adjustments to.
+
+        Returns
+        -------
+        X : pd.DataFrame
+            Transformed data X with adjustments applied to specified columns.
+
+        """
+
+        X = super().transform(X)
+
+        if self.adjust_column not in X.columns.to_numpy():
+            msg = f"{self.classname()}: variable {self.adjust_column} is not in X"
+            raise ValueError(msg)
+
+        return X
+
+
+class CrossColumnMappingTransformer(BaseCrossColumnMappingTransformer):
     """Transformer to adjust values in one column based on the values of another column.
 
     Parameters
@@ -255,17 +318,11 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
         mappings: dict[str, dict],
         **kwargs: dict[str, bool],
     ) -> None:
-        super().__init__(mappings=mappings, **kwargs)
-
-        if not isinstance(adjust_column, str):
-            msg = f"{self.classname()}: adjust_column should be a string"
-            raise TypeError(msg)
+        super().__init__(mappings=mappings, adjust_column=adjust_column, **kwargs)
 
         if len(mappings) > 1 and not isinstance(mappings, OrderedDict):
             msg = f"{self.classname()}: mappings should be an ordered dict for 'replace' mappings using multiple columns"
             raise TypeError(msg)
-
-        self.adjust_column = adjust_column
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transforms values in given column using the values provided in the adjustments dictionary.
@@ -281,13 +338,8 @@ class CrossColumnMappingTransformer(BaseMappingTransformer):
             Transformed data X with adjustments applied to specified columns.
 
         """
-        self.check_is_fitted(["adjust_column"])
 
         X = super().transform(X)
-
-        if self.adjust_column not in X.columns.to_numpy():
-            msg = f"{self.classname()}: variable {self.adjust_column} is not in X"
-            raise ValueError(msg)
 
         for i in self.columns:
             for j in self.mappings[i]:
