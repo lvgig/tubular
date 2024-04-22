@@ -1091,7 +1091,7 @@ class TestTransform:
             x.transform(X=[1, 2, 3, 4, 5, 6])
 
     def test_super_transform_called(self, mocker):
-        """Test that BaseTransformer.transform called."""
+        """Test that BaseNominalTransformer.transform called."""
         df = d.create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(columns="b")
@@ -1104,7 +1104,7 @@ class TestTransform:
 
         with ta.functions.assert_function_call(
             mocker,
-            tubular.base.BaseTransformer,
+            tubular.nominal.BaseNominalTransformer,
             "transform",
             expected_call_args,
             return_value=d.create_MeanResponseTransformer_test_df(),

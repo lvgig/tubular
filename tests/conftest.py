@@ -167,7 +167,7 @@ def minimal_attribute_dict():
             "dtype": str,
         },
         "BaseNominalTransformer": {
-            "columns": ["a"],
+            "columns": ["b"],
         },
         "NominalToIntegerTransformer": {
             "columns": ["b"],
