@@ -1042,7 +1042,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
         return BaseMappingTransformMixin.transform(self, X)
 
 
-class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
+class OneHotEncodingTransformer(BaseTransformer, OneHotEncoder):
     """Transformer to convert cetegorical variables into dummy columns.
 
     Extends the sklearn OneHotEncoder class to provide easy renaming of dummy columns.
@@ -1091,7 +1091,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         dtype: np.int8 = np.int8,
         **kwargs: dict[str, bool],
     ) -> None:
-        BaseNominalTransformer.__init__(
+        BaseTransformer.__init__(
             self,
             columns=columns,
             verbose=verbose,
@@ -1124,7 +1124,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
             Ignored. This parameter exists only for compatibility with sklearn.pipeline.Pipeline.
 
         """
-        BaseNominalTransformer.fit(self, X=X, y=y)
+        BaseTransformer.fit(self, X=X, y=y)
 
         # Check for nulls
         for c in self.columns:
