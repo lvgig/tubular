@@ -15,6 +15,8 @@ from tubular.mapping import BaseMappingTransformMixin
 class BaseNominalTransformer(BaseTransformer):
     """Base Transformer extension for nominal transformers."""
 
+    FITS = False
+
     def check_mappable_rows(self, X: pd.DataFrame) -> None:
         """Method to check that all the rows to apply the transformer to are able to be
         mapped according to the values in the mappings dict.
@@ -26,6 +28,7 @@ class BaseNominalTransformer(BaseTransformer):
             the mapping dict in mappings[c].
 
         """
+        self.columns_check(X)
         self.check_is_fitted(["mappings"])
 
         for c in self.columns:
@@ -34,6 +37,27 @@ class BaseNominalTransformer(BaseTransformer):
             if mappable_rows < X.shape[0]:
                 msg = f"{self.classname()}: nulls would be introduced into column {c} from levels not present in mapping"
                 raise ValueError(msg)
+
+    def transform(self, X: pd.DataFrame) -> None:
+        """Base nominal transformer transform method.  Checks that all the rows are able to be
+        mapped according to the values in the mappings dict and calls the BaseTransformer transform method.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data to apply nominal transformations to.
+
+        Returns
+        -------
+        X : pd.DataFrame
+            Input X.
+
+        """
+
+        self.check_mappable_rows(X)
+
+        # specify which class to prevent additional inheritance calls
+        return BaseTransformer.transform(self, X)
 
 
 class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMixin):
@@ -69,6 +93,8 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         levels.
 
     """
+
+    FITS = True
 
     def __init__(
         self,
@@ -125,13 +151,11 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         Returns
         -------
         X : pd.DataFrame
-            Transformed input X with levels mapped accoriding to mappings dict.
+            Transformed input X with levels mapped according to mappings dict.
 
         """
 
-        super(BaseNominalTransformer, self).columns_check(X)
-
-        self.check_mappable_rows(X)
+        X = super().transform(X)
 
         return BaseMappingTransformMixin.transform(self, X)
 
@@ -149,7 +173,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
             Transformed input X with integers mapped back to categorical levels.
 
         """
-        X = BaseNominalTransformer.transform(self, X)
+        X = BaseTransformer.transform(self, X)
 
         self.check_is_fitted(["mappings"])
 
@@ -174,7 +198,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         return X
 
 
-class GroupRareLevelsTransformer(BaseNominalTransformer):
+class GroupRareLevelsTransformer(BaseTransformer):
     """Transformer to group together rare levels of nominal variables into a new level,
     labelled 'rare' (by default).
 
@@ -247,6 +271,8 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         will only exist in if unseen_levels_to_rare is set to False.
 
     """
+
+    FITS = True
 
     def __init__(
         self,
@@ -400,7 +426,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
             Transformed input X with rare levels grouped for into a new rare level.
 
         """
-        X = BaseNominalTransformer.transform(self, X)
+        X = BaseTransformer.transform(self, X)
 
         self.check_is_fitted(["non_rare_levels"])
 
@@ -542,6 +568,8 @@ class MeanResponseTransformer(BaseNominalTransformer):
         Store the casting method associated to return_type
 
     """
+
+    FITS = True
 
     def __init__(
         self,
@@ -833,7 +861,7 @@ class MeanResponseTransformer(BaseNominalTransformer):
             Transformed input X with levels mapped accoriding to mappings dict.
 
         """
-        X = super().transform(X)
+        X = BaseTransformer.transform(self, X)
 
         if self.level:
             for response_level in self.response_levels:
@@ -853,7 +881,7 @@ class MeanResponseTransformer(BaseNominalTransformer):
             for c in self.columns:
                 X.loc[unseen_indices[c], c] = self.unseen_levels_encoding_dict[c]
         else:
-            self.check_mappable_rows(X)
+            X = super().transform(X)
             X = self.map_imputation_values(X)
 
         if self.level:
@@ -895,6 +923,8 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
         ordinal encoded response values) pairs.
 
     """
+
+    FITS = True
 
     def __init__(
         self,
@@ -1007,9 +1037,7 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
             Transformed data with levels mapped to ordinal encoded values for categorical variables.
 
         """
-        super(BaseNominalTransformer, self).columns_check(X)
-
-        self.check_mappable_rows(X)
+        X = super().transform(X)
 
         return BaseMappingTransformMixin.transform(self, X)
 
@@ -1050,6 +1078,8 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         Should original columns be dropped after creating dummy fields?
 
     """
+
+    FITS = True
 
     def __init__(
         self,
@@ -1173,7 +1203,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         self.check_is_fitted(["separator"])
         self.check_is_fitted(["drop_original"])
 
-        self.columns_check(X)
+        X = BaseTransformer.transform(self, X)
 
         # Check for nulls
         for c in self.columns:
@@ -1182,8 +1212,6 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
                     f"{self.classname()}: column %s has nulls - replace before proceeding"
                     % c,
                 )
-
-        X = BaseNominalTransformer.transform(self, X)
 
         # Apply OHE transform
         X_transformed = OneHotEncoder.transform(self, X[self.columns])
