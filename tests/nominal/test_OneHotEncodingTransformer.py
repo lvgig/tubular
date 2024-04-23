@@ -234,27 +234,6 @@ class TestTransform:
         ):
             x.transform(df)
 
-    def test_check_is_fitted_first_call(self, mocker):
-        """Test the calls to BaseTransformer check_is_fitted."""
-        df = d.create_df_1()
-
-        x = OneHotEncodingTransformer(columns="b")
-
-        x.fit(df)
-
-        expected_call_args = {
-            0: {"args": (["separator"],), "kwargs": {}},
-            1: {"args": (["drop_original"],), "kwargs": {}},
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "check_is_fitted",
-            expected_call_args,
-        ):
-            x.transform(df)
-
     def test_non_numeric_column_error_1(self):
         """Test that transform will raise an error if a column to transform has nulls."""
         df_train = d.create_df_1()

@@ -1200,8 +1200,6 @@ class OneHotEncodingTransformer(BaseTransformer, OneHotEncoder):
             the output X.
 
         """
-        self.check_is_fitted(["separator"])
-        self.check_is_fitted(["drop_original"])
 
         X = BaseTransformer.transform(self, X)
 
