@@ -17,6 +17,8 @@ class BaseImputer(BaseTransformer):
     Other imputers in this module should inherit from this class.
     """
 
+    FITS = False
+
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Impute missing values with median values calculated from fit method.
 
@@ -60,16 +62,14 @@ class ArbitraryImputer(BaseImputer):
         Value to impute nulls with.
     """
 
+    FITS = False
+
     def __init__(
         self,
         impute_value: float | str,
-        columns: str | list[str] | None = None,
+        columns: str | list[str],
         **kwargs: dict[str, bool],
     ) -> None:
-        if columns is None:
-            msg = f"{self.classname()}: columns must be specified in init for ArbitraryImputer"
-            raise ValueError(msg)
-
         super().__init__(columns=columns, **kwargs)
 
         if (
@@ -82,6 +82,9 @@ class ArbitraryImputer(BaseImputer):
 
         self.impute_values_ = {}
         self.impute_value = impute_value
+
+        for c in self.columns:
+            self.impute_values_[c] = self.impute_value
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Impute missing values with the supplied impute_value.
@@ -113,9 +116,6 @@ class ArbitraryImputer(BaseImputer):
                 X[c] = X[c].cat.add_categories(
                     self.impute_value,
                 )  # add new category
-            self.impute_values_[
-                c
-            ] = self.impute_value  # updating impute_values_ attribute
 
         # Calling the BaseImputer's transform method to impute the values
         X_transformed = super().transform(X)
@@ -151,9 +151,11 @@ class MedianImputer(BaseImputer):
 
     """
 
+    FITS = True
+
     def __init__(
         self,
-        columns: str | list[str] | None = None,
+        columns: str | list[str],
         weight: str | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
@@ -360,7 +362,18 @@ class ModeImputer(BaseImputer):
             super().check_weights_column(X, self.weight)
 
             for c in self.columns:
-                self.impute_values_[c] = X.groupby(c)[self.weight].sum().idxmax()
+                grouped = X.groupby(c)[self.weight].sum()
+
+                if grouped.isna().all():
+                    warnings.warn(
+                        f"ModeImputer: The Mode of column {c} is NaN.",
+                        stacklevel=2,
+                    )
+
+                    self.impute_values_[c] = np.nan
+
+                else:
+                    self.impute_values_[c] = grouped.idxmax()
 
         return self
 

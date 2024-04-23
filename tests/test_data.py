@@ -61,6 +61,17 @@ def create_df_2():
     return df
 
 
+def create_df_3():
+    """Create simple DataFrame to use in other tests."""
+    return pd.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5, 6, np.nan],
+            "b": [1, 2, 3, np.nan, 7, 8, 9],
+            "c": [np.nan, 1, 2, 3, -4, -5, -6],
+        },
+    )
+
+
 def create_df_4():
     """Create simple DataFrame to use in other tests."""
     df = pd.DataFrame(
@@ -74,17 +85,6 @@ def create_df_4():
     df["c"] = df["c"].astype("category")
 
     return df
-
-
-def create_df_3():
-    """Create simple DataFrame to use in other tests."""
-    return pd.DataFrame(
-        {
-            "a": [1, 2, 3, 4, 5, 6, np.nan],
-            "b": [1, 2, 3, np.nan, 7, 8, 9],
-            "c": [np.nan, 1, 2, 3, -4, -5, -6],
-        },
-    )
 
 
 def create_df_5():
