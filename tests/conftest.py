@@ -72,6 +72,9 @@ def minimal_attribute_dict():
         "BaseDateTransformer": {
             "columns": ["a"],
         },
+        "BaseCappingTransformer": {
+            "capping_values": {"a": [0.1, 0.2]},
+        },
         "CappingTransformer": {
             "capping_values": {"a": [0.1, 0.2]},
         },
