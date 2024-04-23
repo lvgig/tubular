@@ -191,7 +191,10 @@ class MedianImputer(BaseImputer):
                 filtered = X[X[c].notna()]
 
                 # below algorithm only works for >1 non null values
-                if len(filtered) > 0:
+                if len(filtered) <= 0:
+                    median = np.nan
+
+                else:
                     # first sort df by column to be imputed (order of weight column shouldn't matter for median)
                     filtered = filtered.sort_values(c)
 
@@ -203,9 +206,6 @@ class MedianImputer(BaseImputer):
 
                     # find first value >= this point
                     median = filtered[c][cumsum >= cutoff].iloc[0]
-
-                else:
-                    median = np.nan
 
                 self.impute_values_[c] = median
 
