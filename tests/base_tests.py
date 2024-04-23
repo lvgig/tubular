@@ -478,10 +478,21 @@ class CheckWeightsColumnTests:
             ValueError,
             match=error,
         ):
-            uninitialized_transformers[self.transformer_name].check_weights_column(
-                df,
-                col,
-            )
+            # using check_weights_column method to test correct error is raised for transformers that use weights
+            for transformer_name in [
+                "CappingTransformer",
+                "OutOfRangeNullTransformer",
+                "MedianImputer",
+                "MeanImputer",
+                "ModeImputer",
+                "GroupRareLevelsTransformer",
+                "MeanResponseTransformer",
+                "OrdinalEncoderTransformer",
+            ]:
+                uninitialized_transformers[transformer_name].check_weights_column(
+                    df,
+                    col,
+                )
 
 
 class OtherBaseBehaviourTests(

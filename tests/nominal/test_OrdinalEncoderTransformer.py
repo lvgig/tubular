@@ -134,7 +134,7 @@ class TestFit:
 
         with pytest.raises(
             ValueError,
-            match="OrdinalEncoderTransformer: weights column z not in X",
+            match=r"weight col \(z\) is not present in columns of data",
         ):
             x.fit(df, df["a"])
 

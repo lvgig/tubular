@@ -101,7 +101,7 @@ class TestFit:
 
         with pytest.raises(
             ValueError,
-            match="GroupRareLevelsTransformer: weight aaaa not in X",
+            match=r"weight col \(aaaa\) is not present in columns of data",
         ):
             x.fit(df)
 
@@ -238,7 +238,7 @@ class TestTransform:
         """Expected output for test_expected_output_weight."""
         df = pd.DataFrame(
             {
-                "a": [2, 2, 2, 2, np.nan, 2, 2, 2, 3, 3],
+                "a": [2, 2, 2, 2, 0, 2, 2, 2, 3, 3],
                 "b": ["a", "a", "a", "d", "e", "f", "g", np.nan, np.nan, np.nan],
                 "c": ["a", "b", "c", "d", "f", "f", "f", "g", "g", np.nan],
             },

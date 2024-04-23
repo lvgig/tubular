@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 from tubular.base import BaseTransformer
+from tubular.mixins import WeightColumnMixin
 
 
 class BaseImputer(BaseTransformer):
@@ -128,7 +129,7 @@ class ArbitraryImputer(BaseImputer):
         return X_transformed
 
 
-class MedianImputer(BaseImputer):
+class MedianImputer(BaseImputer, WeightColumnMixin):
     """Transformer to impute missing values with the median of the supplied columns.
 
     Parameters
@@ -184,7 +185,7 @@ class MedianImputer(BaseImputer):
         self.impute_values_ = {}
 
         if self.weight is not None:
-            super().check_weights_column(X, self.weight)
+            WeightColumnMixin.check_weights_column(X, self.weight)
 
             for c in self.columns:
                 # filter out null rows so their weight doesn't influence calc
@@ -211,7 +212,7 @@ class MedianImputer(BaseImputer):
         return self
 
 
-class MeanImputer(BaseImputer):
+class MeanImputer(BaseImputer, WeightColumnMixin):
     """Transformer to impute missing values with the mean of the supplied columns.
 
     Parameters
@@ -265,7 +266,7 @@ class MeanImputer(BaseImputer):
         self.impute_values_ = {}
 
         if self.weight is not None:
-            super().check_weights_column(X, self.weight)
+            WeightColumnMixin.check_weights_column(X, self.weight)
 
             for c in self.columns:
                 # filter out null rows so they don't count towards total weight
@@ -287,7 +288,7 @@ class MeanImputer(BaseImputer):
         return self
 
 
-class ModeImputer(BaseImputer):
+class ModeImputer(BaseImputer, WeightColumnMixin):
     """Transformer to impute missing values with the mode of the supplied columns.
 
     If mode is NaN, a warning will be raised.
@@ -359,7 +360,7 @@ class ModeImputer(BaseImputer):
                     self.impute_values_[c] = mode_value[0]
 
         else:
-            super().check_weights_column(X, self.weight)
+            WeightColumnMixin.check_weights_column(X, self.weight)
 
             for c in self.columns:
                 grouped = X.groupby(c)[self.weight].sum()

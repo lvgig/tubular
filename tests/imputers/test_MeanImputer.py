@@ -5,6 +5,7 @@ import test_aide as ta
 
 import tests.test_data as d
 import tubular
+import tubular.mixins
 from tubular.imputers import MeanImputer
 
 
@@ -55,7 +56,7 @@ class TestFit:
             x.fit(df)
 
     def test_check_weights_column_called(self, mocker):
-        """Test that fit calls BaseTransformer.check_weights_column - when weights are used."""
+        """Test that fit calls WeightColumnMixin.check_weights_column - when weights are used."""
         df = d.create_df_9()
 
         x = MeanImputer(columns=["a", "b"], weight="c")
@@ -64,7 +65,7 @@ class TestFit:
 
         with ta.functions.assert_function_call(
             mocker,
-            tubular.base.BaseTransformer,
+            tubular.mixins.WeightColumnMixin,
             "check_weights_column",
             expected_call_args,
         ):

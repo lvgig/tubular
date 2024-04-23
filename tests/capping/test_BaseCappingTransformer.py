@@ -255,13 +255,18 @@ class GenericCappingFitTests(GenericFitTests):
             transformer.fit(df)
 
     @pytest.mark.parametrize(
-        "bad_weight_value, issue",
-        [(np.nan, "null"), (np.inf, "inf"), (-np.inf, "inf"), (-1, "negative")],
+        "bad_weight_value, expected_message",
+        [
+            (np.nan, "weight column must be non-null"),
+            (np.inf, "weight column must not contain infinite values."),
+            (-np.inf, "weight column must be positive"),
+            (-1, "weight column must be positive"),
+        ],
     )
     def test_bad_values_in_weights_error(
         self,
         bad_weight_value,
-        issue,
+        expected_message,
         minimal_attribute_dict,
         uninitialized_transformers,
     ):
@@ -281,10 +286,7 @@ class GenericCappingFitTests(GenericFitTests):
             },
         )
 
-        with pytest.raises(
-            ValueError,
-            match=f"{self.transformer_name}: sample weights values cannot be {issue}",
-        ):
+        with pytest.raises(ValueError, match=expected_message):
             transformer.fit(df)
 
     def test_zero_total_weight_error(

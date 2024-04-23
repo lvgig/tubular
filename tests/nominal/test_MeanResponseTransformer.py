@@ -770,7 +770,7 @@ class TestFitBinaryResponse:
 
         with pytest.raises(
             ValueError,
-            match="MeanResponseTransformer: weights column z not in X",
+            match=r"weight col \(z\) is not present in columns of data",
         ):
             x._fit_binary_response(df, df["a"], x.columns)
 

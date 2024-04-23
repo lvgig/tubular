@@ -106,7 +106,7 @@ def create_df_6():
     """Nulls in different positions to check summing weights by col with nulls."""
     df = pd.DataFrame(
         {
-            "a": [2, 2, 2, 2, np.nan, 2, 2, 2, 3, 3],
+            "a": [2, 2, 2, 2, 0, 2, 2, 2, 3, 3],
             "b": ["a", "a", "a", "d", "e", "f", "g", np.nan, np.nan, np.nan],
             "c": ["a", "b", "c", "d", "f", "f", "f", "g", "g", np.nan],
         },

@@ -10,6 +10,7 @@ from sklearn.preprocessing import OneHotEncoder
 
 from tubular.base import BaseTransformer
 from tubular.mapping import BaseMappingTransformMixin
+from tubular.mixins import WeightColumnMixin
 
 
 class BaseNominalTransformer(BaseTransformer):
@@ -174,7 +175,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         return X
 
 
-class GroupRareLevelsTransformer(BaseNominalTransformer):
+class GroupRareLevelsTransformer(BaseNominalTransformer, WeightColumnMixin):
     """Transformer to group together rare levels of nominal variables into a new level,
     labelled 'rare' (by default).
 
@@ -310,16 +311,15 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         """
         super().fit(X, y)
 
+        if self.weight is not None:
+            WeightColumnMixin.check_weights_column(X, self.weight)
+
         for c in self.columns:
             if (X[c].dtype.name != "category") and (
                 pd.Series(self.rare_level_name).dtype != X[c].dtypes
             ):
                 msg = f"{self.classname()}: rare_level_name must be of the same type of the columns"
                 raise ValueError(msg)
-
-        if self.weight is not None and self.weight not in X.columns.to_numpy():
-            msg = f"{self.classname()}: weight {self.weight} not in X"
-            raise ValueError(msg)
 
         self.non_rare_levels = {}
 
@@ -450,7 +450,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer):
         return X
 
 
-class MeanResponseTransformer(BaseNominalTransformer):
+class MeanResponseTransformer(BaseNominalTransformer, WeightColumnMixin):
     """Transformer to apply mean response encoding. This converts categorical variables to
     numeric by mapping levels to the mean response for that level.
 
@@ -642,12 +642,8 @@ class MeanResponseTransformer(BaseNominalTransformer):
             {column_in_original_data}_{response_level}, where response_level is the level
             being encoded against in this call of _fit_binary_response.
         """
-        if (
-            self.weights_column is not None
-            and self.weights_column not in X.columns.to_numpy()
-        ):
-            msg = f"{self.classname()}: weights column {self.weights_column} not in X"
-            raise ValueError(msg)
+        if self.weights_column is not None:
+            WeightColumnMixin.check_weights_column(X, self.weights_column)
 
         response_null_count = y.isna().sum()
 
@@ -865,7 +861,11 @@ class MeanResponseTransformer(BaseNominalTransformer):
         return X
 
 
-class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixin):
+class OrdinalEncoderTransformer(
+    BaseNominalTransformer,
+    BaseMappingTransformMixin,
+    WeightColumnMixin,
+):
     """Transformer to encode categorical variables into ascending rank-ordered integer values variables by mapping
     it's levels to the target-mean response for that level.
     Values will be sorted in ascending order only i.e. categorical level with lowest target mean response to
@@ -930,12 +930,8 @@ class OrdinalEncoderTransformer(BaseNominalTransformer, BaseMappingTransformMixi
 
         self.mappings = {}
 
-        if (
-            self.weights_column is not None
-            and self.weights_column not in X.columns.to_numpy()
-        ):
-            msg = f"{self.classname()}: weights column {self.weights_column} not in X"
-            raise ValueError(msg)
+        if self.weights_column is not None:
+            WeightColumnMixin.check_weights_column(X, self.weights_column)
 
         response_null_count = y.isna().sum()
 
