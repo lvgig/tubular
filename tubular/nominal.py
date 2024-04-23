@@ -28,7 +28,6 @@ class BaseNominalTransformer(BaseTransformer):
             the mapping dict in mappings[c].
 
         """
-        self.columns_check(X)
         self.check_is_fitted(["mappings"])
 
         for c in self.columns:
@@ -54,10 +53,12 @@ class BaseNominalTransformer(BaseTransformer):
 
         """
 
+        # specify which class to prevent additional inheritance calls
+        X = BaseTransformer.transform(self, X)
+
         self.check_mappable_rows(X)
 
-        # specify which class to prevent additional inheritance calls
-        return BaseTransformer.transform(self, X)
+        return X
 
 
 class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMixin):
