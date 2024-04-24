@@ -862,7 +862,6 @@ class MeanResponseTransformer(BaseNominalTransformer):
             Transformed input X with levels mapped accoriding to mappings dict.
 
         """
-        X = BaseTransformer.transform(self, X)
 
         if self.level:
             for response_level in self.response_levels:
@@ -878,12 +877,17 @@ class MeanResponseTransformer(BaseNominalTransformer):
             for c in self.columns:
                 # finding rows with values not in the keys of mappings dictionary
                 unseen_indices[c] = X[~X[c].isin(self.mappings[c].keys())].index
-            X = self.map_imputation_values(X)
-            for c in self.columns:
-                X.loc[unseen_indices[c], c] = self.unseen_levels_encoding_dict[c]
+            # BaseTransformer.transform as we do not want to run check_mappable_rows in BaseNominalTransformer
+            X = BaseTransformer.transform(self, X)
         else:
             X = super().transform(X)
-            X = self.map_imputation_values(X)
+
+        # map values
+        X = self.map_imputation_values(X)
+
+        if self.unseen_level_handling:
+            for c in self.columns:
+                X.loc[unseen_indices[c], c] = self.unseen_levels_encoding_dict[c]
 
         if self.level:
             # Setting self.columns back so that the transformer object is unchanged after transform is called
