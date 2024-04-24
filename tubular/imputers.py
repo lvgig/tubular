@@ -190,17 +190,22 @@ class MedianImputer(BaseImputer):
                 # filter out null rows so their weight doesn't influence calc
                 filtered = X[X[c].notna()]
 
-                # first sort df by column to be imputed (order of weight column shouldn't matter for median)
-                filtered = filtered.sort_values(c)
+                # below algorithm only works for >1 non null values
+                if len(filtered) <= 0:
+                    median = np.nan
 
-                # next calculate cumulative weight sums
-                cumsum = filtered[self.weight].cumsum()
+                else:
+                    # first sort df by column to be imputed (order of weight column shouldn't matter for median)
+                    filtered = filtered.sort_values(c)
 
-                # find midpoint
-                cutoff = filtered[self.weight].sum() / 2.0
+                    # next calculate cumulative weight sums
+                    cumsum = filtered[self.weight].cumsum()
 
-                # find first value >= this point
-                median = filtered[c][cumsum >= cutoff].iloc[0]
+                    # find midpoint
+                    cutoff = filtered[self.weight].sum() / 2.0
+
+                    # find first value >= this point
+                    median = filtered[c][cumsum >= cutoff].iloc[0]
 
                 self.impute_values_[c] = median
 
