@@ -118,6 +118,35 @@ class TestTransform(BaseCrossColumnMappingTransformerTransformTests):
             msg_tag="expected output from cross column mapping transformer",
         )
 
+    def test_mappings_unchanged(
+        self,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test that mappings is unchanged in transform - this overwrites a base test as
+        logic specific to this transformer is needed."""
+        df = d.create_df_1()
+
+        mapping = {
+            "a": {1: "a", 2: "b", 3: "c", 4: "d", 5: "e", 6: "f"},
+            "b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6},
+        }
+
+        mapping = OrderedDict(mapping)
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["mappings"] = mapping
+
+        x = uninitialized_transformers[self.transformer_name](**args)
+
+        x.transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=mapping,
+            actual=x.mappings,
+            msg=f"{self.transformer_name}.transform has changed self.mappings unexpectedly",
+        )
+
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
     """
