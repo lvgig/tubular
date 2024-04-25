@@ -114,6 +114,30 @@ class ColumnStrListInitTests(GenericInitTests):
             uninitialized_transformers[self.transformer_name](**args)
 
 
+class WeightColumnInitTests(GenericInitTests):
+    """
+    Tests for BaseTransformer.init() behaviour specific to when a transformer takes accepts a weight column.
+    Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
+    """
+
+    @pytest.mark.parametrize("weight", (0, ["a"], {"a": 10}))
+    def test_weight_arg_errors(
+        self,
+        uninitialized_transformers,
+        minimal_attribute_dict,
+        weight,
+    ):
+        """Test that appropriate errors are throw for bad weight arg."""
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["weight"] = weight
+
+        with pytest.raises(
+            TypeError,
+            match="weight should be str or None",
+        ):
+            uninitialized_transformers[self.transformer_name](**args)
+
+
 class GenericFitTests:
     """
     Generic tests for transformer.fit().

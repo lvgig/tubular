@@ -14,6 +14,46 @@ from tests.base_tests import (
 )
 
 
+class GenericImputerFitTestsWeight:
+    def test_fit_returns_self_weighted(
+        self,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test fit returns self?."""
+        df = d.create_df_9()
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["weight"] = "c"
+
+        transformer = uninitialized_transformers[self.transformer_name](**args)
+
+        x_fitted = transformer.fit(df)
+
+        assert (
+            x_fitted is transformer
+        ), f"Returned value from {self.transformer_name}.fit not as expected."
+
+    def test_fit_not_changing_data_weighted(
+        self,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test fit does not change X - when weights are used."""
+        df = d.create_df_9()
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["weight"] = "c"
+
+        transformer = uninitialized_transformers[self.transformer_name](**args)
+
+        transformer.fit(df)
+        ta.equality.assert_equal_dispatch(
+            expected=d.create_df_9(),
+            actual=df,
+            msg=f"X changed during fit for {self.transformer_name}",
+        )
+
+
 class GenericImputerTransformTests:
     def test_not_fitted_error_raised(self, initialized_transformers):
         if initialized_transformers[self.transformer_name].FITS:
@@ -148,6 +188,74 @@ class GenericImputerTransformTests:
             expected=expected,
             actual=df_transformed,
             msg=f"Error from {self.transformer_name} transform col b, c",
+        )
+
+
+class GenericImputerTransformTestsWeight:
+    def expected_df_weights():
+        """Expected output for test_nulls_imputed_correctly_weights."""
+        df = d.create_df_9()
+
+        for col in ["a"]:
+            df.loc[df[col].isna(), col] = 4
+
+        return df
+
+    @pytest.mark.parametrize(
+        ("df", "expected"),
+        ta.pandas.row_by_row_params(d.create_df_9(), expected_df_weights())
+        + ta.pandas.index_preserved_params(d.create_df_9(), expected_df_weights()),
+    )
+    def test_nulls_imputed_correctly_weights(
+        self,
+        df,
+        expected,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test missing values are filled with the correct values - and unrelated columns are not changed
+        (when weight is used).
+        """
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["weight"] = "c"
+
+        transformer = uninitialized_transformers[self.transformer_name](**args)
+
+        # set the impute values dict directly rather than fitting x on df so test works with helpers
+        transformer.impute_values_ = {"a": 4}
+
+        df_transformed = transformer.transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=expected,
+            actual=df_transformed,
+            msg=f"Check nulls filled correctly in transform for {self.transformer_name}",
+        )
+
+    def test_learnt_values_not_modified_weights(
+        self,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test that the impute_values_ from fit are not changed in transform - when using weights."""
+        df = d.create_df_9()
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["columns"] = ["a", "b"]
+        args["weight"] = "c"
+
+        transformer1 = uninitialized_transformers[self.transformer_name](**args)
+
+        transformer1.fit(df)
+
+        transformer2 = uninitialized_transformers[self.transformer_name](**args)
+
+        transformer2.fit_transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=transformer1.impute_values_,
+            actual=transformer2.impute_values_,
+            msg=f"Impute values changed in transform for {self.transformer_name}",
         )
 
 

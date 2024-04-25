@@ -21,6 +21,23 @@ class GenericCappingInitTests(GenericInitTests):
     def setup_class(cls):
         cls.transformer_name = "BaseCappingTransformer"
 
+    @pytest.mark.parametrize("weights_column", (0, ["a"], {"a": 10}))
+    def test_weight_arg_errors(
+        self,
+        uninitialized_transformers,
+        minimal_attribute_dict,
+        weights_column,
+    ):
+        """Test that appropriate errors are throw for bad weight arg."""
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["weights_column"] = weights_column
+
+        with pytest.raises(
+            TypeError,
+            match="weights_column should be str or None",
+        ):
+            uninitialized_transformers[self.transformer_name](**args)
+
     @pytest.mark.parametrize(
         "non_string, cap_type",
         [(1, "capping_values"), (True, "quantiles")],

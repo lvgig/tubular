@@ -323,8 +323,8 @@ class ModeImputer(BaseImputer, WeightColumnMixin):
         super().__init__(columns=columns, **kwargs)
 
         if weight is not None and not isinstance(weight, str):
-            msg = "ModeImputer: weight should be a string or None"
-            raise ValueError(msg)
+            msg = "weight should be str or None"
+            raise TypeError(msg)
 
         self.weight = weight
 
