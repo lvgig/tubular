@@ -3,73 +3,46 @@ import pandas as pd
 import pytest
 import test_aide as ta
 
-import tests.test_data as d
-import tubular
-from tubular.misc import SetColumnDtype
+from tests.base_tests import (
+    ColumnStrListInitTests,
+    GenericFitTests,
+    GenericTransformTests,
+    OtherBaseBehaviourTests,
+)
+from tubular.misc import ColumnDtypeSetter
 
 
-class TestSetColumnDtypeInit:
-    """Tests for SetColumnDtype custom transformer."""
+class TestInit(ColumnStrListInitTests):
+    """Generic tests for ColumnDtypeSetter.init()."""
 
-    def test_tubular_base_transformer_super_init_called(self, mocker):
-        """Test that init calls tubular BaseTransformer.init."""
-        expected_call_args = {
-            0: {
-                "args": (["a"],),
-                "kwargs": {},
-            },
-        }
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "__init__",
-            expected_call_args,
-        ):
-            SetColumnDtype(columns=["a"], dtype=float)
-
-    def test_dtype_attribute_set(self):
-        """Test that the value passed in the value arg is set as an attribute of the same name."""
-        x = SetColumnDtype(columns=["a"], dtype=str)
-
-        assert x.dtype == str, "unexpected value set to dtype atttribute"
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "ColumnDtypeSetter"
 
     @pytest.mark.parametrize(
         "invalid_dtype",
         ["STRING", "misc_invalid", "np.int", 0],
     )
     def test_invalid_dtype_error(self, invalid_dtype):
-        msg = f"SetColumnDtype: data type '{invalid_dtype}' not understood as a valid dtype"
+        msg = f"ColumnDtypeSetter: data type '{invalid_dtype}' not understood as a valid dtype"
         with pytest.raises(TypeError, match=msg):
-            SetColumnDtype(columns=["a"], dtype=invalid_dtype)
+            ColumnDtypeSetter(columns=["a"], dtype=invalid_dtype)
 
 
-class TestSetColumnDtypeTransform:
-    def test_transform_arguments(self):
-        """Test that transform has expected arguments."""
-        ta.functions.test_function_arguments(
-            func=SetColumnDtype.transform,
-            expected_arguments=[
-                "self",
-                "X",
-            ],
-        )
+class TestFit(GenericFitTests):
+    """Generic tests for ColumnDtypeSetter.fit()"""
 
-    def test_super_transform_called(self, mocker):
-        """Test that BaseTransformer.transform called."""
-        df = d.create_df_3()
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "ColumnDtypeSetter"
 
-        x = SetColumnDtype(columns=["a"], dtype=float)
 
-        expected_call_args = {0: {"args": (d.create_df_3(),), "kwargs": {}}}
+class TestTransform(GenericTransformTests):
+    """Tests for ColumnDtypeSetter.transform."""
 
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-            return_value=d.create_df_3(),
-        ):
-            x.transform(df)
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "ColumnDtypeSetter"
 
     def base_df():
         """Input dataframe from test_expected_output."""
@@ -106,7 +79,7 @@ class TestSetColumnDtypeTransform:
         df["c"] = df["c"].astype(int)
         df["d"] = df["d"].astype(str)
 
-        x = SetColumnDtype(columns=["a", "b", "c", "d"], dtype=dtype)
+        x = ColumnDtypeSetter(columns=["a", "b", "c", "d"], dtype=dtype)
 
         df_transformed = x.transform(df)
 
@@ -115,3 +88,15 @@ class TestSetColumnDtypeTransform:
             actual=df_transformed,
             msg="Check values correctly converted to float",
         )
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for ColumnDtypeSetter behaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "ColumnDtypeSetter"

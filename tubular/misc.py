@@ -55,7 +55,7 @@ class SetValueTransformer(BaseTransformer):
         return X
 
 
-class SetColumnDtype(BaseTransformer):
+class ColumnDtypeSetter(BaseTransformer):
     """Transformer to set transform columns in a dataframe to a dtype.
 
     Parameters
@@ -68,8 +68,13 @@ class SetColumnDtype(BaseTransformer):
         e.g. float or 'float'
     """
 
-    def __init__(self, columns: str | list[str], dtype: type | str) -> None:
-        super().__init__(columns)
+    def __init__(
+        self,
+        columns: str | list[str],
+        dtype: type | str,
+        **kwargs: dict[str, bool],
+    ) -> None:
+        super().__init__(columns, **kwargs)
 
         self.__validate_dtype(dtype)
 
