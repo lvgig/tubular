@@ -30,13 +30,16 @@ Changed
 - Update DataFrameMethodTransformer tests to have inheritable init class that can be used by othe test files.
 - Moved BaseTransformer, DataFrameMethodTransformer, BaseMappingTransformer, BaseMappingTransformerMixin, CrossColumnMappingTransformer and Mapping Transformer over to the new testing framework.
 - Refactored MappingTransformer by removing redundant init method.
-- Updated tests for 
+- Refactored tests for ColumnDtypeSetter, and renamed (from SetColumnDtype)
+- Refactored tests for SetValueTransformer
 - Refactored ArbitraryImputer by removing redundant fillna call in transform method. This should increase tubular's efficiency and maintainability.
+- Fixed bugs in MedianImputer and ModeImputer where they would error for all null columns.
 - Refactored ArbitraryImputer and BaseImputer tests in new format.
 - Refactored MedianImputer tests in new format.
 - Replaced occurrences of pd.Dataframe.drop() with del statement to speed up tubular. Note that no additional unit testing has been done for copy=False as this release is scheduled to remove copy. 
 - Created BaseCrossColumnNumericTransformer class. Refactored CrossColumnAddTransformer and CrossColumnMultiplyTransformer to use this class. 
 Moved tests for these objects to new approach.
+- Refactored BaseNominalTransformer tests in new format & moved its logic to the transform method.
 
 Removed
 ^^^^^^^
