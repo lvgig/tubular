@@ -41,6 +41,8 @@ Changed
 - Refactored ModeImputer tests in new format.
 - Added generic init tests to base tests for transformers that take two columns as an input.
 - Refactored EqualityChecker tests in new format.
+- Bugfix to MeanResponseTransformer to ignore unobserved categorical levels
+
 
 Removed
 ^^^^^^^
