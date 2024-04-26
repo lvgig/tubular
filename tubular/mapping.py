@@ -352,7 +352,70 @@ class CrossColumnMappingTransformer(BaseCrossColumnMappingTransformer):
         return X
 
 
-class CrossColumnMultiplyTransformer(BaseMappingTransformer):
+class BaseCrossColumnNumericTransformer(BaseCrossColumnMappingTransformer):
+    """BaseCrossColumnNumericTransformer Extension for cross column numerical mapping transformers.
+
+    Parameters
+    ----------
+    adjust_column : str
+        The column to be adjusted.
+
+    mappings : dict
+        Dictionary containing adjustments. Exact structure will vary by child class.
+
+    **kwargs
+        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+
+    Attributes
+    ----------
+    adjust_column : str
+        Column containing the values to be adjusted.
+
+    mappings : dict
+        Dictionary of mappings for each column individually to be applied to the adjust_column.
+        The dict passed to mappings in init is set to the mappings attribute.
+
+    """
+
+    def __init__(
+        self,
+        adjust_column: str,
+        mappings: dict[str, dict],
+        **kwargs: dict[str, bool],
+    ) -> None:
+        super().__init__(mappings=mappings, adjust_column=adjust_column, **kwargs)
+
+        for j in mappings.values():
+            for k in j.values():
+                if type(k) not in [int, float]:
+                    msg = f"{self.classname()}: mapping values must be numeric"
+                    raise TypeError(msg)
+
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Checks X is valid for transform and calls parent transform
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data to apply adjustments to.
+
+        Returns
+        -------
+        X : pd.DataFrame
+            Transformed data X with adjustments applied to specified columns.
+
+        """
+
+        X = super().transform(X)
+
+        if not pd.api.types.is_numeric_dtype(X[self.adjust_column]):
+            msg = f"{self.classname()}: variable {self.adjust_column} must have numeric dtype."
+            raise TypeError(msg)
+
+        return X
+
+
+class CrossColumnMultiplyTransformer(BaseCrossColumnNumericTransformer):
     """Transformer to apply a multiplicative adjustment to values in one column based on the values of another column.
 
     Parameters
@@ -390,19 +453,7 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
         mappings: dict[str, dict],
         **kwargs: dict[str, bool],
     ) -> None:
-        super().__init__(mappings=mappings, **kwargs)
-
-        if not isinstance(adjust_column, str):
-            msg = f"{self.classname()}: adjust_column should be a string"
-            raise TypeError(msg)
-
-        for j in mappings.values():
-            for k in j.values():
-                if type(k) not in [int, float]:
-                    msg = f"{self.classname()}: mapping values must be numeric"
-                    raise TypeError(msg)
-
-        self.adjust_column = adjust_column
+        super().__init__(mappings=mappings, adjust_column=adjust_column, **kwargs)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transforms values in given column using the values provided in the adjustments dictionary.
@@ -418,17 +469,8 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
             Transformed data X with adjustments applied to specified columns.
 
         """
-        self.check_is_fitted(["adjust_column"])
 
         X = super().transform(X)
-
-        if self.adjust_column not in X.columns.to_numpy():
-            msg = f"{self.classname()}: variable {self.adjust_column} is not in X"
-            raise ValueError(msg)
-
-        if not pd.api.types.is_numeric_dtype(X[self.adjust_column]):
-            msg = f"{self.classname()}: variable {self.adjust_column} must have numeric dtype."
-            raise TypeError(msg)
 
         for i in self.columns:
             for j in self.mappings[i]:
@@ -441,7 +483,7 @@ class CrossColumnMultiplyTransformer(BaseMappingTransformer):
         return X
 
 
-class CrossColumnAddTransformer(BaseMappingTransformer):
+class CrossColumnAddTransformer(BaseCrossColumnNumericTransformer):
     """Transformer to apply an additive adjustment to values in one column based on the values of another column.
 
     Parameters
@@ -479,19 +521,7 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
         mappings: dict[str, dict],
         **kwargs: dict[str, bool],
     ) -> None:
-        super().__init__(mappings=mappings, **kwargs)
-
-        if not isinstance(adjust_column, str):
-            msg = f"{self.classname()}: adjust_column should be a string"
-            raise TypeError(msg)
-
-        for j in mappings.values():
-            for k in j.values():
-                if type(k) not in [int, float]:
-                    msg = f"{self.classname()}: mapping values must be numeric"
-                    raise TypeError(msg)
-
-        self.adjust_column = adjust_column
+        super().__init__(mappings=mappings, adjust_column=adjust_column, **kwargs)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transforms values in given column using the values provided in the adjustments dictionary.
@@ -507,21 +537,8 @@ class CrossColumnAddTransformer(BaseMappingTransformer):
             Transformed data X with adjustments applied to specified columns.
 
         """
-        self.check_is_fitted(["adjust_column"])
 
         X = super().transform(X)
-
-        if self.adjust_column not in X.columns.to_numpy():
-            raise ValueError(
-                f"{self.classname()}: variable " + self.adjust_column + " is not in X",
-            )
-
-        if not pd.api.types.is_numeric_dtype(X[self.adjust_column]):
-            raise TypeError(
-                f"{self.classname()}: variable "
-                + self.adjust_column
-                + " must have numeric dtype.",
-            )
 
         for i in self.columns:
             for j in self.mappings[i]:
