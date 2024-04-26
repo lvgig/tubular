@@ -35,6 +35,8 @@ Changed
 - Refactored ArbitraryImputer and BaseImputer tests in new format.
 - Refactored MedianImputer tests in new format.
 - Replaced occurrences of pd.Dataframe.drop() with del statement to speed up tubular. Note that no additional unit testing has been done for copy=False as this release is scheduled to remove copy. 
+- Created BaseCrossColumnNumericTransformer class. Refactored CrossColumnAddTransformer and CrossColumnMultiplyTransformer to use this class. 
+Moved tests for these objects to new approach.
 
 Removed
 ^^^^^^^
