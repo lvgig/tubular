@@ -133,7 +133,7 @@ class TwoColumnListInitTests(ColumnStrListInitTests):
         minimal_attribute_dict,
         uninitialized_transformers,
     ):
-        """Test an error is raised if columns is not passed as a list."""
+        """Test an error is raised if columns is not passed as a string not a list."""
 
         args = minimal_attribute_dict[self.transformer_name].copy()
         args["columns"] = non_list
@@ -170,13 +170,13 @@ class TwoColumnListInitTests(ColumnStrListInitTests):
         "new_column_type",
         [1, True, {"a": 1}, [1, 2], None, np.inf, np.nan],
     )
-    def test_new_column_type_error(
+    def test_new_column_name_type_error(
         self,
         new_column_type,
         minimal_attribute_dict,
         uninitialized_transformers,
     ):
-        """Test an error is raised if any type other than str passed to new_column_type"""
+        """Test an error is raised if any type other than str passed to new_column_name"""
 
         args = minimal_attribute_dict[self.transformer_name].copy()
         args["new_col_name"] = new_column_type

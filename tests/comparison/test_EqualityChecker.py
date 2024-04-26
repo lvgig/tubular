@@ -5,7 +5,9 @@ import test_aide as ta
 
 import tests.test_data as d
 from tests.base_tests import (
+    GenericFitTests,
     GenericTransformTests,
+    OtherBaseBehaviourTests,
     TwoColumnListInitTests,
 )
 from tubular.comparison import EqualityChecker
@@ -33,6 +35,14 @@ class TestInit(TwoColumnListInitTests):
                 columns=["b", "c"],
                 drop_original=not_bool,
             )
+
+
+class TestFit(GenericFitTests):
+    """Generic tests for transformer.fit()"""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "EqualityChecker"
 
 
 class TestTransform(GenericTransformTests):
@@ -91,3 +101,15 @@ class TestTransform(GenericTransformTests):
             msg_tag="EqualityChecker transformer does not produce the expected output",
             print_actual_and_expected=True,
         )
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "EqualityChecker"
