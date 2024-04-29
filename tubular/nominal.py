@@ -193,7 +193,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer, WeightColumnMixin):
         Cut off for the percent of rows or percent of weight for a level, levels below
         this value will be grouped.
 
-    weight : None or str, default = None
+    weights_column : None or str, default = None
         Name of weights column that should be used so cut_off_percent applies to sum of weights
         rather than number of rows.
 
@@ -236,7 +236,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer, WeightColumnMixin):
         Only created (in fit) if record_rare_levels is True. This is dict containing a list of
         levels that were grouped into 'rare' for each column the transformer was applied to.
 
-    weight : str
+    weights_column : str
         Name of weights columns to use if cut_off_percent should be in terms of sum of weight
         not number of rows.
 
@@ -253,7 +253,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer, WeightColumnMixin):
         self,
         columns: str | list[str] | None = None,
         cut_off_percent: float = 0.01,
-        weight: str | None = None,
+        weights_column: str | None = None,
         rare_level_name: str | list[str] | None = "rare",
         record_rare_levels: bool = True,
         unseen_levels_to_rare: bool = True,
@@ -271,11 +271,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer, WeightColumnMixin):
 
         self.cut_off_percent = cut_off_percent
 
-        if weight is not None and not isinstance(weight, str):
-            msg = f"{self.classname()}: weight should be a single column (str)"
-            raise ValueError(msg)
-
-        self.weight = weight
+        WeightColumnMixin.check_and_set_weight(self, weights_column)
 
         self.rare_level_name = rare_level_name
 
@@ -311,8 +307,8 @@ class GroupRareLevelsTransformer(BaseNominalTransformer, WeightColumnMixin):
         """
         super().fit(X, y)
 
-        if self.weight is not None:
-            WeightColumnMixin.check_weights_column(X, self.weight)
+        if self.weights_column is not None:
+            WeightColumnMixin.check_weights_column(X, self.weights_column)
 
         for c in self.columns:
             if (X[c].dtype.name != "category") and (
@@ -326,7 +322,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer, WeightColumnMixin):
         if self.record_rare_levels:
             self.rare_levels_record_ = {}
 
-        if self.weight is None:
+        if self.weights_column is None:
             for c in self.columns:
                 col_percents = X[c].value_counts(dropna=False) / X.shape[0]
 
@@ -350,14 +346,17 @@ class GroupRareLevelsTransformer(BaseNominalTransformer, WeightColumnMixin):
 
         else:
             for c in self.columns:
-                cols_w_percents = X.groupby(c)[self.weight].sum()
+                cols_w_percents = X.groupby(c)[self.weights_column].sum()
 
                 # nulls are excluded from pandas groupby; https://github.com/pandas-dev/pandas/issues/3729
                 # so add them back in
-                if cols_w_percents.sum() < X[self.weight].sum():
-                    cols_w_percents[np.nan] = X.loc[X[c].isna(), self.weight].sum()
+                if cols_w_percents.sum() < X[self.weights_column].sum():
+                    cols_w_percents[np.nan] = X.loc[
+                        X[c].isna(),
+                        self.weights_column,
+                    ].sum()
 
-                cols_w_percents = cols_w_percents / X[self.weight].sum()
+                cols_w_percents = cols_w_percents / X[self.weights_column].sum()
 
                 self.non_rare_levels[c] = list(
                     cols_w_percents.loc[
@@ -553,10 +552,6 @@ class MeanResponseTransformer(BaseNominalTransformer, WeightColumnMixin):
         return_type: Literal["float32", "float64"] = "float32",
         **kwargs: dict[str, bool],
     ) -> None:
-        if weights_column is not None and type(weights_column) is not str:
-            msg = f"{self.classname()}: weights_column should be a str"
-            raise TypeError(msg)
-
         if type(prior) is not int:
             msg = f"{self.classname()}: prior should be a int"
             raise TypeError(msg)
@@ -580,7 +575,8 @@ class MeanResponseTransformer(BaseNominalTransformer, WeightColumnMixin):
             msg = f"{self.classname()}: return_type should be one of: 'float64', 'float32'"
             raise ValueError(msg)
 
-        self.weights_column = weights_column
+        WeightColumnMixin.check_and_set_weight(self, weights_column)
+
         self.prior = prior
         self.level = level
         self.unseen_level_handling = unseen_level_handling
@@ -902,11 +898,7 @@ class OrdinalEncoderTransformer(
         weights_column: str | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
-        if weights_column is not None and type(weights_column) is not str:
-            msg = f"{self.classname()}: weights_column should be a str"
-            raise TypeError(msg)
-
-        self.weights_column = weights_column
+        WeightColumnMixin.check_and_set_weight(self, weights_column)
 
         BaseNominalTransformer.__init__(self, columns=columns, **kwargs)
 

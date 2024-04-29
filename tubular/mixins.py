@@ -38,3 +38,9 @@ class WeightColumnMixin:
         if np.isinf(X[weights_column]).any():
             msg = "weight column must not contain infinite values."
             raise ValueError(msg)
+
+    def check_and_set_weight(self, weights_column: str) -> None:
+        if weights_column is not None and not isinstance(weights_column, str):
+            msg = "weights_column should be str or None"
+            raise TypeError(msg)
+        self.weights_column = weights_column

@@ -239,7 +239,7 @@ def create_weighted_imputers_test_df():
             "c": ["a", "a", np.nan, np.nan, np.nan, "f"],
             "d": [1.0, 5.0, 3.0, np.nan, np.nan, 1.0],
             "response": [0, 1, 0, 1, 1, 1],
-            "weight": [0.1, 0.1, 0.8, 0.5, 0.9, 0.8],
+            "weights_column": [0.1, 0.1, 0.8, 0.5, 0.9, 0.8],
         },
     )
 

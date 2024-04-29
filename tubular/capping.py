@@ -98,7 +98,7 @@ class BaseCappingTransformer(BaseTransformer, WeightColumnMixin):
             super().__init__(columns=list(quantiles.keys()), **kwargs)
 
         self.quantiles = quantiles
-        self.weights_column = weights_column
+        WeightColumnMixin.check_and_set_weight(self, weights_column)
 
     def check_capping_values_dict(
         self,
@@ -492,10 +492,6 @@ class CappingTransformer(BaseCappingTransformer):
         if capping_values:
             self._replacement_values = copy.deepcopy(self.capping_values)
 
-        if weights_column is not None and not isinstance(weights_column, str):
-            msg = "weights_column should be str or None"
-            raise TypeError(msg)
-
     def fit(self, X: pd.DataFrame, y: None = None) -> CappingTransformer:
         """Learn capping values from input data X.
 
@@ -592,10 +588,6 @@ class OutOfRangeNullTransformer(BaseCappingTransformer):
             self._replacement_values = OutOfRangeNullTransformer.set_replacement_values(
                 self.capping_values,
             )
-
-        if weights_column is not None and not isinstance(weights_column, str):
-            msg = "weights_column should be str or None"
-            raise TypeError(msg)
 
     @staticmethod
     def set_replacement_values(capping_values: dict[str, list[float]]) -> None:

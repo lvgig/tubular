@@ -138,7 +138,7 @@ class MedianImputer(BaseImputer, WeightColumnMixin):
         Columns to impute, if the default of None is supplied all columns in X are used
         when the transform method is called.
 
-    weight: None or str, default=None
+    weights_column: None or str, default=None
         Column containing weights
 
     **kwargs
@@ -157,16 +157,12 @@ class MedianImputer(BaseImputer, WeightColumnMixin):
     def __init__(
         self,
         columns: str | list[str],
-        weight: str | None = None,
+        weights_column: str | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
-        if not isinstance(weight, str) and weight is not None:
-            msg = "weight should be str or None"
-            raise TypeError(msg)
-
-        self.weight = weight
+        WeightColumnMixin.check_and_set_weight(self, weights_column)
 
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Calculate median values to impute with from X.
@@ -184,8 +180,8 @@ class MedianImputer(BaseImputer, WeightColumnMixin):
 
         self.impute_values_ = {}
 
-        if self.weight is not None:
-            WeightColumnMixin.check_weights_column(X, self.weight)
+        if self.weights_column is not None:
+            WeightColumnMixin.check_weights_column(X, self.weights_column)
 
             for c in self.columns:
                 # filter out null rows so their weight doesn't influence calc
@@ -195,10 +191,10 @@ class MedianImputer(BaseImputer, WeightColumnMixin):
                 filtered = filtered.sort_values(c)
 
                 # next calculate cumulative weight sums
-                cumsum = filtered[self.weight].cumsum()
+                cumsum = filtered[self.weights_column].cumsum()
 
                 # find midpoint
-                cutoff = filtered[self.weight].sum() / 2.0
+                cutoff = filtered[self.weights_column].sum() / 2.0
 
                 # find first value >= this point
                 median = filtered[c][cumsum >= cutoff].iloc[0]
@@ -221,7 +217,7 @@ class MeanImputer(BaseImputer, WeightColumnMixin):
         Columns to impute, if the default of None is supplied all columns in X are used
         when the transform method is called.
 
-    weights : None or str, default = None
+    weights_column : None or str, default = None
         Column containing weights.
 
     **kwargs
@@ -238,16 +234,12 @@ class MeanImputer(BaseImputer, WeightColumnMixin):
     def __init__(
         self,
         columns: str | list[str] | None = None,
-        weight: str | None = None,
+        weights_column: str | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
-        if not isinstance(weight, str) and weight is not None:
-            msg = "weight should be str or None"
-            raise TypeError(msg)
-
-        self.weight = weight
+        WeightColumnMixin.check_and_set_weight(self, weights_column)
 
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Calculate mean values to impute with from X.
@@ -265,16 +257,18 @@ class MeanImputer(BaseImputer, WeightColumnMixin):
 
         self.impute_values_ = {}
 
-        if self.weight is not None:
-            WeightColumnMixin.check_weights_column(X, self.weight)
+        if self.weights_column is not None:
+            WeightColumnMixin.check_weights_column(X, self.weights_column)
 
             for c in self.columns:
                 # filter out null rows so they don't count towards total weight
                 filtered = X[X[c].notna()]
 
                 # calculate total weight and total of weighted col
-                total_weight = filtered[self.weight].sum()
-                total_weighted_col = filtered[c].mul(filtered[self.weight]).sum()
+                total_weight = filtered[self.weights_column].sum()
+                total_weighted_col = (
+                    filtered[c].mul(filtered[self.weights_column]).sum()
+                )
 
                 # find weighted mean and add to dict
                 weighted_mean = total_weighted_col / total_weight
@@ -299,7 +293,7 @@ class ModeImputer(BaseImputer, WeightColumnMixin):
         Columns to impute, if the default of None is supplied all columns in X are used
         when the transform method is called.
 
-    weight : str
+    weights_column : str
         Name of weights columns to use if mode should be in terms of sum of weights
         not count of rows.
 
@@ -317,16 +311,12 @@ class ModeImputer(BaseImputer, WeightColumnMixin):
     def __init__(
         self,
         columns: str | list[str] | None = None,
-        weight: str | None = None,
+        weights_column: str | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
-        if weight is not None and not isinstance(weight, str):
-            msg = "weight should be str or None"
-            raise TypeError(msg)
-
-        self.weight = weight
+        WeightColumnMixin.check_and_set_weight(self, weights_column)
 
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Calculate mode values to impute with from X.
@@ -344,7 +334,7 @@ class ModeImputer(BaseImputer, WeightColumnMixin):
 
         self.impute_values_ = {}
 
-        if self.weight is None:
+        if self.weights_column is None:
             for c in self.columns:
                 mode_value = X[c].mode(dropna=True)
 
@@ -360,10 +350,10 @@ class ModeImputer(BaseImputer, WeightColumnMixin):
                     self.impute_values_[c] = mode_value[0]
 
         else:
-            WeightColumnMixin.check_weights_column(X, self.weight)
+            WeightColumnMixin.check_weights_column(X, self.weights_column)
 
             for c in self.columns:
-                grouped = X.groupby(c)[self.weight].sum()
+                grouped = X.groupby(c)[self.weights_column].sum()
 
                 if grouped.isna().all():
                     warnings.warn(

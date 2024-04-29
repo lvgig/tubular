@@ -23,7 +23,7 @@ class GenericImputerFitTestsWeight:
         """Test fit returns self?."""
         df = d.create_df_9()
         args = minimal_attribute_dict[self.transformer_name].copy()
-        args["weight"] = "c"
+        args["weights_column"] = "c"
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
@@ -42,7 +42,7 @@ class GenericImputerFitTestsWeight:
         df = d.create_df_9()
 
         args = minimal_attribute_dict[self.transformer_name].copy()
-        args["weight"] = "c"
+        args["weights_column"] = "c"
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
@@ -217,7 +217,7 @@ class GenericImputerTransformTestsWeight:
         (when weight is used).
         """
         args = minimal_attribute_dict[self.transformer_name].copy()
-        args["weight"] = "c"
+        args["weights_column"] = "c"
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
@@ -242,7 +242,7 @@ class GenericImputerTransformTestsWeight:
 
         args = minimal_attribute_dict[self.transformer_name].copy()
         args["columns"] = ["a", "b"]
-        args["weight"] = "c"
+        args["weights_column"] = "c"
 
         transformer1 = uninitialized_transformers[self.transformer_name](**args)
 

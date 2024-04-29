@@ -109,7 +109,7 @@ class TestInit:
         """Test that an exception is raised if weights_column is not a str."""
         with pytest.raises(
             TypeError,
-            match="MeanResponseTransformer: weights_column should be a str",
+            match="weights_column should be str or None",
         ):
             MeanResponseTransformer(weights_column=1)
 

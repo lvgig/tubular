@@ -82,7 +82,7 @@ class TestFit(GenericFitTests, GenericImputerFitTestsWeight):
         """Test that the impute values learnt during fit are expected when df is weighted."""
         df = d.create_weighted_imputers_test_df()
 
-        x = ModeImputer(columns=["a", "b", "c", "d"], weight="weight")
+        x = ModeImputer(columns=["a", "b", "c", "d"], weights_column="weights_column")
 
         x.fit(df)
 

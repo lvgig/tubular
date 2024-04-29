@@ -26,14 +26,14 @@ class TestInit:
         ):
             MeanImputer(columns=None, verbose=True)
 
-    @pytest.mark.parametrize("weight", (0, ["a"], {"a": 10}))
-    def test_weight_arg_errors(self, weight):
+    @pytest.mark.parametrize("weights_column", (0, ["a"], {"a": 10}))
+    def test_weight_arg_errors(self, weights_column):
         """Test that appropriate errors are throw for bad weight arg."""
         with pytest.raises(
             TypeError,
-            match="weight should be str or None",
+            match="weights_column should be str or None",
         ):
-            MeanImputer(columns=["s"], weight=weight)
+            MeanImputer(columns=["s"], weights_column=weights_column)
 
 
 class TestFit:
@@ -59,7 +59,7 @@ class TestFit:
         """Test that fit calls WeightColumnMixin.check_weights_column - when weights are used."""
         df = d.create_df_9()
 
-        x = MeanImputer(columns=["a", "b"], weight="c")
+        x = MeanImputer(columns=["a", "b"], weights_column="c")
 
         expected_call_args = {0: {"args": (d.create_df_9(), "c"), "kwargs": {}}}
 
@@ -95,7 +95,7 @@ class TestFit:
         """Test that the impute values learnt during fit are expected - when weights are used."""
         df = d.create_df_9()
 
-        x = MeanImputer(columns=["a", "b"], weight="c")
+        x = MeanImputer(columns=["a", "b"], weights_column="c")
 
         x.fit(df)
 
@@ -124,7 +124,7 @@ class TestFit:
         """Test fit returns self - when weight is used."""
         df = d.create_df_9()
 
-        x = MeanImputer(columns="a", weight="c")
+        x = MeanImputer(columns="a", weights_column="c")
 
         x_fitted = x.fit(df)
 
@@ -148,7 +148,7 @@ class TestFit:
         """Test fit does not change X - when weights are used."""
         df = d.create_df_9()
 
-        x = MeanImputer(columns="a", weight="c")
+        x = MeanImputer(columns="a", weights_column="c")
 
         x.fit(df)
 
@@ -282,7 +282,7 @@ class TestTransform:
     )
     def test_nulls_imputed_correctly_3(self, df, expected):
         """Test missing values are filled with the correct values - and unrelated columns are not changed."""
-        x = MeanImputer(columns=["a", "b"], weight="c")
+        x = MeanImputer(columns=["a", "b"], weights_column="c")
 
         # set the impute values dict directly rather than fitting x on df so test works with decorators
         x.impute_values_ = {"a": 59 / 15, "b": 42 / 18}
@@ -317,11 +317,11 @@ class TestTransform:
         """Test that the impute_values_ from fit are not changed in transform - when using weights."""
         df = d.create_df_9()
 
-        x = MeanImputer(columns=["a", "b"], weight="c")
+        x = MeanImputer(columns=["a", "b"], weights_column="c")
 
         x.fit(df)
 
-        x2 = MeanImputer(columns=["a", "b"], weight="c")
+        x2 = MeanImputer(columns=["a", "b"], weights_column="c")
 
         x2.fit_transform(df)
 

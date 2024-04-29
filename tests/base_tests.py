@@ -120,20 +120,20 @@ class WeightColumnInitTests(GenericInitTests):
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
-    @pytest.mark.parametrize("weight", (0, ["a"], {"a": 10}))
+    @pytest.mark.parametrize("weights_column", (0, ["a"], {"a": 10}))
     def test_weight_arg_errors(
         self,
         uninitialized_transformers,
         minimal_attribute_dict,
-        weight,
+        weights_column,
     ):
         """Test that appropriate errors are throw for bad weight arg."""
         args = minimal_attribute_dict[self.transformer_name].copy()
-        args["weight"] = weight
+        args["weights_column"] = weights_column
 
         with pytest.raises(
             TypeError,
-            match="weight should be str or None",
+            match="weights_column should be str or None",
         ):
             uninitialized_transformers[self.transformer_name](**args)
 
