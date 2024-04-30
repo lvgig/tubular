@@ -14,7 +14,7 @@ class TestInit:
         """Test that an exception is raised if weights_column is not a str."""
         with pytest.raises(
             TypeError,
-            match="weights_column",
+            match="weights_column should be str or None",
         ):
             OrdinalEncoderTransformer(weights_column=1)
 

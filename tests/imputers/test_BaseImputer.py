@@ -14,46 +14,6 @@ from tests.base_tests import (
 )
 
 
-class GenericImputerFitTestsWeight:
-    def test_fit_returns_self_weighted(
-        self,
-        minimal_attribute_dict,
-        uninitialized_transformers,
-    ):
-        """Test fit returns self?."""
-        df = d.create_df_9()
-        args = minimal_attribute_dict[self.transformer_name].copy()
-        args["weights_column"] = "c"
-
-        transformer = uninitialized_transformers[self.transformer_name](**args)
-
-        x_fitted = transformer.fit(df)
-
-        assert (
-            x_fitted is transformer
-        ), f"Returned value from {self.transformer_name}.fit not as expected."
-
-    def test_fit_not_changing_data_weighted(
-        self,
-        minimal_attribute_dict,
-        uninitialized_transformers,
-    ):
-        """Test fit does not change X - when weights are used."""
-        df = d.create_df_9()
-
-        args = minimal_attribute_dict[self.transformer_name].copy()
-        args["weights_column"] = "c"
-
-        transformer = uninitialized_transformers[self.transformer_name](**args)
-
-        transformer.fit(df)
-        ta.equality.assert_equal_dispatch(
-            expected=d.create_df_9(),
-            actual=df,
-            msg=f"X changed during fit for {self.transformer_name}",
-        )
-
-
 class GenericImputerTransformTests:
     def test_not_fitted_error_raised(self, initialized_transformers):
         if initialized_transformers[self.transformer_name].FITS:

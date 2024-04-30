@@ -8,10 +8,10 @@ from tests.base_tests import (
     GenericFitTests,
     GenericTransformTests,
     OtherBaseBehaviourTests,
+    WeightColumnFitTests,
     WeightColumnInitTests,
 )
 from tests.imputers.test_BaseImputer import (
-    GenericImputerFitTestsWeight,
     GenericImputerTransformTests,
     GenericImputerTransformTestsWeight,
 )
@@ -26,7 +26,7 @@ class TestInit(ColumnStrListInitTests, WeightColumnInitTests):
         cls.transformer_name = "MedianImputer"
 
 
-class TestFit(GenericFitTests, GenericImputerFitTestsWeight):
+class TestFit(WeightColumnFitTests, GenericFitTests):
     """Generic tests for transformer.fit()"""
 
     @classmethod

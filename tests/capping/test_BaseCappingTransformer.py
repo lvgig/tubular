@@ -10,6 +10,7 @@ from tests.base_tests import (
     GenericFitTests,
     GenericInitTests,
     GenericTransformTests,
+    WeightColumnFitTests,
     WeightColumnInitTests,
 )
 from tubular.capping import BaseCappingTransformer
@@ -228,7 +229,7 @@ class GenericCappingInitTests(WeightColumnInitTests, GenericInitTests):
             uninitialized_transformers[self.transformer_name](**args)
 
 
-class GenericCappingFitTests(GenericFitTests):
+class GenericCappingFitTests(WeightColumnFitTests, GenericFitTests):
     """Tests for BaseCappingTransformer.fit()."""
 
     @classmethod
@@ -253,41 +254,6 @@ class GenericCappingFitTests(GenericFitTests):
         ):
             df = d.create_df_3()
 
-            transformer.fit(df)
-
-    @pytest.mark.parametrize(
-        "bad_weight_value, expected_message",
-        [
-            (np.nan, "weight column must be non-null"),
-            (np.inf, "weight column must not contain infinite values."),
-            (-np.inf, "weight column must be positive"),
-            (-1, "weight column must be positive"),
-        ],
-    )
-    def test_bad_values_in_weights_error(
-        self,
-        bad_weight_value,
-        expected_message,
-        minimal_attribute_dict,
-        uninitialized_transformers,
-    ):
-        """Test that an exception is raised if there are negative/nan/inf values in sample_weight."""
-
-        args = minimal_attribute_dict[self.transformer_name].copy()
-        args["quantiles"] = {"a": [0.2, 0.9]}
-        args["capping_values"] = None
-        args["weights_column"] = "w"
-
-        transformer = uninitialized_transformers[self.transformer_name](**args)
-
-        df = pd.DataFrame(
-            {
-                "a": [1, 2, 3],
-                "w": [1, 1, bad_weight_value],
-            },
-        )
-
-        with pytest.raises(ValueError, match=expected_message):
             transformer.fit(df)
 
     def test_zero_total_weight_error(
