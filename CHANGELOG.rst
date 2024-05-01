@@ -39,7 +39,12 @@ Changed
 - Replaced occurrences of pd.Dataframe.drop() with del statement to speed up tubular. Note that no additional unit testing has been done for copy=False as this release is scheduled to remove copy.
 - Created BaseCrossColumnMappingTransformer class and integrated into CrossColumnMappingTransformer tests  
 - Refactored BaseNominalTransformer tests in new format & moved its logic to the transform method.
+- Refactored ModeImputer tests in new format.
+- Added generic init tests to base tests for transformers that take two columns as an input.
+- Refactored EqualityChecker tests in new format.
 - Bugfix to MeanResponseTransformer to ignore unobserved categorical levels
+
+
 Removed
 ^^^^^^^
 - Functionality for BaseTransformer (and thus all transformers) to take `None` as an option for columns. This behaviour was inconsistently implemented across transformers. Rather than extending to all we decided to remove 

@@ -1,113 +1,56 @@
+import re
+
 import pytest
 import test_aide as ta
 
 import tests.test_data as d
-import tubular
+from tests.base_tests import (
+    GenericFitTests,
+    GenericTransformTests,
+    OtherBaseBehaviourTests,
+    TwoColumnListInitTests,
+)
 from tubular.comparison import EqualityChecker
 
 
-@pytest.fixture(scope="module", autouse=True)
-def example_transformer():
-    return EqualityChecker(columns=["a", "b"], new_col_name="d")
+class TestInit(TwoColumnListInitTests):
+    """Generic tests for transformer.init()."""
 
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "EqualityChecker"
 
-class TestInit:
-    """Tests for the EqualityChecker.__init__ method."""
+    @pytest.mark.parametrize("not_bool", [{"a": 1}, [1, 2], 1, "True", 1.5])
+    def test_exception_raised_drop_original_not_bool(self, not_bool):
+        """Test an exception is raised if drop_original is not a string"""
 
-    def test_super_init_call(self, mocker):
-        """Test that BaseTransformer.init is called as expected."""
-        expected_call_args = {
-            0: {
-                "args": (),
-                "kwargs": {"columns": ["a", "b"], "verbose": False},
-            },
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "__init__",
-            expected_call_args,
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                "EqualityChecker: drop_original should be bool",
+            ),
         ):
             EqualityChecker(
-                columns=["a", "b"],
-                new_col_name="d",
-                verbose=False,
-            )
-
-    def test_value_new_col_name(self, example_transformer):
-        """Test that the value passed in the new column name arg is correct."""
-        assert (
-            example_transformer.new_col_name == "d"
-        ), "unexpected value set to new_col_name atttribute"
-
-    def test_value_drop_original(self, example_transformer):
-        """Test that the value passed in the drop_original arg is correct."""
-        assert (
-            not example_transformer.drop_original
-        ), "unexpected value set to drop_original atttribute"
-
-    def test_type_error_for_columns(self):
-        """
-        Checks that an error is raised if wrong data type for argument:columns.
-
-        This is distinct from the BaseTransformer columns in put check as equality checker will only work
-        with columns as a list, not a string.
-        """
-        with pytest.raises(
-            TypeError,
-            match="columns should be list",
-        ):
-            EqualityChecker(columns="a", new_col_name="d")
-
-    @pytest.mark.parametrize("test_input_col", [["b", "b", "b"], ["a"]])
-    def test_value_error_for_columns(self, test_input_col):
-        """Checks that a value error is raised where 2 cols are not supplied."""
-        with pytest.raises(
-            ValueError,
-            match="This transformer works with two columns only",
-        ):
-            EqualityChecker(columns=test_input_col, new_col_name="d")
-
-    @pytest.mark.parametrize("test_input_new_col", [123, ["a"], True])
-    def test_type_error_for_new_column_name(self, test_input_new_col):
-        """Checks that an error is raised if wrong data type for argument:new_col_name."""
-        with pytest.raises(
-            TypeError,
-            match="new_col_name should be str",
-        ):
-            EqualityChecker(columns=["a", "b"], new_col_name=test_input_new_col)
-
-    @pytest.mark.parametrize("test_input_drop_col", [123, ["a"], "asd"])
-    def test_type_error_for_drop_column(self, test_input_drop_col):
-        """Checks that an error is raised if wrong data type for argument:drop_original."""
-        with pytest.raises(
-            TypeError,
-            match="drop_original should be bool",
-        ):
-            EqualityChecker(
-                columns=["a", "b"],
-                new_col_name="col_name",
-                drop_original=test_input_drop_col,
+                new_col_name="a",
+                columns=["b", "c"],
+                drop_original=not_bool,
             )
 
 
-class TestTransform:
-    """Tests for the EqualityChecker.transform method."""
+class TestFit(GenericFitTests):
+    """Generic tests for transformer.fit()"""
 
-    def test_super_transform_called(self, mocker, example_transformer):
-        """Test that BaseTransformer.transform called."""
-        df = d.create_df_7()
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "EqualityChecker"
 
-        expected_call_args = {0: {"args": (d.create_df_7(),), "kwargs": {}}}
 
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-        ):
-            example_transformer.transform(df)
+class TestTransform(GenericTransformTests):
+    """Tests for transformer.transform."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "EqualityChecker"
 
     @pytest.mark.parametrize(
         "test_dataframe",
@@ -158,3 +101,15 @@ class TestTransform:
             msg_tag="EqualityChecker transformer does not produce the expected output",
             print_actual_and_expected=True,
         )
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "EqualityChecker"
