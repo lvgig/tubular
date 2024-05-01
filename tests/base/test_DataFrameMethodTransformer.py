@@ -85,7 +85,7 @@ class DataFrameMethodTransformerInitTests(ColumnStrListInitTests):
 
     @pytest.mark.parametrize("not_bool", [{"a": 1}, [1, 2], 1, "True", 1.5])
     def test_exception_raised_drop_original_not_bool(self, not_bool):
-        """Test an exception is raised if pd_method_name is not a string"""
+        """Test an exception is raised if drop_original is not a string"""
 
         with pytest.raises(
             TypeError,

@@ -1,5 +1,4 @@
 import re
-from collections import OrderedDict
 
 import pytest
 import test_aide as ta
@@ -113,9 +112,6 @@ class BaseMappingTransformerTransformTests(GenericTransformTests):
         mapping = {
             "b": {1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7},
         }
-
-        if self.transformer_name == "CrossColumnMappingTransformer":
-            mapping = OrderedDict(mapping)
 
         args = minimal_attribute_dict[self.transformer_name].copy()
         args["mappings"] = mapping

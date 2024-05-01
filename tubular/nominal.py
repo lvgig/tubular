@@ -701,9 +701,9 @@ class MeanResponseTransformer(BaseNominalTransformer):
 
         for c in columns:
             if self.weights_column is None:
-                group_means = X_y.groupby(c)[response_column].mean()
+                group_means = X_y.groupby(c, observed=True)[response_column].mean()
 
-                group_counts = X_y.groupby(c)[response_column].size()
+                group_counts = X_y.groupby(c, observed=True)[response_column].size()
 
                 self.mappings[c] = self._prior_regularisation(
                     group_means,
@@ -711,7 +711,7 @@ class MeanResponseTransformer(BaseNominalTransformer):
                 ).to_dict()
 
             else:
-                groupby_sum = X_y.groupby([c])[
+                groupby_sum = X_y.groupby([c], observed=True)[
                     ["weighted_response", self.weights_column]
                 ].sum()
 
