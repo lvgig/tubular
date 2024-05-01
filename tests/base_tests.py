@@ -360,7 +360,7 @@ class GenericTransformTests:
     def test_original_df_not_updated(self, initialized_transformers):
         """Test that the original dataframe is not transformed when transform method used."""
 
-        df = d.create_df_10()
+        df = d.create_df_3()
 
         x = initialized_transformers[self.transformer_name]
 
@@ -368,7 +368,7 @@ class GenericTransformTests:
 
         _ = x.transform(df)
 
-        pd.testing.assert_frame_equal(df, d.create_df_10())
+        pd.testing.assert_frame_equal(df, d.create_df_3())
 
 
 class ColumnsCheckTests:
