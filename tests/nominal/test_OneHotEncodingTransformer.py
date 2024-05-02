@@ -13,75 +13,75 @@ class TestInit:
     """Tests for OneHotEncodingTransformer.init()."""
 
     def test_super_init_called(self, mocker):
-        """Test that init calls BaseNominalTransformer.init.
+        """Test that init calls BaseTransformer.init.
 
-        Note, not using ta.functions.assert_function_call for this as it does not handle self being passed to BaseNominalTransformer.init.
+        Note, not using ta.functions.assert_function_call for this as it does not handle self being passed to BaseTransformer.init.
         """
         expected_keyword_args = {"columns": None, "verbose": True, "copy": None}
 
-        mocker.patch("tubular.nominal.BaseNominalTransformer.__init__")
+        mocker.patch("tubular.base.BaseTransformer.__init__")
 
         x = OneHotEncodingTransformer(columns=None, verbose=True)
 
         assert (
-            tubular.nominal.BaseNominalTransformer.__init__.call_count == 1
-        ), f"Not enough calls to BaseNominalTransformer.__init__ -\n  Expected: 1\n  Actual: {tubular.nominal.BaseNominalTransformer.__init__.call_count}"
+            tubular.base.BaseTransformer.__init__.call_count == 1
+        ), f"Not enough calls to BaseTransformer.__init__ -\n  Expected: 1\n  Actual: {tubular.base.BaseTransformer.__init__.call_count}"
 
-        call_args = tubular.nominal.BaseNominalTransformer.__init__.call_args_list[0]
+        call_args = tubular.base.BaseTransformer.__init__.call_args_list[0]
         call_pos_args = call_args[0]
         call_kwargs = call_args[1]
 
         ta.equality.assert_equal_dispatch(
             expected=expected_keyword_args,
             actual=call_kwargs,
-            msg="kwargs for BaseNominalTransformer.__init__ in OneHotEncodingTransformer.init",
+            msg="kwargs for BaseTransformer.__init__ in OneHotEncodingTransformer.init",
         )
 
         assert (
             len(call_pos_args) == 1
-        ), f"Unepxected number of positional args in BaseNominalTransformer.__init__ call -\n  Expected: 1\n  Actual: {len(call_pos_args)}"
+        ), f"Unepxected number of positional args in BaseTransformer.__init__ call -\n  Expected: 1\n  Actual: {len(call_pos_args)}"
 
         assert (
             call_pos_args[0] is x
-        ), f"Unexpected positional arg (self) in BaseNominalTransformer.__init__ call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
+        ), f"Unexpected positional arg (self) in BaseTransformer.__init__ call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
 
 
 class TestFit:
     """Tests for OneHotEncodingTransformer.fit()."""
 
-    def test_base_nominal_transformer_fit_called(self, mocker):
-        """Test that fit calls BaseNominalTransformer.fit."""
+    def test_base_transformer_fit_called(self, mocker):
+        """Test that fit calls BaseTransformer.fit."""
         expected_keyword_args = {"X": d.create_df_1(), "y": None}
 
         df = d.create_df_1()
 
         x = OneHotEncodingTransformer(columns="b")
 
-        mocker.patch("tubular.nominal.BaseNominalTransformer.fit")
+        mocker.patch("tubular.base.BaseTransformer.fit")
 
         x.fit(df)
 
         assert (
-            tubular.nominal.BaseNominalTransformer.fit.call_count == 1
-        ), f"Not enough calls to BaseNominalTransformer.fit -\n  Expected: 1\n  Actual: {tubular.nominal.BaseNominalTransformer.fit.call_count}"
+            tubular.base.BaseTransformer.fit.call_count == 1
+        ), f"Not enough calls to BaseTransformer.fit -\n  Expected: 1\n  Actual: {tubular.base.BaseTransformer.fit.call_count}"
 
-        call_args = tubular.nominal.BaseNominalTransformer.fit.call_args_list[0]
+        call_args = tubular.base.BaseTransformer.fit.call_args_list[0]
         call_pos_args = call_args[0]
         call_kwargs = call_args[1]
 
         ta.equality.assert_equal_dispatch(
             expected=expected_keyword_args,
             actual=call_kwargs,
-            msg="kwargs for BaseNominalTransformer.fit in OneHotEncodingTransformer.init",
+            msg="kwargs for BaseTransformer.fit in OneHotEncodingTransformer.init",
         )
 
         assert (
             len(call_pos_args) == 1
-        ), f"Unepxected number of positional args in BaseNominalTransformer.fit call -\n  Expected: 1\n  Actual: {len(call_pos_args)}"
+        ), f"Unepxected number of positional args in BaseTransformer.fit call -\n  Expected: 1\n  Actual: {len(call_pos_args)}"
 
         assert (
             call_pos_args[0] is x
-        ), f"Unexpected positional arg (self) in BaseNominalTransformer.fit call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
+        ), f"Unexpected positional arg (self) in BaseTransformer.fit call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
 
     def test_one_hot_encoder_fit_called(self, mocker):
         """Test that fit calls OneHotEncoder.fit."""
@@ -234,27 +234,6 @@ class TestTransform:
         ):
             x.transform(df)
 
-    def test_check_is_fitted_first_call(self, mocker):
-        """Test the calls to BaseTransformer check_is_fitted."""
-        df = d.create_df_1()
-
-        x = OneHotEncodingTransformer(columns="b")
-
-        x.fit(df)
-
-        expected_call_args = {
-            0: {"args": (["separator"],), "kwargs": {}},
-            1: {"args": (["drop_original"],), "kwargs": {}},
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "check_is_fitted",
-            expected_call_args,
-        ):
-            x.transform(df)
-
     def test_non_numeric_column_error_1(self):
         """Test that transform will raise an error if a column to transform has nulls."""
         df_train = d.create_df_1()
@@ -270,8 +249,8 @@ class TestTransform:
         ):
             x.transform(df_test)
 
-    def test_base_nominal_transformer_transform_called(self, mocker):
-        """Test that BaseNominalTransformer.transform called."""
+    def test_base_transformer_transform_called(self, mocker):
+        """Test that BaseTransformer.transform called."""
         df = d.create_df_1()
 
         x = OneHotEncodingTransformer(columns="b")
@@ -279,41 +258,41 @@ class TestTransform:
         x.fit(df)
 
         mocker.patch(
-            "tubular.nominal.BaseNominalTransformer.transform",
+            "tubular.base.BaseTransformer.transform",
             return_value=d.create_df_1(),
         )
 
         x.transform(df)
 
         assert (
-            tubular.nominal.BaseNominalTransformer.transform.call_count == 1
-        ), f"Not enough calls to BaseNominalTransformer.transform -\n  Expected: 1\n  Actual: {tubular.nominal.BaseNominalTransformer.transform.call_count}"
+            tubular.base.BaseTransformer.transform.call_count == 1
+        ), f"Not enough calls to BaseTransformer.transform -\n  Expected: 1\n  Actual: {tubular.base.BaseTransformer.transform.call_count}"
 
-        call_args = tubular.nominal.BaseNominalTransformer.transform.call_args_list[0]
+        call_args = tubular.base.BaseTransformer.transform.call_args_list[0]
         call_pos_args = call_args[0]
         call_kwargs = call_args[1]
 
         ta.equality.assert_equal_dispatch(
             expected={},
             actual=call_kwargs,
-            msg="kwargs for BaseNominalTransformer.transform in OneHotEncodingTransformer.init",
+            msg="kwargs for BaseTransformer.transform in OneHotEncodingTransformer.init",
         )
 
         expected_pos_args = (x, d.create_df_1())
 
         assert (
             len(call_pos_args) == 2
-        ), f"Unepxected number of positional args in BaseNominalTransformer.transform call -\n  Expected: 2\n  Actual: {len(call_pos_args)}"
+        ), f"Unepxected number of positional args in BaseTransformer.transform call -\n  Expected: 2\n  Actual: {len(call_pos_args)}"
 
         ta.equality.assert_frame_equal_msg(
             expected=expected_pos_args[1],
             actual=call_pos_args[1],
-            msg_tag="X positional arg in BaseNominalTransformer.transform call",
+            msg_tag="X positional arg in BaseTransformer.transform call",
         )
 
         assert (
             expected_pos_args[0] == call_pos_args[0]
-        ), "self positional arg in BaseNominalTransformer.transform call"
+        ), "self positional arg in BaseTransformer.transform call"
 
     def test_one_hot_encoder_transform_called(self, mocker):
         """Test that OneHotEncoder.transform called."""

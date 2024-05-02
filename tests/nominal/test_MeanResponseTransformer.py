@@ -499,6 +499,22 @@ class TestFit:
                     expected = learnt_unseen_levels_encoding_dict_arbitrary[column]
                     assert actual == expected
 
+    def test_missing_categories_ignored(self):
+        "test that where a categorical column has missing levels, these do not make it into the encoding dict"
+
+        df = d.create_MeanResponseTransformer_test_df()
+        unobserved_value = "bla"
+        df["c"] = df["c"].cat.add_categories(unobserved_value)
+        target_column = "e"
+        x = MeanResponseTransformer(
+            columns=["c"],
+        )
+        x.fit(df, df[target_column])
+
+        assert (
+            unobserved_value not in x.mappings
+        ), "MeanResponseTransformer should ignore unobserved levels"
+
 
 class TestFitBinaryResponse:
     """Tests for MeanResponseTransformer.fit()."""
@@ -1091,7 +1107,7 @@ class TestTransform:
             x.transform(X=[1, 2, 3, 4, 5, 6])
 
     def test_super_transform_called(self, mocker):
-        """Test that BaseTransformer.transform called."""
+        """Test that BaseNominalTransformer.transform called."""
         df = d.create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(columns="b")
@@ -1104,7 +1120,7 @@ class TestTransform:
 
         with ta.functions.assert_function_call(
             mocker,
-            tubular.base.BaseTransformer,
+            tubular.nominal.BaseNominalTransformer,
             "transform",
             expected_call_args,
             return_value=d.create_MeanResponseTransformer_test_df(),

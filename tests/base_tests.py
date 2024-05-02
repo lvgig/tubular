@@ -73,7 +73,10 @@ class ColumnStrListInitTests(GenericInitTests):
         with pytest.raises(ValueError):
             uninitialized_transformers[self.transformer_name](**args)
 
-    @pytest.mark.parametrize("non_string", [1, True, {"a": 1}, [1, 2], None])
+    @pytest.mark.parametrize(
+        "non_string",
+        [1, True, {"a": 1}, [1, 2], None, np.inf, np.nan],
+    )
     def test_columns_list_element_error(
         self,
         non_string,
@@ -93,7 +96,10 @@ class ColumnStrListInitTests(GenericInitTests):
         ):
             uninitialized_transformers[self.transformer_name](**args)
 
-    @pytest.mark.parametrize("non_string_or_list", [1, True, {"a": 1}, None])
+    @pytest.mark.parametrize(
+        "non_string_or_list",
+        [1, True, {"a": 1}, None, np.inf, np.nan],
+    )
     def test_columns_non_string_or_list_error(
         self,
         non_string_or_list,
@@ -112,6 +118,7 @@ class ColumnStrListInitTests(GenericInitTests):
             ),
         ):
             uninitialized_transformers[self.transformer_name](**args)
+
 
 
 class WeightColumnInitTests(GenericInitTests):
@@ -134,6 +141,74 @@ class WeightColumnInitTests(GenericInitTests):
         with pytest.raises(
             TypeError,
             match="weights_column should be str or None",
+
+class TwoColumnListInitTests(ColumnStrListInitTests):
+    """
+    Tests for BaseTransformer.init() behaviour specific to when a transformer takes two columns as a list.
+    Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
+    """
+
+    @pytest.mark.parametrize("non_list", ["a", "b", "c"])
+    def test_columns_non_list_error(
+        self,
+        non_list,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test an error is raised if columns is not passed as a string not a list."""
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["columns"] = non_list
+
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                f"{self.transformer_name}: columns should be list",
+            ),
+        ):
+            uninitialized_transformers[self.transformer_name](**args)
+
+    @pytest.mark.parametrize("list_length", [["a", "a", "a"], ["a"]])
+    def test_list_length_error(
+        self,
+        list_length,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test an error is raised if list of any length other than 2 is passed"""
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["columns"] = list_length
+
+        with pytest.raises(
+            ValueError,
+            match=re.escape(
+                f"{self.transformer_name}: This transformer works with two columns only",
+            ),
+        ):
+            uninitialized_transformers[self.transformer_name](**args)
+
+    @pytest.mark.parametrize(
+        "new_column_type",
+        [1, True, {"a": 1}, [1, 2], None, np.inf, np.nan],
+    )
+    def test_new_column_name_type_error(
+        self,
+        new_column_type,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test an error is raised if any type other than str passed to new_column_name"""
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["new_col_name"] = new_column_type
+
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                f"{self.transformer_name}: new_col_name should be str",
+            ),
+
         ):
             uninitialized_transformers[self.transformer_name](**args)
 
@@ -420,7 +495,7 @@ class GenericTransformTests:
     def test_original_df_not_updated(self, initialized_transformers):
         """Test that the original dataframe is not transformed when transform method used."""
 
-        df = d.create_df_10()
+        df = d.create_df_3()
 
         x = initialized_transformers[self.transformer_name]
 
@@ -428,7 +503,7 @@ class GenericTransformTests:
 
         _ = x.transform(df)
 
-        pd.testing.assert_frame_equal(df, d.create_df_10())
+        pd.testing.assert_frame_equal(df, d.create_df_3())
 
 
 class ColumnsCheckTests:

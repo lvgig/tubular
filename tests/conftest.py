@@ -149,6 +149,14 @@ def minimal_attribute_dict():
         "MappingTransformer": {
             "mappings": {"a": {1: 2, 3: 4}},
         },
+        "BaseCrossColumnMappingTransformer": {
+            "mappings": {"a": {1: 2, 3: 4}},
+            "adjust_column": "b",
+        },
+        "BaseCrossColumnNumericTransformer": {
+            "mappings": {"a": {1: 2, 3: 4}},
+            "adjust_column": "b",
+        },
         "CrossColumnMappingTransformer": {
             "mappings": {"a": {1: 2, 3: 4}},
             "adjust_column": "b",
@@ -165,12 +173,12 @@ def minimal_attribute_dict():
             "value": 1,
             "columns": ["a"],
         },
-        "SetColumnDtype": {
+        "ColumnDtypeSetter": {
             "columns": ["a"],
             "dtype": str,
         },
         "BaseNominalTransformer": {
-            "columns": ["a"],
+            "columns": ["b"],
         },
         "NominalToIntegerTransformer": {
             "columns": ["b"],

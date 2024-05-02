@@ -149,14 +149,14 @@ class TestTransform:
             x.transform(X=[1, 2, 3, 4, 5, 6])
 
     def test_super_transform_called(self, mocker):
-        """Test that BaseTransformer.transform called."""
+        """Test that BaseNominalTransformer.transform called."""
         df = d.create_df_1()
 
         x = NominalToIntegerTransformer(columns="a")
 
         x.fit(df)
 
-        expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
+        expected_call_args = {0: {"args": (x, d.create_df_1()), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
             mocker,

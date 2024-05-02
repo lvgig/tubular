@@ -16,6 +16,8 @@ from tubular.mixins import WeightColumnMixin
 class BaseNominalTransformer(BaseTransformer):
     """Base Transformer extension for nominal transformers."""
 
+    FITS = False
+
     def check_mappable_rows(self, X: pd.DataFrame) -> None:
         """Method to check that all the rows to apply the transformer to are able to be
         mapped according to the values in the mappings dict.
@@ -35,6 +37,29 @@ class BaseNominalTransformer(BaseTransformer):
             if mappable_rows < X.shape[0]:
                 msg = f"{self.classname()}: nulls would be introduced into column {c} from levels not present in mapping"
                 raise ValueError(msg)
+
+    def transform(self, X: pd.DataFrame) -> None:
+        """Base nominal transformer transform method.  Checks that all the rows are able to be
+        mapped according to the values in the mappings dict and calls the BaseTransformer transform method.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data to apply nominal transformations to.
+
+        Returns
+        -------
+        X : pd.DataFrame
+            Input X.
+
+        """
+
+        # specify which class to prevent additional inheritance calls
+        X = BaseTransformer.transform(self, X)
+
+        self.check_mappable_rows(X)
+
+        return X
 
 
 class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMixin):
@@ -70,6 +95,8 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         levels.
 
     """
+
+    FITS = True
 
     def __init__(
         self,
@@ -126,13 +153,11 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         Returns
         -------
         X : pd.DataFrame
-            Transformed input X with levels mapped accoriding to mappings dict.
+            Transformed input X with levels mapped according to mappings dict.
 
         """
 
-        super(BaseNominalTransformer, self).columns_check(X)
-
-        self.check_mappable_rows(X)
+        X = super().transform(X)
 
         return BaseMappingTransformMixin.transform(self, X)
 
@@ -150,7 +175,7 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
             Transformed input X with integers mapped back to categorical levels.
 
         """
-        X = BaseNominalTransformer.transform(self, X)
+        X = BaseTransformer.transform(self, X)
 
         self.check_is_fitted(["mappings"])
 
@@ -175,7 +200,9 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         return X
 
 
-class GroupRareLevelsTransformer(BaseNominalTransformer, WeightColumnMixin):
+
+class GroupRareLevelsTransformer(BaseTransformer, WeightColumnMixin):
+  
     """Transformer to group together rare levels of nominal variables into a new level,
     labelled 'rare' (by default).
 
@@ -248,6 +275,8 @@ class GroupRareLevelsTransformer(BaseNominalTransformer, WeightColumnMixin):
         will only exist in if unseen_levels_to_rare is set to False.
 
     """
+
+    FITS = True
 
     def __init__(
         self,
@@ -399,7 +428,7 @@ class GroupRareLevelsTransformer(BaseNominalTransformer, WeightColumnMixin):
             Transformed input X with rare levels grouped for into a new rare level.
 
         """
-        X = BaseNominalTransformer.transform(self, X)
+        X = BaseTransformer.transform(self, X)
 
         self.check_is_fitted(["non_rare_levels"])
 
@@ -542,6 +571,8 @@ class MeanResponseTransformer(BaseNominalTransformer, WeightColumnMixin):
 
     """
 
+    FITS = True
+
     def __init__(
         self,
         columns: str | list[str] | None = None,
@@ -664,9 +695,9 @@ class MeanResponseTransformer(BaseNominalTransformer, WeightColumnMixin):
 
         for c in columns:
             if self.weights_column is None:
-                group_means = X_y.groupby(c)[response_column].mean()
+                group_means = X_y.groupby(c, observed=True)[response_column].mean()
 
-                group_counts = X_y.groupby(c)[response_column].size()
+                group_counts = X_y.groupby(c, observed=True)[response_column].size()
 
                 self.mappings[c] = self._prior_regularisation(
                     group_means,
@@ -674,7 +705,7 @@ class MeanResponseTransformer(BaseNominalTransformer, WeightColumnMixin):
                 ).to_dict()
 
             else:
-                groupby_sum = X_y.groupby([c])[
+                groupby_sum = X_y.groupby([c], observed=True)[
                     ["weighted_response", self.weights_column]
                 ].sum()
 
@@ -825,7 +856,6 @@ class MeanResponseTransformer(BaseNominalTransformer, WeightColumnMixin):
             Transformed input X with levels mapped accoriding to mappings dict.
 
         """
-        X = super().transform(X)
 
         if self.level:
             for response_level in self.response_levels:
@@ -841,12 +871,17 @@ class MeanResponseTransformer(BaseNominalTransformer, WeightColumnMixin):
             for c in self.columns:
                 # finding rows with values not in the keys of mappings dictionary
                 unseen_indices[c] = X[~X[c].isin(self.mappings[c].keys())].index
-            X = self.map_imputation_values(X)
+            # BaseTransformer.transform as we do not want to run check_mappable_rows in BaseNominalTransformer
+            X = BaseTransformer.transform(self, X)
+        else:
+            X = super().transform(X)
+
+        # map values
+        X = self.map_imputation_values(X)
+
+        if self.unseen_level_handling:
             for c in self.columns:
                 X.loc[unseen_indices[c], c] = self.unseen_levels_encoding_dict[c]
-        else:
-            self.check_mappable_rows(X)
-            X = self.map_imputation_values(X)
 
         if self.level:
             # Setting self.columns back so that the transformer object is unchanged after transform is called
@@ -891,6 +926,8 @@ class OrdinalEncoderTransformer(
         ordinal encoded response values) pairs.
 
     """
+
+    FITS = True
 
     def __init__(
         self,
@@ -995,14 +1032,12 @@ class OrdinalEncoderTransformer(
             Transformed data with levels mapped to ordinal encoded values for categorical variables.
 
         """
-        super(BaseNominalTransformer, self).columns_check(X)
-
-        self.check_mappable_rows(X)
+        X = super().transform(X)
 
         return BaseMappingTransformMixin.transform(self, X)
 
 
-class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
+class OneHotEncodingTransformer(BaseTransformer, OneHotEncoder):
     """Transformer to convert cetegorical variables into dummy columns.
 
     Extends the sklearn OneHotEncoder class to provide easy renaming of dummy columns.
@@ -1039,6 +1074,8 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
 
     """
 
+    FITS = True
+
     def __init__(
         self,
         columns: str | list[str] | None = None,
@@ -1049,7 +1086,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
         dtype: np.int8 = np.int8,
         **kwargs: dict[str, bool],
     ) -> None:
-        BaseNominalTransformer.__init__(
+        BaseTransformer.__init__(
             self,
             columns=columns,
             verbose=verbose,
@@ -1082,7 +1119,7 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
             Ignored. This parameter exists only for compatibility with sklearn.pipeline.Pipeline.
 
         """
-        BaseNominalTransformer.fit(self, X=X, y=y)
+        BaseTransformer.fit(self, X=X, y=y)
 
         # Check for nulls
         for c in self.columns:
@@ -1158,10 +1195,8 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
             the output X.
 
         """
-        self.check_is_fitted(["separator"])
-        self.check_is_fitted(["drop_original"])
 
-        self.columns_check(X)
+        X = BaseTransformer.transform(self, X)
 
         # Check for nulls
         for c in self.columns:
@@ -1170,8 +1205,6 @@ class OneHotEncodingTransformer(BaseNominalTransformer, OneHotEncoder):
                     f"{self.classname()}: column %s has nulls - replace before proceeding"
                     % c,
                 )
-
-        X = BaseNominalTransformer.transform(self, X)
 
         # Apply OHE transform
         X_transformed = OneHotEncoder.transform(self, X[self.columns])

@@ -298,7 +298,7 @@ class TestTransform:
 
         with ta.functions.assert_function_call(
             mocker,
-            tubular.nominal.BaseNominalTransformer,
+            tubular.base.BaseTransformer,
             "transform",
             expected_call_args,
             return_value=d.create_df_5(),
