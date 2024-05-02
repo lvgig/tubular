@@ -68,9 +68,7 @@ class TestFit(WeightColumnFitTests, GenericFitTests):
             },
         )
 
-
-        x = MedianImputer(columns=["a"], weights_column="c")
-
+        x = MedianImputer(columns=["a", "d"], weights_column="c")
 
         x.fit(df)
 

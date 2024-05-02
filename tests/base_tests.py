@@ -120,7 +120,6 @@ class ColumnStrListInitTests(GenericInitTests):
             uninitialized_transformers[self.transformer_name](**args)
 
 
-
 class WeightColumnInitTests(GenericInitTests):
     """
     Tests for BaseTransformer.init() behaviour specific to when a transformer takes accepts a weight column.
@@ -141,6 +140,9 @@ class WeightColumnInitTests(GenericInitTests):
         with pytest.raises(
             TypeError,
             match="weights_column should be str or None",
+        ):
+            uninitialized_transformers[self.transformer_name](**args)
+
 
 class TwoColumnListInitTests(ColumnStrListInitTests):
     """
@@ -208,7 +210,6 @@ class TwoColumnListInitTests(ColumnStrListInitTests):
             match=re.escape(
                 f"{self.transformer_name}: new_col_name should be str",
             ),
-
         ):
             uninitialized_transformers[self.transformer_name](**args)
 
