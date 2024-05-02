@@ -200,9 +200,8 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         return X
 
 
-
 class GroupRareLevelsTransformer(BaseTransformer, WeightColumnMixin):
-  
+
     """Transformer to group together rare levels of nominal variables into a new level,
     labelled 'rare' (by default).
 
