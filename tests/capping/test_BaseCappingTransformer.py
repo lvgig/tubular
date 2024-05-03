@@ -256,32 +256,6 @@ class GenericCappingFitTests(WeightColumnFitTests, GenericFitTests):
 
             transformer.fit(df)
 
-    def test_zero_total_weight_error(
-        self,
-        minimal_attribute_dict,
-        uninitialized_transformers,
-    ):
-        """Test that an exception is raised if the total sample weights are 0."""
-
-        args = minimal_attribute_dict[self.transformer_name].copy()
-        args["quantiles"] = {"a": [0.2, 0.9]}
-        args["capping_values"] = None
-        args["weights_column"] = "w"
-
-        df = pd.DataFrame(
-            {
-                "a": [1, 2, 3],
-                "w": [0, 0, 0],
-            },
-        )
-
-        transformer = uninitialized_transformers[self.transformer_name](**args)
-        with pytest.raises(
-            ValueError,
-            match=f"{self.transformer_name}: total sample weights are not greater than 0",
-        ):
-            transformer.fit(df)
-
     @pytest.mark.parametrize(
         ("values", "sample_weight", "quantiles", "expected_quantiles"),
         # quantiles use linear interpolation, which is manually replicated here where needed

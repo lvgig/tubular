@@ -336,7 +336,7 @@ class GroupRareLevelsTransformer(BaseTransformer, WeightColumnMixin):
         super().fit(X, y)
 
         if self.weights_column is not None:
-            WeightColumnMixin.check_weights_column(X, self.weights_column)
+            WeightColumnMixin.check_weights_column(self, X, self.weights_column)
 
         for c in self.columns:
             if (X[c].dtype.name != "category") and (
@@ -669,7 +669,7 @@ class MeanResponseTransformer(BaseNominalTransformer, WeightColumnMixin):
             being encoded against in this call of _fit_binary_response.
         """
         if self.weights_column is not None:
-            WeightColumnMixin.check_weights_column(X, self.weights_column)
+            WeightColumnMixin.check_weights_column(self, X, self.weights_column)
 
         response_null_count = y.isna().sum()
 
@@ -959,7 +959,7 @@ class OrdinalEncoderTransformer(
         self.mappings = {}
 
         if self.weights_column is not None:
-            WeightColumnMixin.check_weights_column(X, self.weights_column)
+            WeightColumnMixin.check_weights_column(self, X, self.weights_column)
 
         response_null_count = y.isna().sum()
 

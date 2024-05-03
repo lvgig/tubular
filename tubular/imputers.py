@@ -181,7 +181,7 @@ class MedianImputer(BaseImputer, WeightColumnMixin):
         self.impute_values_ = {}
 
         if self.weights_column is not None:
-            WeightColumnMixin.check_weights_column(X, self.weights_column)
+            WeightColumnMixin.check_weights_column(self, X, self.weights_column)
 
             for c in self.columns:
                 # filter out null rows so their weight doesn't influence calc
@@ -263,7 +263,7 @@ class MeanImputer(BaseImputer, WeightColumnMixin):
         self.impute_values_ = {}
 
         if self.weights_column is not None:
-            WeightColumnMixin.check_weights_column(X, self.weights_column)
+            WeightColumnMixin.check_weights_column(self, X, self.weights_column)
 
             for c in self.columns:
                 # filter out null rows so they don't count towards total weight
@@ -355,7 +355,7 @@ class ModeImputer(BaseImputer, WeightColumnMixin):
                     self.impute_values_[c] = mode_value[0]
 
         else:
-            WeightColumnMixin.check_weights_column(X, self.weights_column)
+            WeightColumnMixin.check_weights_column(self, X, self.weights_column)
 
             for c in self.columns:
                 grouped = X.groupby(c)[self.weights_column].sum()

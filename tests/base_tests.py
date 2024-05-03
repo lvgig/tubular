@@ -436,7 +436,14 @@ class WeightColumnFitTests(GenericFitTests):
         ]
 
     @pytest.mark.parametrize("df, error, col", get_df_error_combos())
-    def test_weight_not_in_X_error(self, df, error, col, uninitialized_transformers):
+    def test_weight_not_in_X_error(
+        self,
+        df,
+        error,
+        col,
+        uninitialized_transformers,
+        minimal_attribute_dict,
+    ):
         """Test an error is raised if weight is not in X."""
 
         with pytest.raises(
@@ -445,10 +452,35 @@ class WeightColumnFitTests(GenericFitTests):
         ):
             # using check_weights_column method to test correct error is raised for transformers that use weights
 
-            uninitialized_transformers[self.transformer_name].check_weights_column(
-                df,
-                col,
-            )
+            args = minimal_attribute_dict[self.transformer_name].copy()
+            args["weights_column"] = col
+
+            transformer = uninitialized_transformers[self.transformer_name](**args)
+            transformer.fit(df)
+
+    def test_zero_total_weight_error(
+        self,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test that an exception is raised if the total sample weights are 0."""
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["weights_column"] = "w"
+
+        df = pd.DataFrame(
+            {
+                "a": [1, 2, 3],
+                "w": [0, 0, 0],
+            },
+        )
+
+        transformer = uninitialized_transformers[self.transformer_name](**args)
+        with pytest.raises(
+            ValueError,
+            match="total sample weights are not greater than 0",
+        ):
+            transformer.fit(df)
 
 
 class GenericTransformTests:

@@ -61,7 +61,7 @@ class TestFit:
 
         x = MeanImputer(columns=["a", "b"], weights_column="c")
 
-        expected_call_args = {0: {"args": (d.create_df_9(), "c"), "kwargs": {}}}
+        expected_call_args = {0: {"args": (x, d.create_df_9(), "c"), "kwargs": {}}}
 
         with ta.functions.assert_function_call(
             mocker,

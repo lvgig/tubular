@@ -172,7 +172,7 @@ class BaseCappingTransformer(BaseTransformer, WeightColumnMixin):
 
         """
         if self.weights_column:
-            WeightColumnMixin.check_weights_column(X, self.weights_column)
+            WeightColumnMixin.check_weights_column(self, X, self.weights_column)
 
         super().fit(X, y)
 
