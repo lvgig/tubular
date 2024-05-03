@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 
 from tubular.base import BaseTransformer
+from tubular.mixins import WeightColumnMixin
 
 
 class BaseImputer(BaseTransformer):
@@ -128,7 +129,7 @@ class ArbitraryImputer(BaseImputer):
         return X_transformed
 
 
-class MedianImputer(BaseImputer):
+class MedianImputer(BaseImputer, WeightColumnMixin):
     """Transformer to impute missing values with the median of the supplied columns.
 
     Parameters
@@ -137,7 +138,7 @@ class MedianImputer(BaseImputer):
         Columns to impute, if the default of None is supplied all columns in X are used
         when the transform method is called.
 
-    weight: None or str, default=None
+    weights_column: None or str, default=None
         Column containing weights
 
     **kwargs
@@ -156,16 +157,12 @@ class MedianImputer(BaseImputer):
     def __init__(
         self,
         columns: str | list[str],
-        weight: str | None = None,
+        weights_column: str | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
-        if not isinstance(weight, str) and weight is not None:
-            msg = "weight should be str or None"
-            raise TypeError(msg)
-
-        self.weight = weight
+        WeightColumnMixin.check_and_set_weight(self, weights_column)
 
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Calculate median values to impute with from X.
@@ -183,8 +180,8 @@ class MedianImputer(BaseImputer):
 
         self.impute_values_ = {}
 
-        if self.weight is not None:
-            super().check_weights_column(X, self.weight)
+        if self.weights_column is not None:
+            WeightColumnMixin.check_weights_column(self, X, self.weights_column)
 
             for c in self.columns:
                 # filter out null rows so their weight doesn't influence calc
@@ -199,10 +196,10 @@ class MedianImputer(BaseImputer):
                     filtered = filtered.sort_values(c)
 
                     # next calculate cumulative weight sums
-                    cumsum = filtered[self.weight].cumsum()
+                    cumsum = filtered[self.weights_column].cumsum()
 
                     # find midpoint
-                    cutoff = filtered[self.weight].sum() / 2.0
+                    cutoff = filtered[self.weights_column].sum() / 2.0
 
                     # find first value >= this point
                     median = filtered[c][cumsum >= cutoff].iloc[0]
@@ -216,7 +213,7 @@ class MedianImputer(BaseImputer):
         return self
 
 
-class MeanImputer(BaseImputer):
+class MeanImputer(BaseImputer, WeightColumnMixin):
     """Transformer to impute missing values with the mean of the supplied columns.
 
     Parameters
@@ -225,7 +222,7 @@ class MeanImputer(BaseImputer):
         Columns to impute, if the default of None is supplied all columns in X are used
         when the transform method is called.
 
-    weights : None or str, default = None
+    weights_column : None or str, default = None
         Column containing weights.
 
     **kwargs
@@ -242,16 +239,12 @@ class MeanImputer(BaseImputer):
     def __init__(
         self,
         columns: str | list[str] | None = None,
-        weight: str | None = None,
+        weights_column: str | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
-        if not isinstance(weight, str) and weight is not None:
-            msg = "weight should be str or None"
-            raise TypeError(msg)
-
-        self.weight = weight
+        WeightColumnMixin.check_and_set_weight(self, weights_column)
 
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Calculate mean values to impute with from X.
@@ -269,16 +262,18 @@ class MeanImputer(BaseImputer):
 
         self.impute_values_ = {}
 
-        if self.weight is not None:
-            super().check_weights_column(X, self.weight)
+        if self.weights_column is not None:
+            WeightColumnMixin.check_weights_column(self, X, self.weights_column)
 
             for c in self.columns:
                 # filter out null rows so they don't count towards total weight
                 filtered = X[X[c].notna()]
 
                 # calculate total weight and total of weighted col
-                total_weight = filtered[self.weight].sum()
-                total_weighted_col = filtered[c].mul(filtered[self.weight]).sum()
+                total_weight = filtered[self.weights_column].sum()
+                total_weighted_col = (
+                    filtered[c].mul(filtered[self.weights_column]).sum()
+                )
 
                 # find weighted mean and add to dict
                 weighted_mean = total_weighted_col / total_weight
@@ -292,7 +287,7 @@ class MeanImputer(BaseImputer):
         return self
 
 
-class ModeImputer(BaseImputer):
+class ModeImputer(BaseImputer, WeightColumnMixin):
     """Transformer to impute missing values with the mode of the supplied columns.
 
     If mode is NaN, a warning will be raised.
@@ -303,7 +298,7 @@ class ModeImputer(BaseImputer):
         Columns to impute, if the default of None is supplied all columns in X are used
         when the transform method is called.
 
-    weight : str
+    weights_column : str
         Name of weights columns to use if mode should be in terms of sum of weights
         not count of rows.
 
@@ -321,16 +316,12 @@ class ModeImputer(BaseImputer):
     def __init__(
         self,
         columns: str | list[str] | None = None,
-        weight: str | None = None,
+        weights_column: str | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
-        if weight is not None and not isinstance(weight, str):
-            msg = "ModeImputer: weight should be a string or None"
-            raise ValueError(msg)
-
-        self.weight = weight
+        WeightColumnMixin.check_and_set_weight(self, weights_column)
 
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Calculate mode values to impute with from X.
@@ -348,7 +339,7 @@ class ModeImputer(BaseImputer):
 
         self.impute_values_ = {}
 
-        if self.weight is None:
+        if self.weights_column is None:
             for c in self.columns:
                 mode_value = X[c].mode(dropna=True)
 
@@ -364,10 +355,10 @@ class ModeImputer(BaseImputer):
                     self.impute_values_[c] = mode_value[0]
 
         else:
-            super().check_weights_column(X, self.weight)
+            WeightColumnMixin.check_weights_column(self, X, self.weights_column)
 
             for c in self.columns:
-                grouped = X.groupby(c)[self.weight].sum()
+                grouped = X.groupby(c)[self.weights_column].sum()
 
                 if grouped.isna().all():
                     warnings.warn(

@@ -24,9 +24,11 @@ Added
 - Inheritable tests for generic base behaviours for base transformer in `base_tests.py`, with fixtures to allow for this in `conftest.py`
 - Split existing input check into two better defined checks for TwoColumnOperatorTransformer `#183 <https://github.com/lvgig/tubular/pull/183>`_
 - Created unit tests for checking column type and size `#183 <https://github.com/lvgig/tubular/pull/183>`_
+- Automated weights column checks through a mixin class and captured common weight tests in generic test classes for weighted transformers
 
 Changed
 ^^^^^^^
+- Standardised naming of weight arg across transformers 
 - Update DataFrameMethodTransformer tests to have inheritable init class that can be used by othe test files.
 - Moved BaseTransformer, DataFrameMethodTransformer, BaseMappingTransformer, BaseMappingTransformerMixin, CrossColumnMappingTransformer and Mapping Transformer over to the new testing framework.
 - Refactored MappingTransformer by removing redundant init method.

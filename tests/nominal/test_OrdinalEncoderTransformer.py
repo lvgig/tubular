@@ -14,7 +14,7 @@ class TestInit:
         """Test that an exception is raised if weights_column is not a str."""
         with pytest.raises(
             TypeError,
-            match="OrdinalEncoderTransformer: weights_column should be a str",
+            match="weights_column should be str or None",
         ):
             OrdinalEncoderTransformer(weights_column=1)
 
@@ -134,7 +134,7 @@ class TestFit:
 
         with pytest.raises(
             ValueError,
-            match="OrdinalEncoderTransformer: weights column z not in X",
+            match=r"weight col \(z\) is not present in columns of data",
         ):
             x.fit(df, df["a"])
 

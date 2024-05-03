@@ -120,6 +120,30 @@ class ColumnStrListInitTests(GenericInitTests):
             uninitialized_transformers[self.transformer_name](**args)
 
 
+class WeightColumnInitTests(GenericInitTests):
+    """
+    Tests for BaseTransformer.init() behaviour specific to when a transformer takes accepts a weight column.
+    Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
+    """
+
+    @pytest.mark.parametrize("weights_column", (0, ["a"], {"a": 10}))
+    def test_weight_arg_errors(
+        self,
+        uninitialized_transformers,
+        minimal_attribute_dict,
+        weights_column,
+    ):
+        """Test that appropriate errors are throw for bad weight arg."""
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["weights_column"] = weights_column
+
+        with pytest.raises(
+            TypeError,
+            match="weights_column should be str or None",
+        ):
+            uninitialized_transformers[self.transformer_name](**args)
+
+
 class TwoColumnListInitTests(ColumnStrListInitTests):
     """
     Tests for BaseTransformer.init() behaviour specific to when a transformer takes two columns as a list.
@@ -313,6 +337,140 @@ class GenericFitTests:
                 unexpected_kwarg="spanish inquisition",
                 **minimal_attribute_dict[self.transformer_name],
             )
+
+
+class WeightColumnFitTests(GenericFitTests):
+    def test_fit_returns_self_weighted(
+        self,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test fit returns self?."""
+        df = d.create_df_9()
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["weights_column"] = "c"
+
+        transformer = uninitialized_transformers[self.transformer_name](**args)
+
+        x_fitted = transformer.fit(df)
+
+        assert (
+            x_fitted is transformer
+        ), f"Returned value from {self.transformer_name}.fit not as expected."
+
+    def test_fit_not_changing_data_weighted(
+        self,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test fit does not change X - when weights are used."""
+        df = d.create_df_9()
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["weights_column"] = "c"
+
+        transformer = uninitialized_transformers[self.transformer_name](**args)
+
+        transformer.fit(df)
+        ta.equality.assert_equal_dispatch(
+            expected=d.create_df_9(),
+            actual=df,
+            msg=f"X changed during fit for {self.transformer_name}",
+        )
+
+    @pytest.mark.parametrize(
+        "bad_weight_value, expected_message",
+        [
+            (np.nan, "weight column must be non-null"),
+            (np.inf, "weight column must not contain infinite values."),
+            (-np.inf, "weight column must be positive"),
+            (-1, "weight column must be positive"),
+        ],
+    )
+    def test_bad_values_in_weights_error(
+        self,
+        bad_weight_value,
+        expected_message,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test that an exception is raised if there are negative/nan/inf values in sample_weight."""
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["weights_column"] = "w"
+
+        transformer = uninitialized_transformers[self.transformer_name](**args)
+
+        df = pd.DataFrame(
+            {
+                "a": [1, 2, 3],
+                "w": [1, 1, bad_weight_value],
+            },
+        )
+
+        with pytest.raises(ValueError, match=expected_message):
+            transformer.fit(df)
+
+    def get_df_error_combos():
+        return [
+            (
+                pd.DataFrame({"a": [1, 2], "b": [3, 4]}),
+                r"weight col \(c\) is not present in columns of data",
+                "c",
+            ),
+            (
+                pd.DataFrame({"a": [1, 2], "b": ["a", "b"]}),
+                r"weight column must be numeric.",
+                "b",
+            ),
+        ]
+
+    @pytest.mark.parametrize("df, error, col", get_df_error_combos())
+    def test_weight_not_in_X_error(
+        self,
+        df,
+        error,
+        col,
+        uninitialized_transformers,
+        minimal_attribute_dict,
+    ):
+        """Test an error is raised if weight is not in X or weight is not numeric."""
+
+        with pytest.raises(
+            ValueError,
+            match=error,
+        ):
+            # using check_weights_column method to test correct error is raised for transformers that use weights
+
+            args = minimal_attribute_dict[self.transformer_name].copy()
+            args["weights_column"] = col
+
+            transformer = uninitialized_transformers[self.transformer_name](**args)
+            transformer.fit(df)
+
+    def test_zero_total_weight_error(
+        self,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test that an exception is raised if the total sample weights are 0."""
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["weights_column"] = "w"
+
+        df = pd.DataFrame(
+            {
+                "a": [1, 2, 3],
+                "w": [0, 0, 0],
+            },
+        )
+
+        transformer = uninitialized_transformers[self.transformer_name](**args)
+        with pytest.raises(
+            ValueError,
+            match="total sample weights are not greater than 0",
+        ):
+            transformer.fit(df)
 
 
 class GenericTransformTests:
@@ -516,53 +674,8 @@ class CombineXYTests:
         pd.testing.assert_frame_equal(result, expected_output)
 
 
-class CheckWeightsColumnTests:
-    """
-    tests for check_weights_column method.
-    Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
-    """
-
-    def get_df_error_combos():
-        return [
-            (
-                pd.DataFrame({"a": [1, 2], "b": [3, 4]}),
-                r"weight col \(c\) is not present in columns of data",
-                "c",
-            ),
-            (
-                pd.DataFrame({"a": [1, 2], "b": ["a", "b"]}),
-                r"weight column must be numeric.",
-                "b",
-            ),
-            (
-                pd.DataFrame({"a": [1, 2], "b": [-1, 0]}),
-                r"weight column must be positive",
-                "b",
-            ),
-            (
-                pd.DataFrame({"a": [1, 2], "b": [np.nan, 0]}),
-                r"weight column must be non-null",
-                "b",
-            ),
-        ]
-
-    @pytest.mark.parametrize("df, error, col", get_df_error_combos())
-    def test_weight_not_in_X_error(self, df, error, col, uninitialized_transformers):
-        """Test an error is raised if weight is not in X."""
-
-        with pytest.raises(
-            ValueError,
-            match=error,
-        ):
-            uninitialized_transformers[self.transformer_name].check_weights_column(
-                df,
-                col,
-            )
-
-
 class OtherBaseBehaviourTests(
     ColumnsCheckTests,
-    CheckWeightsColumnTests,
     CombineXYTests,
 ):
     """
