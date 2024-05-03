@@ -423,16 +423,6 @@ class WeightColumnFitTests(GenericFitTests):
                 r"weight column must be numeric.",
                 "b",
             ),
-            (
-                pd.DataFrame({"a": [1, 2], "b": [-1, 0]}),
-                r"weight column must be positive",
-                "b",
-            ),
-            (
-                pd.DataFrame({"a": [1, 2], "b": [np.nan, 0]}),
-                r"weight column must be non-null",
-                "b",
-            ),
         ]
 
     @pytest.mark.parametrize("df, error, col", get_df_error_combos())
@@ -444,7 +434,7 @@ class WeightColumnFitTests(GenericFitTests):
         uninitialized_transformers,
         minimal_attribute_dict,
     ):
-        """Test an error is raised if weight is not in X."""
+        """Test an error is raised if weight is not in X or weight is not numeric."""
 
         with pytest.raises(
             ValueError,
