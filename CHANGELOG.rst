@@ -45,6 +45,8 @@ Moved tests for these objects to new approach.
 - Added generic init tests to base tests for transformers that take two columns as an input.
 - Refactored EqualityChecker tests in new format.
 - Bugfix to MeanResponseTransformer to ignore unobserved categorical levels
+- Refactored dates.py to prepare for testing refactor. Edited BaseDateTransformer (and created BaseDateTwoColumnTransformer) to follow standard format, implementing validations at init/fit/transform. 
+To reduce complexity of file, made transformers more opinionated to insist on specific and consistent column dtypes. 
 
 
 Removed

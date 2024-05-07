@@ -71,6 +71,11 @@ def minimal_attribute_dict():
         },
         "BaseDateTransformer": {
             "columns": ["a"],
+            "new_column_name": "bla",
+        },
+        "BaseDateTwoColumnTransformer": {
+            "columns": ["a", "b"],
+            "new_column_name": "bla",
         },
         "BaseCappingTransformer": {
             "capping_values": {"a": [0.1, 0.2]},
@@ -86,14 +91,12 @@ def minimal_attribute_dict():
             "new_col_name": "c",
         },
         "DateDiffLeapYearTransformer": {
-            "column_lower": "a",
-            "column_upper": "b",
+            "columns": ["a", "b"],
             "new_column_name": "c",
-            "drop_cols": False,
         },
         "DateDifferenceTransformer": {
-            "column_lower": "a",
-            "column_upper": "b",
+            "columns": ["a", "b"],
+            "new_column_name": "c",
         },
         "ToDatetimeTransformer": {
             "new_column_name": "b",
@@ -109,9 +112,7 @@ def minimal_attribute_dict():
         },
         "BetweenDatesTransformer": {
             "new_column_name": "c",
-            "column_lower": "a",
-            "column_upper": "b",
-            "column_between": "c",
+            "columns": ["a", "c", "b"],
         },
         "DatetimeSinusoidCalculator": {
             "columns": ["a"],

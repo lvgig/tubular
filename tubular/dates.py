@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import datetime
-import itertools
 import warnings
 
 import numpy as np
@@ -14,132 +13,196 @@ from tubular.base import BaseTransformer
 
 class BaseDateTransformer(BaseTransformer):
     """
-    Transformer with date data checks needed by all transformers taking dates as input data.
-    """
-
-    def _generate_is_datetime64_dict(self, X: pd.DataFrame) -> None:
-        """
-        Function to generate a dictionary attribute storing the result of pd.api.types.is_datetime64_any_dtype()
-        for each column in self.columns to avoid repeated calls to this function.
-        """
-
-        self._is_datetime64_dict = {}
-
-        for col in self.columns:
-            self._is_datetime64_dict[col] = pd.api.types.is_datetime64_any_dtype(X[col])
-
-    def check_columns_are_date_or_datetime(self, X: pd.DataFrame) -> None:
-        "Raise a type error if a column to be operated on is not a datetime.datetime or datetime.date object"
-
-        self._generate_is_datetime64_dict(X)
-
-        for col in self.columns:
-            if (
-                not self._is_datetime64_dict[col]
-                and pd.api.types.infer_dtype(X[col]) != "date"
-            ):
-                msg = f"{self.classname()}: {col} should be datetime64 or date type but got {X[col].dtype}"
-                raise TypeError(msg)
-
-    def cast_columns_to_datetime(self, X: pd.DataFrame) -> pd.DataFrame:
-        """
-        Check whether columns are datetime64 or date type. If not, an error will be raised. If one is datetime.date
-        it will be cast to datetime64.
-        """
-
-        self.check_columns_are_date_or_datetime(X)
-
-        temp = X[self.columns]
-
-        for column in self.columns:
-            if not self._is_datetime64_dict[column]:
-                temp[column] = pd.to_datetime(X[column])
-
-                warnings.warn(
-                    f"""
-                    {self.classname()}: temporarily cast {column} from datetime64 to date before transforming in order to apply the datetime method.
-
-                    This will artificially increase the precision of each data point in the column. Original column not changed.
-                    """,
-                    stacklevel=2,
-                )
-
-        return temp
-
-    def _cast_non_matching_columns(
-        self,
-        temp: pd.DataFrame,
-        column_A_name: str,
-        column_B_name: str,
-    ) -> pd.DataFrame:
-        """
-        Helper function that asymetrically compares column A to column B and casts column B to match column A. This will need calling twice.
-
-        If any casting is done a user warning is raised.
-
-        Operation is:
-        - check column A is not datetime 64 (assumed that only other option is 'date' type based on prior checks)
-        - check column B is datetime 64
-        - if both of the above are true, cast column B to 'date'
-        """
-
-        if (
-            not self._is_datetime64_dict[column_A_name]
-            and self._is_datetime64_dict[column_B_name]
-        ):
-            temp[column_B_name] = temp[column_B_name].apply(lambda x: x.date())
-
-            warnings.warn(
-                f"""
-                {self.classname()}: temporarily cast {column_B_name} from datetime64 to date before transforming in order to match {column_A_name}.
-
-                Some precision may be lost from {column_B_name}. Original column not changed.
-                """,
-                stacklevel=2,
-            )
-
-        return temp
-
-    def match_column_dtypes(self, X: pd.DataFrame) -> pd.DataFrame:
-        """
-        Check the dtype of the two columns to be compared by the transformer. If one is datetime.date and one is
-        datetime.datetime, the datetime.datetime column will be cast to datetime.date.
-
-        The casting is done this way to avoid artificially creating precision we don't have by going from a date to a datetime object
-        """
-        if len(self.columns) != 2:
-            msg = f"{self.classname}: match_column_dtypes() called expecting 2 columns but got {len(self.columns)}"
-            raise ValueError(msg)
-
-        self.check_columns_are_date_or_datetime(X)
-
-        temp = X[self.columns]
-
-        for column_one_name, column_two_name in itertools.permutations(self.columns):
-            temp = self._cast_non_matching_columns(
-                temp,
-                column_one_name,
-                column_two_name,
-            )
-
-        return temp
-
-
-class DateDiffLeapYearTransformer(BaseDateTransformer):
-    """Transformer to calculate the number of years between two dates.
+    Extends BaseTransformer for datetime scenarios.
 
     Parameters
     ----------
-    column_lower : str
-        Name of date column to subtract.
-
-    column_upper : str
-        Name of date column to subtract from.
+    columns : List[str]
+        List of 2 columns. First column will be subtracted from second.
 
     new_column_name : str
         Name for the new year column.
 
-    drop_cols : bool
+    drop_original : bool
+        Flag for whether to drop the original columns.
+
+    **kwargs
+        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+
+    Attributes
+    ----------
+    columns : List[str]
+        List of 2 columns. First column will be subtracted from second.
+
+    new_column_name : str
+        Name for the new year column.
+
+    drop_original : bool
+        Flag for whether to drop the original columns.
+
+    """
+
+    def __init__(
+        self,
+        columns: list,
+        new_column_name: str,
+        drop_original: bool = False,
+        **kwargs: dict[str, bool],
+    ) -> None:
+        super().__init__(columns=columns, **kwargs)
+
+        if not (isinstance(new_column_name, str)):
+            msg = f"{self.classname()}: new_column_name should be str"
+            raise TypeError(msg)
+
+        if not (isinstance(drop_original, bool)):
+            msg = f"{self.classname()}: drop_original should be bool"
+            raise TypeError(msg)
+
+        self.new_column_name = new_column_name
+        self.drop_original = drop_original
+
+    def check_columns_are_date_or_datetime(
+        self,
+        X: pd.DataFrame,
+        datetime_only: bool,
+    ) -> None:
+        """Raise a type error if a column to be operated on is not a datetime.datetime or datetime.date object
+
+        Parameters
+        ----------
+
+        X: pd.DataFrame
+            Data to validate
+
+        datetime_only: bool
+            Indicates whether ONLY datetime types are accepted
+
+        """
+
+        type_dict = {}
+        datetime_type = "datetime64"
+        date_type = "date"
+        allowed_types = [datetime_type]
+        if not datetime_only:
+            allowed_types = [*allowed_types, date_type]
+
+        for col in self.columns:
+            if pd.api.types.is_datetime64_any_dtype(X[col]):
+                type_dict[col] = datetime_type
+
+            elif (not datetime_only) and (
+                pd.api.types.infer_dtype(X[col]) == date_type
+            ):
+                type_dict[col] = date_type
+
+            else:
+                msg = f"{self.classname()}: {col} type should be in {allowed_types} but got {X[col].dtype}"
+                raise TypeError(msg)
+
+        present_types = set(type_dict.values())
+
+        only_datetime_present = present_types == {datetime_type}
+        only_date_present = present_types == {date_type}
+        date_allowed = ~datetime_only
+
+        if not only_datetime_present and not (date_allowed and only_date_present):
+            msg = f"{self.classname()}: Columns fed to datetime transformers should be {allowed_types} and have consistent types, but found {present_types}. Please use ToDatetimeTransformer to standardise."
+            raise TypeError(
+                msg,
+            )
+
+    def transform(
+        self,
+        X: pd.DataFrame,
+        datetime_only: bool = False,
+    ) -> pd.DataFrame:
+        """Base transform method, calls parent transform and validates data.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data containing self.columns
+
+        datetime_only: bool
+            Indicates whether ONLY datetime types are accepted
+
+        Returns
+        -------
+        X : pd.DataFrame
+            Validated data
+
+        """
+
+        X = super().transform(X)
+
+        self.check_columns_are_date_or_datetime(X, datetime_only=datetime_only)
+
+        return X
+
+
+class BaseDateTwoColumnTransformer(BaseDateTransformer):
+    """
+    Extends BaseDateTransformer for 2 column scenarios
+
+    Parameters
+    ----------
+    columns : List[str]
+        List of 2 columns. First column will be subtracted from second.
+
+    new_column_name : str
+        Name for the new year column.
+
+    drop_original : bool
+        Flag for whether to drop the original columns.
+
+    **kwargs
+        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+
+    Attributes
+    ----------
+    columns : List[str]
+        List of 2 columns. First column will be subtracted from second.
+
+    new_column_name : str
+        Name for the new year column.
+
+    drop_original : bool
+        Flag for whether to drop the original columns.
+
+    """
+
+    def __init__(
+        self,
+        columns: list,
+        new_column_name: str,
+        drop_original: bool = False,
+        **kwargs: dict[str, bool],
+    ) -> None:
+        super().__init__(
+            columns=columns,
+            new_column_name=new_column_name,
+            drop_original=drop_original,
+            **kwargs,
+        )
+
+        if len(columns) != 2:
+            msg = f"{self.classname()}: This transformer works with two columns only"
+            raise ValueError(msg)
+
+
+class DateDiffLeapYearTransformer(BaseDateTwoColumnTransformer):
+    """Transformer to calculate the number of years between two dates.
+
+    Parameters
+    ----------
+    columns : List[str]
+        List of 2 columns. First column will be subtracted from second.
+
+    new_column_name : str
+        Name for the new year column.
+
+    drop_original : bool
         Flag for whether to drop the original columns.
 
     missing_replacement : int/float/str
@@ -151,56 +214,35 @@ class DateDiffLeapYearTransformer(BaseDateTransformer):
 
     Attributes
     ----------
-    column_lower : str
-        Name of date column to subtract. This attribute is not for use in any method,
-        use 'columns' instead. Here only as a fix to allow string representation of transformer.
-
-    column_upper : str
-        Name of date column to subtract from. This attribute is not for use in any method,
-        use 'columns instead. Here only as a fix to allow string representation of transformer.
-
-    columns : list
-        List containing column names for transformation in format [column_lower, column_upper]
+    columns : List[str]
+        List of 2 columns. First column will be subtracted from second.
 
     new_column_name : str, default = None
         Name given to calculated datediff column. If None then {column_upper}_{column_lower}_datediff
         will be used.
 
-    drop_cols : bool
+    drop_original : bool
         Indicator whether to drop old columns during transform method.
 
     """
 
     def __init__(
         self,
-        column_lower: str,
-        column_upper: str,
-        drop_cols: bool,
+        columns: list[str],
         new_column_name: str | None = None,
         missing_replacement: float | str | None = None,
+        drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
-        if not isinstance(column_lower, str):
-            msg = f"{self.classname()}: column_lower should be a str"
-            raise TypeError(msg)
+        if not new_column_name:
+            new_column_name = f"{columns[1]}_{columns[0]}_datediff"
 
-        if not isinstance(column_upper, str):
-            msg = f"{self.classname()}: column_upper should be a str"
-            raise TypeError(msg)
-
-        if new_column_name is not None:
-            if not isinstance(new_column_name, str):
-                msg = f"{self.classname()}: new_column_name should be a str"
-                raise TypeError(msg)
-
-            self.new_column_name = new_column_name
-
-        else:
-            self.new_column_name = f"{column_upper}_{column_lower}_datediff"
-
-        if not isinstance(drop_cols, bool):
-            msg = f"{self.classname()}: drop_cols should be a bool"
-            raise TypeError(msg)
+        super().__init__(
+            columns=columns,
+            new_column_name=new_column_name,
+            drop_original=drop_original,
+            **kwargs,
+        )
 
         if (missing_replacement) and (
             type(missing_replacement) not in [int, float, str]
@@ -208,15 +250,12 @@ class DateDiffLeapYearTransformer(BaseDateTransformer):
             msg = f"{self.classname()}: if not None, missing_replacement should be an int, float or string"
             raise TypeError(msg)
 
-        super().__init__(columns=[column_lower, column_upper], **kwargs)
-
-        self.drop_cols = drop_cols
         self.missing_replacement = missing_replacement
 
         # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.
-        self.column_lower = column_lower
-        self.column_upper = column_upper
+        self.column_lower = columns[0]
+        self.column_upper = columns[1]
 
     def calculate_age(self, row: pd.Series) -> int:
         """Function to calculate age from two date columns in a pd.DataFrame.
@@ -276,28 +315,24 @@ class DateDiffLeapYearTransformer(BaseDateTransformer):
 
         """
 
-        self.check_columns_are_date_or_datetime(X)
-
         X = super().transform(X)
 
         X[self.new_column_name] = X.apply(self.calculate_age, axis=1)
 
-        if self.drop_cols:
+        if self.drop_original:
             for col in self.columns:
                 del X[col]
 
         return X
 
 
-class DateDifferenceTransformer(BaseDateTransformer):
+class DateDifferenceTransformer(BaseDateTwoColumnTransformer):
     """Class to transform calculate the difference between 2 date fields in specified units.
 
     Parameters
     ----------
-    column_lower : str
-        Name of first date column, difference will be calculated as column_upper - column_lower
-    column_upper : str
-        Name of second date column, difference will be calculated as column_upper - column_lower
+    columns : List[str]
+        List of 2 columns. First column will be subtracted from second.
     new_column_name : str, default = None
         Name given to calculated datediff column. If None then {column_upper}_{column_lower}_datediff_{units}
         will be used.
@@ -306,27 +341,21 @@ class DateDifferenceTransformer(BaseDateTransformer):
     copy : bool, default = True
         Should X be copied prior to transform? Copy argument no longer used and will be deprecated in a future release
     verbose: bool, default = False
+        Control level of detail in printouts
+    drop_original:
+        Boolean flag indicating whether to drop original columns.
     """
 
     def __init__(
         self,
-        column_lower: str,
-        column_upper: str,
+        columns: list[str],
         new_column_name: str | None = None,
         units: str = "D",
         copy: bool | None = None,
         verbose: bool = False,
+        drop_original: bool = False,
+        **kwargs: dict[str, bool],
     ) -> None:
-        if type(column_lower) is not str:
-            msg = f"{self.classname()}: column_lower must be a str"
-            raise TypeError(msg)
-
-        if type(column_upper) is not str:
-            msg = f"{self.classname()}: column_upper must be a str"
-            raise TypeError(msg)
-
-        columns = [column_lower, column_upper]
-
         accepted_values_units = [
             "D",
             "h",
@@ -334,32 +363,28 @@ class DateDifferenceTransformer(BaseDateTransformer):
             "s",
         ]
 
-        if type(units) is not str:
-            msg = f"{self.classname()}: units must be a str"
-            raise TypeError(msg)
-
         if units not in accepted_values_units:
             msg = f"{self.classname()}: units must be one of {accepted_values_units}, got {units}"
             raise ValueError(msg)
 
         self.units = units
 
-        if new_column_name is not None:
-            if type(new_column_name) is not str:
-                msg = f"{self.classname()}: new_column_name must be a str"
-                raise TypeError(msg)
+        if not new_column_name:
+            new_column_name = f"{columns[1]}_{columns[0]}_datediff_{units}"
 
-            self.new_column_name = new_column_name
-
-        else:
-            self.new_column_name = f"{column_upper}_{column_lower}_datediff_{units}"
-
-        super().__init__(columns=columns, verbose=verbose, copy=copy)
+        super().__init__(
+            columns=columns,
+            new_column_name=new_column_name,
+            drop_original=drop_original,
+            copy=copy,
+            verbose=verbose,
+            **kwargs,
+        )
 
         # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.
-        self.column_lower = column_lower
-        self.column_upper = column_upper
+        self.column_lower = columns[0]
+        self.column_upper = columns[1]
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Calculate the difference between the given fields in the specified units.
@@ -373,27 +398,32 @@ class DateDifferenceTransformer(BaseDateTransformer):
 
         X = super().transform(X)
 
-        temp = self.match_column_dtypes(X)
-
         X[self.new_column_name] = (
-            temp[self.columns[1]] - temp[self.columns[0]]
+            X[self.columns[1]] - X[self.columns[0]]
         ) / np.timedelta64(1, self.units)
+
+        if self.drop_original:
+            for col in self.columns:
+                del X[col]
 
         return X
 
 
-class ToDatetimeTransformer(BaseTransformer):
-    """Class to transform convert specified column to datetime.
+class ToDatetimeTransformer(BaseDateTransformer):
+    """Class to transform convert specified columns to datetime.
 
-    Class simply uses the pd.to_datetime method on the specified column.
+    Class simply uses the pd.to_datetime method on the specified columns.
 
     Parameters
     ----------
-    column : str
-        Name of the column to convert to datetime.
+    columns : List[str]
+        List of names of the column to convert to datetime.
 
     new_column_name : str
         Name given to the new datetime column.
+
+    drop_original: bool
+        Boolean flag indicating whether to drop original column.
 
     to_datetime_kwargs : dict, default = {}
         A dictionary of keyword arguments to be passed to the pd.to_datetime method when it is called in transform.
@@ -407,17 +437,10 @@ class ToDatetimeTransformer(BaseTransformer):
         self,
         column: str,
         new_column_name: str,
+        drop_original: bool = False,
         to_datetime_kwargs: dict[str, object] | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
-        if type(column) is not str:
-            msg = f"{self.classname()}: column should be a single str giving the column to transform to datetime"
-            raise TypeError(msg)
-
-        if type(new_column_name) is not str:
-            msg = f"{self.classname()}: new_column_name must be a str"
-            raise TypeError(msg)
-
         if to_datetime_kwargs is None:
             to_datetime_kwargs = {}
         else:
@@ -431,13 +454,17 @@ class ToDatetimeTransformer(BaseTransformer):
                     raise TypeError(msg)
 
         self.to_datetime_kwargs = to_datetime_kwargs
-        self.new_column_name = new_column_name
 
         # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.
         self.column = column
 
-        super().__init__(columns=[column], **kwargs)
+        super().__init__(
+            columns=[column],
+            new_column_name=new_column_name,
+            drop_original=drop_original,
+            **kwargs,
+        )
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Convert specified column to datetime using pd.to_datetime.
@@ -448,12 +475,18 @@ class ToDatetimeTransformer(BaseTransformer):
             Data with column to transform.
 
         """
-        X = super().transform(X)
+        # purposely avoid BaseDateTransformer method, as uniquely for this transformer columns
+        # are not yet date/datetime
+        X = BaseTransformer.transform(self, X)
 
         X[self.new_column_name] = pd.to_datetime(
             X[self.columns[0]],
             **self.to_datetime_kwargs,
         )
+
+        if self.drop_original:
+            for col in self.columns:
+                del X[col]
 
         return X
 
@@ -488,6 +521,9 @@ class SeriesDtMethodTransformer(BaseDateTransformer):
     pd_method_kwargs : dict, default = {}
         A dictionary of keyword arguments to be passed to the pd.Series.dt method when it is called.
 
+    drop_original: bool
+        Indicates whether to drop self.column post transform
+
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.__init__().
 
@@ -510,6 +546,9 @@ class SeriesDtMethodTransformer(BaseDateTransformer):
     pd_method_kwargs : dict
         Dictionary of keyword arguments to call the pd.Series.dt method with.
 
+    drop_original: bool
+        Indicates whether to drop self.column post transform
+
     """
 
     def __init__(
@@ -518,17 +557,19 @@ class SeriesDtMethodTransformer(BaseDateTransformer):
         pd_method_name: str,
         column: str,
         pd_method_kwargs: dict[str, object] | None = None,
+        drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
         if type(column) is not str:
             msg = f"{self.classname()}: column should be a str but got {type(column)}"
             raise TypeError(msg)
 
-        super().__init__(columns=column, **kwargs)
-
-        if type(new_column_name) is not str:
-            msg = f"{self.classname()}: unexpected type ({type(new_column_name)}) for new_column_name, must be str"
-            raise TypeError(msg)
+        super().__init__(
+            columns=[column],
+            new_column_name=new_column_name,
+            drop_original=drop_original,
+            **kwargs,
+        )
 
         if type(pd_method_name) is not str:
             msg = f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
@@ -546,7 +587,6 @@ class SeriesDtMethodTransformer(BaseDateTransformer):
                     msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
                     raise TypeError(msg)
 
-        self.new_column_name = new_column_name
         self.pd_method_name = pd_method_name
         self.pd_method_kwargs = pd_method_kwargs
 
@@ -589,21 +629,23 @@ class SeriesDtMethodTransformer(BaseDateTransformer):
             running the pd.Series.dt method.
 
         """
-        X = super().transform(X)
-
-        temp = self.cast_columns_to_datetime(X)
+        X = super().transform(X, datetime_only=True)
 
         if self._callable:
             X[self.new_column_name] = getattr(
-                temp[self.columns[0]].dt,
+                X[self.columns[0]].dt,
                 self.pd_method_name,
             )(**self.pd_method_kwargs)
 
         else:
             X[self.new_column_name] = getattr(
-                temp[self.columns[0]].dt,
+                X[self.columns[0]].dt,
                 self.pd_method_name,
             )
+
+        if self.drop_original:
+            for col in self.columns:
+                del X[col]
 
         return X
 
@@ -616,17 +658,14 @@ class BetweenDatesTransformer(BaseDateTransformer):
 
     Parameters
     ----------
-    column_lower : str
-        Name of column containing the lower date range values.
-
-    column_between : str
-        Name of column to check if it's values fall between column_lower and column_upper.
-
-    column_upper : str
-        Name of column containing the upper date range values.
+    columns : list[str]
+        List of columns for comparison, in format [lower, to_compare, upper]
 
     new_column_name : str
         Name for new column to be added to X.
+
+    drop_original: bool
+        indicates whether to drop original columns.
 
     lower_inclusive : bool, defualt = True
         If lower_inclusive is True the comparison to column_lower will be column_lower <=
@@ -666,34 +705,20 @@ class BetweenDatesTransformer(BaseDateTransformer):
     upper_inclusive : bool
         upper_inclusive argument passed when initialising the transformer.
 
+    drop_original: bool
+        indicates whether to drop original columns.
+
     """
 
     def __init__(
         self,
-        column_lower: str,
-        column_between: str,
-        column_upper: str,
+        columns: list[str],
         new_column_name: str,
+        drop_original: bool = False,
         lower_inclusive: bool = True,
         upper_inclusive: bool = True,
         **kwargs: dict[str, bool],
     ) -> None:
-        if type(column_lower) is not str:
-            msg = f"{self.classname()}: column_lower should be str"
-            raise TypeError(msg)
-
-        if type(column_between) is not str:
-            msg = f"{self.classname()}: column_between should be str"
-            raise TypeError(msg)
-
-        if type(column_upper) is not str:
-            msg = f"{self.classname()}: column_upper should be str"
-            raise TypeError(msg)
-
-        if type(new_column_name) is not str:
-            msg = f"{self.classname()}: new_column_name should be str"
-            raise TypeError(msg)
-
         if type(lower_inclusive) is not bool:
             msg = f"{self.classname()}: lower_inclusive should be a bool"
             raise TypeError(msg)
@@ -702,17 +727,25 @@ class BetweenDatesTransformer(BaseDateTransformer):
             msg = f"{self.classname()}: upper_inclusive should be a bool"
             raise TypeError(msg)
 
-        self.new_column_name = new_column_name
         self.lower_inclusive = lower_inclusive
         self.upper_inclusive = upper_inclusive
 
-        super().__init__(columns=[column_lower, column_between, column_upper], **kwargs)
+        super().__init__(
+            columns=columns,
+            new_column_name=new_column_name,
+            drop_original=drop_original,
+            **kwargs,
+        )
+
+        if len(columns) != 3:
+            msg = f"{self.classname()}: This transformer works with three columns only"
+            raise ValueError(msg)
 
         # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.
-        self.column_lower = column_lower
-        self.column_upper = column_upper
-        self.column_between = column_between
+        self.column_lower = columns[0]
+        self.column_upper = columns[2]
+        self.column_between = columns[2]
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform - creates column indicating if middle date is between the other two.
@@ -734,8 +767,6 @@ class BetweenDatesTransformer(BaseDateTransformer):
         """
         X = super().transform(X)
 
-        self.check_columns_are_date_or_datetime(X)
-
         if not (X[self.columns[0]] <= X[self.columns[2]]).all():
             warnings.warn(
                 f"{self.classname()}: not all {self.columns[2]} are greater than or equal to {self.columns[0]}",
@@ -755,6 +786,10 @@ class BetweenDatesTransformer(BaseDateTransformer):
             upper_comparison = X[self.columns[1]] < X[self.columns[2]]
 
         X[self.new_column_name] = lower_comparison & upper_comparison
+
+        if self.drop_original:
+            for col in self.columns:
+                del X[col]
 
         return X
 
@@ -814,17 +849,25 @@ class DatetimeInfoExtractor(BaseDateTransformer):
                 "sunday": [6],
             }
 
+    drop_original: str
+        indicates whether to drop provided columns post transform
 
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
 
     Attributes
     ----------
+    columns: List[str]
+        List of columns for processing
+
     include : list of str, default = ["timeofday", "timeofmonth", "timeofyear", "dayofweek"]
         Which datetime categorical information to extract
 
     datetime_mappings : dict, default = None
         Optional argument to define custom mappings for datetime values.
+
+    drop_original: str
+        indicates whether to drop provided columns post transform
 
     """
 
@@ -833,6 +876,7 @@ class DatetimeInfoExtractor(BaseDateTransformer):
         columns: str | list[str],
         include: str | list[str] | None = None,
         datetime_mappings: dict[str,] | None = None,
+        drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
         if include is None:
@@ -849,7 +893,14 @@ class DatetimeInfoExtractor(BaseDateTransformer):
                 msg = f"{self.classname()}: datetime_mappings should be Dict"
                 raise TypeError(msg)
 
-        super().__init__(columns=columns, **kwargs)
+        # note, this has highlighted that new_column_name func might be worth pulling out into a mixin
+        # but will leave for followup PR
+        super().__init__(
+            columns=columns,
+            drop_original=drop_original,
+            new_column_name="dummy",
+            **kwargs,
+        )
 
         for var in include:
             if var not in [
@@ -1027,34 +1078,36 @@ class DatetimeInfoExtractor(BaseDateTransformer):
         X : pd.DataFrame
             Transformed input X with added columns of extracted information.
         """
-        X = super().transform(X)
-
-        temp = self.cast_columns_to_datetime(X)
+        X = super().transform(X, datetime_only=True)
 
         for col in self.columns:
             if "timeofday" in self.include:
-                X[col + "_timeofday"] = temp[col].dt.hour.apply(
+                X[col + "_timeofday"] = X[col].dt.hour.apply(
                     self._map_values,
                     interval="timeofday",
                 )
 
             if "timeofmonth" in self.include:
-                X[col + "_timeofmonth"] = temp[col].dt.day.apply(
+                X[col + "_timeofmonth"] = X[col].dt.day.apply(
                     self._map_values,
                     interval="timeofmonth",
                 )
 
             if "timeofyear" in self.include:
-                X[col + "_timeofyear"] = temp[col].dt.month.apply(
+                X[col + "_timeofyear"] = X[col].dt.month.apply(
                     self._map_values,
                     interval="timeofyear",
                 )
 
             if "dayofweek" in self.include:
-                X[col + "_dayofweek"] = temp[col].dt.weekday.apply(
+                X[col + "_dayofweek"] = X[col].dt.weekday.apply(
                     self._map_values,
                     interval="dayofweek",
                 )
+
+        if self.drop_original:
+            for col in self.columns:
+                del X[col]
 
         return X
 
@@ -1105,8 +1158,13 @@ class DatetimeSinusoidCalculator(BaseDateTransformer):
         method: str | list[str],
         units: str | dict,
         period: float | dict = 2 * np.pi,
+        drop_original: bool = False,
     ) -> None:
-        super().__init__(columns)
+        super().__init__(
+            columns=columns,
+            drop_original=drop_original,
+            new_column_name="dummy",
+        )
 
         if not isinstance(method, str) and not isinstance(method, list):
             msg = "{}: method must be a string or list but got {}".format(
@@ -1230,16 +1288,14 @@ class DatetimeSinusoidCalculator(BaseDateTransformer):
         X : pd.DataFrame
             Input X with additional columns added, these are named "<method>_<original_column>"
         """
-        X = super().transform(X)
-
-        temp = self.cast_columns_to_datetime(X)
+        X = super().transform(X, datetime_only=True)
 
         for column in self.columns:
             if not isinstance(self.units, dict):
-                column_in_desired_unit = getattr(temp[column].dt, self.units)
+                column_in_desired_unit = getattr(X[column].dt, self.units)
                 desired_units = self.units
             elif isinstance(self.units, dict):
-                column_in_desired_unit = getattr(temp[column].dt, self.units[column])
+                column_in_desired_unit = getattr(X[column].dt, self.units[column])
                 desired_units = self.units[column]
             if not isinstance(self.period, dict):
                 desired_period = self.period
@@ -1252,5 +1308,9 @@ class DatetimeSinusoidCalculator(BaseDateTransformer):
                 X[new_column_name] = getattr(np, method)(
                     column_in_desired_unit * (2.0 * np.pi / desired_period),
                 )
+
+        if self.drop_original:
+            for col in self.columns:
+                del X[col]
 
         return X
