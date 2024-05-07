@@ -64,6 +64,10 @@ def minimal_attribute_dict():
         "BaseTransformer": {
             "columns": ["a"],
         },
+        "BaseTwoColumnTransformer": {
+            "columns": ["a", "b"],
+            "new_col_name": "c",
+        },
         "DataFrameMethodTransformer": {
             "columns": ["a", "c"],
             "new_column_names": "f",

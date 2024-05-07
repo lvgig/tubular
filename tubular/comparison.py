@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import pandas as pd  # noqa: TCH002
 
-from tubular.base import BaseTransformer
+from tubular.base import BaseTwoColumnTransformer
 
 
-class EqualityChecker(BaseTransformer):
+class EqualityChecker(BaseTwoColumnTransformer):
     """Transformer to check if two columns are equal.
 
     Parameters
@@ -31,25 +31,12 @@ class EqualityChecker(BaseTransformer):
         drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
-        super().__init__(columns=columns, **kwargs)
-
-        if not (isinstance(columns, list)):
-            msg = f"{self.classname()}: columns should be list"
-            raise TypeError(msg)
-
-        if len(columns) != 2:
-            msg = f"{self.classname()}: This transformer works with two columns only"
-            raise ValueError(msg)
-
-        if not (isinstance(new_col_name, str)):
-            msg = f"{self.classname()}: new_col_name should be str"
-            raise TypeError(msg)
+        super().__init__(columns=columns, new_col_name=new_col_name, **kwargs)
 
         if not (isinstance(drop_original, bool)):
             msg = f"{self.classname()}: drop_original should be bool"
             raise TypeError(msg)
 
-        self.new_col_name = new_col_name
         self.drop_original = drop_original
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
