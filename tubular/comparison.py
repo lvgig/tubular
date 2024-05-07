@@ -33,18 +33,6 @@ class EqualityChecker(BaseTwoColumnTransformer):
     ) -> None:
         super().__init__(columns=columns, new_col_name=new_col_name, **kwargs)
 
-        if not (isinstance(columns, list)):
-            msg = f"{self.classname()}: columns should be list"
-            raise TypeError(msg)
-
-        if len(columns) != 2:
-            msg = f"{self.classname()}: This transformer works with two columns only"
-            raise ValueError(msg)
-
-        if not (isinstance(new_col_name, str)):
-            msg = f"{self.classname()}: new_col_name should be str"
-            raise TypeError(msg)
-
         if not (isinstance(drop_original, bool)):
             msg = f"{self.classname()}: drop_original should be bool"
             raise TypeError(msg)
