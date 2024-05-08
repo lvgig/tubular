@@ -22,7 +22,7 @@ class BaseDropOriginalMixin:
         """
         # check if 'drop_original' argument is boolean
         if type(drop_original) is not bool:
-            msg = f"{self.classname()}: unexpected type ({type(drop_original)}) for drop_original, expecting bool"
+            msg = f"{self.classname()}: drop_original should be bool"
             raise TypeError(msg)
 
         self.drop_original = drop_original

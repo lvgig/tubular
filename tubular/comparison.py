@@ -3,9 +3,10 @@ from __future__ import annotations
 import pandas as pd  # noqa: TCH002
 
 from tubular.base import BaseTransformer
+from tubular.mixins import BaseDropOriginalMixin
 
 
-class EqualityChecker(BaseTransformer):
+class EqualityChecker(BaseDropOriginalMixin, BaseTransformer):
     """Transformer to check if two columns are equal.
 
     Parameters
@@ -45,12 +46,9 @@ class EqualityChecker(BaseTransformer):
             msg = f"{self.classname()}: new_col_name should be str"
             raise TypeError(msg)
 
-        if not (isinstance(drop_original, bool)):
-            msg = f"{self.classname()}: drop_original should be bool"
-            raise TypeError(msg)
-
         self.new_col_name = new_col_name
-        self.drop_original = drop_original
+
+        BaseDropOriginalMixin.set_drop_original_column(self, drop_original)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Create a column which is populated by the boolean
@@ -71,8 +69,12 @@ class EqualityChecker(BaseTransformer):
 
         X[self.new_col_name] = X[self.columns[0]] == X[self.columns[1]]
 
-        if self.drop_original:
-            for col in self.columns:
-                del X[col]
+        # Drop original columns
+        BaseDropOriginalMixin.drop_original_column(
+            self,
+            X,
+            self.drop_original,
+            self.columns,
+        )
 
         return X

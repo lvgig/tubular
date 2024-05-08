@@ -90,7 +90,7 @@ class DataFrameMethodTransformerInitTests(ColumnStrListInitTests):
         with pytest.raises(
             TypeError,
             match=re.escape(
-                f"DataFrameMethodTransformer: unexpected type ({type(not_bool)}) for drop_original, expecting bool",
+                "DataFrameMethodTransformer: drop_original should be bool",
             ),
         ):
             DataFrameMethodTransformer(
