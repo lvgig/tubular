@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import pandas as pd  # noqa: TCH002
 
-from tubular.mixins import BaseDropOriginalMixin
 from tubular.base import BaseTwoColumnTransformer
-
+from tubular.mixins import BaseDropOriginalMixin
 
 
 class EqualityChecker(BaseDropOriginalMixin, BaseTwoColumnTransformer):

@@ -285,7 +285,7 @@ class BaseTwoColumnTransformer(BaseTransformer):
 
 
 class DataFrameMethodTransformer(BaseDropOriginalMixin, BaseTransformer):
-  
+
     """Tranformer that applies a pandas.DataFrame method.
 
     Transformer assigns the output of the method to a new column or columns. It is possible to
