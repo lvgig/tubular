@@ -47,6 +47,7 @@ Moved tests for these objects to new approach.
 - Added generic init tests to base tests for transformers that take two columns as an input.
 - Refactored EqualityChecker tests in new format.
 - Bugfix to MeanResponseTransformer to ignore unobserved categorical levels.
+- Added test_BaseTwoColumnTransformer base class for columns that require a list of two columns for input
 - Added BaseDropOriginalMixin to mixin transformers to handle validation and method of dropping original features, also added appropriate test classes.
 
 

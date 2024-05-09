@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import pandas as pd  # noqa: TCH002
 
-from tubular.base import BaseTransformer
 from tubular.mixins import BaseDropOriginalMixin
+from tubular.base import BaseTwoColumnTransformer
 
 
-class EqualityChecker(BaseDropOriginalMixin, BaseTransformer):
+
+class EqualityChecker(BaseDropOriginalMixin, BaseTwoColumnTransformer):
     """Transformer to check if two columns are equal.
 
     Parameters
@@ -32,21 +33,7 @@ class EqualityChecker(BaseDropOriginalMixin, BaseTransformer):
         drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
-        super().__init__(columns=columns, **kwargs)
-
-        if not (isinstance(columns, list)):
-            msg = f"{self.classname()}: columns should be list"
-            raise TypeError(msg)
-
-        if len(columns) != 2:
-            msg = f"{self.classname()}: This transformer works with two columns only"
-            raise ValueError(msg)
-
-        if not (isinstance(new_col_name, str)):
-            msg = f"{self.classname()}: new_col_name should be str"
-            raise TypeError(msg)
-
-        self.new_col_name = new_col_name
+        super().__init__(columns=columns, new_col_name=new_col_name, **kwargs)
 
         BaseDropOriginalMixin.set_drop_original_column(self, drop_original)
 
