@@ -8,6 +8,8 @@ import test_aide as ta
 import tests.test_data as d
 from tests.base_tests import (
     ColumnStrListInitTests,
+    DropOriginalInitTests,
+    DropOriginalTransformTests,
     GenericFitTests,
     GenericTransformTests,
     OtherBaseBehaviourTests,
@@ -83,25 +85,8 @@ class DataFrameMethodTransformerInitTests(ColumnStrListInitTests):
                 columns=["b", "c"],
             )
 
-    @pytest.mark.parametrize("not_bool", [{"a": 1}, [1, 2], 1, "True", 1.5])
-    def test_exception_raised_drop_original_not_bool(self, not_bool):
-        """Test an exception is raised if drop_original is not a string"""
 
-        with pytest.raises(
-            TypeError,
-            match=re.escape(
-                "DataFrameMethodTransformer: drop_original should be bool",
-            ),
-        ):
-            DataFrameMethodTransformer(
-                new_column_names="a",
-                pd_method_name="sum",
-                columns=["b", "c"],
-                drop_original=not_bool,
-            )
-
-
-class TestInit(DataFrameMethodTransformerInitTests):
+class TestInit(DropOriginalInitTests, DataFrameMethodTransformerInitTests):
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "DataFrameMethodTransformer"
@@ -115,7 +100,7 @@ class TestFit(GenericFitTests):
         cls.transformer_name = "DataFrameMethodTransformer"
 
 
-class TestTransform(GenericTransformTests):
+class TestTransform(DropOriginalTransformTests, GenericTransformTests):
     """Tests for DataFrameMethodTransformer.transform()."""
 
     @classmethod
@@ -186,44 +171,6 @@ class TestTransform(GenericTransformTests):
             actual=df_transformed,
             msg="DataFrameMethodTransformer divide by 2 columns b and c",
         )
-
-    def test_original_columns_dropped_when_specified(self):
-        """Test DataFrameMethodTransformer.transform drops original columns get when specified."""
-        df = d.create_df_3()
-
-        x = DataFrameMethodTransformer(
-            new_column_names="a_b_sum",
-            pd_method_name="sum",
-            columns=["a", "b"],
-            drop_original=True,
-        )
-
-        x.fit(df)
-
-        df_transformed = x.transform(df)
-
-        assert ("a" not in df_transformed.columns.to_numpy()) and (
-            "b" not in df_transformed.columns.to_numpy()
-        ), "original columns not dropped"
-
-    def test_original_columns_kept_when_specified(self):
-        """Test DataFrameMethodTransformer.transform keeps original columns when specified."""
-        df = d.create_df_3()
-
-        x = DataFrameMethodTransformer(
-            new_column_names="a_b_sum",
-            pd_method_name="sum",
-            columns=["a", "b"],
-            drop_original=False,
-        )
-
-        x.fit(df)
-
-        df_transformed = x.transform(df)
-
-        assert ("a" in df_transformed.columns.to_numpy()) and (
-            "b" in df_transformed.columns.to_numpy()
-        ), "original columns not kept"
 
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):

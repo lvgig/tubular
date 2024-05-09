@@ -68,6 +68,7 @@ def minimal_attribute_dict():
             "columns": ["a", "c"],
             "new_column_names": "f",
             "pd_method_name": "sum",
+            "drop_original": True,
         },
         "BaseDateTransformer": {
             "columns": ["a"],
@@ -84,6 +85,7 @@ def minimal_attribute_dict():
         "EqualityChecker": {
             "columns": ["a", "b"],
             "new_col_name": "c",
+            "drop_original": True,
         },
         "DateDiffLeapYearTransformer": {
             "column_lower": "a",
@@ -194,6 +196,7 @@ def minimal_attribute_dict():
         },
         "OneHotEncodingTransformer": {
             "columns": ["c"],
+            "drop_original": True,
         },
         "LogTransformer": {
             "columns": ["a"],
