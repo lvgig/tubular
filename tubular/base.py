@@ -408,7 +408,7 @@ class DataFrameMethodTransformer(BaseDropOriginalMixin, BaseTransformer):
             **self.pd_method_kwargs,
         )
 
-        # Drop original columns
+        # Drop original columns if self.drop_original is True
         BaseDropOriginalMixin.drop_original_column(
             self,
             X,

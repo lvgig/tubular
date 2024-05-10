@@ -594,6 +594,24 @@ class DropOriginalTransformTests(GenericTransformTests):
             "b" in df_transformed.columns.to_numpy()
         ), "original columns not kept"
 
+    def test_other_columns_not_modified(self, initialized_transformers):
+        """Test transformer does not modify unspecified columns."""
+
+        df = d.create_df_3()
+
+        x = initialized_transformers[self.transformer_name]
+
+        x.columns = ["a"]
+        x.drop_original = True
+
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=df[["b", "c"]],
+            actual=df_transformed[["b", "c"]],
+            msg=f"{self.transformer_name}.transform has changed other columns unexpectedly",
+        )
+
 
 class ColumnsCheckTests:
     """

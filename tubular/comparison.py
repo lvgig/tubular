@@ -55,7 +55,7 @@ class EqualityChecker(BaseDropOriginalMixin, BaseTwoColumnTransformer):
 
         X[self.new_col_name] = X[self.columns[0]] == X[self.columns[1]]
 
-        # Drop original columns
+        # Drop original columns if self.drop_original is True
         BaseDropOriginalMixin.drop_original_column(
             self,
             X,
