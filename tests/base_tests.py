@@ -120,6 +120,30 @@ class ColumnStrListInitTests(GenericInitTests):
             uninitialized_transformers[self.transformer_name](**args)
 
 
+class DropOriginalInitTests(GenericInitTests):
+    """
+    Tests for BaseTransformer.init() behaviour specific to when a transformer accepts a "drop_original" column.
+    Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
+    """
+
+    @pytest.mark.parametrize("drop_orginal_column", (0, "a", ["a"], {"a": 10}, None))
+    def test_drop_column_arg_errors(
+        self,
+        uninitialized_transformers,
+        minimal_attribute_dict,
+        drop_orginal_column,
+    ):
+        """Test that appropriate errors are throwm for non boolean arg."""
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["drop_original"] = drop_orginal_column
+
+        with pytest.raises(
+            TypeError,
+            match=f"{self.transformer_name}: drop_original should be bool",
+        ):
+            uninitialized_transformers[self.transformer_name](**args)
+
+
 class WeightColumnInitTests(GenericInitTests):
     """
     Tests for BaseTransformer.init() behaviour specific to when a transformer takes accepts a weight column.
@@ -527,6 +551,66 @@ class GenericTransformTests:
         _ = x.transform(df)
 
         pd.testing.assert_frame_equal(df, d.create_df_3())
+
+
+class DropOriginalTransformTests(GenericTransformTests):
+    """
+    Transform tests for transformers that take a "drop_original" argument
+    Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
+    """
+
+    def test_original_columns_dropped_when_specified(
+        self,
+        initialized_transformers,
+    ):
+        """Test transformer drops original columns when specified."""
+
+        df = d.create_df_3()
+
+        x = initialized_transformers[self.transformer_name]
+
+        x.columns = ["a", "b"]
+        x.drop_original = True
+
+        df_transformed = x.transform(df)
+
+        assert ("a" not in df_transformed.columns.to_numpy()) and (
+            "b" not in df_transformed.columns.to_numpy()
+        ), "original columns not dropped"
+
+    def test_original_columns_kept_when_specified(self, initialized_transformers):
+        """Test transformer keeps original columns when specified."""
+
+        df = d.create_df_3()
+
+        x = initialized_transformers[self.transformer_name]
+
+        x.columns = ["a", "b"]
+        x.drop_original = False
+
+        df_transformed = x.transform(df)
+
+        assert ("a" in df_transformed.columns.to_numpy()) and (
+            "b" in df_transformed.columns.to_numpy()
+        ), "original columns not kept"
+
+    def test_other_columns_not_modified(self, initialized_transformers):
+        """Test transformer does not modify unspecified columns."""
+
+        df = d.create_df_3()
+
+        x = initialized_transformers[self.transformer_name]
+
+        x.columns = ["a"]
+        x.drop_original = True
+
+        df_transformed = x.transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=df[["b", "c"]],
+            actual=df_transformed[["b", "c"]],
+            msg=f"{self.transformer_name}.transform has changed other columns unexpectedly",
+        )
 
 
 class ColumnsCheckTests:

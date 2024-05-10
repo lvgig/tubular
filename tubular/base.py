@@ -11,6 +11,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from tubular._version import __version__
+from tubular.mixins import BaseDropOriginalMixin
 
 pd.options.mode.copy_on_write = True
 
@@ -283,7 +284,8 @@ class BaseTwoColumnTransformer(BaseTransformer):
         self.new_col_name = new_col_name
 
 
-class DataFrameMethodTransformer(BaseTransformer):
+class DataFrameMethodTransformer(BaseDropOriginalMixin, BaseTransformer):
+
     """Tranformer that applies a pandas.DataFrame method.
 
     Transformer assigns the output of the method to a new column or columns. It is possible to
@@ -368,14 +370,11 @@ class DataFrameMethodTransformer(BaseTransformer):
                     msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
                     raise TypeError(msg)
 
-        if type(drop_original) is not bool:
-            msg = f"{self.classname()}: unexpected type ({type(drop_original)}) for drop_original, expecting bool"
-            raise TypeError(msg)
-
         self.new_column_names = new_column_names
         self.pd_method_name = pd_method_name
         self.pd_method_kwargs = pd_method_kwargs
-        self.drop_original = drop_original
+
+        BaseDropOriginalMixin.set_drop_original_column(self, drop_original)
 
         try:
             df = pd.DataFrame()
@@ -409,8 +408,12 @@ class DataFrameMethodTransformer(BaseTransformer):
             **self.pd_method_kwargs,
         )
 
-        if self.drop_original:
-            for col in self.columns:
-                del X[col]
+        # Drop original columns if self.drop_original is True
+        BaseDropOriginalMixin.drop_original_column(
+            self,
+            X,
+            self.drop_original,
+            self.columns,
+        )
 
         return X

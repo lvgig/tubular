@@ -1,5 +1,63 @@
+from __future__ import annotations
+
 import numpy as np
 import pandas as pd
+
+
+class BaseDropOriginalMixin:
+    """Mixin class to validate and apply 'drop_original' argument used by various transformers.
+
+    Transformer deletes transformer input columns depending on boolean argument.
+
+    """
+
+    def set_drop_original_column(self, drop_original: bool) -> None:
+        """Helper method for validating 'drop_original' argument.
+
+        Parameters
+        ----------
+        drop_original : bool
+            boolean dictating dropping the input columns from X after checks.
+
+        """
+        # check if 'drop_original' argument is boolean
+        if type(drop_original) is not bool:
+            msg = f"{self.classname()}: drop_original should be bool"
+            raise TypeError(msg)
+
+        self.drop_original = drop_original
+
+    def drop_original_column(
+        self,
+        X: pd.DataFrame,
+        drop_original: bool,
+        columns: list[str] | str | None,
+    ) -> pd.DataFrame:
+        """Method for dropping input columns from X if drop_original set to True.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data with columns to drop.
+
+        drop_original : bool
+            boolean dictating dropping the input columns from X after checks.
+
+        columns: list[str] | str |  None
+            Object containing columns to drop
+
+        Returns
+        -------
+        X : pd.DataFrame
+            Transformed input X with columns dropped.
+
+        """
+
+        if drop_original:
+            for col in columns:
+                del X[col]
+
+        return X
 
 
 class WeightColumnMixin:
