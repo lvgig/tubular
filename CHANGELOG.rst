@@ -49,6 +49,7 @@ Changed
 - Refactored dates.py to prepare for testing refactor. Edited BaseDateTransformer (and created BaseDateTwoColumnTransformer) to follow standard format, implementing validations at init/fit/transform. To reduce complexity of file, made transformers more opinionated to insist on specific and consistent column dtypes.  `#246 <https://github.com/lvgig/tubular/pull/246>`_
 - Added test_BaseTwoColumnTransformer base class for columns that require a list of two columns for input
 - Added BaseDropOriginalMixin to mixin transformers to handle validation and method of dropping original features, also added appropriate test classes.
+- Refactored MeanImputer tests in new format `#250 <https://github.com/lvgig/tubular/pull/250>`_
 
 
 Removed
