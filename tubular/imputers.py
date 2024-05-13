@@ -213,7 +213,7 @@ class MedianImputer(BaseImputer, WeightColumnMixin):
         return self
 
 
-class MeanImputer(BaseImputer, WeightColumnMixin):
+class MeanImputer(WeightColumnMixin, BaseImputer):
     """Transformer to impute missing values with the mean of the supplied columns.
 
     Parameters
@@ -235,6 +235,8 @@ class MeanImputer(BaseImputer, WeightColumnMixin):
         in the columns attribute. Keys of impute_values_ give the column names.
 
     """
+
+    FITS = True
 
     def __init__(
         self,
@@ -312,6 +314,8 @@ class ModeImputer(BaseImputer, WeightColumnMixin):
         in the columns attribute. Keys of impute_values_ give the column names.
 
     """
+
+    FITS = True
 
     def __init__(
         self,
