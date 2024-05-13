@@ -52,10 +52,10 @@ class TestInit:
     def test_weight_not_str_error(self):
         """Test that an exception is raised if weight is not a str, if supplied."""
         with pytest.raises(
-            ValueError,
-            match="GroupRareLevelsTransformer: weight should be a single column",
+            TypeError,
+            match="weights_column should be str or None",
         ):
-            GroupRareLevelsTransformer(columns="a", weight=2)
+            GroupRareLevelsTransformer(columns="a", weights_column=2)
 
     def test_record_rare_levels_not_bool_error(self):
         """Test that an exception is raised if record_rare_levels is not a bool."""
@@ -97,11 +97,11 @@ class TestFit:
         """Test that an exception is raised if weight is not in X."""
         df = d.create_df_5()
 
-        x = GroupRareLevelsTransformer(columns=["b", "c"], weight="aaaa")
+        x = GroupRareLevelsTransformer(columns=["b", "c"], weights_column="aaaa")
 
         with pytest.raises(
             ValueError,
-            match="GroupRareLevelsTransformer: weight aaaa not in X",
+            match=r"weight col \(aaaa\) is not present in columns of data",
         ):
             x.fit(df)
 
@@ -151,7 +151,11 @@ class TestFit:
         """Test that the impute values learnt during fit, using a weight, are expected."""
         df = d.create_df_6()
 
-        x = GroupRareLevelsTransformer(columns=["b"], cut_off_percent=0.3, weight="a")
+        x = GroupRareLevelsTransformer(
+            columns=["b"],
+            cut_off_percent=0.3,
+            weights_column="a",
+        )
 
         x.fit(df)
 
@@ -165,7 +169,11 @@ class TestFit:
         """Test that the impute values learnt during fit, using a weight, are expected."""
         df = d.create_df_6()
 
-        x = GroupRareLevelsTransformer(columns=["c"], cut_off_percent=0.2, weight="a")
+        x = GroupRareLevelsTransformer(
+            columns=["c"],
+            cut_off_percent=0.2,
+            weights_column="a",
+        )
 
         x.fit(df)
 
@@ -238,7 +246,7 @@ class TestTransform:
         """Expected output for test_expected_output_weight."""
         df = pd.DataFrame(
             {
-                "a": [2, 2, 2, 2, np.nan, 2, 2, 2, 3, 3],
+                "a": [2, 2, 2, 2, 0, 2, 2, 2, 3, 3],
                 "b": ["a", "a", "a", "d", "e", "f", "g", np.nan, np.nan, np.nan],
                 "c": ["a", "b", "c", "d", "f", "f", "f", "g", "g", np.nan],
             },
@@ -383,7 +391,11 @@ class TestTransform:
     )
     def test_expected_output_weight(self, df, expected):
         """Test that the output is expected from transform, when weights are used."""
-        x = GroupRareLevelsTransformer(columns=["b"], cut_off_percent=0.3, weight="a")
+        x = GroupRareLevelsTransformer(
+            columns=["b"],
+            cut_off_percent=0.3,
+            weights_column="a",
+        )
 
         # set the mappging dict directly rather than fitting x on df so test works with decorators
         x.non_rare_levels = {"b": ["a", np.nan]}

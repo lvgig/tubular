@@ -10,11 +10,13 @@ from tests.base_tests import (
     GenericFitTests,
     GenericInitTests,
     GenericTransformTests,
+    WeightColumnFitTests,
+    WeightColumnInitTests,
 )
 from tubular.capping import BaseCappingTransformer
 
 
-class GenericCappingInitTests(GenericInitTests):
+class GenericCappingInitTests(WeightColumnInitTests, GenericInitTests):
     """Tests for BaseCappingTransformer.init()."""
 
     @classmethod
@@ -227,7 +229,7 @@ class GenericCappingInitTests(GenericInitTests):
             uninitialized_transformers[self.transformer_name](**args)
 
 
-class GenericCappingFitTests(GenericFitTests):
+class GenericCappingFitTests(WeightColumnFitTests, GenericFitTests):
     """Tests for BaseCappingTransformer.fit()."""
 
     @classmethod
@@ -252,65 +254,6 @@ class GenericCappingFitTests(GenericFitTests):
         ):
             df = d.create_df_3()
 
-            transformer.fit(df)
-
-    @pytest.mark.parametrize(
-        "bad_weight_value, issue",
-        [(np.nan, "null"), (np.inf, "inf"), (-np.inf, "inf"), (-1, "negative")],
-    )
-    def test_bad_values_in_weights_error(
-        self,
-        bad_weight_value,
-        issue,
-        minimal_attribute_dict,
-        uninitialized_transformers,
-    ):
-        """Test that an exception is raised if there are negative/nan/inf values in sample_weight."""
-
-        args = minimal_attribute_dict[self.transformer_name].copy()
-        args["quantiles"] = {"a": [0.2, 0.9]}
-        args["capping_values"] = None
-        args["weights_column"] = "w"
-
-        transformer = uninitialized_transformers[self.transformer_name](**args)
-
-        df = pd.DataFrame(
-            {
-                "a": [1, 2, 3],
-                "w": [1, 1, bad_weight_value],
-            },
-        )
-
-        with pytest.raises(
-            ValueError,
-            match=f"{self.transformer_name}: sample weights values cannot be {issue}",
-        ):
-            transformer.fit(df)
-
-    def test_zero_total_weight_error(
-        self,
-        minimal_attribute_dict,
-        uninitialized_transformers,
-    ):
-        """Test that an exception is raised if the total sample weights are 0."""
-
-        args = minimal_attribute_dict[self.transformer_name].copy()
-        args["quantiles"] = {"a": [0.2, 0.9]}
-        args["capping_values"] = None
-        args["weights_column"] = "w"
-
-        df = pd.DataFrame(
-            {
-                "a": [1, 2, 3],
-                "w": [0, 0, 0],
-            },
-        )
-
-        transformer = uninitialized_transformers[self.transformer_name](**args)
-        with pytest.raises(
-            ValueError,
-            match=f"{self.transformer_name}: total sample weights are not greater than 0",
-        ):
             transformer.fit(df)
 
     @pytest.mark.parametrize(
