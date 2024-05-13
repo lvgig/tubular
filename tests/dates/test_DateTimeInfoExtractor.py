@@ -6,7 +6,6 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
-import tubular
 from tubular.dates import DatetimeInfoExtractor
 
 
@@ -31,29 +30,6 @@ def dayofweek_extractor():
 
 
 class TestExtractDatetimeInfoInit:
-    def test_assert_inheritance(self):
-        """Test that ExtractDatetimeInfo inherits from BaseTransformer."""
-        x = DatetimeInfoExtractor(columns=["a"])
-
-        ta.classes.assert_inheritance(x, tubular.base.BaseTransformer)
-
-    def test_super_init_called(self, mocker):
-        """Test that init calls BaseTransformer.init."""
-        expected_call_args = {
-            0: {
-                "args": (),
-                "kwargs": {"columns": ["a"]},
-            },
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "__init__",
-            expected_call_args,
-        ):
-            DatetimeInfoExtractor(columns=["a"])
-
     def test_values_passed_in_init_set_to_attribute(self):
         """Test that the values passed in init are saved in an attribute of the same name."""
         x = DatetimeInfoExtractor(
@@ -323,29 +299,6 @@ class TestMapValues:
 
 
 class TestTransform:
-    def test_super_transform_called(self, mocker):
-        """Test that init calls BaseTransformer.init."""
-        df = d.create_date_test_df()
-        df = df.astype("datetime64[ns]")
-
-        expected_call_args = {
-            0: {
-                "args": (df,),
-                "kwargs": {},
-            },
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-            return_value=df,
-        ):
-            x = DatetimeInfoExtractor(columns=["a"], include=["dayofweek"])
-
-            x.transform(df)
-
     @pytest.mark.parametrize(
         ("columns"),
         [
@@ -353,6 +306,7 @@ class TestTransform:
             ["string_col"],
             ["bool_col"],
             ["empty_col"],
+            ["date_col"],
         ],
     )
     def test_input_data_check_column_errors(self, columns):
@@ -361,26 +315,10 @@ class TestTransform:
 
         df = d.create_date_diff_incorrect_dtypes()
 
-        msg = f"{x.classname()}: {columns[0]} should be datetime64 or date type but got {df[columns[0]].dtype}"
+        msg = rf"{x.classname()}: {columns[0]} type should be in \['datetime64'\] but got {df[columns[0]].dtype}"
 
         with pytest.raises(TypeError, match=msg):
             x.transform(df)
-
-    def test_cast_to_date_warning(self):
-        "Test that transform raises a warning if column is date but not datetime"
-
-        x = DatetimeInfoExtractor(columns="date_col_1")
-
-        column = "date_col_1"
-
-        msg = f"""
-                    {x.classname()}: temporarily cast {column} from datetime64 to date before transforming in order to apply the datetime method.
-
-                    This will artificially increase the precision of each data point in the column. Original column not changed.
-                    """
-
-        with pytest.warns(UserWarning, match=msg):
-            x.transform(d.create_date_diff_different_dtypes())
 
     def test_correct_col_returned(self):
         """Test that the added column is correct."""
@@ -432,42 +370,6 @@ class TestTransform:
         df = d.create_date_test_df()
         df.loc[0, "b"] = np.nan
         df = df.astype("datetime64[ns]")
-
-        x = DatetimeInfoExtractor(columns=["b"], include=["timeofmonth", "timeofyear"])
-        transformed = x.transform(df)
-
-        expected = df.copy()
-        expected["b_timeofmonth"] = [
-            np.nan,
-            "end",
-            "start",
-            "start",
-            "start",
-            "start",
-            "start",
-            "end",
-        ]
-        expected["b_timeofyear"] = [
-            np.nan,
-            "winter",
-            "autumn",
-            "autumn",
-            "autumn",
-            "autumn",
-            "autumn",
-            "summer",
-        ]
-
-        ta.equality.assert_frame_equal_msg(
-            transformed,
-            expected,
-            "incorrect dataframe returned",
-        )
-
-    def test_correct_df_returned_date_input(self):
-        """Test that correct df is returned after transformation."""
-        df = d.create_date_test_df()
-        df.loc[0, "b"] = np.nan
 
         x = DatetimeInfoExtractor(columns=["b"], include=["timeofmonth", "timeofyear"])
         transformed = x.transform(df)

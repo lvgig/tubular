@@ -6,62 +6,23 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
-import tubular
 from tubular.dates import DateDifferenceTransformer
 
 
 class TestInit:
     """Tests for DateDifferenceTransformer.init()."""
 
-    def test_super_init_called(self, mocker):
-        """Test that init calls BaseTransformer.init."""
-        expected_call_args = {
-            0: {
-                "args": (),
-                "kwargs": {
-                    "columns": ["dummy_1", "dummy_2"],
-                    "verbose": False,
-                    "copy": None,
-                },
-            },
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "__init__",
-            expected_call_args,
-        ):
-            DateDifferenceTransformer(
-                column_lower="dummy_1",
-                column_upper="dummy_2",
-                new_column_name="dummy_3",
-                units="D",
-            )
-
-    def test_column_lower_type_error(self):
-        """Test that an exception is raised if column_lower is not a str."""
+    @pytest.mark.parametrize("column_index", [0, 1])
+    def test_columns_type_error(self, column_index):
+        """Test that an exception is raised if columns element is not a str."""
         with pytest.raises(
             TypeError,
-            match="DateDifferenceTransformer: column_lower must be a str",
+            match=r"DateDifferenceTransformer: each element of columns should be a single \(string\) column name",
         ):
+            columns = ["dummy_1", "dummy_2"]
+            columns[column_index] = 123
             DateDifferenceTransformer(
-                column_lower=123,
-                column_upper="dummy_2",
-                new_column_name="dummy_3",
-                units="D",
-                verbose=False,
-            )
-
-    def test_column_2_type_error(self):
-        """Test that an exception is raised if column_upper is not a str."""
-        with pytest.raises(
-            TypeError,
-            match="DateDifferenceTransformer: column_upper must be a str",
-        ):
-            DateDifferenceTransformer(
-                column_lower="dummy_1",
-                column_upper=123,
+                columns=columns,
                 new_column_name="dummy_3",
                 units="D",
                 verbose=False,
@@ -71,27 +32,12 @@ class TestInit:
         """Test that an exception is raised if new_column_name is not a str."""
         with pytest.raises(
             TypeError,
-            match="DateDifferenceTransformer: new_column_name must be a str",
+            match="DateDifferenceTransformer: new_column_name should be str",
         ):
             DateDifferenceTransformer(
-                column_lower="dummy_1",
-                column_upper="dummy_2",
+                columns=["dummy_1", "dummy_2"],
                 new_column_name=123,
                 units="D",
-                verbose=False,
-            )
-
-    def test_units_type_error(self):
-        """Test that an exception is raised if new_column_name is not a str."""
-        with pytest.raises(
-            TypeError,
-            match="DateDifferenceTransformer: units must be a str",
-        ):
-            DateDifferenceTransformer(
-                column_lower="dummy_1",
-                column_upper="dummy_2",
-                new_column_name="dummy_3",
-                units=123,
                 verbose=False,
             )
 
@@ -102,39 +48,16 @@ class TestInit:
             match=r"DateDifferenceTransformer: units must be one of \['D', 'h', 'm', 's'\], got y",
         ):
             DateDifferenceTransformer(
-                column_lower="dummy_1",
-                column_upper="dummy_2",
+                columns=["dummy_1", "dummy_2"],
                 new_column_name="dummy_3",
                 units="y",
                 verbose=False,
             )
 
-    def test_inputs_set_to_attribute(self):
-        """Test that the value passed for new_column_name and units are saved in attributes of the same name."""
-        x = DateDifferenceTransformer(
-            column_lower="dummy_1",
-            column_upper="dummy_2",
-            new_column_name="value_1",
-            units="D",
-            verbose=False,
-        )
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "columns": ["dummy_1", "dummy_2"],
-                "new_column_name": "value_1",
-                "units": "D",
-                "verbose": False,
-            },
-            msg="Attributes for DateDifferenceTransformer set in init",
-        )
-
     def test_inputs_set_to_attribute_name_not_set(self):
         """Test that the value passed for new_column_new_column_name and units are saved in attributes of the same new_column_name."""
         x = DateDifferenceTransformer(
-            column_lower="dummy_1",
-            column_upper="dummy_2",
+            columns=["dummy_1", "dummy_2"],
             units="D",
             verbose=False,
         )
@@ -868,38 +791,14 @@ class TestTransform:
     def test_input_data_check_column_errors(self, columns, bad_col):
         """Check that errors are raised on a variety of different non date datatypes"""
         x = DateDifferenceTransformer(
-            column_lower=columns[0],
-            column_upper=columns[1],
+            columns=columns,
             new_column_name="c",
         )
         df = d.create_date_diff_incorrect_dtypes()
 
-        msg = f"{x.classname()}: {columns[bad_col]} should be datetime64 or date type but got {df[columns[bad_col]].dtype}"
+        msg = rf"{x.classname()}: {columns[bad_col]} type should be in \['datetime64', 'date'\] but got {df[columns[bad_col]].dtype}"
 
         with pytest.raises(TypeError, match=msg):
-            x.transform(df)
-
-    def test_super_transform_called(self, mocker):
-        """Test that BaseTransformer.transform called."""
-        df = d.create_datediff_test_df()
-
-        x = DateDifferenceTransformer(
-            column_lower="a",
-            column_upper="b",
-            new_column_name="D",
-            units="D",
-            verbose=False,
-        )
-
-        expected_call_args = {0: {"args": (d.create_datediff_test_df(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-            return_value=d.create_datediff_test_df(),
-        ):
             x.transform(df)
 
     @pytest.mark.parametrize(
@@ -909,23 +808,31 @@ class TestTransform:
             (["datetime_col_1", "date_col_2"], 0, 1),
         ],
     )
-    def test_cast_to_date_warning(self, columns, datetime_col, date_col):
-        "Test that transform raises a warning if one column is a date and one is datetime"
+    def test_mismatched_datetypes_error(self, columns, datetime_col, date_col):
+        "Test that transform raises an error if one column is a date and one is datetime"
 
         x = DateDifferenceTransformer(
-            column_lower=columns[0],
-            column_upper=columns[1],
+            columns=columns,
             new_column_name="c",
         )
 
-        msg = f"""
-                {x.classname()}: temporarily cast {columns[datetime_col]} from datetime64 to date before transforming in order to match {columns[date_col]}.
+        df = d.create_date_diff_different_dtypes()
+        # types don't seem to come out of the above function as expected, hard enforce
+        for col in ["date_col_1", "date_col_2"]:
+            df[col] = pd.to_datetime(df[col]).dt.date
 
-                Some precision may be lost from {columns[datetime_col]}. Original column not changed.
-                """
+        for col in ["datetime_col_1", "datetime_col_2"]:
+            df[col] = pd.to_datetime(df[col])
 
-        with pytest.warns(UserWarning, match=msg):
-            x.transform(d.create_date_diff_different_dtypes())
+        present_types = (
+            {"datetime64", "date"} if datetime_col == 0 else {"date", "datetime64"}
+        )
+        msg = rf"Columns fed to datetime transformers should be \['datetime64', 'date'\] and have consistent types, but found {present_types}. Please use ToDatetimeTransformer to standardise"
+        with pytest.raises(
+            TypeError,
+            match=msg,
+        ):
+            x.transform(df)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -941,8 +848,7 @@ class TestTransform:
 
         """
         x = DateDifferenceTransformer(
-            column_lower="a",
-            column_upper="b",
+            columns=["a", "b"],
             new_column_name="D",
             units="D",
             verbose=False,
@@ -970,8 +876,7 @@ class TestTransform:
 
         """
         x = DateDifferenceTransformer(
-            column_lower="a",
-            column_upper="b",
+            columns=["a", "b"],
             new_column_name="h",
             units="h",
             verbose=False,
@@ -999,8 +904,7 @@ class TestTransform:
 
         """
         x = DateDifferenceTransformer(
-            column_lower="a",
-            column_upper="b",
+            columns=["a", "b"],
             new_column_name="m",
             units="m",
             verbose=False,
@@ -1028,8 +932,7 @@ class TestTransform:
 
         """
         x = DateDifferenceTransformer(
-            column_lower="a",
-            column_upper="b",
+            columns=["a", "b"],
             new_column_name="s",
             units="s",
             verbose=False,
@@ -1053,8 +956,7 @@ class TestTransform:
     def test_expected_output_nulls(self, df, expected):
         """Test that the output is expected from transform, when columns are nulls."""
         x = DateDifferenceTransformer(
-            column_lower="a",
-            column_upper="b",
+            columns=["a", "b"],
             new_column_name="D",
             units="D",
             verbose=False,
@@ -1066,37 +968,4 @@ class TestTransform:
             actual=df_transformed,
             expected=expected,
             msg_tag="Unexpected values in DateDifferenceTransformer.transform (nulls)",
-        )
-
-    @pytest.mark.parametrize(
-        ("columns, output"),
-        [
-            (["date_col_1", "date_col_2"], "dates output"),
-            (["date_col_1", "datetime_col_2"], "dates output"),
-            (["datetime_col_1", "date_col_2"], "dates output"),
-            (["datetime_col_1", "datetime_col_2"], "datetime output"),
-        ],
-    )
-    def test_expcected_output_different_date_types(self, columns, output):
-        "Test that transform works for different date datatype combinations"
-
-        x = DateDifferenceTransformer(
-            column_lower=columns[0],
-            column_upper=columns[1],
-            new_column_name="D",
-            units="D",
-            verbose=False,
-        )
-
-        output_col = d.expected_date_diff_df_3()[output]
-        df = d.create_date_diff_different_dtypes_2()
-        expected = df.copy()
-        expected["D"] = output_col
-
-        df_transformed = x.transform(df)
-
-        ta.equality.assert_frame_equal_msg(
-            actual=df_transformed,
-            expected=expected,
-            msg_tag=f"Unexpected values in DateDifferenceTransformer.transform between {columns[0]} and {columns[1]}",
         )

@@ -1,48 +1,22 @@
 import datetime
 
 import numpy as np
-import pandas
 import pandas as pd
 import pytest
 import test_aide as ta
 
 import tests.test_data as d
-import tubular
 from tubular.dates import ToDatetimeTransformer
 
 
 class TestInit:
     """Tests for ToDatetimeTransformer.init()."""
 
-    def test_super_init_called(self, mocker):
-        """Test that init calls BaseTransformer.init."""
-        expected_call_args = {
-            0: {
-                "args": (),
-                "kwargs": {
-                    "columns": ["a"],
-                    "verbose": False,
-                },
-            },
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "__init__",
-            expected_call_args,
-        ):
-            ToDatetimeTransformer(
-                column="a",
-                new_column_name="b",
-                verbose=False,
-            )
-
     def test_column_type_error(self):
         """Test that an exception is raised if column is not a str."""
         with pytest.raises(
             TypeError,
-            match="ToDatetimeTransformer: column should be a single str giving the column to transform to datetime",
+            match=r"ToDatetimeTransformer: each element of columns should be a single \(string\) column name",
         ):
             ToDatetimeTransformer(
                 column=["a"],
@@ -53,7 +27,7 @@ class TestInit:
         """Test that an exception is raised if new_column_name is not a str."""
         with pytest.raises(
             TypeError,
-            match="ToDatetimeTransformer: new_column_name must be a str",
+            match="ToDatetimeTransformer: new_column_name should be str",
         ):
             ToDatetimeTransformer(column="b", new_column_name=1)
 
@@ -124,69 +98,6 @@ class TestTransform:
                 ],
             },
         )
-
-    def test_super_transform_call(self, mocker):
-        """Test the call to BaseTransformer.transform is as expected."""
-        df = d.create_datediff_test_df()
-
-        to_dt = ToDatetimeTransformer(column="a", new_column_name="Y")
-
-        expected_call_args = {0: {"args": (d.create_datediff_test_df(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-            return_value=d.create_datediff_test_df(),
-        ):
-            to_dt.transform(df)
-
-    def test_to_datetime_call(self, mocker):
-        """Test the call to pandas.to_datetime is as expected."""
-        df = d.create_to_datetime_test_df()
-
-        to_dt = ToDatetimeTransformer(
-            column="a",
-            new_column_name="a_Y",
-            to_datetime_kwargs={"format": "%Y"},
-        )
-
-        expected_call_args = {
-            0: {
-                "args": (d.create_to_datetime_test_df()["a"],),
-                "kwargs": {"format": "%Y"},
-            },
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            pandas,
-            "to_datetime",
-            expected_call_args,
-            return_value=pd.to_datetime(d.create_to_datetime_test_df()["a"]),
-        ):
-            to_dt.transform(df)
-
-    def test_output_from_to_datetime_assigned_to_column(self, mocker):
-        """Test that the output from pd.to_datetime is assigned to column with name new_column_name."""
-        df = d.create_to_datetime_test_df()
-
-        to_dt = ToDatetimeTransformer(
-            column="a",
-            new_column_name="a_new",
-            to_datetime_kwargs={"format": "%Y"},
-        )
-
-        to_datetime_output = [1, 2, 3, 4, 5, 6]
-
-        mocker.patch("pandas.to_datetime", return_value=to_datetime_output)
-
-        df_transformed = to_dt.transform(df)
-
-        assert (
-            df_transformed["a_new"].tolist() == to_datetime_output
-        ), "unexpected values assigned to a_new column"
 
     @pytest.mark.parametrize(
         ("df", "expected"),

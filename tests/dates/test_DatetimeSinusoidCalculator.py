@@ -1,12 +1,10 @@
 import re
 
 import numpy as np
-import pandas as pd
 import pytest
 import test_aide as ta
 
 import tests.test_data as d
-import tubular
 from tubular.dates import DatetimeSinusoidCalculator
 
 
@@ -17,28 +15,6 @@ def example_transformer():
 
 class TestDatetimeSinusoidCalculatorInit:
     """Tests for DateDifferenceTransformer.init()."""
-
-    def test_super_init_called(self, mocker):
-        """Test that init calls BaseTransformer.init."""
-        expected_call_args = {
-            0: {
-                "args": ("a",),
-                "kwargs": {},
-            },
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "__init__",
-            expected_call_args,
-        ):
-            DatetimeSinusoidCalculator(
-                "a",
-                "cos",
-                "hour",
-                24,
-            )
 
     @pytest.mark.parametrize("incorrect_type_method", [2, 2.0, True, {"a": 4}])
     def test_method_type_error(self, incorrect_type_method):
@@ -249,6 +225,7 @@ class TestDatetimeSinusoidCalculatorTransform:
             ["string_col"],
             ["bool_col"],
             ["empty_col"],
+            ["date_col"],
         ],
     )
     def test_input_data_check_column_errors(self, columns):
@@ -262,76 +239,10 @@ class TestDatetimeSinusoidCalculatorTransform:
 
         df = d.create_date_diff_incorrect_dtypes()
 
-        msg = f"{x.classname()}: {columns[0]} should be datetime64 or date type but got {df[columns[0]].dtype}"
+        msg = rf"{x.classname()}: {columns[0]} type should be in \['datetime64'\] but got {df[columns[0]].dtype}"
 
         with pytest.raises(TypeError, match=msg):
             x.transform(df)
-
-    def test_cast_to_date_warning(self):
-        "Test that transform raises a warning if column is date but not datetime"
-
-        x = DatetimeSinusoidCalculator(
-            "date_col_1",
-            "cos",
-            "month",
-            12,
-        )
-
-        column = "date_col_1"
-
-        msg = f"""
-                    {x.classname()}: temporarily cast {column} from datetime64 to date before transforming in order to apply the datetime method.
-
-                    This will artificially increase the precision of each data point in the column. Original column not changed.
-                    """
-
-        with pytest.warns(UserWarning, match=msg):
-            x.transform(d.create_date_diff_different_dtypes())
-
-    def test_BaseTransformer_transform_called(self, example_transformer, mocker):
-        test_data = d.create_datediff_test_df()
-
-        expected_call_args = {0: {"args": (test_data,), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-            return_value=test_data,
-        ):
-            example_transformer.transform(test_data)
-
-    def test_cos_called_with_correct_args(self, mocker):
-        """Tests that the correct numpy method is called on the correct column - also implicitly checks that the column has been transformed
-        into the correct units through the value of the argument.
-        """
-        method = "cos"
-
-        data = d.create_datediff_test_df()
-        column_in_desired_unit = data["a"].dt.month
-        cos_argument = column_in_desired_unit * (2.0 * np.pi / 12)
-
-        spy = mocker.spy(np, method)
-
-        x = DatetimeSinusoidCalculator(
-            "a",
-            "cos",
-            "month",
-            12,
-        )
-        x.transform(data)
-
-        # pull out positional args to target the call
-
-        call_args = spy.call_args_list[0][0]
-
-        # test positional args are as expected
-        ta.equality.assert_list_tuple_equal_msg(
-            actual=call_args,
-            expected=(cos_argument,),
-            msg_tag=f"""Positional arg assert for {method}""",
-        )
 
     @pytest.mark.parametrize(
         "transformer",
@@ -371,15 +282,12 @@ class TestDatetimeSinusoidCalculatorTransform:
 
     def test_expected_output_both_methods(self):
         expected = d.create_datediff_test_df()
-
+        columns = ["a", "b"]
         transformer = DatetimeSinusoidCalculator(
-            [
-                "a",
-                "b",
-            ],
-            ["sin", "cos"],
-            "month",
-            12,
+            method=["sin", "cos"],
+            units="month",
+            period=12,
+            columns=columns,
         )
 
         for column in transformer.columns:
@@ -390,7 +298,8 @@ class TestDatetimeSinusoidCalculatorTransform:
             expected[new_sin_col_name] = method_ready_column.apply(np.sin)
             expected[new_cos_col_name] = method_ready_column.apply(np.cos)
 
-        actual = transformer.transform(d.create_datediff_test_df())
+        df = d.create_datediff_test_df()
+        actual = transformer.transform(df)
         ta.equality.assert_frame_equal_msg(
             actual=actual,
             expected=expected,
@@ -399,15 +308,12 @@ class TestDatetimeSinusoidCalculatorTransform:
 
     def test_expected_output_dict_units(self):
         expected = d.create_datediff_test_df()
-
+        columns = ["a", "b"]
         transformer = DatetimeSinusoidCalculator(
-            [
-                "a",
-                "b",
-            ],
-            ["sin"],
-            {"a": "month", "b": "day"},
-            12,
+            columns=columns,
+            method=["sin"],
+            units={"a": "month", "b": "day"},
+            period=12,
         )
 
         a_in_desired_unit = expected["a"].dt.month
@@ -418,8 +324,8 @@ class TestDatetimeSinusoidCalculatorTransform:
         b_col_name = "sin_12_day_b"
         expected[a_col_name] = a_method_ready_column.apply(np.sin)
         expected[b_col_name] = b_method_ready_column.apply(np.sin)
-
-        actual = transformer.transform(d.create_datediff_test_df())
+        df = d.create_datediff_test_df()
+        actual = transformer.transform(df)
         ta.equality.assert_frame_equal_msg(
             actual=actual,
             expected=expected,
@@ -430,13 +336,13 @@ class TestDatetimeSinusoidCalculatorTransform:
         expected = d.create_datediff_test_df()
 
         transformer = DatetimeSinusoidCalculator(
-            [
+            columns=[
                 "a",
                 "b",
             ],
-            ["sin"],
-            "month",
-            {"a": 12, "b": 24},
+            method=["sin"],
+            units="month",
+            period={"a": 12, "b": 24},
         )
 
         a_in_desired_unit = expected["a"].dt.month
@@ -457,15 +363,12 @@ class TestDatetimeSinusoidCalculatorTransform:
 
     def test_expected_output_dict_both(self):
         expected = d.create_datediff_test_df()
-
+        columns = ["a", "b"]
         transformer = DatetimeSinusoidCalculator(
-            [
-                "a",
-                "b",
-            ],
-            ["sin"],
-            {"a": "month", "b": "day"},
-            {"a": 12, "b": 24},
+            columns=columns,
+            method=["sin"],
+            units={"a": "month", "b": "day"},
+            period={"a": 12, "b": 24},
         )
 
         a_in_desired_unit = expected["a"].dt.month
@@ -476,42 +379,9 @@ class TestDatetimeSinusoidCalculatorTransform:
         b_col_name = "sin_24_day_b"
         expected[a_col_name] = a_method_ready_column.apply(np.sin)
         expected[b_col_name] = b_method_ready_column.apply(np.sin)
+        df = d.create_datediff_test_df()
 
-        actual = transformer.transform(d.create_datediff_test_df())
-        ta.equality.assert_frame_equal_msg(
-            actual=actual,
-            expected=expected,
-            msg_tag="DatetimeSinusoidCalculator transformer does not produce the expected output",
-        )
-
-    def test_expected_output_dict_both_with_both_methods(self):
-        "Checks that both methods produce the correct output on both date and datetime columna"
-        expected = d.create_date_diff_different_dtypes()
-
-        transformer = DatetimeSinusoidCalculator(
-            [
-                "date_col_1",
-                "datetime_col_1",
-            ],
-            ["sin", "cos"],
-            {"date_col_1": "month", "datetime_col_1": "day"},
-            {"date_col_1": 12, "datetime_col_1": 24},
-        )
-
-        a_in_desired_unit = pd.to_datetime(expected["date_col_1"]).dt.month
-        b_in_desired_unit = expected["datetime_col_1"].dt.day
-        a_method_ready_column = a_in_desired_unit * (2.0 * np.pi / 12)
-        b_method_ready_column = b_in_desired_unit * (2.0 * np.pi / 24)
-        a_sin_col_name = "sin_12_month_date_col_1"
-        a_cos_col_name = "cos_12_month_date_col_1"
-        b_sin_col_name = "sin_24_day_datetime_col_1"
-        b_cos_col_name = "cos_24_day_datetime_col_1"
-        expected[a_sin_col_name] = a_method_ready_column.apply(np.sin)
-        expected[a_cos_col_name] = a_method_ready_column.apply(np.cos)
-        expected[b_sin_col_name] = b_method_ready_column.apply(np.sin)
-        expected[b_cos_col_name] = b_method_ready_column.apply(np.cos)
-
-        actual = transformer.transform(d.create_date_diff_different_dtypes())
+        actual = transformer.transform(df)
         ta.equality.assert_frame_equal_msg(
             actual=actual,
             expected=expected,
