@@ -39,16 +39,14 @@ Changed
 - Refactored ArbitraryImputer and BaseImputer tests in new format.
 - Refactored MedianImputer tests in new format.
 - Replaced occurrences of pd.Dataframe.drop() with del statement to speed up tubular. Note that no additional unit testing has been done for copy=False as this release is scheduled to remove copy. 
-- Created BaseCrossColumnNumericTransformer class. Refactored CrossColumnAddTransformer and CrossColumnMultiplyTransformer to use this class. 
-Moved tests for these objects to new approach.
+- Created BaseCrossColumnNumericTransformer class. Refactored CrossColumnAddTransformer and CrossColumnMultiplyTransformer to use this class. Moved tests for these objects to new approach.
 - Created BaseCrossColumnMappingTransformer class and integrated into CrossColumnMappingTransformer tests  
 - Refactored BaseNominalTransformer tests in new format & moved its logic to the transform method.
 - Refactored ModeImputer tests in new format.
 - Added generic init tests to base tests for transformers that take two columns as an input.
 - Refactored EqualityChecker tests in new format.
 - Bugfix to MeanResponseTransformer to ignore unobserved categorical levels
-- Refactored dates.py to prepare for testing refactor. Edited BaseDateTransformer (and created BaseDateTwoColumnTransformer) to follow standard format, implementing validations at init/fit/transform. 
-To reduce complexity of file, made transformers more opinionated to insist on specific and consistent column dtypes. 
+- Refactored dates.py to prepare for testing refactor. Edited BaseDateTransformer (and created BaseDateTwoColumnTransformer) to follow standard format, implementing validations at init/fit/transform. To reduce complexity of file, made transformers more opinionated to insist on specific and consistent column dtypes.  `#246 <https://github.com/lvgig/tubular/pull/246>`_
 - Added test_BaseTwoColumnTransformer base class for columns that require a list of two columns for input
 - Added BaseDropOriginalMixin to mixin transformers to handle validation and method of dropping original features, also added appropriate test classes.
 
@@ -58,7 +56,7 @@ Removed
 - Functionality for BaseTransformer (and thus all transformers) to take `None` as an option for columns. This behaviour was inconsistently implemented across transformers. Rather than extending to all we decided to remove 
 this functionality. This required updating a lot of test files.
 - The `columns_set_or_check()` method from BaseTransformer. With the above change it was no longer necessary. Subsequent updates to nominal transformers and their tests were required.
-- Set pd copy_on_write to True (will become default in pandas 3.0) which allowed the functionality of the copy method of the transformers to be dropped `#197 <https://github.com/lvgig/tubular/pull/197>`
+- Set pd copy_on_write to True (will become default in pandas 3.0) which allowed the functionality of the copy method of the transformers to be dropped `#197 <https://github.com/lvgig/tubular/pull/197>`_
 
 1.2.2 (2024-02-20)
 ------------------
@@ -75,14 +73,14 @@ Changed
 ------------------
 Added
 ^^^^^
-- Updated GroupRareLevelsTransformer so that when working with category dtypes it forgets categories encoded as rare (this is wanted behaviour as these categories are no longer present in the data) `<#177 https://github.com/lvgig/tubular/pull/177>`_
+- Updated GroupRareLevelsTransformer so that when working with category dtypes it forgets categories encoded as rare (this is wanted behaviour as these categories are no longer present in the data) `#177 <https://github.com/lvgig/tubular/pull/177>`_
 
 1.2.0 (2024-02-06)
 ------------------
 Added
 ^^^^^
 - Update OneHotEncodingTransformer to default to returning int8 columns `#175 <https://github.com/lvgig/tubular/pull/175>`_
-- Updated NullIndicator to return int8 columns `<#173 https://github.com/lvgig/tubular/pull/173>`_
+- Updated NullIndicator to return int8 columns `#173 <https://github.com/lvgig/tubular/pull/173>`_
 - Updated MeanResponseTransformer to coerce return to float (useful behaviour for category type features) `#174 <https://github.com/lvgig/tubular/pull/174>`_
 
 1.1.1 (2024-01-18)
