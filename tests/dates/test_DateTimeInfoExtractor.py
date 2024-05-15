@@ -1,5 +1,3 @@
-import re
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -63,7 +61,7 @@ class TestExtractDatetimeInfoInit:
         """Test that an exception is raised when include contains incorrect values."""
         with pytest.raises(
             ValueError,
-            match=r'elements in include should be in \["timeofday", "timeofmonth", "timeofyear", "dayofweek"\]',
+            match=r"DatetimeInfoExtractor: elements in include should be in \['timeofday', 'timeofmonth', 'timeofyear', 'dayofweek'\]",
         ):
             DatetimeInfoExtractor(
                 columns=["a"],
@@ -138,27 +136,19 @@ class TestExtractDatetimeInfoInit:
         [
             (
                 {"timeofday": {"mapped": range(23)}},
-                re.escape(
-                    "timeofday mapping dictionary should contain mapping for all hours between 0-23. {23} are missing",
-                ),
+                r"DatetimeInfoExtractor: timeofday mapping dictionary should contain mapping for all values between 0-23. \{23\} are missing",
             ),
             (
                 {"timeofmonth": {"mapped": range(1, 31)}},
-                re.escape(
-                    "timeofmonth mapping dictionary should contain mapping for all days between 1-31. {31} are missing",
-                ),
+                r"DatetimeInfoExtractor: timeofmonth mapping dictionary should contain mapping for all values between 1-31. \{31\} are missing",
             ),
             (
                 {"timeofyear": {"mapped": range(1, 12)}},
-                re.escape(
-                    "timeofyear mapping dictionary should contain mapping for all months between 1-12. {12} are missing",
-                ),
+                r"DatetimeInfoExtractor: timeofyear mapping dictionary should contain mapping for all values between 1-12. \{12\} are missing",
             ),
             (
                 {"dayofweek": {"mapped": range(6)}},
-                re.escape(
-                    "dayofweek mapping dictionary should contain mapping for all days between 0-6. {6} are missing",
-                ),
+                r"DatetimeInfoExtractor: dayofweek mapping dictionary should contain mapping for all values between 0-6. \{6\} are missing",
             ),
         ],
     )
@@ -177,8 +167,8 @@ class TestMapValues:
     def test_incorrect_type_input(self, incorrect_type_input, timeofday_extractor):
         """Test that an error is raised if input is the wrong type."""
         with pytest.raises(
-            TypeError,
-            match="DatetimeInfoExtractor: value should be float or int",
+            ValueError,
+            match="DatetimeInfoExtractor: value for timeofday mapping in self._map_values should be an integer value in 0-23",
         ):
             timeofday_extractor._map_values(incorrect_type_input, "timeofday")
 
@@ -191,7 +181,7 @@ class TestMapValues:
         """Test that an error is raised when value is outside of 0-23 range."""
         with pytest.raises(
             ValueError,
-            match="DatetimeInfoExtractor: value for timeofday mapping  in self._map_values should be an integer value in 0-23",
+            match="DatetimeInfoExtractor: value for timeofday mapping in self._map_values should be an integer value in 0-23",
         ):
             timeofday_extractor._map_values(incorrect_size_input, "timeofday")
 

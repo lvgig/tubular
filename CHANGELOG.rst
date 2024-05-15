@@ -50,6 +50,7 @@ Changed
 - Added test_BaseTwoColumnTransformer base class for columns that require a list of two columns for input
 - Added BaseDropOriginalMixin to mixin transformers to handle validation and method of dropping original features, also added appropriate test classes.
 - Refactored MeanImputer tests in new format `#250 <https://github.com/lvgig/tubular/pull/250>`_
+- Refactored DatetimeInfoExtractor to condense and improve readability
 
 
 Removed
