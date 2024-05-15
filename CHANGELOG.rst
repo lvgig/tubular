@@ -47,7 +47,7 @@ Moved tests for these objects to new approach.
 - Bugfix to MeanResponseTransformer to ignore unobserved categorical levels
 - Refactored dates.py to prepare for testing refactor. Edited BaseDateTransformer (and created BaseDateTwoColumnTransformer) to follow standard format, implementing validations at init/fit/transform. 
 To reduce complexity of file, made transformers more opinionated to insist on specific and consistent column dtypes. 
-
+- Refactored DatetimeInfoExtractor to condense and improve readability
 
 Removed
 ^^^^^^^
