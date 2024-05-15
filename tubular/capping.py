@@ -9,9 +9,10 @@ import numpy as np
 import pandas as pd
 
 from tubular.base import BaseTransformer
+from tubular.mixins import WeightColumnMixin
 
 
-class BaseCappingTransformer(BaseTransformer):
+class BaseCappingTransformer(BaseTransformer, WeightColumnMixin):
     def __init__(
         self,
         capping_values: dict[str, list[int | float | None]] | None = None,
@@ -97,7 +98,7 @@ class BaseCappingTransformer(BaseTransformer):
             super().__init__(columns=list(quantiles.keys()), **kwargs)
 
         self.quantiles = quantiles
-        self.weights_column = weights_column
+        WeightColumnMixin.check_and_set_weight(self, weights_column)
 
     def check_capping_values_dict(
         self,
@@ -170,6 +171,9 @@ class BaseCappingTransformer(BaseTransformer):
             Required for pipeline.
 
         """
+        if self.weights_column:
+            WeightColumnMixin.check_weights_column(self, X, self.weights_column)
+
         super().fit(X, y)
 
         self.quantile_capping_values = {}

@@ -1,10 +1,9 @@
-import re
-
 import pytest
 import test_aide as ta
 
 import tests.test_data as d
 from tests.base_tests import (
+    DropOriginalInitTests,
     GenericFitTests,
     GenericTransformTests,
     OtherBaseBehaviourTests,
@@ -13,28 +12,12 @@ from tests.base_tests import (
 from tubular.comparison import EqualityChecker
 
 
-class TestInit(TwoColumnListInitTests):
+class TestInit(DropOriginalInitTests, TwoColumnListInitTests):
     """Generic tests for transformer.init()."""
 
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "EqualityChecker"
-
-    @pytest.mark.parametrize("not_bool", [{"a": 1}, [1, 2], 1, "True", 1.5])
-    def test_exception_raised_drop_original_not_bool(self, not_bool):
-        """Test an exception is raised if drop_original is not a string"""
-
-        with pytest.raises(
-            TypeError,
-            match=re.escape(
-                "EqualityChecker: drop_original should be bool",
-            ),
-        ):
-            EqualityChecker(
-                new_col_name="a",
-                columns=["b", "c"],
-                drop_original=not_bool,
-            )
 
 
 class TestFit(GenericFitTests):
