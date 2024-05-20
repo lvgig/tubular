@@ -7,8 +7,8 @@ from tests.base_tests import (
     GenericFitTests,
     GenericTransformTests,
     OtherBaseBehaviourTests,
-    WeightColumnFitTests,
-    WeightColumnInitTests,
+    WeightColumnFitMixinTests,
+    WeightColumnInitMixinTests,
 )
 from tests.imputers.test_BaseImputer import (
     GenericImputerTransformTests,
@@ -17,7 +17,7 @@ from tests.imputers.test_BaseImputer import (
 from tubular.imputers import MeanImputer
 
 
-class TestInit(WeightColumnInitTests, ColumnStrListInitTests):
+class TestInit(WeightColumnInitMixinTests, ColumnStrListInitTests):
     """Generic tests for transformer.init()."""
 
     @classmethod
@@ -25,7 +25,7 @@ class TestInit(WeightColumnInitTests, ColumnStrListInitTests):
         cls.transformer_name = "MeanImputer"
 
 
-class TestFit(WeightColumnFitTests, GenericFitTests):
+class TestFit(WeightColumnFitMixinTests, GenericFitTests):
     """Generic tests for transformer.fit()"""
 
     @classmethod

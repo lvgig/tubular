@@ -8,8 +8,8 @@ import test_aide as ta
 import tests.test_data as d
 from tests.base_tests import (
     ColumnStrListInitTests,
-    DropOriginalInitTests,
-    DropOriginalTransformTests,
+    DropOriginalInitMixinTests,
+    DropOriginalTransformMixinTests,
     GenericFitTests,
     GenericTransformTests,
     OtherBaseBehaviourTests,
@@ -86,7 +86,7 @@ class DataFrameMethodTransformerInitTests(ColumnStrListInitTests):
             )
 
 
-class TestInit(DropOriginalInitTests, DataFrameMethodTransformerInitTests):
+class TestInit(DropOriginalInitMixinTests, DataFrameMethodTransformerInitTests):
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "DataFrameMethodTransformer"
@@ -100,7 +100,7 @@ class TestFit(GenericFitTests):
         cls.transformer_name = "DataFrameMethodTransformer"
 
 
-class TestTransform(DropOriginalTransformTests, GenericTransformTests):
+class TestTransform(DropOriginalTransformMixinTests, GenericTransformTests):
     """Tests for DataFrameMethodTransformer.transform()."""
 
     @classmethod
