@@ -6,6 +6,11 @@ from pathlib import Path
 import pytest
 
 import tubular.base as base
+from tests.test_data import (
+    create_is_between_dates_df_1,
+    create_numeric_df_1,
+    create_object_df,
+)
 
 """
 How To Use This Testing Framework
@@ -26,7 +31,7 @@ New transformers will need to be added to minimal_attribute_dict.
  """
 
 
-def get_all_classes():
+def get_all_classes(wanted_module=None):
     root = str(Path(__file__).parent.parent)
 
     all_classes = []
@@ -39,6 +44,8 @@ def get_all_classes():
     for _importer, modname, _ispkg in pkgutil.walk_packages(
         path=[root],
     ):
+        if wanted_module and modname != wanted_module:
+            continue
         mod_parts = modname.split(".")
         if any(part in modules_to_ignore for part in mod_parts) or "_" in modname:
             continue
@@ -238,6 +245,45 @@ def minimal_attribute_dict():
             "new_column": "c",
         },
     }
+
+
+@pytest.fixture()
+def minimal_dataframe_dict():
+    """links transformers to minimal dataframes needed to successfully run transformer.
+    New transformers need to be added here"""
+
+    num_df = create_numeric_df_1()
+    object_df = create_object_df()
+    date_df = create_is_between_dates_df_1()
+
+    # generally most transformers will work with num_df
+    min_df_dict = {x[0]: num_df for x in get_all_classes()}
+
+    # where they do not, will need to override
+    date_transformers = [x[0] for x in get_all_classes(wanted_module="tubular.dates")]
+    for transformer in date_transformers:
+        min_df_dict[transformer] = date_df
+
+    object_modules = ["tubular.mapping", "tubular.nominal", "tubular.strings"]
+    object_transformers = []
+    for module in object_modules:
+        object_transformers = object_transformers + [
+            x[0] for x in get_all_classes(wanted_module=module)
+        ]
+
+    for transformer in object_transformers:
+        min_df_dict[transformer] = object_df
+
+    # Some may require further manual overwrites
+    other_num_transformers = [
+        "CrossColumnMultiplyTransformer",
+        "CrossColumnAddTransformer",
+        "BaseCrossColumnNumericTransformer",
+    ]
+    for transformer in other_num_transformers:
+        min_df_dict[transformer] = num_df
+
+    return min_df_dict
 
 
 @pytest.fixture()
