@@ -120,7 +120,7 @@ class ColumnStrListInitTests(GenericInitTests):
             uninitialized_transformers[self.transformer_name](**args)
 
 
-class DropOriginalInitTests(GenericInitTests):
+class DropOriginalInitMixinTests:
     """
     Tests for BaseTransformer.init() behaviour specific to when a transformer accepts a "drop_original" column.
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
@@ -144,7 +144,7 @@ class DropOriginalInitTests(GenericInitTests):
             uninitialized_transformers[self.transformer_name](**args)
 
 
-class WeightColumnInitTests(GenericInitTests):
+class WeightColumnInitMixinTests:
     """
     Tests for BaseTransformer.init() behaviour specific to when a transformer takes accepts a weight column.
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
@@ -363,7 +363,7 @@ class GenericFitTests:
             )
 
 
-class WeightColumnFitTests(GenericFitTests):
+class WeightColumnFitMixinTests:
     def test_fit_returns_self_weighted(
         self,
         minimal_attribute_dict,
@@ -553,7 +553,7 @@ class GenericTransformTests:
         pd.testing.assert_frame_equal(df, d.create_df_3())
 
 
-class DropOriginalTransformTests(GenericTransformTests):
+class DropOriginalTransformMixinTests:
     """
     Transform tests for transformers that take a "drop_original" argument
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
