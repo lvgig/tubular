@@ -4,7 +4,9 @@ import inspect
 import pkgutil
 from importlib import import_module
 from pathlib import Path
+from typing import TYPE_CHECKING
 
+import pandas as pd
 import pytest
 
 import tubular.base as base
@@ -13,6 +15,9 @@ from tests.test_data import (
     create_numeric_df_1,
     create_object_df,
 )
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 """
 How To Use This Testing Framework
@@ -270,9 +275,18 @@ def minimal_attribute_dict():
 
 
 @pytest.fixture()
-def minimal_dataframe_lookup():
-    """links transformers to minimal dataframes needed to successfully run transformer.
-    New transformers need to be added here"""
+def minimal_dataframe_lookup() -> dict[str, pd.DataFrame]:
+    """links transformers to minimal dataframes needed to successfully run transformer. There is logic to do this automatically by module, so function will only need to be edited where either:
+    - a new module that operates primarily on non-numeric columns is added
+    - a new transformer is added to an existing module that breaks the pattern of that module, e.g. a transformer in dates.py that operates on numeric columns
+
+    Returns
+    -------
+
+    min_df_dict: dict[str, pd.DataFrame]
+        dictionary mapping transformers to minimal dataframes that they can successfully run on
+
+    """
 
     num_df = create_numeric_df_1()
     object_df = create_object_df()
@@ -281,11 +295,12 @@ def minimal_dataframe_lookup():
     # generally most transformers will work with num_df
     min_df_dict = {x[0]: num_df for x in get_all_classes()}
 
-    # where they do not, will need to override
+    # override dict value with date_df for transformers in tubular.dates
     date_transformers = [x[0] for x in get_all_classes(wanted_module="tubular.dates")]
     for transformer in date_transformers:
         min_df_dict[transformer] = date_df
 
+    # override dict value for transformers that run on object type columns
     object_modules = ["tubular.mapping", "tubular.nominal", "tubular.strings"]
     object_transformers = []
     for module in object_modules:
