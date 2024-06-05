@@ -248,11 +248,11 @@ class GenericFitTests:
     def test_fit_returns_self(
         self,
         initialized_transformers,
-        minimal_dataframe_dict,
+        minimal_dataframe_lookup,
     ):
         """Test fit returns self?."""
 
-        df = minimal_dataframe_dict[self.transformer_name]
+        df = minimal_dataframe_lookup[self.transformer_name]
 
         x = initialized_transformers[self.transformer_name]
 
@@ -265,11 +265,11 @@ class GenericFitTests:
     def test_fit_not_changing_data(
         self,
         initialized_transformers,
-        minimal_dataframe_dict,
+        minimal_dataframe_lookup,
     ):
         """Test fit does not change X."""
 
-        df = minimal_dataframe_dict[self.transformer_name]
+        df = minimal_dataframe_lookup[self.transformer_name]
         original_df = copy.deepcopy(df)
 
         x = initialized_transformers[self.transformer_name]
@@ -372,10 +372,10 @@ class WeightColumnFitTests(GenericFitTests):
         self,
         minimal_attribute_dict,
         uninitialized_transformers,
-        minimal_dataframe_dict,
+        minimal_dataframe_lookup,
     ):
         """Test fit returns self?."""
-        df = minimal_dataframe_dict[self.transformer_name]
+        df = minimal_dataframe_lookup[self.transformer_name]
         args = minimal_attribute_dict[self.transformer_name].copy()
         # insert weight column
         weight_column = "weight_column"
@@ -394,10 +394,10 @@ class WeightColumnFitTests(GenericFitTests):
         self,
         minimal_attribute_dict,
         uninitialized_transformers,
-        minimal_dataframe_dict,
+        minimal_dataframe_lookup,
     ):
         """Test fit does not change X - when weights are used."""
-        df = minimal_dataframe_dict[self.transformer_name]
+        df = minimal_dataframe_lookup[self.transformer_name]
         # insert weight column
         weight_column = "weight_column"
         df[weight_column] = np.arange(1, len(df) + 1)
@@ -431,11 +431,11 @@ class WeightColumnFitTests(GenericFitTests):
         expected_message,
         minimal_attribute_dict,
         uninitialized_transformers,
-        minimal_dataframe_dict,
+        minimal_dataframe_lookup,
     ):
         """Test that an exception is raised if there are negative/nan/inf values in sample_weight."""
 
-        df = minimal_dataframe_dict[self.transformer_name]
+        df = minimal_dataframe_lookup[self.transformer_name]
 
         args = minimal_attribute_dict[self.transformer_name].copy()
         weight_column = "weight_column"
@@ -467,11 +467,11 @@ class WeightColumnFitTests(GenericFitTests):
         self,
         uninitialized_transformers,
         minimal_attribute_dict,
-        minimal_dataframe_dict,
+        minimal_dataframe_lookup,
     ):
         """Test an error is raised if weight is not numeric."""
 
-        df = minimal_dataframe_dict[self.transformer_name]
+        df = minimal_dataframe_lookup[self.transformer_name]
 
         weight_column = "weight_column"
         error = r"weight column must be numeric."
@@ -493,11 +493,11 @@ class WeightColumnFitTests(GenericFitTests):
         self,
         uninitialized_transformers,
         minimal_attribute_dict,
-        minimal_dataframe_dict,
+        minimal_dataframe_lookup,
     ):
         """Test an error is raised if weight is not in X"""
 
-        df = minimal_dataframe_dict[self.transformer_name]
+        df = minimal_dataframe_lookup[self.transformer_name]
 
         weight_column = "weight_column"
         error = rf"weight col \({weight_column}\) is not present in columns of data"
@@ -518,7 +518,7 @@ class WeightColumnFitTests(GenericFitTests):
         self,
         minimal_attribute_dict,
         uninitialized_transformers,
-        minimal_dataframe_dict,
+        minimal_dataframe_lookup,
     ):
         """Test that an exception is raised if the total sample weights are 0."""
 
@@ -526,7 +526,7 @@ class WeightColumnFitTests(GenericFitTests):
         weight_column = "weight_column"
         args["weights_column"] = weight_column
 
-        df = minimal_dataframe_dict[self.transformer_name]
+        df = minimal_dataframe_lookup[self.transformer_name]
         df[weight_column] = [0] * len(df)
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
@@ -582,11 +582,11 @@ class GenericTransformTests:
     def test_original_df_not_updated(
         self,
         initialized_transformers,
-        minimal_dataframe_dict,
+        minimal_dataframe_lookup,
     ):
         """Test that the original dataframe is not transformed when transform method used."""
 
-        df = minimal_dataframe_dict[self.transformer_name]
+        df = minimal_dataframe_lookup[self.transformer_name]
         original_df = copy.deepcopy(df)
 
         x = initialized_transformers[self.transformer_name]
@@ -607,11 +607,11 @@ class DropOriginalTransformTests(GenericTransformTests):
     def test_original_columns_dropped_when_specified(
         self,
         initialized_transformers,
-        minimal_dataframe_dict,
+        minimal_dataframe_lookup,
     ):
         """Test transformer drops original columns when specified."""
 
-        df = minimal_dataframe_dict[self.transformer_name]
+        df = minimal_dataframe_lookup[self.transformer_name]
 
         x = initialized_transformers[self.transformer_name]
 
@@ -625,11 +625,11 @@ class DropOriginalTransformTests(GenericTransformTests):
     def test_original_columns_kept_when_specified(
         self,
         initialized_transformers,
-        minimal_dataframe_dict,
+        minimal_dataframe_lookup,
     ):
         """Test transformer keeps original columns when specified."""
 
-        df = minimal_dataframe_dict[self.transformer_name]
+        df = minimal_dataframe_lookup[self.transformer_name]
 
         x = initialized_transformers[self.transformer_name]
 
@@ -643,11 +643,11 @@ class DropOriginalTransformTests(GenericTransformTests):
     def test_other_columns_not_modified(
         self,
         initialized_transformers,
-        minimal_dataframe_dict,
+        minimal_dataframe_lookup,
     ):
         """Test transformer does not modify unspecified columns."""
 
-        df = minimal_dataframe_dict[self.transformer_name]
+        df = minimal_dataframe_lookup[self.transformer_name]
 
         x = initialized_transformers[self.transformer_name]
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import inspect
 import pkgutil
 from importlib import import_module
@@ -31,7 +33,27 @@ New transformers will need to be added to minimal_attribute_dict.
  """
 
 
-def get_all_classes(wanted_module=None):
+def get_all_classes(
+    wanted_module: str | None = None,
+) -> dict[str, base.BaseTransformer]:
+    """Method to call the weighted_quantile method and prepare the outputs.
+
+    If there are no None values in the supplied quantiles then the outputs from weighted_quantile
+    are returned as is. If there are then prepare_quantiles removes the None values before
+    calling weighted_quantile and adds them back into the output, in the same position, after
+    calling.
+
+    Parameters
+    ----------
+    wanted_module : str or None
+        str indicating which module to load classes from (e.g. 'tubular.dates'). If none, loads from all modules.
+
+    Returns
+    -------
+    all_classes : dict[str, BaseTransformer]
+        Dictionary containing classes in format {transformer_name:transformer}
+
+    """
     root = str(Path(__file__).parent.parent)
 
     all_classes = []
@@ -248,7 +270,7 @@ def minimal_attribute_dict():
 
 
 @pytest.fixture()
-def minimal_dataframe_dict():
+def minimal_dataframe_lookup():
     """links transformers to minimal dataframes needed to successfully run transformer.
     New transformers need to be added here"""
 
