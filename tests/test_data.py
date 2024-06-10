@@ -34,6 +34,17 @@ def create_numeric_df_1():
     )
 
 
+def create_object_df():
+    """Example with object columns - c is numeric target"""
+    return pd.DataFrame(
+        {
+            "a": ["a", "b", "c", "d", "e"],
+            "b": ["f", "g", "h", "i", "j"],
+            "c": [1, 2, 3, 4, 5],
+        },
+    )
+
+
 def create_df_1():
     """Create simple DataFrame with the following...
 

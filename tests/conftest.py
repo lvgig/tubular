@@ -1,11 +1,23 @@
+from __future__ import annotations
+
 import inspect
 import pkgutil
 from importlib import import_module
 from pathlib import Path
+from typing import TYPE_CHECKING
 
+import pandas as pd
 import pytest
 
 import tubular.base as base
+from tests.test_data import (
+    create_is_between_dates_df_1,
+    create_numeric_df_1,
+    create_object_df,
+)
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 """
 How To Use This Testing Framework
@@ -26,7 +38,27 @@ New transformers will need to be added to minimal_attribute_dict.
  """
 
 
-def get_all_classes():
+def get_all_classes(
+    wanted_module: str | None = None,
+) -> dict[str, base.BaseTransformer]:
+    """Method to call the weighted_quantile method and prepare the outputs.
+
+    If there are no None values in the supplied quantiles then the outputs from weighted_quantile
+    are returned as is. If there are then prepare_quantiles removes the None values before
+    calling weighted_quantile and adds them back into the output, in the same position, after
+    calling.
+
+    Parameters
+    ----------
+    wanted_module : str or None
+        str indicating which module to load classes from (e.g. 'tubular.dates'). If none, loads from all modules.
+
+    Returns
+    -------
+    all_classes : dict[str, BaseTransformer]
+        Dictionary containing classes in format {transformer_name:transformer}
+
+    """
     root = str(Path(__file__).parent.parent)
 
     all_classes = []
@@ -39,6 +71,8 @@ def get_all_classes():
     for _importer, modname, _ispkg in pkgutil.walk_packages(
         path=[root],
     ):
+        if wanted_module and modname != wanted_module:
+            continue
         mod_parts = modname.split(".")
         if any(part in modules_to_ignore for part in mod_parts) or "_" in modname:
             continue
@@ -238,6 +272,55 @@ def minimal_attribute_dict():
             "new_column": "c",
         },
     }
+
+
+@pytest.fixture()
+def minimal_dataframe_lookup() -> dict[str, pd.DataFrame]:
+    """links transformers to minimal dataframes needed to successfully run transformer. There is logic to do this automatically by module, so function will only need to be edited where either:
+    - a new module that operates primarily on non-numeric columns is added
+    - a new transformer is added to an existing module that breaks the pattern of that module, e.g. a transformer in dates.py that operates on numeric columns
+
+    Returns
+    -------
+
+    min_df_dict: dict[str, pd.DataFrame]
+        dictionary mapping transformers to minimal dataframes that they can successfully run on
+
+    """
+
+    num_df = create_numeric_df_1()
+    object_df = create_object_df()
+    date_df = create_is_between_dates_df_1()
+
+    # generally most transformers will work with num_df
+    min_df_dict = {x[0]: num_df for x in get_all_classes()}
+
+    # override dict value with date_df for transformers in tubular.dates
+    date_transformers = [x[0] for x in get_all_classes(wanted_module="tubular.dates")]
+    for transformer in date_transformers:
+        min_df_dict[transformer] = date_df
+
+    # override dict value for transformers that run on object type columns
+    object_modules = ["tubular.mapping", "tubular.nominal", "tubular.strings"]
+    object_transformers = []
+    for module in object_modules:
+        object_transformers = object_transformers + [
+            x[0] for x in get_all_classes(wanted_module=module)
+        ]
+
+    for transformer in object_transformers:
+        min_df_dict[transformer] = object_df
+
+    # Some may require further manual overwrites
+    other_num_transformers = [
+        "CrossColumnMultiplyTransformer",
+        "CrossColumnAddTransformer",
+        "BaseCrossColumnNumericTransformer",
+    ]
+    for transformer in other_num_transformers:
+        min_df_dict[transformer] = num_df
+
+    return min_df_dict
 
 
 @pytest.fixture()

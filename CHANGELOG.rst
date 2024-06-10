@@ -51,6 +51,7 @@ Changed
 - Added BaseDropOriginalMixin to mixin transformers to handle validation and method of dropping original features, also added appropriate test classes.
 - Refactored MeanImputer tests in new format `#250 <https://github.com/lvgig/tubular/pull/250>`_
 - Refactored DatetimeInfoExtractor to condense and improve readability
+- added minimal_dataframe_lookup fixture to conftest, and edited generic tests to use this
 
 
 Removed
