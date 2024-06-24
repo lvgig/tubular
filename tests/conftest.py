@@ -194,8 +194,9 @@ def minimal_attribute_dict():
             "columns": ["a"],
         },
         "OneHotEncodingTransformer": {
-            "columns": ["c"],
+            "columns": ["a", "c"],
             "drop_original": True,
+            "separator": "-",
         },
         "OrdinalEncoderTransformer": {
             "columns": ["b"],

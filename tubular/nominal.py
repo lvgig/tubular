@@ -1092,7 +1092,7 @@ class OneHotEncodingTransformer(BaseDropOriginalMixin, BaseTransformer, OneHotEn
             copy=copy,
         )
 
-        # Set attributes for scikit-learn'S OneHotEncoder
+        # Set attributes for scikit-learn's OneHotEncoder
         OneHotEncoder.__init__(
             self,
             sparse_output=False,
@@ -1102,6 +1102,10 @@ class OneHotEncodingTransformer(BaseDropOriginalMixin, BaseTransformer, OneHotEn
         )
 
         # Set other class attrributes
+        if not isinstance(separator, str):
+            msg = f"{self.classname()}: separator must be a str"
+            raise TypeError(msg)
+
         self.separator = separator
 
         BaseDropOriginalMixin.set_drop_original_column(self, drop_original)
