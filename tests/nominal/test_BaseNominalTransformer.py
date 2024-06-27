@@ -29,7 +29,7 @@ class GenericBaseNominalTransformerTests:
             with pytest.raises(NotFittedError):
                 initialized_transformers[self.transformer_name].transform(df)
 
-    def test_exception_raised(self, initialized_transformers):
+    def test_non_mappable_rows_exception_raised(self, initialized_transformers):
         """Test an exception is raised if non-mappable rows are present in X."""
         df = d.create_df_1()
 
