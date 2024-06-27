@@ -10,11 +10,12 @@ from tests.base_tests import (
     GenericFitTests,
     GenericTransformTests,
     OtherBaseBehaviourTests,
+    WeightColumnInitMixinTests,
 )
 from tubular.nominal import GroupRareLevelsTransformer
 
 
-class TestInit(ColumnStrListInitTests):
+class TestInit(ColumnStrListInitTests, WeightColumnInitMixinTests):
     """Tests for GroupRareLevelsTransformer.init()."""
 
     @classmethod
@@ -44,14 +45,6 @@ class TestInit(ColumnStrListInitTests):
             match="GroupRareLevelsTransformer: cut_off_percent must be > 0 and < 1",
         ):
             GroupRareLevelsTransformer(columns="a", cut_off_percent=2.0)
-
-    def test_weight_not_str_error(self):
-        """Test that an exception is raised if weight is not a str, if supplied."""
-        with pytest.raises(
-            TypeError,
-            match="weights_column should be str or None",
-        ):
-            GroupRareLevelsTransformer(columns="a", weights_column=2)
 
     def test_record_rare_levels_not_bool_error(self):
         """Test that an exception is raised if record_rare_levels is not a bool."""
