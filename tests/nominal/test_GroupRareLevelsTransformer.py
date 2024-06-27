@@ -5,11 +5,21 @@ import test_aide as ta
 
 import tests.test_data as d
 import tubular
+from tests.base_tests import (
+    ColumnStrListInitTests,
+    GenericFitTests,
+    GenericTransformTests,
+    OtherBaseBehaviourTests,
+)
 from tubular.nominal import GroupRareLevelsTransformer
 
 
-class TestInit:
+class TestInit(ColumnStrListInitTests):
     """Tests for GroupRareLevelsTransformer.init()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "GroupRareLevelsTransformer"
 
     def test_super_init_called(self, mocker):
         """Test that init calls BaseTransformer.init."""
@@ -74,8 +84,12 @@ class TestInit:
             GroupRareLevelsTransformer(columns="a", unseen_levels_to_rare=2)
 
 
-class TestFit:
+class TestFit(GenericFitTests):
     """Tests for GroupRareLevelsTransformer.fit()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "GroupRareLevelsTransformer"
 
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseTransformer.fit."""
@@ -221,8 +235,12 @@ class TestFit:
         )
 
 
-class TestTransform:
+class TestTransform(GenericTransformTests):
     """Tests for GroupRareLevelsTransformer.transform()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "GroupRareLevelsTransformer"
 
     def expected_df_1():
         """Expected output for test_expected_output_no_weight."""
@@ -471,3 +489,15 @@ class TestTransform:
             assert (
                 cat not in output_categories
             ), f"{x.classname} output columns should forget rare encoded categories, expected {cat} to be forgotten from column {column}"
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseNominalTransformer"
