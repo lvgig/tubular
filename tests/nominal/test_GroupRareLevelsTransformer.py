@@ -10,6 +10,7 @@ from tests.base_tests import (
     GenericFitTests,
     GenericTransformTests,
     OtherBaseBehaviourTests,
+    WeightColumnFitMixinTests,
     WeightColumnInitMixinTests,
 )
 from tubular.nominal import GroupRareLevelsTransformer
@@ -63,24 +64,12 @@ class TestInit(ColumnStrListInitTests, WeightColumnInitMixinTests):
             GroupRareLevelsTransformer(columns="a", unseen_levels_to_rare=2)
 
 
-class TestFit(GenericFitTests):
+class TestFit(GenericFitTests, WeightColumnFitMixinTests):
     """Tests for GroupRareLevelsTransformer.fit()."""
 
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "GroupRareLevelsTransformer"
-
-    def test_weight_column_not_in_X_error(self):
-        """Test that an exception is raised if weight is not in X."""
-        df = d.create_df_5()
-
-        x = GroupRareLevelsTransformer(columns=["b", "c"], weights_column="aaaa")
-
-        with pytest.raises(
-            ValueError,
-            match=r"weight col \(aaaa\) is not present in columns of data",
-        ):
-            x.fit(df)
 
     def test_learnt_values_no_weight(self):
         """Test that the impute values learnt during fit, without using a weight, are expected."""
