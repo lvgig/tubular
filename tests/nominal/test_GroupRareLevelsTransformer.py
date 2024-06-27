@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import test_aide as ta
+from test_BaseNominalTransformer import GenericBaseNominalTransformerTests
 
 import tests.test_data as d
 from tests.base_tests import (
@@ -178,7 +179,7 @@ class TestFit(GenericFitTests):
         )
 
 
-class TestTransform(GenericTransformTests):
+class TestTransform(GenericBaseNominalTransformerTests, GenericTransformTests):
     """Tests for GroupRareLevelsTransformer.transform()."""
 
     @classmethod
@@ -220,6 +221,9 @@ class TestTransform(GenericTransformTests):
         )
 
         return df
+
+    def test_exception_raised(self, initialized_transformers):
+        """override test in GenericBaseNominalTransformerTests as not relevant to this transformer."""
 
     def test_learnt_values_not_modified(self):
         """Test that the non_rare_levels from fit are not changed in transform."""
