@@ -129,8 +129,12 @@ class TestTransform(GenericBaseNominalTransformerTests, GenericTransformTests):
         )
 
 
-class TestInverseTransform:
+class TestInverseTransform(GenericBaseNominalTransformerTests, GenericTransformTests):
     """Tests for NominalToIntegerTransformer.inverse_transform()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "NominalToIntegerTransformer"
 
     @pytest.mark.parametrize(
         ("df", "expected"),
