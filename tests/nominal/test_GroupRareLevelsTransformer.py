@@ -222,7 +222,7 @@ class TestTransform(GenericBaseNominalTransformerTests, GenericTransformTests):
 
         return df
 
-    def test_exception_raised(self, initialized_transformers):
+    def test_exception_raised(self):
         """override test in GenericBaseNominalTransformerTests as not relevant to this transformer."""
 
     def test_learnt_values_not_modified(self):
