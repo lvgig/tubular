@@ -4,7 +4,6 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
-import tubular
 from tests.base_tests import (
     ColumnStrListInitTests,
     GenericFitTests,
@@ -20,20 +19,6 @@ class TestInit(ColumnStrListInitTests):
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "GroupRareLevelsTransformer"
-
-    def test_super_init_called(self, mocker):
-        """Test that init calls BaseTransformer.init."""
-        expected_call_args = {
-            0: {"args": (), "kwargs": {"columns": None, "verbose": True}},
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "__init__",
-            expected_call_args,
-        ):
-            GroupRareLevelsTransformer(columns=None, verbose=True)
 
     def test_cut_off_percent_not_float_error(self):
         """Test that an exception is raised if cut_off_percent is not an float."""
@@ -91,22 +76,6 @@ class TestFit(GenericFitTests):
     def setup_class(cls):
         cls.transformer_name = "GroupRareLevelsTransformer"
 
-    def test_super_fit_called(self, mocker):
-        """Test that fit calls BaseTransformer.fit."""
-        df = d.create_df_5()
-
-        x = GroupRareLevelsTransformer(columns=["b", "c"])
-
-        expected_call_args = {0: {"args": (d.create_df_5(), None), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "fit",
-            expected_call_args,
-        ):
-            x.fit(df)
-
     def test_weight_column_not_in_X_error(self):
         """Test that an exception is raised if weight is not in X."""
         df = d.create_df_5()
@@ -118,32 +87,6 @@ class TestFit(GenericFitTests):
             match=r"weight col \(aaaa\) is not present in columns of data",
         ):
             x.fit(df)
-
-    def test_fit_returns_self(self):
-        """Test fit returns self?."""
-        df = d.create_df_5()
-
-        x = GroupRareLevelsTransformer(columns=["b", "c"])
-
-        x_fitted = x.fit(df)
-
-        assert (
-            x_fitted is x
-        ), "Returned value from GroupRareLevelsTransformer.fit not as expected."
-
-    def test_fit_not_changing_data(self):
-        """Test fit does not change X."""
-        df = d.create_df_5()
-
-        x = GroupRareLevelsTransformer(columns=["b", "c"])
-
-        x.fit(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=d.create_df_5(),
-            actual=df,
-            msg="Check X not changing during fit",
-        )
 
     def test_learnt_values_no_weight(self):
         """Test that the impute values learnt during fit, without using a weight, are expected."""
@@ -277,51 +220,6 @@ class TestTransform(GenericTransformTests):
         )
 
         return df
-
-    def test_check_is_fitted_called(self, mocker):
-        """Test that BaseTransformer check_is_fitted called."""
-        df = d.create_df_5()
-
-        x = GroupRareLevelsTransformer(columns=["b", "c"])
-
-        x.fit(df)
-
-        expected_call_args = {0: {"args": (["non_rare_levels"],), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "check_is_fitted",
-            expected_call_args,
-        ):
-            x.transform(df)
-
-    def test_super_transform_called(self, mocker):
-        """Test that BaseTransformer.transform called."""
-        df = d.create_df_5()
-
-        x = GroupRareLevelsTransformer(columns=["b", "c"])
-
-        x.fit(df)
-
-        expected_call_args = {
-            0: {
-                "args": (
-                    x,
-                    d.create_df_5(),
-                ),
-                "kwargs": {},
-            },
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-            return_value=d.create_df_5(),
-        ):
-            x.transform(df)
 
     def test_learnt_values_not_modified(self):
         """Test that the non_rare_levels from fit are not changed in transform."""
