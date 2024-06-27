@@ -1,3 +1,4 @@
+import joblib
 import numpy as np
 import pandas as pd
 import pytest
@@ -391,3 +392,17 @@ class TestTransform:
             expected,
             "incorrect dataframe returned",
         )
+
+    def test_is_serialisable(self, tmpdir):
+        x = DatetimeInfoExtractor(columns=["b"], include=["timeofyear"])
+        expected = x
+
+        # pickle transformer
+        path = tmpdir.join("transformer.pkl")
+
+        joblib.dump(x, path)
+
+        # unpickle
+        actual = joblib.load(tmpdir.join("transformer.pkl"))
+
+        assert actual == expected
