@@ -1,14 +1,24 @@
 import pandas as pd
 import pytest
 import test_aide as ta
+from test_BaseNominalTransformer import GenericBaseNominalTransformerTests
 
 import tests.test_data as d
-import tubular
+from tests.base_tests import (
+    ColumnStrListInitTests,
+    GenericFitTests,
+    GenericTransformTests,
+    OtherBaseBehaviourTests,
+)
 from tubular.nominal import NominalToIntegerTransformer
 
 
-class TestInit:
+class TestInit(ColumnStrListInitTests):
     """Tests for NominalToIntegerTransformer.init()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "NominalToIntegerTransformer"
 
     def test_start_encoding_not_int_error(self):
         """Test that an exception is raised if start_encoding is not an int."""
@@ -16,46 +26,12 @@ class TestInit:
             NominalToIntegerTransformer(columns="a", start_encoding="a")
 
 
-class TestFit:
+class TestFit(GenericFitTests):
     """Tests for NominalToIntegerTransformer.fit()."""
 
-    def test_super_fit_called(self, mocker):
-        """Test that fit calls BaseTransformer.fit."""
-        df = d.create_df_1()
-
-        x = NominalToIntegerTransformer(columns=["a", "b"])
-
-        spy = mocker.spy(tubular.base.BaseTransformer, "fit")
-
-        x.fit(df)
-
-        assert spy.call_count == 1, "unexpected number of calls to BaseTransformer.fit"
-
-        call_args = spy.call_args_list[0]
-        call_pos_args = call_args[0]
-        call_kwargs = call_args[1]
-
-        expected_kwargs = {}
-
-        assert (
-            call_kwargs == expected_kwargs
-        ), "unexpected kwargs in BaseTransformer.fit call"
-
-        expected_pos_args = (x, d.create_df_1(), None)
-
-        assert len(expected_pos_args) == len(
-            call_pos_args,
-        ), "unexpected # positional args in BaseTransformer.fit call"
-
-        assert (
-            expected_pos_args[0] == call_pos_args[0]
-        ), "unexpected 1st positional arg in BaseTransformer.fit call"
-
-        ta.equality.assert_equal_dispatch(
-            expected_pos_args[1:3],
-            call_pos_args[1:3],
-            "unexpected 2nd, 3rd positional arg in BaseTransformer.fit call",
-        )
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "NominalToIntegerTransformer"
 
     def test_learnt_values(self):
         """Test that the impute values learnt during fit are expected."""
@@ -76,35 +52,13 @@ class TestFit:
             msg="mappings attribute",
         )
 
-    def test_fit_returns_self(self):
-        """Test fit returns self?."""
-        df = d.create_df_1()
 
-        x = NominalToIntegerTransformer(columns=["a", "b"])
-
-        x_fitted = x.fit(df)
-
-        assert (
-            x_fitted is x
-        ), "Returned value from NominalToIntegerTransformer.fit not as expected."
-
-    def test_fit_not_changing_data(self):
-        """Test fit does not change X."""
-        df = d.create_df_1()
-
-        x = NominalToIntegerTransformer(columns=["a", "b"])
-
-        x.fit(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=d.create_df_1(),
-            actual=df,
-            msg="Check X not changing during fit",
-        )
-
-
-class TestTransform:
+class TestTransform(GenericBaseNominalTransformerTests, GenericTransformTests):
     """Tests for NominalToIntegerTransformer.transform()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "NominalToIntegerTransformer"
 
     def expected_df_1():
         """Expected output for test_expected_output."""
@@ -117,55 +71,6 @@ class TestTransform:
         df["b"] = df["b"].replace({k: i for i, k in enumerate(df["b"].unique())})
 
         return df
-
-    def test_check_is_fitted_called(self, mocker):
-        """Test that BaseTransformer check_is_fitted called."""
-        df = d.create_df_1()
-
-        x = NominalToIntegerTransformer(columns=["a", "b"])
-
-        x.fit(df)
-
-        expected_call_args = {0: {"args": (["mappings"],), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "check_is_fitted",
-            expected_call_args,
-        ):
-            x.transform(df)
-
-    def test_not_dataframe_error_raised(self):
-        df = d.create_df_1()
-
-        x = NominalToIntegerTransformer(columns=["a", "b"])
-        x.fit(df, df["a"])
-
-        with pytest.raises(
-            TypeError,
-            match=f"{x.classname()}: X should be a pd.DataFrame",
-        ):
-            x.transform(X=[1, 2, 3, 4, 5, 6])
-
-    def test_super_transform_called(self, mocker):
-        """Test that BaseNominalTransformer.transform called."""
-        df = d.create_df_1()
-
-        x = NominalToIntegerTransformer(columns="a")
-
-        x.fit(df)
-
-        expected_call_args = {0: {"args": (x, d.create_df_1()), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-            return_value=d.create_df_1(),
-        ):
-            x.transform(df)
 
     def test_learnt_values_not_modified(self):
         """Test that the mappings from fit are not changed in transform."""
@@ -226,26 +131,6 @@ class TestTransform:
 
 class TestInverseTransform:
     """Tests for NominalToIntegerTransformer.inverse_transform()."""
-
-    def test_check_is_fitted_called(self, mocker):
-        """Test that BaseTransformer check_is_fitted called."""
-        df = d.create_df_1()
-
-        x = NominalToIntegerTransformer(columns=["a", "b"])
-
-        x.fit(df)
-
-        df_transformed = x.transform(df)
-
-        expected_call_args = {0: {"args": (["mappings"],), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "check_is_fitted",
-            expected_call_args,
-        ):
-            x.inverse_transform(df_transformed)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -310,3 +195,15 @@ class TestInverseTransform:
             actual=x2.mappings,
             msg="Impute values not changed in inverse_transform",
         )
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "NominalToIntegerTransformer"
