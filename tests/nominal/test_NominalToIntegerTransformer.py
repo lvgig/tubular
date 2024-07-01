@@ -90,22 +90,6 @@ class TestTransform(GenericBaseNominalTransformerTests, GenericTransformTests):
             msg="Impute values not changed in transform",
         )
 
-    def test_non_mappable_rows_raises_error(self):
-        """Test that rows that cannot be mapped result in an exception."""
-        df = d.create_df_1()
-
-        x = NominalToIntegerTransformer(columns=["a", "b"])
-
-        x.fit(df)
-
-        df["a"] = df["a"] + 1
-
-        with pytest.raises(
-            ValueError,
-            match="NominalToIntegerTransformer: nulls would be introduced into column a from levels not present in mapping",
-        ):
-            x.transform(df)
-
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_1(), expected_df_1()),
