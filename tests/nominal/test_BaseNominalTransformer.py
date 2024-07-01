@@ -1,5 +1,3 @@
-import re
-
 import pandas as pd
 import pytest
 from sklearn.exceptions import NotFittedError
@@ -62,24 +60,6 @@ class GenericBaseNominalTransformerTests:
         _ = x.transform(df)
 
         pd.testing.assert_frame_equal(df, d.create_df_1())
-
-    def test_no_rows_error(self, initialized_transformers):
-        """Test an error is raised if X has no rows."""
-        df = d.create_df_1()
-
-        x = initialized_transformers[self.transformer_name]
-
-        x = x.fit(df)
-
-        x.mappings = {"b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6}}
-
-        df = pd.DataFrame(columns=["a", "b", "c"])
-
-        with pytest.raises(
-            ValueError,
-            match=re.escape(f"{self.transformer_name}: X has no rows; (0, 3)"),
-        ):
-            x.transform(df)
 
 
 class TestInit(ColumnStrListInitTests):
