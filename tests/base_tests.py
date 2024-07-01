@@ -2,6 +2,7 @@
 import copy
 import re
 
+import joblib
 import numpy as np
 import pandas as pd
 import pytest
@@ -816,3 +817,9 @@ class OtherBaseBehaviourTests(
     Class to collect and hold tests for BaseTransformerBehaviour outside the three standard methods.
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
+
+    def test_is_serialisable(self, initialized_transformers, tmp_path):
+        path = tmp_path / "transformer.pkl"
+
+        # serialise without raising error
+        joblib.dump(initialized_transformers[self.transformer_name], path)
