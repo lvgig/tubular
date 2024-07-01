@@ -15,7 +15,12 @@ Subsections for each version can be one of the following;
 - ``Security`` in case of vulnerabilities.
 
 Each individual change should have a link to the pull request after the description of the change.
+1.3.1 (unreleased)
+------------------
 
+Changed
+^^^^^^^
+- DatetimeInfoExtractor.mappings_provided changed from a dict.keys() object to list so transformer is serialisable. `#258 <https://github.com/lvgig/tubular/pull/258>`_
 
 1.3.0 (2024-06-13)
 ------------------
