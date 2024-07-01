@@ -1,5 +1,3 @@
-import os
-
 import joblib
 import numpy as np
 import pandas as pd
@@ -395,13 +393,11 @@ class TestTransform:
             "incorrect dataframe returned",
         )
 
-    def test_is_serialisable(self):
-        x = DatetimeInfoExtractor(columns=["b"], include=["timeofyear"])
+    def test_is_serialisable(self, tmp_path):
+        transformer = DatetimeInfoExtractor(columns=["b"], include=["timeofyear"])
 
-        path = "transformer.pkl"
+        # pickle transformer
+        path = tmp_path / "transformer.pkl"
 
-        try:
-            joblib.dump(x, path)
-            os.remove(path)
-        except TypeError:
-            os.remove(path)
+        # serialise without raising error
+        joblib.dump(transformer, path)
