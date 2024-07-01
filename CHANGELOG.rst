@@ -16,6 +16,12 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+1.3.1 (unreleased)
+------------------
+
+Changed
+^^^^^^^
+- Refactored NominalToIntegerTransformer tests in new format `#261 <https://github.com/lvgig/tubular/pull/261>`_
 
 1.3.0 (2024-06-13)
 ------------------
