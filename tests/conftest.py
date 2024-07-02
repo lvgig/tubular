@@ -237,6 +237,9 @@ def minimal_attribute_dict():
             "columns": ["c"],
             "drop_original": True,
         },
+        "BaseNumericTransformer": {
+            "columns": ["a", "b"],
+        },
         "LogTransformer": {
             "columns": ["a"],
         },
