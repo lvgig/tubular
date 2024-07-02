@@ -266,14 +266,14 @@ class GenericFitTests:
     ):
         """Test fit does not change X."""
 
-        df = d.create_df_2()
+        df = d.create_df_1()
 
         x = initialized_transformers[self.transformer_name]
 
         x.fit(df)
 
         ta.equality.assert_equal_dispatch(
-            expected=d.create_df_2(),
+            expected=d.create_df_1(),
             actual=df,
             msg="Check X not changing during fit",
         )

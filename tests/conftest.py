@@ -134,7 +134,7 @@ def minimal_attribute_dict():
             },
         },
         "DataFrameMethodTransformer": {
-            "columns": ["a", "c"],
+            "columns": ["a", "b"],
             "new_column_names": "f",
             "pd_method_name": "sum",
             "drop_original": True,
@@ -194,7 +194,7 @@ def minimal_attribute_dict():
             "columns": ["a"],
         },
         "OneHotEncodingTransformer": {
-            "columns": ["a", "c"],
+            "columns": ["a", "b"],
             "drop_original": True,
             "separator": "-",
         },

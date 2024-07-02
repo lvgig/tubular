@@ -1,8 +1,11 @@
+import pandas as pd
 import pytest
 
+import tests.test_data as d
 from tests.base_tests import (
     ColumnStrListInitTests,
     DropOriginalInitTests,
+    GenericFitTests,
 )
 from tubular.nominal import OneHotEncodingTransformer
 
@@ -20,127 +23,37 @@ class TestInit(DropOriginalInitTests, ColumnStrListInitTests):
             OneHotEncodingTransformer(columns=["c"], separator=333)
 
 
-# class TestFit:
-#     """Tests for OneHotEncodingTransformer.fit()."""
+class TestFit(GenericFitTests):
+    """Generic tests for transformer.fit()"""
 
-#     def test_base_transformer_fit_called(self, mocker):
-#         """Test that fit calls BaseTransformer.fit."""
-#         expected_keyword_args = {"X": d.create_df_1(), "y": None}
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "OneHotEncodingTransformer"
 
-#         df = d.create_df_1()
+    def test_nulls_in_X_error(self):
+        """Test that an exception is raised if X has nulls in column to be fit on."""
+        df = d.create_df_2()
 
-#         x = OneHotEncodingTransformer(columns="b")
+        x = OneHotEncodingTransformer(columns=["b", "c"])
 
-#         mocker.patch("tubular.base.BaseTransformer.fit")
+        with pytest.raises(
+            ValueError,
+            match="OneHotEncodingTransformer: column b has nulls - replace before proceeding",
+        ):
+            x.fit(df)
 
-#         x.fit(df)
+    def test_fields_with_over_100_levels_error(self):
+        """Test that OneHotEncodingTransformer.fit on fields with more than 100 levels raises error."""
+        df = pd.DataFrame({"b": list(range(101))})
+        df["a"] = 1
 
-#         assert (
-#             tubular.base.BaseTransformer.fit.call_count == 1
-#         ), f"Not enough calls to BaseTransformer.fit -\n  Expected: 1\n  Actual: {tubular.base.BaseTransformer.fit.call_count}"
+        x = OneHotEncodingTransformer(columns=["a", "b"])
 
-#         call_args = tubular.base.BaseTransformer.fit.call_args_list[0]
-#         call_pos_args = call_args[0]
-#         call_kwargs = call_args[1]
-
-#         ta.equality.assert_equal_dispatch(
-#             expected=expected_keyword_args,
-#             actual=call_kwargs,
-#             msg="kwargs for BaseTransformer.fit in OneHotEncodingTransformer.init",
-#         )
-
-#         assert (
-#             len(call_pos_args) == 1
-#         ), f"Unepxected number of positional args in BaseTransformer.fit call -\n  Expected: 1\n  Actual: {len(call_pos_args)}"
-
-#         assert (
-#             call_pos_args[0] is x
-#         ), f"Unexpected positional arg (self) in BaseTransformer.fit call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
-
-#     def test_one_hot_encoder_fit_called(self, mocker):
-#         """Test that fit calls OneHotEncoder.fit."""
-#         expected_keyword_args = {"X": d.create_df_1()[["b"]], "y": None}
-
-#         df = d.create_df_1()
-
-#         x = OneHotEncodingTransformer(columns="b")
-
-#         mocker.patch("sklearn.preprocessing.OneHotEncoder.fit")
-
-#         x.fit(df)
-
-#         assert (
-#             sklearn.preprocessing.OneHotEncoder.fit.call_count == 1
-#         ), f"Not enough calls to OneHotEncoder.fit -\n  Expected: 1\n  Actual: {sklearn.preprocessing.OneHotEncoder.fit.call_count}"
-
-#         call_args = sklearn.preprocessing.OneHotEncoder.fit.call_args_list[0]
-#         call_pos_args = call_args[0]
-#         call_kwargs = call_args[1]
-
-#         ta.equality.assert_equal_dispatch(
-#             expected=expected_keyword_args,
-#             actual=call_kwargs,
-#             msg="kwargs for OneHotEncoder.fit in OneHotEncodingTransformer.init",
-#         )
-
-#         assert (
-#             len(call_pos_args) == 1
-#         ), f"Unepxected number of positional args in OneHotEncoder.fit call -\n  Expected: 1\n  Actual: {len(call_pos_args)}"
-
-#         assert (
-#             call_pos_args[0] is x
-#         ), f"Unexpected positional arg (self) in OneHotEncoder.fit call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
-
-#     def test_nulls_in_X_error(self):
-#         """Test that an exception is raised if X has nulls in column to be fit on."""
-#         df = d.create_df_2()
-
-#         x = OneHotEncodingTransformer(columns=["b", "c"])
-
-#         with pytest.raises(
-#             ValueError,
-#             match="OneHotEncodingTransformer: column b has nulls - replace before proceeding",
-#         ):
-#             x.fit(df)
-
-#     def test_fields_with_over_100_levels_error(self):
-#         """Test that OneHotEncodingTransformer.fit on fields with more than 100 levels raises error."""
-#         df = pd.DataFrame({"b": list(range(101))})
-#         df["a"] = 1
-
-#         x = OneHotEncodingTransformer(columns=["a", "b"])
-
-#         with pytest.raises(
-#             ValueError,
-#             match="OneHotEncodingTransformer: column b has over 100 unique values - consider another type of encoding",
-#         ):
-#             x.fit(df)
-
-#     def test_fit_returns_self(self):
-#         """Test fit returns self?."""
-#         df = d.create_df_1()
-
-#         x = OneHotEncodingTransformer(columns="b")
-
-#         x_fitted = x.fit(df)
-
-#         assert (
-#             x_fitted is x
-#         ), "Returned value from OneHotEncodingTransformer.fit not as expected."
-
-#     def test_fit_not_changing_data(self):
-#         """Test fit does not change X."""
-#         df = d.create_df_1()
-
-#         x = OneHotEncodingTransformer(columns="b")
-
-#         x.fit(df)
-
-#         ta.equality.assert_equal_dispatch(
-#             expected=d.create_df_1(),
-#             actual=df,
-#             msg="Check X not changing during fit",
-#         )
+        with pytest.raises(
+            ValueError,
+            match="OneHotEncodingTransformer: column b has over 100 unique values - consider another type of encoding",
+        ):
+            x.fit(df)
 
 
 # class TestTransform:
