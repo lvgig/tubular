@@ -180,6 +180,17 @@ def create_df_11():
     )
 
 
+def create_df_12():
+    """Create simple DataFrame to use in other tests."""
+    return pd.DataFrame(
+        {
+            "a": [1, 3, 3, 4, 5, 6, 10, 8, 12],
+            "b": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            "c": [1, 1, 3, 4, 5, 6, 5, 8, 50],
+        },
+    )
+
+
 def create_large_null_df(n_col=1000):
     """Create large single row df with all null values.
 
@@ -304,6 +315,60 @@ def create_MeanResponseTransformer_test_df_unseen_levels():
     )
 
     df["c"] = df["c"].astype("category")
+
+    return df
+
+
+def create_OneHotEncoderTransformer_test_df_1():
+    """Create DataFrame to test OneHotEncoderTransformer
+
+    binary columns are representative of transformed output of column b
+
+    """
+    df = pd.DataFrame(
+        {
+            "a": [4, 2, 2, 1, 3],
+            "b": ["x", "z", "y", "x", "x"],
+            "c": ["c", "a", "a", "c", "b"],
+        },
+    )
+
+    df["c"] = df["c"].astype("category")
+
+    df["b_x"] = [1.0, 0.0, 0.0, 1.0, 1.0]
+    df["b_y"] = [0.0, 0.0, 1.0, 0.0, 0.0]
+    df["b_z"] = [0.0, 1.0, 0.0, 0.0, 0.0]
+
+    return df
+
+
+def create_OneHotEncoderTransformer_test_df_2():
+    """Create DataFrame to test OneHotEncoderTransformer
+
+    binary columns are representative of transformed output of all columns
+
+    """
+    df = pd.DataFrame(
+        {
+            "a": [1, 5, 2, 3, 3],
+            "b": ["w", "w", "z", "y", "x"],
+            "c": ["a", "a", "c", "b", "a"],
+        },
+        index=[10, 15, 200, 251, 59],
+    )
+
+    df["c"] = df["c"].astype("category")
+
+    df["a_1"] = [1.0, 0.0, 0.0, 0.0, 0.0]
+    df["a_2"] = [0.0, 0.0, 1.0, 0.0, 0.0]
+    df["a_3"] = [0.0, 0.0, 0.0, 1.0, 1.0]
+    df["a_4"] = [0.0, 0.0, 0.0, 0.0, 0.0]
+    df["b_x"] = [0.0, 0.0, 0.0, 0.0, 1.0]
+    df["b_y"] = [0.0, 0.0, 0.0, 1.0, 0.0]
+    df["b_z"] = [0.0, 0.0, 1.0, 0.0, 0.0]
+    df["c_a"] = [1.0, 1.0, 0.0, 0.0, 1.0]
+    df["c_b"] = [0.0, 0.0, 0.0, 1.0, 0.0]
+    df["c_c"] = [0.0, 0.0, 1.0, 0.0, 0.0]
 
     return df
 

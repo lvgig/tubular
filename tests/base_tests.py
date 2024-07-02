@@ -511,7 +511,7 @@ class GenericTransformTests:
     ):
         """Test that an error is raised in transform is X is not a pd.DataFrame."""
 
-        df = d.create_df_10()
+        df = d.create_df_8()
 
         x = initialized_transformers[self.transformer_name]
 
@@ -525,7 +525,7 @@ class GenericTransformTests:
 
     def test_no_rows_error(self, initialized_transformers):
         """Test an error is raised if X has no rows."""
-        df = d.create_df_10()
+        df = d.create_df_8()
 
         x = initialized_transformers[self.transformer_name]
 
@@ -542,7 +542,7 @@ class GenericTransformTests:
     def test_original_df_not_updated(self, initialized_transformers):
         """Test that the original dataframe is not transformed when transform method used."""
 
-        df = d.create_df_3()
+        df = d.create_df_12()
 
         x = initialized_transformers[self.transformer_name]
 
@@ -550,7 +550,7 @@ class GenericTransformTests:
 
         _ = x.transform(df)
 
-        pd.testing.assert_frame_equal(df, d.create_df_3())
+        pd.testing.assert_frame_equal(df, d.create_df_12())
 
 
 class DropOriginalTransformTests(GenericTransformTests):
