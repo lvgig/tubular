@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import test_aide as ta
-from test_BaseNominalTransformer import GenericBaseNominalTransformerTests
+from test_BaseNominalTransformer import GenericNominalTransformTests
 
 import tests.test_data as d
 from tests.base_tests import (
@@ -161,7 +161,7 @@ class TestFit(GenericFitTests, WeightColumnFitMixinTests):
         )
 
 
-class TestTransform(GenericBaseNominalTransformerTests, GenericTransformTests):
+class TestTransform(GenericNominalTransformTests, GenericTransformTests):
     """Tests for GroupRareLevelsTransformer.transform()."""
 
     @classmethod
@@ -205,7 +205,7 @@ class TestTransform(GenericBaseNominalTransformerTests, GenericTransformTests):
         return df
 
     def test_non_mappable_rows_exception_raised(self):
-        """override test in GenericBaseNominalTransformerTests as not relevant to this transformer."""
+        """override test in GenericNominalTransformTests as not relevant to this transformer."""
 
     def test_learnt_values_not_modified(self):
         """Test that the non_rare_levels from fit are not changed in transform."""
