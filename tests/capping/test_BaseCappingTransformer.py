@@ -10,13 +10,13 @@ from tests.base_tests import (
     GenericFitTests,
     GenericInitTests,
     GenericTransformTests,
-    WeightColumnFitTests,
-    WeightColumnInitTests,
+    WeightColumnFitMixinTests,
+    WeightColumnInitMixinTests,
 )
 from tubular.capping import BaseCappingTransformer
 
 
-class GenericCappingInitTests(WeightColumnInitTests, GenericInitTests):
+class GenericCappingInitTests(WeightColumnInitMixinTests, GenericInitTests):
     """Tests for BaseCappingTransformer.init()."""
 
     @classmethod
@@ -229,7 +229,7 @@ class GenericCappingInitTests(WeightColumnInitTests, GenericInitTests):
             uninitialized_transformers[self.transformer_name](**args)
 
 
-class GenericCappingFitTests(WeightColumnFitTests, GenericFitTests):
+class GenericCappingFitTests(WeightColumnFitMixinTests, GenericFitTests):
     """Tests for BaseCappingTransformer.fit()."""
 
     @classmethod

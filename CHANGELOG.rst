@@ -15,9 +15,14 @@ Subsections for each version can be one of the following;
 - ``Security`` in case of vulnerabilities.
 
 Each individual change should have a link to the pull request after the description of the change.
+1.3.1 (unreleased)
+------------------
 
+Changed
+^^^^^^^
+- DatetimeInfoExtractor.mappings_provided changed from a dict.keys() object to list so transformer is serialisable. `#258 <https://github.com/lvgig/tubular/pull/258>`_
 
-1.3.0 (unreleased)
+1.3.0 (2024-06-13)
 ------------------
 Added
 ^^^^^
@@ -51,12 +56,12 @@ Changed
 - Added BaseDropOriginalMixin to mixin transformers to handle validation and method of dropping original features, also added appropriate test classes.
 - Refactored MeanImputer tests in new format `#250 <https://github.com/lvgig/tubular/pull/250>`_
 - Refactored DatetimeInfoExtractor to condense and improve readability
+- added minimal_dataframe_lookup fixture to conftest, and edited generic tests to use this
 
 
 Removed
 ^^^^^^^
-- Functionality for BaseTransformer (and thus all transformers) to take `None` as an option for columns. This behaviour was inconsistently implemented across transformers. Rather than extending to all we decided to remove 
-this functionality. This required updating a lot of test files.
+- Functionality for BaseTransformer (and thus all transformers) to take `None` as an option for columns. This behaviour was inconsistently implemented across transformers. Rather than extending to all we decided to remove this functionality. This required updating a lot of test files.
 - The `columns_set_or_check()` method from BaseTransformer. With the above change it was no longer necessary. Subsequent updates to nominal transformers and their tests were required.
 - Set pd copy_on_write to True (will become default in pandas 3.0) which allowed the functionality of the copy method of the transformers to be dropped `#197 <https://github.com/lvgig/tubular/pull/197>`_
 
