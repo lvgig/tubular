@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 import test_aide as ta
-from test_BaseNominalTransformer import GenericBaseNominalTransformerTests
+from test_BaseNominalTransformer import GenericNominalTransformTests
 
 import tests.test_data as d
 from tests.base_tests import (
@@ -53,7 +53,7 @@ class TestFit(GenericFitTests):
         )
 
 
-class TestTransform(GenericBaseNominalTransformerTests, GenericTransformTests):
+class TestTransform(GenericNominalTransformTests):
     """Tests for NominalToIntegerTransformer.transform()."""
 
     @classmethod
@@ -113,7 +113,7 @@ class TestTransform(GenericBaseNominalTransformerTests, GenericTransformTests):
         )
 
 
-class TestInverseTransform(GenericBaseNominalTransformerTests, GenericTransformTests):
+class TestInverseTransform(GenericNominalTransformTests, GenericTransformTests):
     """Tests for NominalToIntegerTransformer.inverse_transform()."""
 
     @classmethod
