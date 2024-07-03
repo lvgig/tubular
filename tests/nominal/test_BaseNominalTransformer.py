@@ -14,7 +14,7 @@ from tests.base_tests import (
 # The first part of this file builds out the tests for BaseNominalTransformer so that they can be
 # imported into other test files (by not starting the class name with Test)
 # The second part actually calls these tests (along with all other require tests) for the BaseNominalTransformer
-class GenericNominalTransformTests:
+class GenericNominalTransformTests(GenericTransformTests):
     """
     Tests for BaseNominalTransformer.transform().
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
@@ -78,7 +78,7 @@ class TestFit(GenericFitTests):
         cls.transformer_name = "BaseNominalTransformer"
 
 
-class TestTransform(GenericNominalTransformTests, GenericTransformTests):
+class TestTransform(GenericNominalTransformTests):
     """Tests for BaseImputer.transform."""
 
     @classmethod

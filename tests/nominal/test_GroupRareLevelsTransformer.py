@@ -8,7 +8,6 @@ import tests.test_data as d
 from tests.base_tests import (
     ColumnStrListInitTests,
     GenericFitTests,
-    GenericTransformTests,
     OtherBaseBehaviourTests,
     WeightColumnFitMixinTests,
     WeightColumnInitMixinTests,
@@ -161,7 +160,7 @@ class TestFit(GenericFitTests, WeightColumnFitMixinTests):
         )
 
 
-class TestTransform(GenericNominalTransformTests, GenericTransformTests):
+class TestTransform(GenericNominalTransformTests):
     """Tests for GroupRareLevelsTransformer.transform()."""
 
     @classmethod
