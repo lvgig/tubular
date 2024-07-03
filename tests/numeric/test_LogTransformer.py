@@ -6,12 +6,19 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
-import tubular
+from tests.numeric.test_BaseNumericTransformer import (
+    BaseNumericTransformerInitTests,
+    BaseNumericTransformerTransformTests,
+)
 from tubular.numeric import LogTransformer
 
 
-class TestInit:
-    """Tests for LogTransformer.init()."""
+class TestInit(BaseNumericTransformerInitTests):
+    """Tests for LogTransformer.init()"""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "LogTransformer"
 
     def test_base_type_error(self):
         """Test that an exception is raised if base is non-numeric."""
@@ -22,6 +29,28 @@ class TestInit:
             LogTransformer(
                 columns=["a"],
                 base="a",
+            )
+
+    def test_suffix_type_error(self):
+        """Test that an exception is raised if suffix is non-str."""
+        with pytest.raises(
+            TypeError,
+            match=f"{self.transformer_name}: suffix should be str",
+        ):
+            LogTransformer(
+                columns=["a"],
+                suffix=1,
+            )
+
+    def test_add_1_type_error(self):
+        """Test that an exception is raised if add_1 is not bool."""
+        with pytest.raises(
+            TypeError,
+            match=f"{self.transformer_name}: add_1 should be bool",
+        ):
+            LogTransformer(
+                columns=["a"],
+                add_1="bla",
             )
 
     def test_base_not_strictly_positive_error(self):
@@ -35,51 +64,13 @@ class TestInit:
                 base=0,
             )
 
-    def test_super_init_called(self, mocker):
-        """Test that init calls BaseTransformer.init."""
-        expected_call_args = {
-            0: {
-                "args": (),
-                "kwargs": {"columns": ["a", "b"], "verbose": True},
-            },
-        }
 
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "__init__",
-            expected_call_args,
-        ):
-            LogTransformer(
-                columns=["a", "b"],
-                add_1=True,
-                drop=True,
-                suffix="_new",
-                verbose=True,
-            )
+class TestTransform(BaseNumericTransformerTransformTests):
+    """Tests for LogTransformer.transform()"""
 
-    def test_impute_values_set_to_attribute(self):
-        """Test that the value passed for impute_value is saved in an attribute of the same name."""
-        x = LogTransformer(
-            columns=["a", "b"],
-            base=1,
-            add_1=True,
-            drop=False,
-            suffix="new",
-            verbose=True,
-        )
-
-        expected_attributes = {"base": 1, "add_1": True, "drop": False, "suffix": "new"}
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes=expected_attributes,
-            msg="Attributes for LogTransformer set in init",
-        )
-
-
-class TestTransform:
-    """Tests for LogTransformer.transform()."""
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "LogTransformer"
 
     def expected_df_1():
         """Expected output of test_expected_output_1."""
@@ -155,35 +146,6 @@ class TestTransform:
         actual = log_transformer.transform(df)
         pd.testing.assert_frame_equal(actual, expected)
 
-    def test_super_transform_called(self, mocker):
-        """Test that BaseTransformer.transform called."""
-        df = d.create_df_3()
-
-        x = LogTransformer(columns=["a", "b"])
-
-        expected_call_args = {0: {"args": (d.create_df_3(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-            return_value=d.create_df_3(),
-        ):
-            x.transform(df)
-
-    def test_error_with_non_numeric_columns(self):
-        """Test an exception is raised if transform is applied to non-numeric columns."""
-        df = d.create_df_5()
-
-        x = LogTransformer(columns=["a", "b", "c"])
-
-        with pytest.raises(
-            TypeError,
-            match=r"LogTransformer: The following columns are not numeric in X; \['b', 'c'\]",
-        ):
-            x.transform(df)
-
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
@@ -193,7 +155,7 @@ class TestTransform:
         x1 = LogTransformer(
             columns=["a", "b"],
             add_1=False,
-            drop=True,
+            drop_original=True,
             suffix="new_col",
         )
 
@@ -211,7 +173,12 @@ class TestTransform:
     )
     def test_expected_output_2(self, df, expected):
         """Test that transform is giving the expected output when adding one and dropping original columns."""
-        x1 = LogTransformer(columns=["a", "b"], add_1=True, drop=True, suffix="new_col")
+        x1 = LogTransformer(
+            columns=["a", "b"],
+            add_1=True,
+            drop_original=True,
+            suffix="new_col",
+        )
 
         df_transformed = x1.transform(df)
 
@@ -230,7 +197,7 @@ class TestTransform:
         x1 = LogTransformer(
             columns=["a", "b"],
             add_1=False,
-            drop=False,
+            drop_original=False,
             suffix="new_col",
         )
 
@@ -251,7 +218,7 @@ class TestTransform:
         x1 = LogTransformer(
             columns=["a", "b"],
             add_1=True,
-            drop=False,
+            drop_original=False,
             suffix="new_col",
         )
 
@@ -275,7 +242,7 @@ class TestTransform:
             columns=["a"],
             base=5,
             add_1=True,
-            drop=False,
+            drop_original=False,
             suffix="new_col",
         )
 
@@ -299,7 +266,7 @@ class TestTransform:
             columns=["a"],
             base=7,
             add_1=False,
-            drop=True,
+            drop_original=True,
             suffix="new_col",
         )
 
@@ -347,7 +314,7 @@ class TestTransform:
         extra_exception_text,
     ):
         """Test that an exception is raised if negative values are passed in transform."""
-        x = LogTransformer(columns=columns, add_1=add_1, drop=True)
+        x = LogTransformer(columns=columns, add_1=add_1, drop_original=True)
 
         with pytest.raises(
             ValueError,
