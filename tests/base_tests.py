@@ -618,6 +618,8 @@ class DropOriginalTransformMixinTests:
 
         x.drop_original = True
 
+        x.fit(df)
+
         df_transformed = x.transform(df)
         remaining_cols = df_transformed.columns.to_numpy()
         for col in x.columns:
@@ -635,6 +637,8 @@ class DropOriginalTransformMixinTests:
         x = initialized_transformers[self.transformer_name]
 
         x.drop_original = False
+
+        x.fit(df)
 
         df_transformed = x.transform(df)
         remaining_cols = df_transformed.columns.to_numpy()
@@ -654,6 +658,8 @@ class DropOriginalTransformMixinTests:
 
         x.columns = ["a"]
         x.drop_original = True
+
+        x.fit(df)
 
         df_transformed = x.transform(df)
 

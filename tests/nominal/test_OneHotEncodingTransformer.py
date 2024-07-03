@@ -1,17 +1,20 @@
+import numpy as np
 import pandas as pd
 import pytest
+import test_aide as ta
 
 import tests.test_data as d
 from tests.base_tests import (
     ColumnStrListInitTests,
-    DropOriginalInitTests,
+    DropOriginalInitMixinTests,
+    DropOriginalTransformMixinTests,
     GenericFitTests,
     GenericTransformTests,
 )
 from tubular.nominal import OneHotEncodingTransformer
 
 
-class TestInit(DropOriginalInitTests, ColumnStrListInitTests):
+class TestInit(DropOriginalInitMixinTests, ColumnStrListInitTests):
     """Generic tests for transformer.init()."""
 
     @classmethod
@@ -57,7 +60,7 @@ class TestFit(GenericFitTests):
             x.fit(df)
 
 
-class TestTransform(GenericTransformTests):
+class TestTransform(DropOriginalTransformMixinTests, GenericTransformTests):
     """Tests for transformer.transform."""
 
     @classmethod
@@ -79,153 +82,123 @@ class TestTransform(GenericTransformTests):
         ):
             x.transform(df_test)
 
-    # @pytest.mark.parametrize(
-    #     ("df_test", "expected"),
-    #     ta.pandas.adjusted_dataframe_params(d.create_df_7(), expected_df_1()),
-    # )
-    # def test_expected_output(self, df_test, expected):
-    #     """Test that OneHotEncodingTransformer.transform encodes the feature correctly.
+    @pytest.mark.parametrize(
+        ("df_test", "expected"),
+        ta.pandas.adjusted_dataframe_params(
+            d.create_df_7(),
+            d.create_OneHotEncoderTransformer_test_df_1(),
+        ),
+    )
+    def test_expected_output(self, df_test, expected):
+        """Test that OneHotEncodingTransformer.transform encodes the feature correctly.
 
-    #     Also tests that OneHotEncodingTransformer.transform does not modify unrelated columns.
-    #     """
-    #     # transformer is fit on the whole dataset separately from the input df to work with the decorators
-    #     columns = ["b"]
-    #     df_train = d.create_df_7()
-    #     x = OneHotEncodingTransformer(columns=columns)
-    #     x.fit(df_train)
+        Also tests that OneHotEncodingTransformer.transform does not modify unrelated columns.
+        """
+        # transformer is fit on the whole dataset separately from the input df to work with the decorators
+        columns = ["b"]
+        df_train = d.create_df_7()
+        x = OneHotEncodingTransformer(columns=columns)
+        x.fit(df_train)
 
-    #     df_transformed = x.transform(df_test)
+        df_transformed = x.transform(df_test)
 
-    #     for col in [
-    #         column + f"_{value}"
-    #         for column in columns
-    #         for value in df_train[column].unique().tolist()
-    #     ]:
-    #         expected[col] = expected[col].astype(np.int8)
+        for col in [
+            column + f"_{value}"
+            for column in columns
+            for value in df_train[column].unique().tolist()
+        ]:
+            expected[col] = expected[col].astype(np.int8)
 
-    #     ta.equality.assert_frame_equal_msg(
-    #         expected=expected,
-    #         actual=df_transformed,
-    #         msg_tag="Unspecified columns changed in transform",
-    #     )
+        ta.equality.assert_frame_equal_msg(
+            expected=expected,
+            actual=df_transformed,
+            msg_tag="Unspecified columns changed in transform",
+        )
 
-    # def test_categories_not_modified(self):
-    #     """Test that the categories from fit are not changed in transform."""
-    #     df_train = d.create_df_1()
-    #     df_test = d.create_df_7()
+    def test_categories_not_modified(self):
+        """Test that the categories from fit are not changed in transform."""
+        df_train = d.create_df_1()
+        df_test = d.create_df_7()
 
-    #     x = OneHotEncodingTransformer(columns=["a", "b"], verbose=False)
-    #     x2 = OneHotEncodingTransformer(columns=["a", "b"], verbose=False)
+        x = OneHotEncodingTransformer(columns=["a", "b"], verbose=False)
+        x2 = OneHotEncodingTransformer(columns=["a", "b"], verbose=False)
 
-    #     x.fit(df_train)
-    #     x2.fit(df_train)
+        x.fit(df_train)
+        x2.fit(df_train)
 
-    #     x.transform(df_test)
+        x.transform(df_test)
 
-    #     ta.equality.assert_equal_dispatch(
-    #         expected=list(x2.categories_[0]),
-    #         actual=list(x.categories_[0]),
-    #         msg="categories_ (index 0) modified during transform",
-    #     )
+        ta.equality.assert_equal_dispatch(
+            expected=list(x2.categories_[0]),
+            actual=list(x.categories_[0]),
+            msg="categories_ (index 0) modified during transform",
+        )
 
-    #     ta.equality.assert_equal_dispatch(
-    #         expected=list(x2.categories_[1]),
-    #         actual=list(x.categories_[1]),
-    #         msg="categories_ (index 1) modified during transform",
-    #     )
+        ta.equality.assert_equal_dispatch(
+            expected=list(x2.categories_[1]),
+            actual=list(x.categories_[1]),
+            msg="categories_ (index 1) modified during transform",
+        )
 
-    # def test_renaming_feature_works_as_expected(self):
-    #     """Test OneHotEncodingTransformer.transform() is renaming features correctly."""
-    #     df = d.create_df_7()
-    #     df = df[["b", "c"]]
+    def test_renaming_feature_works_as_expected(self):
+        """Test OneHotEncodingTransformer.transform() is renaming features correctly."""
+        df = d.create_df_7()
+        df = df[["b", "c"]]
 
-    #     x = OneHotEncodingTransformer(
-    #         columns=["b", "c"],
-    #         separator="|",
-    #         drop_original=True,
-    #     )
+        x = OneHotEncodingTransformer(
+            columns=["b", "c"],
+            separator="|",
+            drop_original=True,
+        )
 
-    #     x.fit(df)
+        x.fit(df)
 
-    #     df_transformed = x.transform(df)
+        df_transformed = x.transform(df)
 
-    #     ta.equality.assert_equal_dispatch(
-    #         expected=["b|x", "b|y", "b|z", "c|a", "c|b", "c|c"],
-    #         actual=list(df_transformed.columns.values),
-    #         msg="renaming columns feature in OneHotEncodingTransformer.transform",
-    #     )
+        ta.equality.assert_equal_dispatch(
+            expected=["b|x", "b|y", "b|z", "c|a", "c|b", "c|c"],
+            actual=list(df_transformed.columns.values),
+            msg="renaming columns feature in OneHotEncodingTransformer.transform",
+        )
 
-    # def test_warning_generated_by_unseen_categories(self):
-    #     """Test OneHotEncodingTransformer.transform triggers a warning for unseen categories."""
-    #     df_train = d.create_df_7()
-    #     df_test = d.create_df_8()
+    def test_warning_generated_by_unseen_categories(self):
+        """Test OneHotEncodingTransformer.transform triggers a warning for unseen categories."""
+        df_train = d.create_df_7()
+        df_test = d.create_df_8()
 
-    #     x = OneHotEncodingTransformer(columns=["a", "b", "c"], verbose=True)
+        x = OneHotEncodingTransformer(columns=["a", "b", "c"], verbose=True)
 
-    #     x.fit(df_train)
+        x.fit(df_train)
 
-    #     with pytest.warns(Warning):
-    #         x.transform(df_test)
+        with pytest.warns(Warning):
+            x.transform(df_test)
 
-    # @pytest.mark.parametrize(
-    #     ("df_test", "expected"),
-    #     ta.pandas.adjusted_dataframe_params(d.create_df_8(), expected_df_2()),
-    # )
-    # def test_unseen_categories_encoded_as_all_zeroes(self, df_test, expected):
-    #     """Test OneHotEncodingTransformer.transform encodes unseen categories correctly (all 0s)."""
-    #     # transformer is fit on the whole dataset separately from the input df to work with the decorators
-    #     df_train = d.create_df_7()
-    #     columns = ["a", "b", "c"]
-    #     x = OneHotEncodingTransformer(columns=columns, verbose=False)
-    #     x.fit(df_train)
+    @pytest.mark.parametrize(
+        ("df_test", "expected"),
+        ta.pandas.adjusted_dataframe_params(
+            d.create_df_8(),
+            d.create_OneHotEncoderTransformer_test_df_2(),
+        ),
+    )
+    def test_unseen_categories_encoded_as_all_zeroes(self, df_test, expected):
+        """Test OneHotEncodingTransformer.transform encodes unseen categories correctly (all 0s)."""
+        # transformer is fit on the whole dataset separately from the input df to work with the decorators
+        df_train = d.create_df_7()
+        columns = ["a", "b", "c"]
+        x = OneHotEncodingTransformer(columns=columns, verbose=False)
+        x.fit(df_train)
 
-    #     df_transformed = x.transform(df_test)
+        df_transformed = x.transform(df_test)
 
-    #     for col in [
-    #         column + f"_{value}"
-    #         for column in columns
-    #         for value in df_train[column].unique().tolist()
-    #     ]:
-    #         expected[col] = expected[col].astype(np.int8)
+        for col in [
+            column + f"_{value}"
+            for column in columns
+            for value in df_train[column].unique().tolist()
+        ]:
+            expected[col] = expected[col].astype(np.int8)
 
-    #     ta.equality.assert_equal_dispatch(
-    #         expected=expected,
-    #         actual=df_transformed,
-    #         msg="unseen category rows not encoded as 0s",
-    #     )
-
-    # def test_original_columns_dropped_when_specified(self):
-    #     """Test OneHotEncodingTransformer.transform drops original columns get when specified."""
-    #     df = d.create_df_7()
-
-    #     x = OneHotEncodingTransformer(columns=["a", "b", "c"], drop_original=True)
-
-    #     x.fit(df)
-
-    #     df_transformed = x.transform(df)
-
-    #     ta.equality.assert_equal_dispatch(
-    #         expected=["a", "b", "c"],
-    #         actual=[
-    #             x
-    #             for x in df.columns.to_numpy()
-    #             if x not in df_transformed.columns.to_numpy()
-    #         ],
-    #         msg="original columns not dropped",
-    #     )
-
-    # def test_original_columns_kept_when_specified(self):
-    #     """Test OneHotEncodingTransformer.transform keeps original columns when specified."""
-    #     df = d.create_df_7()
-
-    #     x = OneHotEncodingTransformer(columns=["a", "b", "c"], drop_original=False)
-
-    #     x.fit(df)
-
-    #     df_transformed = x.transform(df)
-
-    #     ta.equality.assert_equal_dispatch(
-    #         expected=list(set()),
-    #         actual=list({"a", "b", "c"} - set(df_transformed.columns)),
-    #         msg="original columns not kept",
-    #     )
+        ta.equality.assert_equal_dispatch(
+            expected=expected,
+            actual=df_transformed,
+            msg="unseen category rows not encoded as 0s",
+        )
