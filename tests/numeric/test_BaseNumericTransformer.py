@@ -60,12 +60,16 @@ class TestInit(BaseNumericTransformerInitTests):
 
 
 class TestFit(BaseNumericTransformerFitTests):
+    """Tests for BaseNumericTransformer.fit()"""
+
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "BaseNumericTransformer"
 
 
 class TestTransform(BaseNumericTransformerTransformTests):
+    """Tests for BaseNumericTransformer.transform()"""
+
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "BaseNumericTransformer"

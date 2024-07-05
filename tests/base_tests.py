@@ -9,8 +9,6 @@ import pytest
 import sklearn.base as b
 import test_aide as ta
 
-import tests.test_data as d
-
 
 class GenericInitTests:
     """
@@ -693,9 +691,10 @@ class ColumnsCheckTests:
         self,
         non_list,
         initialized_transformers,
+        minimal_dataframe_lookup,
     ):
         """Test an error is raised if self.columns is not a list."""
-        df = d.create_df_1()
+        df = minimal_dataframe_lookup[self.transformer_name]
 
         x = initialized_transformers[self.transformer_name]
 
@@ -710,9 +709,10 @@ class ColumnsCheckTests:
     def test_columns_not_in_X_error(
         self,
         initialized_transformers,
+        minimal_dataframe_lookup,
     ):
         """Test an error is raised if self.columns contains a value not in X."""
-        df = d.create_df_1()
+        df = minimal_dataframe_lookup[self.transformer_name]
 
         x = initialized_transformers[self.transformer_name]
 

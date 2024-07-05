@@ -66,7 +66,7 @@ class BaseNumericTransformer(BaseTransformer):
         X: pd.DataFrame,
         y: pd.Series | None = None,
     ) -> BaseNumericTransformer:
-        """Base fit method. Validates data and attributes pre-fit.
+        """Base fit method. Validates data and attributes prior to the child objects fit logic.
 
         Parameters
         ----------
@@ -85,7 +85,7 @@ class BaseNumericTransformer(BaseTransformer):
         return self
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Base transform method. Validates data and attributes pre-transform.
+        """Base transform method. Validates data and attributes prior to the child objects tranform logic.
 
         Parameters
         ----------
