@@ -57,6 +57,8 @@ Changed
 - Refactored MeanImputer tests in new format `#250 <https://github.com/lvgig/tubular/pull/250>`_
 - Refactored DatetimeInfoExtractor to condense and improve readability
 - added minimal_dataframe_lookup fixture to conftest, and edited generic tests to use this
+- Alphabetised the minimial attribute dictionary for readability.
+- Refactored OHE transformer tests to align with new testing framework. 
 
 
 Removed
