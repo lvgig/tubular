@@ -2,13 +2,12 @@
 import copy
 import re
 
+import joblib
 import numpy as np
 import pandas as pd
 import pytest
 import sklearn.base as b
 import test_aide as ta
-
-import tests.test_data as d
 
 
 class GenericInitTests:
@@ -287,10 +286,11 @@ class GenericFitTests:
         self,
         initialized_transformers,
         non_df,
+        minimal_dataframe_lookup,
     ):
         """Test an error is raised if X is not passed as a pd.DataFrame."""
 
-        df = d.create_numeric_df_1()
+        df = minimal_dataframe_lookup[self.transformer_name]
 
         x = initialized_transformers[self.transformer_name]
 
@@ -305,10 +305,11 @@ class GenericFitTests:
         self,
         non_series,
         initialized_transformers,
+        minimal_dataframe_lookup,
     ):
         """Test an error is raised if y is not passed as a pd.Series."""
 
-        df = d.create_numeric_df_1()
+        df = minimal_dataframe_lookup[self.transformer_name]
 
         x = initialized_transformers[self.transformer_name]
 
@@ -337,12 +338,13 @@ class GenericFitTests:
     def test_Y_no_rows_error(
         self,
         initialized_transformers,
+        minimal_dataframe_lookup,
     ):
         """Test an error is raised if Y has no rows."""
 
         x = initialized_transformers[self.transformer_name]
 
-        df = pd.DataFrame({"a": 1, "b": "wow", "c": np.nan}, index=[0])
+        df = minimal_dataframe_lookup[self.transformer_name]
 
         with pytest.raises(
             ValueError,
@@ -548,10 +550,11 @@ class GenericTransformTests:
         self,
         non_df,
         initialized_transformers,
+        minimal_dataframe_lookup,
     ):
         """Test that an error is raised in transform is X is not a pd.DataFrame."""
 
-        df = d.create_df_10()
+        df = minimal_dataframe_lookup[self.transformer_name]
 
         x = initialized_transformers[self.transformer_name]
 
@@ -563,19 +566,19 @@ class GenericTransformTests:
         ):
             x_fitted.transform(X=non_df)
 
-    def test_no_rows_error(self, initialized_transformers):
+    def test_no_rows_error(self, initialized_transformers, minimal_dataframe_lookup):
         """Test an error is raised if X has no rows."""
-        df = d.create_df_10()
+        df = minimal_dataframe_lookup[self.transformer_name]
 
         x = initialized_transformers[self.transformer_name]
 
         x = x.fit(df, df["c"])
 
-        df = pd.DataFrame(columns=["a", "b", "c"])
+        df = df.head(0)
 
         with pytest.raises(
             ValueError,
-            match=re.escape(f"{self.transformer_name}: X has no rows; (0, 3)"),
+            match=re.escape(f"{self.transformer_name}: X has no rows; {df.shape}"),
         ):
             x.transform(df)
 
@@ -688,9 +691,10 @@ class ColumnsCheckTests:
         self,
         non_list,
         initialized_transformers,
+        minimal_dataframe_lookup,
     ):
         """Test an error is raised if self.columns is not a list."""
-        df = d.create_df_1()
+        df = minimal_dataframe_lookup[self.transformer_name]
 
         x = initialized_transformers[self.transformer_name]
 
@@ -705,9 +709,10 @@ class ColumnsCheckTests:
     def test_columns_not_in_X_error(
         self,
         initialized_transformers,
+        minimal_dataframe_lookup,
     ):
         """Test an error is raised if self.columns contains a value not in X."""
-        df = d.create_df_1()
+        df = minimal_dataframe_lookup[self.transformer_name]
 
         x = initialized_transformers[self.transformer_name]
 
@@ -816,3 +821,9 @@ class OtherBaseBehaviourTests(
     Class to collect and hold tests for BaseTransformerBehaviour outside the three standard methods.
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
+
+    def test_is_serialisable(self, initialized_transformers, tmp_path):
+        path = tmp_path / "transformer.pkl"
+
+        # serialise without raising error
+        joblib.dump(initialized_transformers[self.transformer_name], path)
