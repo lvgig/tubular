@@ -2,28 +2,25 @@ import numpy as np
 import pandas as pd
 import pytest
 import test_aide as ta
+from test_BaseNominalTransformer import GenericNominalTransformTests
 
 import tests.test_data as d
-import tubular
+from tests.base_tests import (
+    ColumnStrListInitTests,
+    GenericFitTests,
+    OtherBaseBehaviourTests,
+    WeightColumnFitMixinTests,
+    WeightColumnInitMixinTests,
+)
 from tubular.nominal import GroupRareLevelsTransformer
 
 
-class TestInit:
+class TestInit(ColumnStrListInitTests, WeightColumnInitMixinTests):
     """Tests for GroupRareLevelsTransformer.init()."""
 
-    def test_super_init_called(self, mocker):
-        """Test that init calls BaseTransformer.init."""
-        expected_call_args = {
-            0: {"args": (), "kwargs": {"columns": None, "verbose": True}},
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "__init__",
-            expected_call_args,
-        ):
-            GroupRareLevelsTransformer(columns=None, verbose=True)
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "GroupRareLevelsTransformer"
 
     def test_cut_off_percent_not_float_error(self):
         """Test that an exception is raised if cut_off_percent is not an float."""
@@ -49,14 +46,6 @@ class TestInit:
         ):
             GroupRareLevelsTransformer(columns="a", cut_off_percent=2.0)
 
-    def test_weight_not_str_error(self):
-        """Test that an exception is raised if weight is not a str, if supplied."""
-        with pytest.raises(
-            TypeError,
-            match="weights_column should be str or None",
-        ):
-            GroupRareLevelsTransformer(columns="a", weights_column=2)
-
     def test_record_rare_levels_not_bool_error(self):
         """Test that an exception is raised if record_rare_levels is not a bool."""
         with pytest.raises(
@@ -74,62 +63,12 @@ class TestInit:
             GroupRareLevelsTransformer(columns="a", unseen_levels_to_rare=2)
 
 
-class TestFit:
+class TestFit(GenericFitTests, WeightColumnFitMixinTests):
     """Tests for GroupRareLevelsTransformer.fit()."""
 
-    def test_super_fit_called(self, mocker):
-        """Test that fit calls BaseTransformer.fit."""
-        df = d.create_df_5()
-
-        x = GroupRareLevelsTransformer(columns=["b", "c"])
-
-        expected_call_args = {0: {"args": (d.create_df_5(), None), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "fit",
-            expected_call_args,
-        ):
-            x.fit(df)
-
-    def test_weight_column_not_in_X_error(self):
-        """Test that an exception is raised if weight is not in X."""
-        df = d.create_df_5()
-
-        x = GroupRareLevelsTransformer(columns=["b", "c"], weights_column="aaaa")
-
-        with pytest.raises(
-            ValueError,
-            match=r"weight col \(aaaa\) is not present in columns of data",
-        ):
-            x.fit(df)
-
-    def test_fit_returns_self(self):
-        """Test fit returns self?."""
-        df = d.create_df_5()
-
-        x = GroupRareLevelsTransformer(columns=["b", "c"])
-
-        x_fitted = x.fit(df)
-
-        assert (
-            x_fitted is x
-        ), "Returned value from GroupRareLevelsTransformer.fit not as expected."
-
-    def test_fit_not_changing_data(self):
-        """Test fit does not change X."""
-        df = d.create_df_5()
-
-        x = GroupRareLevelsTransformer(columns=["b", "c"])
-
-        x.fit(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=d.create_df_5(),
-            actual=df,
-            msg="Check X not changing during fit",
-        )
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "GroupRareLevelsTransformer"
 
     def test_learnt_values_no_weight(self):
         """Test that the impute values learnt during fit, without using a weight, are expected."""
@@ -221,8 +160,12 @@ class TestFit:
         )
 
 
-class TestTransform:
+class TestTransform(GenericNominalTransformTests):
     """Tests for GroupRareLevelsTransformer.transform()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "GroupRareLevelsTransformer"
 
     def expected_df_1():
         """Expected output for test_expected_output_no_weight."""
@@ -260,50 +203,8 @@ class TestTransform:
 
         return df
 
-    def test_check_is_fitted_called(self, mocker):
-        """Test that BaseTransformer check_is_fitted called."""
-        df = d.create_df_5()
-
-        x = GroupRareLevelsTransformer(columns=["b", "c"])
-
-        x.fit(df)
-
-        expected_call_args = {0: {"args": (["non_rare_levels"],), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "check_is_fitted",
-            expected_call_args,
-        ):
-            x.transform(df)
-
-    def test_super_transform_called(self, mocker):
-        """Test that BaseTransformer.transform called."""
-        df = d.create_df_5()
-
-        x = GroupRareLevelsTransformer(columns=["b", "c"])
-
-        x.fit(df)
-
-        expected_call_args = {
-            0: {
-                "args": (
-                    x,
-                    d.create_df_5(),
-                ),
-                "kwargs": {},
-            },
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-            return_value=d.create_df_5(),
-        ):
-            x.transform(df)
+    def test_non_mappable_rows_exception_raised(self):
+        """override test in GenericNominalTransformTests as not relevant to this transformer."""
 
     def test_learnt_values_not_modified(self):
         """Test that the non_rare_levels from fit are not changed in transform."""
@@ -471,3 +372,15 @@ class TestTransform:
             assert (
                 cat not in output_categories
             ), f"{x.classname} output columns should forget rare encoded categories, expected {cat} to be forgotten from column {column}"
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseNominalTransformer"

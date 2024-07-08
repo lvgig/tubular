@@ -1,5 +1,3 @@
-import re
-
 import pandas as pd
 import pytest
 from sklearn.exceptions import NotFittedError
@@ -16,7 +14,7 @@ from tests.base_tests import (
 # The first part of this file builds out the tests for BaseNominalTransformer so that they can be
 # imported into other test files (by not starting the class name with Test)
 # The second part actually calls these tests (along with all other require tests) for the BaseNominalTransformer
-class GenericBaseNominalTransformerTests:
+class GenericNominalTransformTests(GenericTransformTests):
     """
     Tests for BaseNominalTransformer.transform().
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
@@ -29,7 +27,7 @@ class GenericBaseNominalTransformerTests:
             with pytest.raises(NotFittedError):
                 initialized_transformers[self.transformer_name].transform(df)
 
-    def test_exception_raised(self, initialized_transformers):
+    def test_non_mappable_rows_exception_raised(self, initialized_transformers):
         """Test an exception is raised if non-mappable rows are present in X."""
         df = d.create_df_1()
 
@@ -63,24 +61,6 @@ class GenericBaseNominalTransformerTests:
 
         pd.testing.assert_frame_equal(df, d.create_df_1())
 
-    def test_no_rows_error(self, initialized_transformers):
-        """Test an error is raised if X has no rows."""
-        df = d.create_df_1()
-
-        x = initialized_transformers[self.transformer_name]
-
-        x = x.fit(df)
-
-        x.mappings = {"b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6}}
-
-        df = pd.DataFrame(columns=["a", "b", "c"])
-
-        with pytest.raises(
-            ValueError,
-            match=re.escape(f"{self.transformer_name}: X has no rows; (0, 3)"),
-        ):
-            x.transform(df)
-
 
 class TestInit(ColumnStrListInitTests):
     """Generic tests for transformer.init()."""
@@ -98,7 +78,7 @@ class TestFit(GenericFitTests):
         cls.transformer_name = "BaseNominalTransformer"
 
 
-class TestTransform(GenericBaseNominalTransformerTests, GenericTransformTests):
+class TestTransform(GenericNominalTransformTests):
     """Tests for BaseImputer.transform."""
 
     @classmethod
