@@ -42,7 +42,7 @@ class GenericNominalTransformTests(GenericTransformTests):
 
         with pytest.raises(
             ValueError,
-            match="BaseNominalTransformer: nulls would be introduced into column b from levels not present in mapping",
+            match=f"{self.transformer_name}: nulls would be introduced into column b from levels not present in mapping",
         ):
             x.transform(df)
 
