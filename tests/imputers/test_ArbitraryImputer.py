@@ -1,6 +1,6 @@
+import pandas as pd
 import pytest
 
-import tests.test_data as d
 from tests.base_tests import (
     ColumnStrListInitTests,
     GenericFitTests,
@@ -9,6 +9,17 @@ from tests.base_tests import (
 )
 from tests.imputers.test_BaseImputer import GenericImputerTransformTests
 from tubular.imputers import ArbitraryImputer
+
+
+# Dataframe used exclusively in this testing script
+def create_downcast_df():
+    """Create a dataframe with mixed dtypes to use in downcasting tests."""
+    return pd.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5],
+            "b": [1.0, 2.0, 3.0, 4.0, 5.0],
+        },
+    )
 
 
 class TestInit(ColumnStrListInitTests):
@@ -57,7 +68,7 @@ class TestTransform(GenericImputerTransformTests, GenericTransformTests):
         Explicitly setting the dtype of "a" to int8 and "b" to float16 and check if the dtype of the columns are preserved after imputation.
         """
         df = (
-            d.create_downcast_df()
+            create_downcast_df()
         )  # By default the dtype of "a" and "b" are int64 and float64 respectively
 
         # Imputing the dataframe

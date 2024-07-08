@@ -775,6 +775,38 @@ class TestTransform:
             index=[0, 1],
         )
 
+    def create_datediff_test_nulls_df():
+        """Create DataFrame with nulls only for DateDifferenceTransformer tests."""
+        return pd.DataFrame(
+            {
+                "a": [
+                    datetime.datetime(
+                        1993,
+                        9,
+                        27,
+                        11,
+                        58,
+                        58,
+                        tzinfo=datetime.timezone.utc,
+                    ),
+                    np.nan,
+                ],
+                "b": [
+                    np.nan,
+                    datetime.datetime(
+                        2019,
+                        12,
+                        25,
+                        11,
+                        58,
+                        58,
+                        tzinfo=datetime.timezone.utc,
+                    ),
+                ],
+            },
+            index=[0, 1],
+        )
+
     @pytest.mark.parametrize(
         ("columns, bad_col"),
         [
@@ -949,7 +981,7 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_datediff_test_nulls_df(),
+            create_datediff_test_nulls_df(),
             expected_df_7(),
         ),
     )

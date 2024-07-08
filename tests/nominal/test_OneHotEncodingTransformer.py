@@ -67,6 +67,58 @@ class TestTransform(DropOriginalTransformMixinTests, GenericTransformTests):
     def setup_class(cls):
         cls.transformer_name = "OneHotEncodingTransformer"
 
+    def create_OneHotEncoderTransformer_test_df_1():
+        """Create DataFrame to test OneHotEncoderTransformer
+
+        binary columns are representative of transformed output of column b
+
+        """
+        df = pd.DataFrame(
+            {
+                "a": [4, 2, 2, 1, 3],
+                "b": ["x", "z", "y", "x", "x"],
+                "c": ["c", "a", "a", "c", "b"],
+            },
+        )
+
+        df["c"] = df["c"].astype("category")
+
+        df["b_x"] = [1.0, 0.0, 0.0, 1.0, 1.0]
+        df["b_y"] = [0.0, 0.0, 1.0, 0.0, 0.0]
+        df["b_z"] = [0.0, 1.0, 0.0, 0.0, 0.0]
+
+        return df
+
+    def create_OneHotEncoderTransformer_test_df_2():
+        """Create DataFrame to test OneHotEncoderTransformer
+
+        binary columns are representative of transformed output of all columns
+
+        """
+        df = pd.DataFrame(
+            {
+                "a": [1, 5, 2, 3, 3],
+                "b": ["w", "w", "z", "y", "x"],
+                "c": ["a", "a", "c", "b", "a"],
+            },
+            index=[10, 15, 200, 251, 59],
+        )
+
+        df["c"] = df["c"].astype("category")
+
+        df["a_1"] = [1.0, 0.0, 0.0, 0.0, 0.0]
+        df["a_2"] = [0.0, 0.0, 1.0, 0.0, 0.0]
+        df["a_3"] = [0.0, 0.0, 0.0, 1.0, 1.0]
+        df["a_4"] = [0.0, 0.0, 0.0, 0.0, 0.0]
+        df["b_x"] = [0.0, 0.0, 0.0, 0.0, 1.0]
+        df["b_y"] = [0.0, 0.0, 0.0, 1.0, 0.0]
+        df["b_z"] = [0.0, 0.0, 1.0, 0.0, 0.0]
+        df["c_a"] = [1.0, 1.0, 0.0, 0.0, 1.0]
+        df["c_b"] = [0.0, 0.0, 0.0, 1.0, 0.0]
+        df["c_c"] = [0.0, 0.0, 1.0, 0.0, 0.0]
+
+        return df
+
     def test_non_numeric_column_error_1(self):
         """Test that transform will raise an error if a column to transform has nulls."""
         df_train = d.create_df_1()
@@ -86,7 +138,7 @@ class TestTransform(DropOriginalTransformMixinTests, GenericTransformTests):
         ("df_test", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_df_7(),
-            d.create_OneHotEncoderTransformer_test_df_1(),
+            create_OneHotEncoderTransformer_test_df_1(),
         ),
     )
     def test_expected_output(self, df_test, expected):
@@ -177,7 +229,7 @@ class TestTransform(DropOriginalTransformMixinTests, GenericTransformTests):
         ("df_test", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_df_8(),
-            d.create_OneHotEncoderTransformer_test_df_2(),
+            create_OneHotEncoderTransformer_test_df_2(),
         ),
     )
     def test_unseen_categories_encoded_as_all_zeroes(self, df_test, expected):
