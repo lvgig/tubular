@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import test_aide as ta
-from test_BaseNominalTransformer import GenericBaseNominalTransformerTests
+from test_BaseNominalTransformer import GenericNominalTransformTests
 
 import tests.test_data as d
 from tests.base_tests import (
@@ -63,7 +63,7 @@ class TestFit(GenericFitTests):
 
 class TestTransform(
     DropOriginalTransformMixinTests,
-    GenericBaseNominalTransformerTests,
+    GenericNominalTransformTests,
     GenericTransformTests,
 ):
     """Tests for transformer.transform."""
@@ -124,7 +124,7 @@ class TestTransform(
 
         return df
 
-    def test_exception_raised(self):
+    def test_non_mappable_rows_exception_raised(self):
         """Test inherited from GenericBaseNominalTransformerTests needs to be overwritten,
         inherited test tests the mapping attribute, which OHE transfomer doesn't have.
         """
