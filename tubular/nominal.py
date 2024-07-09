@@ -1200,6 +1200,9 @@ class OneHotEncodingTransformer(BaseDropOriginalMixin, BaseTransformer, OneHotEn
 
         """
 
+        # Check that transformer has been fit before calling transform
+        self.check_is_fitted(["categories_"])
+
         X = BaseTransformer.transform(self, X)
 
         # Check for nulls

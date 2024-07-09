@@ -59,6 +59,8 @@ Changed
 - added minimal_dataframe_lookup fixture to conftest, and edited generic tests to use this
 - Alphabetised the minimial attribute dictionary for readability.
 - Refactored OHE transformer tests to align with new testing framework. 
+- Moved fixtures relating only to a single test out of conftest and into testing script where utilised.
+- !!!Introduced dependency on Sklearn's OneHotEncoder by adding test to check OHE transformer (which we are calling from within our OHE wrapper) is fit before transform 
 
 
 Removed

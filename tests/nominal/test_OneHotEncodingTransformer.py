@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import test_aide as ta
+from test_BaseNominalTransformer import GenericBaseNominalTransformerTests
 
 import tests.test_data as d
 from tests.base_tests import (
@@ -60,7 +61,11 @@ class TestFit(GenericFitTests):
             x.fit(df)
 
 
-class TestTransform(DropOriginalTransformMixinTests, GenericTransformTests):
+class TestTransform(
+    DropOriginalTransformMixinTests,
+    GenericBaseNominalTransformerTests,
+    GenericTransformTests,
+):
     """Tests for transformer.transform."""
 
     @classmethod
@@ -118,6 +123,11 @@ class TestTransform(DropOriginalTransformMixinTests, GenericTransformTests):
         df["c_c"] = [0.0, 0.0, 1.0, 0.0, 0.0]
 
         return df
+
+    def test_exception_raised(self):
+        """Test inherited from GenericBaseNominalTransformerTests needs to be overwritten,
+        inherited test tests the mapping attribute, which OHE transfomer doesn't have.
+        """
 
     def test_non_numeric_column_error_1(self):
         """Test that transform will raise an error if a column to transform has nulls."""
