@@ -15,6 +15,97 @@ from sklearn.preprocessing import (
 from tubular.base import BaseTransformer, DataFrameMethodTransformer
 
 
+class BaseNumericTransformer(BaseTransformer):
+    """
+    Extends BaseTransformer for datetime scenarios.
+
+    Parameters
+    ----------
+    columns : List[str]
+        List of columns to be operated on.
+
+    **kwargs
+        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+
+    Attributes
+    ----------
+    columns : List[str]
+        List of columns to be operated on
+
+    """
+
+    def __init__(self, columns: list[str], **kwargs: dict[str, bool]) -> None:
+        super().__init__(columns=columns, **kwargs)
+
+    def _check_numeric(self, X: pd.DataFrame) -> None:
+        """Raise a type error if a column to be operated on is not numeric
+
+        Parameters
+        ----------
+
+        X: pd.DataFrame
+            Data to validate
+
+        """
+
+        numeric_column_types = X[self.columns].apply(
+            pd.api.types.is_numeric_dtype,
+            axis=0,
+        )
+
+        if not numeric_column_types.all():
+            non_numeric_columns = list(
+                numeric_column_types.loc[~numeric_column_types].index,
+            )
+
+            msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
+            raise TypeError(msg)
+
+    def fit(
+        self,
+        X: pd.DataFrame,
+        y: pd.Series | None = None,
+    ) -> BaseNumericTransformer:
+        """Base fit method. Validates data and attributes prior to the child objects fit logic.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            A dataframe containing the required columns
+
+        y : None
+            Required for pipeline.
+
+        """
+
+        super().fit(X, y)
+
+        self._check_numeric(X)
+
+        return self
+
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Base transform method. Validates data and attributes prior to the child objects tranform logic.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data to transform.
+
+        Returns
+        -------
+        X : pd.DataFrame
+            Validated data
+
+        """
+
+        X = super().transform(X)
+
+        self._check_numeric(X)
+
+        return X
+
+
 class LogTransformer(BaseTransformer):
     """Transformer to apply log transformation.
 

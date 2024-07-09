@@ -130,6 +130,9 @@ def minimal_attribute_dict():
         "BaseNominalTransformer": {
             "columns": ["b"],
         },
+        "BaseNumericTransformer": {
+            "columns": ["a", "b"],
+        },
         "BaseTransformer": {
             "columns": ["a"],
         },
@@ -233,7 +236,7 @@ def minimal_attribute_dict():
             "separator": "-",
         },
         "OrdinalEncoderTransformer": {
-            "columns": ["b"],
+            "columns": ["b"],      
         },
         "OutOfRangeNullTransformer": {
             "capping_values": {"a": [0.1, 0.2]},
