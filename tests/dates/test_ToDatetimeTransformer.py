@@ -5,7 +5,6 @@ import pandas as pd
 import pytest
 import test_aide as ta
 
-import tests.test_data as d
 from tubular.dates import ToDatetimeTransformer
 
 
@@ -99,10 +98,16 @@ class TestTransform:
             },
         )
 
+    def create_to_datetime_test_df():
+        """Create DataFrame to be used in the ToDatetimeTransformer tests."""
+        return pd.DataFrame(
+            {"a": [1950, 1960, 2000, 2001, np.nan, 2010], "b": [1, 2, 3, 4, 5, np.nan]},
+        )
+
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_to_datetime_test_df(),
+            create_to_datetime_test_df(),
             expected_df_1(),
         ),
     )

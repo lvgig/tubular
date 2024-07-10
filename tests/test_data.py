@@ -191,6 +191,17 @@ def create_df_11():
     )
 
 
+def create_df_12():
+    """Create simple DataFrame to use in other tests."""
+    return pd.DataFrame(
+        {
+            "a": [1, 3, 3, 4, 5, 6, 10, 8, 12],
+            "b": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            "c": [1, 1, 3, 4, 5, 6, 5, 8, 50],
+        },
+    )
+
+
 def create_large_null_df(n_col=1000):
     """Create large single row df with all null values.
 
@@ -251,108 +262,6 @@ def create_weighted_imputers_test_df():
             "d": [1.0, 5.0, 3.0, np.nan, np.nan, 1.0],
             "response": [0, 1, 0, 1, 1, 1],
             "weights_column": [0.1, 0.1, 0.8, 0.5, 0.9, 0.8],
-        },
-    )
-
-
-def create_MeanResponseTransformer_test_df():
-    """Create DataFrame to use MeanResponseTransformer tests that correct values are.
-
-    DataFrame column a is the response, the other columns are categorical columns
-    of types; object, category, int, float, bool.
-
-    """
-    df = pd.DataFrame(
-        {
-            "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
-            "b": ["a", "b", "c", "d", "e", "f"],
-            "c": ["a", "b", "c", "d", "e", "f"],
-            "d": [1, 2, 3, 4, 5, 6],
-            "e": [1, 2, 3, 4, 5, 6.0],
-            "f": [False, False, False, True, True, True],
-            "multi_level_response": [
-                "blue",
-                "blue",
-                "yellow",
-                "yellow",
-                "green",
-                "green",
-            ],
-        },
-    )
-
-    df["c"] = df["c"].astype("category")
-
-    return df
-
-
-def create_MeanResponseTransformer_test_df_unseen_levels():
-    """Create DataFrame to use in MeanResponseTransformer tests that check correct values are
-    generated when using transform method on data with unseen levels.
-    DataFrame column a is the response, the other columns are categorical columns
-    of types; object, category, int, float, bool.
-
-    """
-    df = pd.DataFrame(
-        {
-            "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 3.0],
-            "b": ["a", "b", "c", "d", "e", "f", "g", "h"],
-            "c": ["a", "b", "c", "d", "e", "f", "g", "h"],
-            "d": [1, 2, 3, 4, 5, 6, 7, 8],
-            "e": [1, 2, 3, 4, 5, 6.0, 7, 8],
-            "f": [False, False, False, True, True, True, True, False],
-            "multi_level_response": [
-                "blue",
-                "blue",
-                "yellow",
-                "yellow",
-                "green",
-                "green",
-                "yellow",
-                "blue",
-            ],
-        },
-    )
-
-    df["c"] = df["c"].astype("category")
-
-    return df
-
-
-def create_OrdinalEncoderTransformer_test_df():
-    """Create DataFrame to use OrdinalEncoderTransformer tests that correct values are.
-
-    DataFrame column a is the response, the other columns are categorical columns
-    of types; object, category, int, float, bool.
-
-    """
-    df = pd.DataFrame(
-        {
-            "a": [1, 2, 3, 4, 5, 6],
-            "b": ["a", "b", "c", "d", "e", "f"],
-            "c": ["a", "b", "c", "d", "e", "f"],
-            "d": [1, 2, 3, 4, 5, 6],
-            "e": [3, 4, 5, 6, 7, 8.0],
-            "f": [False, False, False, True, True, True],
-        },
-    )
-
-    df["c"] = df["c"].astype("category")
-
-    return df
-
-
-def create_NearestMeanResponseImputer_test_df():
-    """Create DataFrame to use in NearestMeanResponseImputer tests.
-
-    DataFrame column c is the response, the other columns are numerical columns containing null entries.
-
-    """
-    return pd.DataFrame(
-        {
-            "a": [1, 1, 2, 3, 3, np.nan],
-            "b": [np.nan, np.nan, 1, 3, 3, 4],
-            "c": [2, 3, 2, 1, 4, 1],
         },
     )
 
@@ -552,46 +461,7 @@ def create_datediff_test_df():
     )
 
 
-def create_datediff_test_nulls_df():
-    """Create DataFrame with nulls only for DateDifferenceTransformer tests."""
-    return pd.DataFrame(
-        {
-            "a": [
-                datetime.datetime(
-                    1993,
-                    9,
-                    27,
-                    11,
-                    58,
-                    58,
-                    tzinfo=datetime.timezone.utc,
-                ),
-                np.nan,
-            ],
-            "b": [
-                np.nan,
-                datetime.datetime(
-                    2019,
-                    12,
-                    25,
-                    11,
-                    58,
-                    58,
-                    tzinfo=datetime.timezone.utc,
-                ),
-            ],
-        },
-        index=[0, 1],
-    )
-
-
-def create_to_datetime_test_df():
-    """Create DataFrame to be used in the ToDatetimeTransformer tests."""
-    return pd.DataFrame(
-        {"a": [1950, 1960, 2000, 2001, np.nan, 2010], "b": [1, 2, 3, 4, 5, np.nan]},
-    )
-
-
+# Create between dates df staying here as used in conftest also
 def create_is_between_dates_df_1():
     """Create df to use in IsBetweenDates tests. Contains 3 columns of 2 datatime values."""
     return pd.DataFrame(
@@ -687,17 +557,6 @@ def create_is_between_dates_df_3():
                 datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
                 datetime.datetime(1990, 3, 1, tzinfo=datetime.timezone.utc),
             ],
-        },
-    )
-
-
-# Example DataFrame for downcasting dtypes tests
-def create_downcast_df():
-    """Create a dataframe with mixed dtypes to use in downcasting tests."""
-    return pd.DataFrame(
-        {
-            "a": [1, 2, 3, 4, 5],
-            "b": [1.0, 2.0, 3.0, 4.0, 5.0],
         },
     )
 
@@ -816,24 +675,6 @@ def create_date_diff_different_dtypes_and_nans():
     )
 
 
-def expected_date_diff_df_1():
-    """Expected output for test_expected_output_drop_cols_true."""
-    return pd.DataFrame(
-        {
-            "c": [
-                26,
-                19,
-                0,
-                0,
-                0,
-                -2,
-                -3,
-                30,
-            ],
-        },
-    )
-
-
 def expected_date_diff_df_2():
     """Expected output for test_expected_output_drop_cols_true."""
     return pd.DataFrame(
@@ -909,273 +750,6 @@ def create_date_diff_incorrect_dtypes():
                 None,
                 None,
                 None,
-            ],
-        },
-    )
-
-
-def create_date_diff_different_dtypes_2():
-    """Expected output for test_expected_output_units_D."""
-    return pd.DataFrame(
-        {
-            "date_col_1": [
-                datetime.date(
-                    1993,
-                    9,
-                    27,
-                ),
-                datetime.date(
-                    2000,
-                    3,
-                    19,
-                ),
-                datetime.date(
-                    2018,
-                    11,
-                    10,
-                ),
-                datetime.date(
-                    2018,
-                    10,
-                    10,
-                ),
-                datetime.date(
-                    2018,
-                    10,
-                    10,
-                ),
-                datetime.date(
-                    2018,
-                    10,
-                    10,
-                ),
-                datetime.date(
-                    2018,
-                    12,
-                    10,
-                ),
-                datetime.date(
-                    1985,
-                    7,
-                    23,
-                ),
-            ],
-            "date_col_2": [
-                datetime.date(
-                    2020,
-                    5,
-                    1,
-                ),
-                datetime.date(
-                    2019,
-                    12,
-                    25,
-                ),
-                datetime.date(
-                    2018,
-                    11,
-                    10,
-                ),
-                datetime.date(
-                    2018,
-                    11,
-                    10,
-                ),
-                datetime.date(
-                    2018,
-                    9,
-                    10,
-                ),
-                datetime.date(
-                    2015,
-                    11,
-                    10,
-                ),
-                datetime.date(
-                    2015,
-                    11,
-                    10,
-                ),
-                datetime.date(
-                    2015,
-                    7,
-                    23,
-                ),
-            ],
-            "datetime_col_1": [
-                datetime.datetime(
-                    1993,
-                    9,
-                    27,
-                    11,
-                    58,
-                    58,
-                    tzinfo=datetime.timezone.utc,
-                ),
-                datetime.datetime(
-                    2000,
-                    3,
-                    19,
-                    12,
-                    59,
-                    59,
-                    tzinfo=datetime.timezone.utc,
-                ),
-                datetime.datetime(
-                    2018,
-                    11,
-                    10,
-                    11,
-                    59,
-                    59,
-                    tzinfo=datetime.timezone.utc,
-                ),
-                datetime.datetime(
-                    2018,
-                    10,
-                    10,
-                    11,
-                    59,
-                    59,
-                    tzinfo=datetime.timezone.utc,
-                ),
-                datetime.datetime(
-                    2018,
-                    10,
-                    10,
-                    11,
-                    59,
-                    59,
-                    tzinfo=datetime.timezone.utc,
-                ),
-                datetime.datetime(
-                    2018,
-                    10,
-                    10,
-                    10,
-                    59,
-                    59,
-                    tzinfo=datetime.timezone.utc,
-                ),
-                datetime.datetime(
-                    2018,
-                    12,
-                    10,
-                    11,
-                    59,
-                    59,
-                    tzinfo=datetime.timezone.utc,
-                ),
-                datetime.datetime(
-                    1985,
-                    7,
-                    23,
-                    11,
-                    59,
-                    59,
-                    tzinfo=datetime.timezone.utc,
-                ),
-            ],
-            "datetime_col_2": [
-                datetime.datetime(
-                    2020,
-                    5,
-                    1,
-                    12,
-                    59,
-                    59,
-                    tzinfo=datetime.timezone.utc,
-                ),
-                datetime.datetime(
-                    2019,
-                    12,
-                    25,
-                    11,
-                    58,
-                    58,
-                    tzinfo=datetime.timezone.utc,
-                ),
-                datetime.datetime(
-                    2018,
-                    11,
-                    10,
-                    11,
-                    59,
-                    59,
-                    tzinfo=datetime.timezone.utc,
-                ),
-                datetime.datetime(
-                    2018,
-                    11,
-                    10,
-                    11,
-                    59,
-                    59,
-                    tzinfo=datetime.timezone.utc,
-                ),
-                datetime.datetime(
-                    2018,
-                    9,
-                    10,
-                    9,
-                    59,
-                    59,
-                    tzinfo=datetime.timezone.utc,
-                ),
-                datetime.datetime(
-                    2015,
-                    11,
-                    10,
-                    11,
-                    59,
-                    59,
-                    tzinfo=datetime.timezone.utc,
-                ),
-                datetime.datetime(
-                    2015,
-                    11,
-                    10,
-                    12,
-                    59,
-                    59,
-                    tzinfo=datetime.timezone.utc,
-                ),
-                datetime.datetime(
-                    2015,
-                    7,
-                    23,
-                    11,
-                    59,
-                    59,
-                    tzinfo=datetime.timezone.utc,
-                ),
-            ],
-        },
-    )
-
-
-def expected_date_diff_df_3():
-    return pd.DataFrame(
-        {
-            "datetime output": [
-                9713.042372685186,
-                7219.957627314815,
-                0.0,
-                31.0,
-                -30.083333333333332,
-                -1064.9583333333333,
-                -1125.9583333333333,
-                10957.0,
-            ],
-            "dates output": [
-                9713.0,
-                7220.0,
-                0.0,
-                31.0,
-                -30.0,
-                -1065.0,
-                -1126.0,
-                10957.0,
             ],
         },
     )

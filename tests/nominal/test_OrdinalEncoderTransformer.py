@@ -7,6 +7,30 @@ import tubular
 from tubular.nominal import OrdinalEncoderTransformer
 
 
+# Dataframe used exclusively in this testing script
+def create_OrdinalEncoderTransformer_test_df():
+    """Create DataFrame to use OrdinalEncoderTransformer tests that correct values are.
+
+    DataFrame column a is the response, the other columns are categorical columns
+    of types; object, category, int, float, bool.
+
+    """
+    df = pd.DataFrame(
+        {
+            "a": [1, 2, 3, 4, 5, 6],
+            "b": ["a", "b", "c", "d", "e", "f"],
+            "c": ["a", "b", "c", "d", "e", "f"],
+            "d": [1, 2, 3, 4, 5, 6],
+            "e": [3, 4, 5, 6, 7, 8.0],
+            "f": [False, False, False, True, True, True],
+        },
+    )
+
+    df["c"] = df["c"].astype("category")
+
+    return df
+
+
 class TestInit:
     """Tests for OrdinalEncoderTransformer.init()."""
 
@@ -24,7 +48,7 @@ class TestFit:
 
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseNominalTransformer.fit."""
-        df = d.create_OrdinalEncoderTransformer_test_df()
+        df = create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns="b")
 
@@ -46,8 +70,8 @@ class TestFit:
 
         expected_pos_args = (
             x,
-            d.create_OrdinalEncoderTransformer_test_df(),
-            d.create_OrdinalEncoderTransformer_test_df()["a"],
+            create_OrdinalEncoderTransformer_test_df(),
+            create_OrdinalEncoderTransformer_test_df()["a"],
         )
 
         assert len(expected_pos_args) == len(
@@ -62,7 +86,7 @@ class TestFit:
 
     def test_fit_returns_self(self):
         """Test fit returns self?."""
-        df = d.create_OrdinalEncoderTransformer_test_df()
+        df = create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns="b")
 
@@ -74,21 +98,21 @@ class TestFit:
 
     def test_fit_not_changing_data(self):
         """Test fit does not change X."""
-        df = d.create_OrdinalEncoderTransformer_test_df()
+        df = create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns="b")
 
         x.fit(df, df["a"])
 
         ta.equality.assert_equal_dispatch(
-            expected=d.create_OrdinalEncoderTransformer_test_df(),
+            expected=create_OrdinalEncoderTransformer_test_df(),
             actual=df,
             msg="Check X not changing during fit",
         )
 
     def test_learnt_values(self):
         """Test that the ordinal encoder values learnt during fit are expected."""
-        df = d.create_OrdinalEncoderTransformer_test_df()
+        df = create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns=["b", "d", "f"])
 
@@ -108,7 +132,7 @@ class TestFit:
 
     def test_learnt_values_weight(self):
         """Test that the ordinal encoder values learnt during fit are expected if a weights column is specified."""
-        df = d.create_OrdinalEncoderTransformer_test_df()
+        df = create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(weights_column="e", columns=["b", "d", "f"])
 
@@ -128,7 +152,7 @@ class TestFit:
 
     def test_weights_column_missing_error(self):
         """Test that an exception is raised if weights_column is specified but not present in data for fit."""
-        df = d.create_OrdinalEncoderTransformer_test_df()
+        df = create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(weights_column="z", columns=["b", "d", "f"])
 
@@ -173,7 +197,7 @@ class TestTransform:
 
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_mappable_rows called."""
-        df = d.create_OrdinalEncoderTransformer_test_df()
+        df = create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns="b")
 
@@ -190,7 +214,7 @@ class TestTransform:
             x.transform(df)
 
     def test_not_dataframe_error_raised(self):
-        df = d.create_OrdinalEncoderTransformer_test_df()
+        df = create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns="b")
         x.fit(df, df["a"])
@@ -203,7 +227,7 @@ class TestTransform:
 
     def test_super_transform_called(self, mocker):
         """Test that BaseMappingTransformMixin.transform called."""
-        df = d.create_OrdinalEncoderTransformer_test_df()
+        df = create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns="b")
 
@@ -211,7 +235,7 @@ class TestTransform:
 
         expected_call_args = {
             0: {
-                "args": (x, d.create_OrdinalEncoderTransformer_test_df()),
+                "args": (x, create_OrdinalEncoderTransformer_test_df()),
                 "kwargs": {},
             },
         }
@@ -221,13 +245,13 @@ class TestTransform:
             tubular.mapping.BaseMappingTransformMixin,
             "transform",
             expected_call_args,
-            return_value=d.create_OrdinalEncoderTransformer_test_df(),
+            return_value=create_OrdinalEncoderTransformer_test_df(),
         ):
             x.transform(df)
 
     def test_learnt_values_not_modified(self):
         """Test that the mappings from fit are not changed in transform."""
-        df = d.create_OrdinalEncoderTransformer_test_df()
+        df = create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns="b")
 
@@ -248,7 +272,7 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_OrdinalEncoderTransformer_test_df(),
+            create_OrdinalEncoderTransformer_test_df(),
             expected_df_1(),
         ),
     )
@@ -273,7 +297,7 @@ class TestTransform:
 
     def test_nulls_introduced_in_transform_error(self):
         """Test that transform will raise an error if nulls are introduced."""
-        df = d.create_OrdinalEncoderTransformer_test_df()
+        df = create_OrdinalEncoderTransformer_test_df()
 
         x = OrdinalEncoderTransformer(columns=["b", "d", "f"])
 

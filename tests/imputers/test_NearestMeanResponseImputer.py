@@ -8,6 +8,22 @@ import tubular
 from tubular.imputers import NearestMeanResponseImputer
 
 
+# Dataframe used exclusively in this testing script
+def create_NearestMeanResponseImputer_test_df():
+    """Create DataFrame to use in NearestMeanResponseImputer tests.
+
+    DataFrame column c is the response, the other columns are numerical columns containing null entries.
+
+    """
+    return pd.DataFrame(
+        {
+            "a": [1, 1, 2, 3, 3, np.nan],
+            "b": [np.nan, np.nan, 1, 3, 3, 4],
+            "c": [2, 3, 2, 1, 4, 1],
+        },
+    )
+
+
 class TestInit:
     """Tests for NearestMeanResponseImputer.__init__."""
 
@@ -31,15 +47,15 @@ class TestFit:
 
     def test_super_fit_called(self, mocker):
         """Test that fit calls BaseTransformer.fit."""
-        df = d.create_NearestMeanResponseImputer_test_df()
+        df = create_NearestMeanResponseImputer_test_df()
 
         x = NearestMeanResponseImputer(columns=["a", "b"])
 
         expected_call_args = {
             0: {
                 "args": (
-                    d.create_NearestMeanResponseImputer_test_df(),
-                    d.create_NearestMeanResponseImputer_test_df()["c"],
+                    create_NearestMeanResponseImputer_test_df(),
+                    create_NearestMeanResponseImputer_test_df()["c"],
                 ),
                 "kwargs": {},
             },
@@ -81,7 +97,7 @@ class TestFit:
 
     def test_fit_returns_self(self):
         """Test fit returns self?."""
-        df = d.create_NearestMeanResponseImputer_test_df()
+        df = create_NearestMeanResponseImputer_test_df()
 
         x = NearestMeanResponseImputer(columns=["a", "b"])
 
@@ -93,21 +109,21 @@ class TestFit:
 
     def test_fit_not_changing_data(self):
         """Test fit does not change X."""
-        df = d.create_NearestMeanResponseImputer_test_df()
+        df = create_NearestMeanResponseImputer_test_df()
 
         x = NearestMeanResponseImputer(columns=["a", "b"])
 
         x.fit(df, df["c"])
 
         ta.equality.assert_equal_dispatch(
-            expected=d.create_NearestMeanResponseImputer_test_df(),
+            expected=create_NearestMeanResponseImputer_test_df(),
             actual=df,
             msg="Check X not changing during fit",
         )
 
     def test_learnt_values(self):
         """Test that the nearest response values learnt during fit are expected."""
-        df = d.create_NearestMeanResponseImputer_test_df()
+        df = create_NearestMeanResponseImputer_test_df()
 
         x = NearestMeanResponseImputer(columns=["a", "b"])
 
@@ -181,7 +197,7 @@ class TestTransform:
 
     def test_check_is_fitted_called(self, mocker):
         """Test that BaseTransformer check_is_fitted called."""
-        df = d.create_NearestMeanResponseImputer_test_df()
+        df = create_NearestMeanResponseImputer_test_df()
 
         x = NearestMeanResponseImputer(columns=["a", "b"])
 
@@ -199,14 +215,14 @@ class TestTransform:
 
     def test_super_transform_called(self, mocker):
         """Test that BaseTransformer.transform called."""
-        df = d.create_NearestMeanResponseImputer_test_df()
+        df = create_NearestMeanResponseImputer_test_df()
 
         x = NearestMeanResponseImputer(columns=["a", "b"])
 
         x.fit(df, df["c"])
 
         expected_call_args = {
-            0: {"args": (d.create_NearestMeanResponseImputer_test_df(),), "kwargs": {}},
+            0: {"args": (create_NearestMeanResponseImputer_test_df(),), "kwargs": {}},
         }
 
         with ta.functions.assert_function_call(
@@ -220,7 +236,7 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_NearestMeanResponseImputer_test_df(),
+            create_NearestMeanResponseImputer_test_df(),
             expected_df_1(),
         ),
     )
@@ -242,7 +258,7 @@ class TestTransform:
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_NearestMeanResponseImputer_test_df(),
+            create_NearestMeanResponseImputer_test_df(),
             expected_df_2(),
         ),
     )
@@ -285,7 +301,7 @@ class TestTransform:
 
     def test_learnt_values_not_modified(self):
         """Test that the impute_values_ from fit are not changed in transform."""
-        df = d.create_NearestMeanResponseImputer_test_df()
+        df = create_NearestMeanResponseImputer_test_df()
 
         x = NearestMeanResponseImputer(columns=["a", "b"])
 
