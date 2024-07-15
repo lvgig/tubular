@@ -255,7 +255,7 @@ class GenericFitTests:
 
         x = initialized_transformers[self.transformer_name]
 
-        x_fitted = x.fit(df, df["c"])
+        x_fitted = x.fit(df, df["a"])
 
         assert (
             x_fitted is x
@@ -558,7 +558,7 @@ class GenericTransformTests:
 
         x = initialized_transformers[self.transformer_name]
 
-        x_fitted = x.fit(df, df["c"])
+        x_fitted = x.fit(df, df["a"])
 
         with pytest.raises(
             TypeError,
@@ -573,7 +573,7 @@ class GenericTransformTests:
 
         x = initialized_transformers[self.transformer_name]
 
-        x = x.fit(df, df["c"])
+        x = x.fit(df, df["a"])
 
         df = df.head(0)
 
@@ -595,7 +595,7 @@ class GenericTransformTests:
 
         x = initialized_transformers[self.transformer_name]
 
-        x = x.fit(df, df["c"])
+        x = x.fit(df, df["a"])
 
         _ = x.transform(df)
 
