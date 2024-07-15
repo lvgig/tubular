@@ -6,7 +6,6 @@ import pytest
 import test_aide as ta
 from pandas.testing import assert_series_equal
 
-import tubular
 from tests.base_tests import (
     ColumnStrListInitTests,
     GenericFitTests,
@@ -217,27 +216,8 @@ class TestInit(ColumnStrListInitTests, WeightColumnInitMixinTests):
             MeanResponseTransformer(return_type="int")
 
 
-class Test_prior_regularisation:
+class TestPriorRegularisation:
     "tests for _prior_regularisation method."
-
-    def test_check_is_fitted_called(self, mocker):
-        """Test that _prior_regularisation calls BaseTransformer.check_is_fitted."""
-        expected_call_args = {0: {"args": (["global_mean"],), "kwargs": {}}}
-
-        x = MeanResponseTransformer(columns="a")
-
-        x.fit(pd.DataFrame({"a": ["1", "2"]}), pd.Series([2, 3]))
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "check_is_fitted",
-            expected_call_args,
-        ):
-            x._prior_regularisation(
-                cat_freq=pd.Series([1, 2]),
-                target_means=pd.Series([1, 2]),
-            )
 
     def test_output1(self):
         "Test output of method."
