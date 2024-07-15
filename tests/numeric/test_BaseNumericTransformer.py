@@ -1,3 +1,5 @@
+import re
+
 import pytest
 
 import tests.test_data as d
@@ -41,12 +43,16 @@ class BaseNumericTransformerTransformTests(
     def test_non_numeric_exception_raised(self, initialized_transformers):
         """Test an exception is raised if self.columns are non-numeric in X."""
         df = d.create_df_2()
+        # make df all non-numeric
+        df["a"] = df["b"]
 
         x = initialized_transformers[self.transformer_name]
 
         with pytest.raises(
             TypeError,
-            match=rf"{self.transformer_name}: The following columns are not numeric in X; \['b'\]",
+            match=re.escape(
+                rf"{self.transformer_name}: The following columns are not numeric in X; {x.columns}",
+            ),
         ):
             x.transform(df)
 
