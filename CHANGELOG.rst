@@ -16,6 +16,17 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+1.3.1 (unreleased)
+------------------
+
+Changed
+^^^^^^^
+
+- Refactored NominalToIntegerTransformer tests in new format `#261 <https://github.com/lvgig/tubular/pull/261>`_
+- Refactored GroupRareLevelsTransformer tests in new format `#259 <https://github.com/lvgig/tubular/pull/259>`_
+- DatetimeInfoExtractor.mappings_provided changed from a dict.keys() object to list so transformer is serialisable. `#258 <https://github.com/lvgig/tubular/pull/258>`_
+- Created BaseNumericTransformer class to support test refactor of numeric file
+- Updated testing approach for LogTransformer
 
 1.3.0 (2024-06-13)
 ------------------
@@ -52,6 +63,10 @@ Changed
 - Refactored MeanImputer tests in new format `#250 <https://github.com/lvgig/tubular/pull/250>`_
 - Refactored DatetimeInfoExtractor to condense and improve readability
 - added minimal_dataframe_lookup fixture to conftest, and edited generic tests to use this
+- Alphabetised the minimial attribute dictionary for readability.
+- Refactored OHE transformer tests to align with new testing framework. 
+- Moved fixtures relating only to a single test out of conftest and into testing script where utilised.
+- !!!Introduced dependency on Sklearn's OneHotEncoder by adding test to check OHE transformer (which we are calling from within our OHE wrapper) is fit before transform 
 
 
 Removed

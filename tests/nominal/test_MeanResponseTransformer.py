@@ -6,7 +6,6 @@ import pytest
 import test_aide as ta
 from pandas.testing import assert_series_equal
 
-import tests.test_data as d
 import tubular
 from tests.base_tests import (
     ColumnStrListInitTests,
@@ -17,6 +16,72 @@ from tests.base_tests import (
     WeightColumnInitMixinTests,
 )
 from tubular.nominal import MeanResponseTransformer
+
+
+# Dataframe used exclusively in this testing script
+def create_MeanResponseTransformer_test_df():
+    """Create DataFrame to use MeanResponseTransformer tests that correct values are.
+
+    DataFrame column a is the response, the other columns are categorical columns
+    of types; object, category, int, float, bool.
+
+    """
+    df = pd.DataFrame(
+        {
+            "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0],
+            "b": ["a", "b", "c", "d", "e", "f"],
+            "c": ["a", "b", "c", "d", "e", "f"],
+            "d": [1, 2, 3, 4, 5, 6],
+            "e": [1, 2, 3, 4, 5, 6.0],
+            "f": [False, False, False, True, True, True],
+            "multi_level_response": [
+                "blue",
+                "blue",
+                "yellow",
+                "yellow",
+                "green",
+                "green",
+            ],
+        },
+    )
+
+    df["c"] = df["c"].astype("category")
+
+    return df
+
+
+# Dataframe used exclusively in this testing script
+def create_MeanResponseTransformer_test_df_unseen_levels():
+    """Create DataFrame to use in MeanResponseTransformer tests that check correct values are
+    generated when using transform method on data with unseen levels.
+    DataFrame column a is the response, the other columns are categorical columns
+    of types; object, category, int, float, bool.
+
+    """
+    df = pd.DataFrame(
+        {
+            "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 3.0],
+            "b": ["a", "b", "c", "d", "e", "f", "g", "h"],
+            "c": ["a", "b", "c", "d", "e", "f", "g", "h"],
+            "d": [1, 2, 3, 4, 5, 6, 7, 8],
+            "e": [1, 2, 3, 4, 5, 6.0, 7, 8],
+            "f": [False, False, False, True, True, True, True, False],
+            "multi_level_response": [
+                "blue",
+                "blue",
+                "yellow",
+                "yellow",
+                "green",
+                "green",
+                "yellow",
+                "blue",
+            ],
+        },
+    )
+
+    df["c"] = df["c"].astype("category")
+
+    return df
 
 
 @pytest.fixture()
@@ -30,7 +95,7 @@ def learnt_mapping_dict():
         "b_green": {"a": 0.0, "b": 0.0, "c": 0.0, "d": 0.0, "e": 1.0, "f": 1.0},
     }
 
-    # c matches b, but is categorical (see test_data.create_MeanResponseTransformer_test_df)
+    # c matches b, but is categorical (see create_MeanResponseTransformer_test_df)
     c_dict = {
         "c" + suffix: b_dict["b" + suffix]
         for suffix in ["", "_blue", "_yellow", "_green"]
@@ -240,7 +305,7 @@ class TestFit(GenericFitTests, WeightColumnFitMixinTests):
         unseen_level_handling,
     ):
         """Test that an exception is raised if nulls are present in response_column."""
-        df = d.create_MeanResponseTransformer_test_df()
+        df = create_MeanResponseTransformer_test_df()
         df.loc[1, target_column] = np.nan
 
         x = MeanResponseTransformer(
@@ -270,7 +335,7 @@ class TestFit(GenericFitTests, WeightColumnFitMixinTests):
         unseen_level_handling,
     ):
         "Test that the mapping dictionary created in fit has the correct keys and values."
-        df = d.create_MeanResponseTransformer_test_df()
+        df = create_MeanResponseTransformer_test_df()
         columns = ["b", "c"]
         x = MeanResponseTransformer(
             columns=columns,
@@ -302,7 +367,7 @@ class TestFit(GenericFitTests, WeightColumnFitMixinTests):
         unseen_level_handling,
     ):
         "Test that the mapping dictionary created in fit has the correct keys and values."
-        df = d.create_MeanResponseTransformer_test_df()
+        df = create_MeanResponseTransformer_test_df()
         columns = ["b", "c"]
         x = MeanResponseTransformer(
             columns=columns,
@@ -357,7 +422,7 @@ class TestFit(GenericFitTests, WeightColumnFitMixinTests):
         unseen_level_handling,
     ):
         "Test that the unseen_levels_encoding_dict dictionary created in fit has the correct keys and values."
-        df = d.create_MeanResponseTransformer_test_df()
+        df = create_MeanResponseTransformer_test_df()
         x = MeanResponseTransformer(
             columns=["b"],
             level=level,
@@ -422,7 +487,7 @@ class TestFit(GenericFitTests, WeightColumnFitMixinTests):
     def test_missing_categories_ignored(self):
         "test that where a categorical column has missing levels, these do not make it into the encoding dict"
 
-        df = d.create_MeanResponseTransformer_test_df()
+        df = create_MeanResponseTransformer_test_df()
         unobserved_value = "bla"
         df["c"] = df["c"].cat.add_categories(unobserved_value)
         target_column = "e"
@@ -445,7 +510,7 @@ class TestFitBinaryResponse(GenericFitTests, WeightColumnFitMixinTests):
 
     def test_learnt_values(self):
         """Test that the mean response values learnt during fit are expected."""
-        df = d.create_MeanResponseTransformer_test_df()
+        df = create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(columns=["b", "d", "f"])
 
@@ -476,7 +541,7 @@ class TestFitBinaryResponse(GenericFitTests, WeightColumnFitMixinTests):
 
     def test_learnt_values_prior_no_weight(self):
         """Test that the mean response values learnt during fit are expected."""
-        df = d.create_MeanResponseTransformer_test_df()
+        df = create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(columns=["b", "d", "f"], prior=5)
 
@@ -520,7 +585,7 @@ class TestFitBinaryResponse(GenericFitTests, WeightColumnFitMixinTests):
 
     def test_learnt_values_no_prior_weight(self):
         """Test that the mean response values learnt during fit are expected if a weights column is specified."""
-        df = d.create_MeanResponseTransformer_test_df()
+        df = create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(weights_column="e", columns=["b", "d", "f"])
 
@@ -550,7 +615,7 @@ class TestFitBinaryResponse(GenericFitTests, WeightColumnFitMixinTests):
 
     def test_learnt_values_prior_weight(self):
         """Test that the mean response values learnt during fit are expected - when using weight and prior."""
-        df = d.create_MeanResponseTransformer_test_df()
+        df = create_MeanResponseTransformer_test_df()
 
         df["weight"] = [1, 1, 1, 2, 2, 2]
 
@@ -586,7 +651,7 @@ class TestFitBinaryResponse(GenericFitTests, WeightColumnFitMixinTests):
     @pytest.mark.parametrize("prior", (1, 3, 5, 7, 9, 11, 100))
     def test_prior_logic(self, prior):
         "Test that for prior>0 encodings are closer to global mean than for prior=0."
-        df = d.create_MeanResponseTransformer_test_df()
+        df = create_MeanResponseTransformer_test_df()
 
         df["weight"] = [1, 1, 1, 2, 2, 2]
 
@@ -637,7 +702,7 @@ class TestFitBinaryResponse(GenericFitTests, WeightColumnFitMixinTests):
     )
     def test_prior_logic_for_weights(self, low_weight, high_weight):
         "Test that for fixed prior a group with lower weight is moved closer to the global mean than one with higher weight."
-        df = d.create_MeanResponseTransformer_test_df()
+        df = create_MeanResponseTransformer_test_df()
 
         # column f looks like [False, False, False, True, True, True]
         df["weight"] = [
@@ -704,7 +769,7 @@ class TestFitBinaryResponse(GenericFitTests, WeightColumnFitMixinTests):
 
     def test_weights_column_missing_error(self):
         """Test that an exception is raised if weights_column is specified but not present in data for fit."""
-        df = d.create_MeanResponseTransformer_test_df()
+        df = create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(weights_column="z", columns=["b", "d", "f"])
 
@@ -1007,7 +1072,7 @@ class TestTransform(GenericTransformTests):
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_MeanResponseTransformer_test_df(),
+            create_MeanResponseTransformer_test_df(),
             expected_df_1(),
         ),
     )
@@ -1037,7 +1102,7 @@ class TestTransform(GenericTransformTests):
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_MeanResponseTransformer_test_df(),
+            create_MeanResponseTransformer_test_df(),
             expected_df_2(),
         ),
     )
@@ -1079,7 +1144,7 @@ class TestTransform(GenericTransformTests):
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_MeanResponseTransformer_test_df(),
+            create_MeanResponseTransformer_test_df(),
             expected_df_3(),
         ),
     )
@@ -1120,10 +1185,10 @@ class TestTransform(GenericTransformTests):
         """Test that the output is expected from transform with a single level response with unseen levels in data with
         unseen_level_handling set to 'None', i.e., default value.
         """
-        initial_df = d.create_MeanResponseTransformer_test_df()
+        initial_df = create_MeanResponseTransformer_test_df()
         x = MeanResponseTransformer(columns=["b", "d", "f"])
         x.fit(initial_df, initial_df["a"])
-        df = d.create_MeanResponseTransformer_test_df_unseen_levels()
+        df = create_MeanResponseTransformer_test_df_unseen_levels()
         with pytest.raises(
             ValueError,
             match="MeanResponseTransformer: nulls would be introduced into column b from levels not present in mapping",
@@ -1133,7 +1198,7 @@ class TestTransform(GenericTransformTests):
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_MeanResponseTransformer_test_df_unseen_levels(),
+            create_MeanResponseTransformer_test_df_unseen_levels(),
             expected_df_4(),
         ),
     )
@@ -1152,7 +1217,7 @@ class TestTransform(GenericTransformTests):
             unseen_level_handling="Mean",
         )
 
-        initial_df = d.create_MeanResponseTransformer_test_df()
+        initial_df = create_MeanResponseTransformer_test_df()
         x.fit(initial_df, initial_df[target])
         df_transformed = x.transform(df)
 
@@ -1168,7 +1233,7 @@ class TestTransform(GenericTransformTests):
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_MeanResponseTransformer_test_df_unseen_levels(),
+            create_MeanResponseTransformer_test_df_unseen_levels(),
             expected_df_5(),
         ),
     )
@@ -1187,7 +1252,7 @@ class TestTransform(GenericTransformTests):
             unseen_level_handling="Median",
         )
 
-        initial_df = d.create_MeanResponseTransformer_test_df()
+        initial_df = create_MeanResponseTransformer_test_df()
         x.fit(initial_df, initial_df[target])
         df_transformed = x.transform(df)
 
@@ -1203,7 +1268,7 @@ class TestTransform(GenericTransformTests):
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_MeanResponseTransformer_test_df_unseen_levels(),
+            create_MeanResponseTransformer_test_df_unseen_levels(),
             expected_df_6(),
         ),
     )
@@ -1222,7 +1287,7 @@ class TestTransform(GenericTransformTests):
             unseen_level_handling="Lowest",
         )
 
-        initial_df = d.create_MeanResponseTransformer_test_df()
+        initial_df = create_MeanResponseTransformer_test_df()
         x.fit(initial_df, initial_df[target])
         df_transformed = x.transform(df)
 
@@ -1238,7 +1303,7 @@ class TestTransform(GenericTransformTests):
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_MeanResponseTransformer_test_df_unseen_levels(),
+            create_MeanResponseTransformer_test_df_unseen_levels(),
             expected_df_7(),
         ),
     )
@@ -1257,7 +1322,7 @@ class TestTransform(GenericTransformTests):
             unseen_level_handling="Highest",
         )
 
-        initial_df = d.create_MeanResponseTransformer_test_df()
+        initial_df = create_MeanResponseTransformer_test_df()
         x.fit(initial_df, initial_df[target])
         df_transformed = x.transform(df)
 
@@ -1273,7 +1338,7 @@ class TestTransform(GenericTransformTests):
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_MeanResponseTransformer_test_df_unseen_levels(),
+            create_MeanResponseTransformer_test_df_unseen_levels(),
             expected_df_8(),
         ),
     )
@@ -1289,7 +1354,7 @@ class TestTransform(GenericTransformTests):
         target = "a"
         x = MeanResponseTransformer(columns=columns, unseen_level_handling=21.6)
 
-        initial_df = d.create_MeanResponseTransformer_test_df()
+        initial_df = create_MeanResponseTransformer_test_df()
         x.fit(initial_df, initial_df[target])
         df_transformed = x.transform(df)
 
@@ -1305,7 +1370,7 @@ class TestTransform(GenericTransformTests):
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_MeanResponseTransformer_test_df_unseen_levels(),
+            create_MeanResponseTransformer_test_df_unseen_levels(),
             expected_df_9(),
         ),
     )
@@ -1325,7 +1390,7 @@ class TestTransform(GenericTransformTests):
         for col in expected_created_cols:
             expected[col] = expected[col].astype(x.return_type)
 
-        initial_df = d.create_MeanResponseTransformer_test_df()
+        initial_df = create_MeanResponseTransformer_test_df()
         x.fit(initial_df, initial_df["multi_level_response"])
         df_transformed = x.transform(df)
 
@@ -1338,7 +1403,7 @@ class TestTransform(GenericTransformTests):
     @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
-            d.create_MeanResponseTransformer_test_df_unseen_levels(),
+            create_MeanResponseTransformer_test_df_unseen_levels(),
             expected_df_10(),
         ),
     )
@@ -1346,7 +1411,7 @@ class TestTransform(GenericTransformTests):
         """Test that the output is expected from transform with a multi-level response and unseen levels and all level selected."""
         columns = ["b", "f"]
         target = "multi_level_response"
-        initial_df = d.create_MeanResponseTransformer_test_df()
+        initial_df = create_MeanResponseTransformer_test_df()
         expected_created_cols = [
             prefix + "_" + suffix
             for prefix, suffix in product(columns, initial_df[target].unique().tolist())
@@ -1371,7 +1436,7 @@ class TestTransform(GenericTransformTests):
 
     def test_nulls_introduced_in_transform_error(self):
         """Test that transform will raise an error if nulls are introduced."""
-        df = d.create_MeanResponseTransformer_test_df()
+        df = create_MeanResponseTransformer_test_df()
 
         x = MeanResponseTransformer(columns=["b", "d", "f"])
 
@@ -1403,7 +1468,7 @@ class TestTransform(GenericTransformTests):
     ):
         "Test that output return types are controlled by return_type param, this defaults to float32 so test float64 here"
 
-        df = d.create_MeanResponseTransformer_test_df()
+        df = create_MeanResponseTransformer_test_df()
 
         columns = ["b", "d", "f"]
         x = MeanResponseTransformer(

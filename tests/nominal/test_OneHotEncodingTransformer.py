@@ -1,121 +1,39 @@
 import numpy as np
 import pandas as pd
 import pytest
-import sklearn
 import test_aide as ta
+from test_BaseNominalTransformer import GenericNominalTransformTests
 
 import tests.test_data as d
-import tubular
+from tests.base_tests import (
+    ColumnStrListInitTests,
+    DropOriginalInitMixinTests,
+    DropOriginalTransformMixinTests,
+    GenericFitTests,
+    GenericTransformTests,
+)
 from tubular.nominal import OneHotEncodingTransformer
 
 
-class TestInit:
-    """Tests for OneHotEncodingTransformer.init()."""
+class TestInit(DropOriginalInitMixinTests, ColumnStrListInitTests):
+    """Generic tests for transformer.init()."""
 
-    def test_super_init_called(self, mocker):
-        """Test that init calls BaseTransformer.init.
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "OneHotEncodingTransformer"
 
-        Note, not using ta.functions.assert_function_call for this as it does not handle self being passed to BaseTransformer.init.
-        """
-        expected_keyword_args = {"columns": None, "verbose": True, "copy": None}
-
-        mocker.patch("tubular.base.BaseTransformer.__init__")
-
-        x = OneHotEncodingTransformer(columns=None, verbose=True)
-
-        assert (
-            tubular.base.BaseTransformer.__init__.call_count == 1
-        ), f"Not enough calls to BaseTransformer.__init__ -\n  Expected: 1\n  Actual: {tubular.base.BaseTransformer.__init__.call_count}"
-
-        call_args = tubular.base.BaseTransformer.__init__.call_args_list[0]
-        call_pos_args = call_args[0]
-        call_kwargs = call_args[1]
-
-        ta.equality.assert_equal_dispatch(
-            expected=expected_keyword_args,
-            actual=call_kwargs,
-            msg="kwargs for BaseTransformer.__init__ in OneHotEncodingTransformer.init",
-        )
-
-        assert (
-            len(call_pos_args) == 1
-        ), f"Unepxected number of positional args in BaseTransformer.__init__ call -\n  Expected: 1\n  Actual: {len(call_pos_args)}"
-
-        assert (
-            call_pos_args[0] is x
-        ), f"Unexpected positional arg (self) in BaseTransformer.__init__ call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
+    def test_separator_column_not_str_error(self):
+        """Test that an exception is raised if separator is not a str."""
+        with pytest.raises(TypeError, match="separator must be a str"):
+            OneHotEncodingTransformer(columns=["c"], separator=333)
 
 
-class TestFit:
-    """Tests for OneHotEncodingTransformer.fit()."""
+class TestFit(GenericFitTests):
+    """Generic tests for transformer.fit()"""
 
-    def test_base_transformer_fit_called(self, mocker):
-        """Test that fit calls BaseTransformer.fit."""
-        expected_keyword_args = {"X": d.create_df_1(), "y": None}
-
-        df = d.create_df_1()
-
-        x = OneHotEncodingTransformer(columns="b")
-
-        mocker.patch("tubular.base.BaseTransformer.fit")
-
-        x.fit(df)
-
-        assert (
-            tubular.base.BaseTransformer.fit.call_count == 1
-        ), f"Not enough calls to BaseTransformer.fit -\n  Expected: 1\n  Actual: {tubular.base.BaseTransformer.fit.call_count}"
-
-        call_args = tubular.base.BaseTransformer.fit.call_args_list[0]
-        call_pos_args = call_args[0]
-        call_kwargs = call_args[1]
-
-        ta.equality.assert_equal_dispatch(
-            expected=expected_keyword_args,
-            actual=call_kwargs,
-            msg="kwargs for BaseTransformer.fit in OneHotEncodingTransformer.init",
-        )
-
-        assert (
-            len(call_pos_args) == 1
-        ), f"Unepxected number of positional args in BaseTransformer.fit call -\n  Expected: 1\n  Actual: {len(call_pos_args)}"
-
-        assert (
-            call_pos_args[0] is x
-        ), f"Unexpected positional arg (self) in BaseTransformer.fit call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
-
-    def test_one_hot_encoder_fit_called(self, mocker):
-        """Test that fit calls OneHotEncoder.fit."""
-        expected_keyword_args = {"X": d.create_df_1()[["b"]], "y": None}
-
-        df = d.create_df_1()
-
-        x = OneHotEncodingTransformer(columns="b")
-
-        mocker.patch("sklearn.preprocessing.OneHotEncoder.fit")
-
-        x.fit(df)
-
-        assert (
-            sklearn.preprocessing.OneHotEncoder.fit.call_count == 1
-        ), f"Not enough calls to OneHotEncoder.fit -\n  Expected: 1\n  Actual: {sklearn.preprocessing.OneHotEncoder.fit.call_count}"
-
-        call_args = sklearn.preprocessing.OneHotEncoder.fit.call_args_list[0]
-        call_pos_args = call_args[0]
-        call_kwargs = call_args[1]
-
-        ta.equality.assert_equal_dispatch(
-            expected=expected_keyword_args,
-            actual=call_kwargs,
-            msg="kwargs for OneHotEncoder.fit in OneHotEncodingTransformer.init",
-        )
-
-        assert (
-            len(call_pos_args) == 1
-        ), f"Unepxected number of positional args in OneHotEncoder.fit call -\n  Expected: 1\n  Actual: {len(call_pos_args)}"
-
-        assert (
-            call_pos_args[0] is x
-        ), f"Unexpected positional arg (self) in OneHotEncoder.fit call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "OneHotEncodingTransformer"
 
     def test_nulls_in_X_error(self):
         """Test that an exception is raised if X has nulls in column to be fit on."""
@@ -142,38 +60,24 @@ class TestFit:
         ):
             x.fit(df)
 
-    def test_fit_returns_self(self):
-        """Test fit returns self?."""
-        df = d.create_df_1()
 
-        x = OneHotEncodingTransformer(columns="b")
+class TestTransform(
+    DropOriginalTransformMixinTests,
+    GenericNominalTransformTests,
+    GenericTransformTests,
+):
+    """Tests for transformer.transform."""
 
-        x_fitted = x.fit(df)
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "OneHotEncodingTransformer"
 
-        assert (
-            x_fitted is x
-        ), "Returned value from OneHotEncodingTransformer.fit not as expected."
+    def create_OneHotEncoderTransformer_test_df_1():
+        """Create DataFrame to test OneHotEncoderTransformer
 
-    def test_fit_not_changing_data(self):
-        """Test fit does not change X."""
-        df = d.create_df_1()
+        binary columns are representative of transformed output of column b
 
-        x = OneHotEncodingTransformer(columns="b")
-
-        x.fit(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=d.create_df_1(),
-            actual=df,
-            msg="Check X not changing during fit",
-        )
-
-
-class TestTransform:
-    """Tests for OneHotEncodingTransformer.transform()."""
-
-    def expected_df_1():
-        """Expected output for test_expected_output."""
+        """
         df = pd.DataFrame(
             {
                 "a": [4, 2, 2, 1, 3],
@@ -190,8 +94,12 @@ class TestTransform:
 
         return df
 
-    def expected_df_2():
-        """Expected output for test_unseen_categories_encoded_as_all_zeroes."""
+    def create_OneHotEncoderTransformer_test_df_2():
+        """Create DataFrame to test OneHotEncoderTransformer
+
+        binary columns are representative of transformed output of all columns
+
+        """
         df = pd.DataFrame(
             {
                 "a": [1, 5, 2, 3, 3],
@@ -216,23 +124,10 @@ class TestTransform:
 
         return df
 
-    def test_columns_check_call(self, mocker):
-        """Test the first call to BaseTransformer columns_check."""
-        df = d.create_df_1()
-
-        x = OneHotEncodingTransformer(columns="b")
-
-        x.fit(df)
-
-        expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "columns_check",
-            expected_call_args,
-        ):
-            x.transform(df)
+    def test_non_mappable_rows_exception_raised(self):
+        """Test inherited from GenericBaseNominalTransformerTests needs to be overwritten,
+        inherited test tests the mapping attribute, which OHE transfomer doesn't have.
+        """
 
     def test_non_numeric_column_error_1(self):
         """Test that transform will raise an error if a column to transform has nulls."""
@@ -249,94 +144,12 @@ class TestTransform:
         ):
             x.transform(df_test)
 
-    def test_base_transformer_transform_called(self, mocker):
-        """Test that BaseTransformer.transform called."""
-        df = d.create_df_1()
-
-        x = OneHotEncodingTransformer(columns="b")
-
-        x.fit(df)
-
-        mocker.patch(
-            "tubular.base.BaseTransformer.transform",
-            return_value=d.create_df_1(),
-        )
-
-        x.transform(df)
-
-        assert (
-            tubular.base.BaseTransformer.transform.call_count == 1
-        ), f"Not enough calls to BaseTransformer.transform -\n  Expected: 1\n  Actual: {tubular.base.BaseTransformer.transform.call_count}"
-
-        call_args = tubular.base.BaseTransformer.transform.call_args_list[0]
-        call_pos_args = call_args[0]
-        call_kwargs = call_args[1]
-
-        ta.equality.assert_equal_dispatch(
-            expected={},
-            actual=call_kwargs,
-            msg="kwargs for BaseTransformer.transform in OneHotEncodingTransformer.init",
-        )
-
-        expected_pos_args = (x, d.create_df_1())
-
-        assert (
-            len(call_pos_args) == 2
-        ), f"Unepxected number of positional args in BaseTransformer.transform call -\n  Expected: 2\n  Actual: {len(call_pos_args)}"
-
-        ta.equality.assert_frame_equal_msg(
-            expected=expected_pos_args[1],
-            actual=call_pos_args[1],
-            msg_tag="X positional arg in BaseTransformer.transform call",
-        )
-
-        assert (
-            expected_pos_args[0] == call_pos_args[0]
-        ), "self positional arg in BaseTransformer.transform call"
-
-    def test_one_hot_encoder_transform_called(self, mocker):
-        """Test that OneHotEncoder.transform called."""
-        df = d.create_df_1()
-
-        x = OneHotEncodingTransformer(columns="b")
-
-        x.fit(df)
-
-        mocker.patch("sklearn.preprocessing.OneHotEncoder.transform")
-
-        x.transform(df)
-
-        assert (
-            sklearn.preprocessing.OneHotEncoder.transform.call_count == 1
-        ), f"Not enough calls to OneHotEncoder.transform -\n  Expected: 1\n  Actual: {sklearn.preprocessing.OneHotEncoder.transform.call_count}"
-
-        call_args = sklearn.preprocessing.OneHotEncoder.transform.call_args_list[0]
-        call_pos_args = call_args[0]
-        call_kwargs = call_args[1]
-
-        ta.equality.assert_equal_dispatch(
-            expected={},
-            actual=call_kwargs,
-            msg="kwargs for OneHotEncodingTransformer.transform in BaseTransformer.init",
-        )
-
-        assert (
-            len(call_pos_args) == 2
-        ), f"Unepxected number of positional args in OneHotEncodingTransformer.transform call -\n  Expected: 2\n  Actual: {len(call_pos_args)}"
-
-        assert (
-            call_pos_args[0] is x
-        ), f"Unexpected positional arg (self, index 1) in OneHotEncodingTransformer.transform call -\n  Expected: self\n  Actual: {call_pos_args[0]}"
-
-        ta.equality.assert_frame_equal_msg(
-            expected=d.create_df_1()[["b"]],
-            actual=call_pos_args[1],
-            msg_tag="X positional arg in OneHotEncodingTransformer.transform call",
-        )
-
     @pytest.mark.parametrize(
         ("df_test", "expected"),
-        ta.pandas.adjusted_dataframe_params(d.create_df_7(), expected_df_1()),
+        ta.pandas.adjusted_dataframe_params(
+            d.create_df_7(),
+            create_OneHotEncoderTransformer_test_df_1(),
+        ),
     )
     def test_expected_output(self, df_test, expected):
         """Test that OneHotEncodingTransformer.transform encodes the feature correctly.
@@ -424,7 +237,10 @@ class TestTransform:
 
     @pytest.mark.parametrize(
         ("df_test", "expected"),
-        ta.pandas.adjusted_dataframe_params(d.create_df_8(), expected_df_2()),
+        ta.pandas.adjusted_dataframe_params(
+            d.create_df_8(),
+            create_OneHotEncoderTransformer_test_df_2(),
+        ),
     )
     def test_unseen_categories_encoded_as_all_zeroes(self, df_test, expected):
         """Test OneHotEncodingTransformer.transform encodes unseen categories correctly (all 0s)."""
@@ -447,40 +263,4 @@ class TestTransform:
             expected=expected,
             actual=df_transformed,
             msg="unseen category rows not encoded as 0s",
-        )
-
-    def test_original_columns_dropped_when_specified(self):
-        """Test OneHotEncodingTransformer.transform drops original columns get when specified."""
-        df = d.create_df_7()
-
-        x = OneHotEncodingTransformer(columns=["a", "b", "c"], drop_original=True)
-
-        x.fit(df)
-
-        df_transformed = x.transform(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=["a", "b", "c"],
-            actual=[
-                x
-                for x in df.columns.to_numpy()
-                if x not in df_transformed.columns.to_numpy()
-            ],
-            msg="original columns not dropped",
-        )
-
-    def test_original_columns_kept_when_specified(self):
-        """Test OneHotEncodingTransformer.transform keeps original columns when specified."""
-        df = d.create_df_7()
-
-        x = OneHotEncodingTransformer(columns=["a", "b", "c"], drop_original=False)
-
-        x.fit(df)
-
-        df_transformed = x.transform(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=list(set()),
-            actual=list({"a", "b", "c"} - set(df_transformed.columns)),
-            msg="original columns not kept",
         )

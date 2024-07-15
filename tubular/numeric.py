@@ -13,9 +13,101 @@ from sklearn.preprocessing import (
 )
 
 from tubular.base import BaseTransformer, DataFrameMethodTransformer
+from tubular.mixins import BaseDropOriginalMixin
 
 
-class LogTransformer(BaseTransformer):
+class BaseNumericTransformer(BaseTransformer):
+    """
+    Extends BaseTransformer for datetime scenarios.
+
+    Parameters
+    ----------
+    columns : List[str]
+        List of columns to be operated on.
+
+    **kwargs
+        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+
+    Attributes
+    ----------
+    columns : List[str]
+        List of columns to be operated on
+
+    """
+
+    def __init__(self, columns: list[str], **kwargs: dict[str, bool]) -> None:
+        super().__init__(columns=columns, **kwargs)
+
+    def _check_numeric(self, X: pd.DataFrame) -> None:
+        """Raise a type error if a column to be operated on is not numeric
+
+        Parameters
+        ----------
+
+        X: pd.DataFrame
+            Data to validate
+
+        """
+
+        numeric_column_types = X[self.columns].apply(
+            pd.api.types.is_numeric_dtype,
+            axis=0,
+        )
+
+        if not numeric_column_types.all():
+            non_numeric_columns = list(
+                numeric_column_types.loc[~numeric_column_types].index,
+            )
+
+            msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
+            raise TypeError(msg)
+
+    def fit(
+        self,
+        X: pd.DataFrame,
+        y: pd.Series | None = None,
+    ) -> BaseNumericTransformer:
+        """Base fit method. Validates data and attributes prior to the child objects fit logic.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            A dataframe containing the required columns
+
+        y : None
+            Required for pipeline.
+
+        """
+
+        super().fit(X, y)
+
+        self._check_numeric(X)
+
+        return self
+
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Base transform method. Validates data and attributes prior to the child objects tranform logic.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data to transform.
+
+        Returns
+        -------
+        X : pd.DataFrame
+            Validated data
+
+        """
+
+        X = super().transform(X)
+
+        self._check_numeric(X)
+
+        return X
+
+
+class LogTransformer(BaseNumericTransformer, BaseDropOriginalMixin):
     """Transformer to apply log transformation.
 
     Transformer has the option to add 1 to the columns to log and drop the
@@ -33,7 +125,7 @@ class LogTransformer(BaseTransformer):
         Should a constant of 1 be added to the columns to be transformed prior to
         applying the log transform?
 
-    drop : bool
+    drop_original : bool
         Should the original columns to be transformed be dropped after applying the
         log transform?
 
@@ -49,7 +141,7 @@ class LogTransformer(BaseTransformer):
         The name of the column or columns to be assigned to the output of running the
         pandas method in transform.
 
-    drop : bool
+    drop_original : bool
         The name of the pandas.DataFrame method to call.
 
     suffix : str
@@ -62,11 +154,19 @@ class LogTransformer(BaseTransformer):
         columns: str | list[str] | None,
         base: float | None = None,
         add_1: bool = False,
-        drop: bool = True,
+        drop_original: bool = True,
         suffix: str = "log",
         **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
+
+        if not isinstance(add_1, bool):
+            add_1_error_msg = f"{self.classname()}: add_1 should be bool"
+            raise TypeError(add_1_error_msg)
+
+        if not isinstance(suffix, str):
+            suffix_error_msg = f"{self.classname()}: suffix should be str"
+            raise TypeError(suffix_error_msg)
 
         if base is not None:
             if not isinstance(base, (int, float)):
@@ -76,9 +176,10 @@ class LogTransformer(BaseTransformer):
                 msg = f"{self.classname()}: base should be strictly positive"
                 raise ValueError(msg)
 
+        self.set_drop_original_column(drop_original)
+
         self.base = base
         self.add_1 = add_1
-        self.drop = drop
         self.suffix = suffix
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -100,19 +201,6 @@ class LogTransformer(BaseTransformer):
 
         """
         X = super().transform(X)
-
-        numeric_column_types = X[self.columns].apply(
-            pd.api.types.is_numeric_dtype,
-            axis=0,
-        )
-
-        if not numeric_column_types.all():
-            non_numeric_columns = list(
-                numeric_column_types.loc[~numeric_column_types].index,
-            )
-
-            msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
-            raise TypeError(msg)
 
         new_column_names = [f"{column}_{self.suffix}" for column in self.columns]
 
@@ -138,9 +226,7 @@ class LogTransformer(BaseTransformer):
             else:
                 X[new_column_names] = np.log(X[self.columns]) / np.log(self.base)
 
-        if self.drop:
-            for col in self.columns:
-                del X[col]
+        self.drop_original_column(X, self.drop_original, self.columns)
 
         return X
 

@@ -95,18 +95,20 @@ def minimal_attribute_dict():
     """defines minmal attributes (values) needed to initiate each transformer named (key).
     New transformers need to be added here"""
     return {
-        "BaseTransformer": {
+        "ArbitraryImputer": {
             "columns": ["a"],
+            "impute_value": 1,
         },
-        "BaseTwoColumnTransformer": {
-            "columns": ["a", "b"],
-            "new_col_name": "c",
+        "BaseCappingTransformer": {
+            "capping_values": {"a": [0.1, 0.2]},
         },
-        "DataFrameMethodTransformer": {
-            "columns": ["a", "c"],
-            "new_column_names": "f",
-            "pd_method_name": "sum",
-            "drop_original": True,
+        "BaseCrossColumnMappingTransformer": {
+            "mappings": {"a": {1: 2, 3: 4}},
+            "adjust_column": "b",
+        },
+        "BaseCrossColumnNumericTransformer": {
+            "mappings": {"a": {1: 2, 3: 4}},
+            "adjust_column": "b",
         },
         "BaseDateTransformer": {
             "columns": ["a"],
@@ -116,69 +118,7 @@ def minimal_attribute_dict():
             "columns": ["a", "b"],
             "new_column_name": "bla",
         },
-        "BaseCappingTransformer": {
-            "capping_values": {"a": [0.1, 0.2]},
-        },
-        "CappingTransformer": {
-            "capping_values": {"a": [0.1, 0.2]},
-        },
-        "OutOfRangeNullTransformer": {
-            "capping_values": {"a": [0.1, 0.2]},
-        },
-        "EqualityChecker": {
-            "columns": ["a", "b"],
-            "new_col_name": "c",
-            "drop_original": True,
-        },
-        "DateDiffLeapYearTransformer": {
-            "columns": ["a", "b"],
-            "new_column_name": "c",
-        },
-        "DateDifferenceTransformer": {
-            "columns": ["a", "b"],
-            "new_column_name": "c",
-        },
-        "ToDatetimeTransformer": {
-            "new_column_name": "b",
-            "column": "a",
-        },
-        "DatetimeInfoExtractor": {
-            "columns": ["a"],
-        },
-        "SeriesDtMethodTransformer": {
-            "new_column_name": "a",
-            "pd_method_name": "month",
-            "column": "b",
-        },
-        "BetweenDatesTransformer": {
-            "new_column_name": "c",
-            "columns": ["a", "c", "b"],
-        },
-        "DatetimeSinusoidCalculator": {
-            "columns": ["a"],
-            "method": ["sin"],
-            "units": "month",
-        },
         "BaseImputer": {
-            "columns": ["a"],
-        },
-        "ArbitraryImputer": {
-            "columns": ["a"],
-            "impute_value": 1,
-        },
-        "MedianImputer": {
-            "columns": ["a"],
-        },
-        "MeanImputer": {
-            "columns": ["a"],
-        },
-        "ModeImputer": {
-            "columns": ["a"],
-        },
-        "NearestMeanResponseImputer": {
-            "columns": ["a"],
-        },
-        "NullIndicator": {
             "columns": ["a"],
         },
         "BaseMappingTransformer": {
@@ -187,14 +127,31 @@ def minimal_attribute_dict():
         "BaseMappingTransformMixin": {
             "columns": ["a"],
         },
-        "MappingTransformer": {
-            "mappings": {"a": {1: 2, 3: 4}},
+        "BaseNominalTransformer": {
+            "columns": ["b"],
         },
-        "BaseCrossColumnMappingTransformer": {
-            "mappings": {"a": {1: 2, 3: 4}},
-            "adjust_column": "b",
+        "BaseNumericTransformer": {
+            "columns": ["a", "b"],
         },
-        "BaseCrossColumnNumericTransformer": {
+        "BaseTransformer": {
+            "columns": ["a"],
+        },
+        "BaseTwoColumnTransformer": {
+            "columns": ["a", "b"],
+            "new_col_name": "c",
+        },
+        "BetweenDatesTransformer": {
+            "new_column_name": "c",
+            "columns": ["a", "c", "b"],
+        },
+        "CappingTransformer": {
+            "capping_values": {"a": [0.1, 0.2]},
+        },
+        "ColumnDtypeSetter": {
+            "columns": ["a"],
+            "dtype": str,
+        },
+        "CrossColumnAddTransformer": {
             "mappings": {"a": {1: 2, 3: 4}},
             "adjust_column": "b",
         },
@@ -206,40 +163,6 @@ def minimal_attribute_dict():
             "mappings": {"a": {1: 2, 3: 4}},
             "adjust_column": "b",
         },
-        "CrossColumnAddTransformer": {
-            "mappings": {"a": {1: 2, 3: 4}},
-            "adjust_column": "b",
-        },
-        "SetValueTransformer": {
-            "value": 1,
-            "columns": ["a"],
-        },
-        "ColumnDtypeSetter": {
-            "columns": ["a"],
-            "dtype": str,
-        },
-        "BaseNominalTransformer": {
-            "columns": ["b"],
-        },
-        "NominalToIntegerTransformer": {
-            "columns": ["b"],
-        },
-        "GroupRareLevelsTransformer": {
-            "columns": ["b"],
-        },
-        "MeanResponseTransformer": {
-            "columns": ["b"],
-        },
-        "OrdinalEncoderTransformer": {
-            "columns": ["b"],
-        },
-        "OneHotEncodingTransformer": {
-            "columns": ["c"],
-            "drop_original": True,
-        },
-        "LogTransformer": {
-            "columns": ["a"],
-        },
         "CutTransformer": {
             "new_column_name": "b",
             "column": "a",
@@ -247,29 +170,110 @@ def minimal_attribute_dict():
                 "bins": 3,
             },
         },
-        "TwoColumnOperatorTransformer": {
+        "DataFrameMethodTransformer": {
+            "columns": ["a", "b"],
+            "new_column_names": "f",
+            "pd_method_name": "sum",
+            "drop_original": True,
+        },
+        "DateDifferenceTransformer": {
             "columns": ["a", "b"],
             "new_column_name": "c",
-            "pd_method_name": "add",
+        },
+        "DateDiffLeapYearTransformer": {
+            "columns": ["a", "b"],
+            "new_column_name": "c",
+        },
+        "DatetimeInfoExtractor": {
+            "columns": ["a"],
+        },
+        "DatetimeSinusoidCalculator": {
+            "columns": ["a"],
+            "method": ["sin"],
+            "units": "month",
+        },
+        "EqualityChecker": {
+            "columns": ["a", "b"],
+            "new_col_name": "c",
+            "drop_original": True,
+        },
+        "GroupRareLevelsTransformer": {
+            "columns": ["b"],
+        },
+        "InteractionTransformer": {
+            "columns": ["a", "b"],
+        },
+        "LogTransformer": {
+            "columns": ["a"],
+        },
+        "MappingTransformer": {
+            "mappings": {"a": {1: 2, 3: 4}},
+        },
+        "MeanImputer": {
+            "columns": ["a"],
+        },
+        "MeanResponseTransformer": {
+            "columns": ["b"],
+        },
+        "MedianImputer": {
+            "columns": ["a"],
+        },
+        "ModeImputer": {
+            "columns": ["a"],
+        },
+        "NearestMeanResponseImputer": {
+            "columns": ["a"],
+        },
+        "NominalToIntegerTransformer": {
+            "columns": ["b"],
+        },
+        "NullIndicator": {
+            "columns": ["a"],
+        },
+        "OneHotEncodingTransformer": {
+            "columns": ["a", "b"],
+            "drop_original": True,
+            "separator": "-",
+        },
+        "OrdinalEncoderTransformer": {
+            "columns": ["b"],
+        },
+        "OutOfRangeNullTransformer": {
+            "capping_values": {"a": [0.1, 0.2]},
+        },
+        "PCATransformer": {
+            "columns": ["a", "c"],
         },
         "ScalingTransformer": {
             "scaler_type": "standard",
             "columns": ["a"],
         },
-        "PCATransformer": {
-            "columns": ["a", "c"],
-        },
-        "InteractionTransformer": {
-            "columns": ["a", "b"],
+        "SeriesDtMethodTransformer": {
+            "new_column_name": "a",
+            "pd_method_name": "month",
+            "column": "b",
         },
         "SeriesStrMethodTransformer": {
             "columns": ["b"],
             "new_column_name": "a",
             "pd_method_name": "split",
         },
+        "SetValueTransformer": {
+            "value": 1,
+            "columns": ["a"],
+        },
         "StringConcatenator": {
             "columns": ["a", "b"],
             "new_column": "c",
+        },
+        "ToDatetimeTransformer": {
+            "new_column_name": "b",
+            "column": "a",
+        },
+        "TwoColumnOperatorTransformer": {
+            "columns": ["a", "b"],
+            "new_column_name": "c",
+            "pd_method_name": "add",
         },
     }
 

@@ -966,7 +966,7 @@ class DatetimeInfoExtractor(BaseDateTransformer):
 
         self.include = include
         self.datetime_mappings = datetime_mappings
-        self.mappings_provided = self.datetime_mappings.keys()
+        self.mappings_provided = list(self.datetime_mappings.keys())
 
         self._process_provided_mappings()
 
