@@ -25,8 +25,9 @@ Changed
 - Refactored NominalToIntegerTransformer tests in new format `#261 <https://github.com/lvgig/tubular/pull/261>`_
 - Refactored GroupRareLevelsTransformer tests in new format `#259 <https://github.com/lvgig/tubular/pull/259>`_
 - DatetimeInfoExtractor.mappings_provided changed from a dict.keys() object to list so transformer is serialisable. `#258 <https://github.com/lvgig/tubular/pull/258>`_
-- Created BaseNumericTransformer class to support test refactor of numeric file
-- Updated testing approach for LogTransformer
+- Refactored MEanResponseTransformer tests in new format `#262 <https://github.com/lvgig/tubular/pull/262>`_
+- Created BaseNumericTransformer class to support test refactor of numeric file `#266 <https://github.com/lvgig/tubular/pull/266>`_
+- Updated testing approach for LogTransformer `#268 <https://github.com/lvgig/tubular/pull/268>`_
 
 1.3.0 (2024-06-13)
 ------------------
