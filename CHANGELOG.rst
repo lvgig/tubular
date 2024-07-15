@@ -22,6 +22,7 @@ Changed
 ^^^^^^^
 - DatetimeInfoExtractor.mappings_provided changed from a dict.keys() object to list so transformer is serialisable. `#258 <https://github.com/lvgig/tubular/pull/258>`_
 - Created BaseNumericTransformer class to support test refactor of numeric file
+- Updated testing approach for LogTransformer
 
 1.3.0 (2024-06-13)
 ------------------
