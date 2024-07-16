@@ -10,18 +10,17 @@ build-backend = "setuptools.build_meta"
 name = "tubular"
 # TODO: might be easier to just specify version in this file rather than 
 # dynamically with _version.py
-version = ["version"]
+version = "1.3.1"
 dependencies = [
     "pandas>=1.5.0",
     "scikit-learn>=1.2.0"
 ]
 requires-python = ">=3.8"
-authors = { name = "LV GI Data Science Team", email="#DataSciencePackages@lv.co.uk"}
+authors = [{ name = "LV GI Data Science Team", email="#DataSciencePackages@lv.co.uk"}]
 description = "Package to perform pre processing steps for machine learning models"
 readme = {file = "README.md", content-type = "text/markdown"}
 license = {file = "LICENSE"}
 keywords = ["data science", "feature engineering", "data transforms", "pipeline", "sklearn", "machine learning", "ML", "DS"]
-python_requires=">=3.6"
 classifiers=[
     "Programming Language :: Python",
     "Programming Language :: Python :: 3.8",
@@ -38,10 +37,6 @@ Documentation = "https://tubular.readthedocs.io/en/latest/index.html"
 Repository = "https://github.com/lvgig/tubular"
 Issues = "https://github.com/lvgig/tubular/issues"
 Changelog = "https://github.com/lvgig/tubular/CHANGELOG.md"
-
-# TODO: might be easier to just specify version in this file ratehr thna dynamically
-[tool.setuptools.dynamic]
-version = {attr = "tubular.__version__"}
 
 [tool.ruff]
 
