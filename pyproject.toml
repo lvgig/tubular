@@ -39,16 +39,6 @@ Repository = "https://github.com/lvgig/tubular"
 Issues = "https://github.com/lvgig/tubular/issues"
 Changelog = "https://github.com/lvgig/tubular/CHANGELOG.md"
 
-[project.optional-dependencies]
-dev = [
-    "ruff==0.2.2",
-    "test-aide>=0.1.0",
-    "pytest>=5.4.1",
-    "pytest>=5.4.1",
-    "pytest-mock>=3.5.1",
-    "pre-commit==2.15.0",
-]
-
 # TODO: might be easier to just specify version in this file ratehr thna dynamically
 [tool.setuptools.dynamic]
 version = {attr = "tubular.__version__"}
