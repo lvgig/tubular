@@ -21,7 +21,8 @@ jobs:
     - name: Build Package
       run: |
         pip install build
-        python -m build
+        python -m build --sdist .
+        python -m build --wheel .
 
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
