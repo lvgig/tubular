@@ -8,8 +8,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tubular"
-# TODO: might be easier to just specify version in this file rather than 
-# dynamically with _version.py
 version = "1.3.1"
 dependencies = [
     "pandas>=1.5.0",
