@@ -32,7 +32,7 @@ jobs:
           python -m pip install uv
           uv venv -p  ${{ matrix.python-version }} ${{ matrix.python-version }}
           source ${{ matrix.python-version }}/bin/activate
-          uv pip compile pyproject.toml -o requirements-dev.txt 
+          uv pip compile --extra dev pyproject.toml -o requirements-dev.txt 
           uv pip install -r requirements-dev.txt
 
       - name: Test with pytest
