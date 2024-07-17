@@ -32,6 +32,16 @@ classifiers=[
     "License :: OSI Approved :: BSD License",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "test-aide>=0.1.0",
+    "pytest>=5.4.1",
+    "pytest-mock>=3.5.1",
+    "pytest-cov>=2.10.1",
+    "pre-commit==2.15.0 ",
+    "ruff==0.2.2",
+    ]
+
 [project.urls]
 Documentation = "https://tubular.readthedocs.io/en/latest/index.html"
 Repository = "https://github.com/lvgig/tubular"
@@ -39,7 +49,6 @@ Issues = "https://github.com/lvgig/tubular/issues"
 Changelog = "https://github.com/lvgig/tubular/CHANGELOG.md"
 
 [tool.ruff]
-
 # Same as Black.
 line-length = 88
 
