@@ -54,9 +54,10 @@ to create a pinned set of dependencies, ensuring reproducibility.
 To compile using `pip-tools`:
 
   .. code::
-    $ pip install pip-tools # optional
-    $ pip-compile -v --no-emit-index-url --no-emit-trusted-host --output-file requirements.txt  pyproject.toml
-    $ pip-compile --extra dev -v --no-emit-index-url --no-emit-trusted-host --output-file requirements-dev.txt pyproject.toml
+
+     pip install pip-tools # optional
+     pip-compile -v --no-emit-index-url --no-emit-trusted-host --output-file requirements.txt  pyproject.toml
+     pip-compile --extra dev -v --no-emit-index-url --no-emit-trusted-host --output-file requirements-dev.txt pyproject.toml
 
 
 General
