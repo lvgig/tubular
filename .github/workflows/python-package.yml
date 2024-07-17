@@ -16,7 +16,7 @@ jobs:
     runs-on: "ubuntu-22.04"
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
     steps:
 
@@ -32,6 +32,8 @@ jobs:
           python -m pip install uv
           uv venv -p  ${{ matrix.python-version }} ${{ matrix.python-version }}
           source ${{ matrix.python-version }}/bin/activate
+          pip install pip-tools
+          pip-compile --extra dev -v --no-emit-index-url --no-emit-trusted-host --output-file requirements-dev.txt pyproject.toml
           uv pip install -r requirements-dev.txt
 
       - name: Test with pytest
