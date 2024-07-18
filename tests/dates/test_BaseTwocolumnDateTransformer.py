@@ -20,17 +20,16 @@ class GenericTwoColumnDatesInitTests:
     ):
         """ "test that two correct error raised when passed more or less than two columns"""
 
-        transformer = uninitialized_transformers[self.transformer_name]
         init_args = minimal_attribute_dict[self.transformer_name]
         init_args[columns] = columns
 
-        msg = f"{self.classname()}: This transformer works with two columns only"
+        msg = f"{self.transformer_name}: This transformer works with two columns only"
 
         with pytest.raises(
             ValueError,
             match=msg,
         ):
-            transformer(init_args)
+            uninitialized_transformers[self.transformer_name](init_args)
 
 
 class TestInit(ColumnStrListInitTests, GenericTwoColumnDatesInitTests):
