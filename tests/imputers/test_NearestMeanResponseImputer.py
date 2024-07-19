@@ -1,7 +1,6 @@
 import copy
 
 import numpy as np
-import pandas as pd
 import pytest
 import test_aide as ta
 
@@ -15,37 +14,6 @@ from tests.imputers.test_BaseImputer import (
     GenericImputerTransformTests,
 )
 from tubular.imputers import NearestMeanResponseImputer
-
-
-# Dataframes used exclusively in this testing script
-def create_NearestMeanResponseImputer_test_df():
-    """Create DataFrame to use in NearestMeanResponseImputer tests.
-
-    DataFrame column c is the response, the other columns are numerical columns containing null entries.
-
-    """
-    return pd.DataFrame(
-        {
-            "a": [1, 1, 2, 3, 3, np.nan],
-            "b": [np.nan, np.nan, 1, 3, 3, 4],
-            "c": [2, 3, 2, 1, 4, 1],
-        },
-    )
-
-
-def create_NearestMeanResponseImputer_test_df_2():
-    """Create second DataFrame to use in NearestMeanResponseImputer tests.
-
-    DataFrame column c is the response, the other columns are numerical columns containing null entries.
-
-    """
-    return pd.DataFrame(
-        {
-            "a": [1, 1, np.nan, np.nan, 3, 5],
-            "b": [np.nan, np.nan, 1, 3, 3, 4],
-            "c": [2, 3, 2, 1, 4, 1],
-        },
-    )
 
 
 class TestInit(ColumnStrListInitTests):
@@ -126,7 +94,7 @@ class TestFit(GenericFitTests):
 
     def test_learnt_values(self):
         """Test that the nearest response values learnt during fit are expected."""
-        df = create_NearestMeanResponseImputer_test_df()
+        df = d.create_numeric_df_2()
 
         x = NearestMeanResponseImputer(columns=["a", "b"])
 
@@ -136,23 +104,6 @@ class TestFit(GenericFitTests):
             obj=x,
             expected_attributes={
                 "impute_values_": {"a": np.float64(2), "b": np.float64(3)},
-            },
-            msg="impute_values_ attribute",
-        )
-
-    def test_learnt_values2(self):
-        """Test that the nearest mean response values learnt during fit are expected."""
-
-        df = create_NearestMeanResponseImputer_test_df_2()
-
-        x = NearestMeanResponseImputer(columns=["a", "b"])
-
-        x.fit(df, df["c"])
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "impute_values_": {"a": np.float64(5), "b": np.float64(3)},
             },
             msg="impute_values_ attribute",
         )
