@@ -5,13 +5,15 @@ import pandas as pd
 import pytest
 import test_aide as ta
 
+import tests.test_data as d
 from tests.base_tests import (
     ColumnStrListInitTests,
     GenericFitTests,
 )
+from tubular.imputers import NearestMeanResponseImputer
 
 
-# Dataframe used exclusively in this testing script
+# Dataframes used exclusively in this testing script
 def create_NearestMeanResponseImputer_test_df():
     """Create DataFrame to use in NearestMeanResponseImputer tests.
 
@@ -21,6 +23,21 @@ def create_NearestMeanResponseImputer_test_df():
     return pd.DataFrame(
         {
             "a": [1, 1, 2, 3, 3, np.nan],
+            "b": [np.nan, np.nan, 1, 3, 3, 4],
+            "c": [2, 3, 2, 1, 4, 1],
+        },
+    )
+
+
+def create_NearestMeanResponseImputer_test_df_2():
+    """Create second DataFrame to use in NearestMeanResponseImputer tests.
+
+    DataFrame column c is the response, the other columns are numerical columns containing null entries.
+
+    """
+    return pd.DataFrame(
+        {
+            "a": [1, 1, np.nan, np.nan, 3, 5],
             "b": [np.nan, np.nan, 1, 3, 3, 4],
             "c": [2, 3, 2, 1, 4, 1],
         },
@@ -79,95 +96,62 @@ class TestFit(GenericFitTests):
             msg="Check X not changing during fit",
         )
 
-    # def test_null_values_in_response_error(self):
-    #     """Test an error is raised if the response column contains null entries."""
-    #     df = d.create_df_3()
+    def test_null_values_in_response_error(self):
+        """Test an error is raised if the response column contains null entries."""
+        df = d.create_df_3()
 
-    #     x = NearestMeanResponseImputer(columns=["b"])
+        x = NearestMeanResponseImputer(columns=["b"])
 
-    #     with pytest.raises(
-    #         ValueError,
-    #         match="NearestMeanResponseImputer: y has 1 null values",
-    #     ):
-    #         x.fit(df, df["c"])
+        with pytest.raises(
+            ValueError,
+            match="NearestMeanResponseImputer: y has 1 null values",
+        ):
+            x.fit(df, df["c"])
 
-    # def test_columns_with_no_nulls_error(self):
-    #     """Test an error is raised if a non-response column contains no nulls."""
-    #     df = pd.DataFrame(
-    #         {"a": [1, 2, 3, 4, 5], "b": [5, 4, 3, 2, 1], "c": [3, 2, 1, 4, 5]},
-    #     )
+    def test_columns_with_no_nulls_error(self):
+        """Test an error is raised if a non-response column contains no nulls."""
+        df = d.create_numeric_df_1()
 
-    #     x = NearestMeanResponseImputer(columns=["a", "b"])
+        x = NearestMeanResponseImputer(columns=["a", "b"])
 
-    #     with pytest.raises(
-    #         ValueError,
-    #         match="NearestMeanResponseImputer: Column a has no missing values, cannot use this transformer.",
-    #     ):
-    #         x.fit(df, df["c"])
+        with pytest.raises(
+            ValueError,
+            match="NearestMeanResponseImputer: Column a has no missing values, cannot use this transformer.",
+        ):
+            x.fit(df, df["c"])
 
-    # def test_fit_returns_self(self):
-    #     """Test fit returns self?."""
-    #     df = create_NearestMeanResponseImputer_test_df()
+    def test_learnt_values(self):
+        """Test that the nearest response values learnt during fit are expected."""
+        df = create_NearestMeanResponseImputer_test_df()
 
-    #     x = NearestMeanResponseImputer(columns=["a", "b"])
+        x = NearestMeanResponseImputer(columns=["a", "b"])
 
-    #     x_fitted = x.fit(df, df["c"])
+        x.fit(df, df["c"])
 
-    #     assert (
-    #         x_fitted is x
-    #     ), "Returned value from NearestMeanResponseImputer.fit not as expected."
+        ta.classes.test_object_attributes(
+            obj=x,
+            expected_attributes={
+                "impute_values_": {"a": np.float64(2), "b": np.float64(3)},
+            },
+            msg="impute_values_ attribute",
+        )
 
-    # def test_fit_not_changing_data(self):
-    #     """Test fit does not change X."""
-    #     df = create_NearestMeanResponseImputer_test_df()
+    def test_learnt_values2(self):
+        """Test that the nearest mean response values learnt during fit are expected."""
 
-    #     x = NearestMeanResponseImputer(columns=["a", "b"])
+        df = create_NearestMeanResponseImputer_test_df_2()
 
-    #     x.fit(df, df["c"])
+        x = NearestMeanResponseImputer(columns=["a", "b"])
 
-    #     ta.equality.assert_equal_dispatch(
-    #         expected=create_NearestMeanResponseImputer_test_df(),
-    #         actual=df,
-    #         msg="Check X not changing during fit",
-    #     )
+        x.fit(df, df["c"])
 
-    # def test_learnt_values(self):
-    #     """Test that the nearest response values learnt during fit are expected."""
-    #     df = create_NearestMeanResponseImputer_test_df()
-
-    #     x = NearestMeanResponseImputer(columns=["a", "b"])
-
-    #     x.fit(df, df["c"])
-
-    #     ta.classes.test_object_attributes(
-    #         obj=x,
-    #         expected_attributes={
-    #             "impute_values_": {"a": np.float64(2), "b": np.float64(3)},
-    #         },
-    #         msg="impute_values_ attribute",
-    #     )
-
-    # def test_learnt_values2(self):
-    #     """Test that the nearest mean response values learnt during fit are expected."""
-    #     df = pd.DataFrame(
-    #         {
-    #             "a": [1, 1, np.nan, np.nan, 3, 5],
-    #             "b": [np.nan, np.nan, 1, 3, 3, 4],
-    #             "c": [2, 3, 2, 1, 4, 1],
-    #         },
-    #     )
-
-    #     x = NearestMeanResponseImputer(columns=["a", "b"])
-
-    #     x.fit(df, df["c"])
-
-    #     ta.classes.test_object_attributes(
-    #         obj=x,
-    #         expected_attributes={
-    #             "impute_values_": {"a": np.float64(5), "b": np.float64(3)},
-    #         },
-    #         msg="impute_values_ attribute",
-    #     )
+        ta.classes.test_object_attributes(
+            obj=x,
+            expected_attributes={
+                "impute_values_": {"a": np.float64(5), "b": np.float64(3)},
+            },
+            msg="impute_values_ attribute",
+        )
 
 
 # class TestTransform:
