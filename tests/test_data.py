@@ -34,6 +34,19 @@ def create_numeric_df_1():
     )
 
 
+def create_numeric_df_2():
+    """Example with numeric dataframe that includes missings."""
+    return pd.DataFrame(
+        {
+            "a": [34.48, 21.71, np.nan, 1.08, 32.93, 4.74, 2.76, 75.7, np.nan, 61.31],
+            "b": [12.03, 20.32, 24.12, 24.18, 68.99, 0.0, 0.0, 59.46, 11.02, 60.68],
+            "c": [17.06, 12.25, 19.15, 29.73, 1.98, 8.23, 15.22, 20.59, 3.82, 39.73],
+            "d": [25.94, 70.22, 72.94, 64.55, 0.41, 13.62, 30.22, 4.6, 67.13, 10.38],
+            "e": [94.3, 4.18, 51.7, 16.63, 2.6, 16.57, 3.51, 30.79, 66.19, 25.44],
+        },
+    )
+
+
 def create_object_df():
     """Example with object columns - c is numeric target"""
     return pd.DataFrame(
