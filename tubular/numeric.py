@@ -558,7 +558,7 @@ class ScalingTransformer(BaseTransformer):
         return X
 
 
-class InteractionTransformer(BaseTransformer):
+class InteractionTransformer(BaseNumericTransformer):
     """Transformer that generates interaction features.
     Transformer generates a new column  for all combinations from the selected columns up to the maximum degree
     provided. (For sklearn version higher than 1.0.0>, only interaction of a degree higher or equal to the minimum
