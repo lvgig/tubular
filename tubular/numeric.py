@@ -456,7 +456,7 @@ class ScalingTransformer(BaseNumericTransformer):
     scaler_options = {
         "min_max": MinMaxScaler,
         "max_abs": MaxAbsScaler,
-        "standard": StandardScaler
+        "standard": StandardScaler,
     }
 
     def __init__(
@@ -487,7 +487,6 @@ class ScalingTransformer(BaseNumericTransformer):
 
         # Initialize scaler using the dictionary
         self.scaler = self.scaler_options[scaler_type](**scaler_kwargs)
-        
         # This attribute is not for use in any method
         # Here only as a fix to allow string representation of transformer.
         self.scaler_kwargs = scaler_kwargs
@@ -508,9 +507,7 @@ class ScalingTransformer(BaseNumericTransformer):
 
         """
         super().fit(X, y)
-        
         self.scaler.fit(X[self.columns])
-
         return self
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
