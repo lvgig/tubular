@@ -39,13 +39,13 @@ class TestFit(GenericFitTests):
             ValueError,
             match="NearestMeanResponseImputer: y has 1 null values",
         ):
-            x.fit(df, df["c"])
+            x.fit(df, df["a"])
 
     def test_columns_with_no_nulls_error(self):
         """Test an error is raised if a non-response column contains no nulls."""
         df = d.create_numeric_df_1()
 
-        x = NearestMeanResponseImputer(columns=["a", "b"])
+        x = NearestMeanResponseImputer(columns=["b", "c"])
 
         with pytest.raises(
             ValueError,
@@ -57,14 +57,14 @@ class TestFit(GenericFitTests):
         """Test that the nearest response values learnt during fit are expected."""
         df = d.create_numeric_df_2()
 
-        x = NearestMeanResponseImputer(columns=["a", "b"])
+        x = NearestMeanResponseImputer(columns=["b", "c"])
 
-        x.fit(df, df["c"])
+        x.fit(df, df["a"])
 
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
-                "impute_values_": {"a": np.float64(2), "b": np.float64(3)},
+                "impute_values_": {"b": np.float64(3), "c": np.float64(2)},
             },
             msg="impute_values_ attribute",
         )
