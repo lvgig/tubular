@@ -390,6 +390,8 @@ class NearestMeanResponseImputer(BaseImputer):
 
     """
 
+    FITS = True
+
     def __init__(
         self,
         columns: str | list[str] | None = None,
@@ -411,6 +413,7 @@ class NearestMeanResponseImputer(BaseImputer):
             to the average response of the unknown levels is selected as the imputation value.
 
         """
+
         super().fit(X, y)
 
         n_nulls = y.isna().sum()
