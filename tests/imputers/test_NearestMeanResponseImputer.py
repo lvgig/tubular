@@ -1,5 +1,3 @@
-import copy
-
 import numpy as np
 import pytest
 import test_aide as ta
@@ -30,43 +28,6 @@ class TestFit(GenericFitTests):
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "NearestMeanResponseImputer"
-
-    def test_fit_passed_series(
-        self,
-        initialized_transformers,
-        minimal_dataframe_lookup,
-    ):
-        """Test fit is passed a series as y argument."""
-
-        df = minimal_dataframe_lookup[self.transformer_name]
-
-        x = initialized_transformers[self.transformer_name]
-
-        with pytest.raises(
-            TypeError,
-            match="unexpected type for y, should be a pd.Series",
-        ):
-            x.fit(df)(columns=["c"], separator=333)
-
-    def test_fit_not_changing_data(
-        self,
-        initialized_transformers,
-        minimal_dataframe_lookup,
-    ):
-        """Test fit does not change X."""
-
-        df = minimal_dataframe_lookup[self.transformer_name]
-        original_df = copy.deepcopy(df)
-
-        x = initialized_transformers[self.transformer_name]
-
-        x.fit(df, df["c"])
-
-        ta.equality.assert_equal_dispatch(
-            expected=original_df,
-            actual=df,
-            msg="Check X not changing during fit",
-        )
 
     def test_null_values_in_response_error(self):
         """Test an error is raised if the response column contains null entries."""
