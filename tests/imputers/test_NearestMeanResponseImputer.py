@@ -49,7 +49,7 @@ class TestFit(GenericFitTests):
 
         with pytest.raises(
             ValueError,
-            match="NearestMeanResponseImputer: Column a has no missing values, cannot use this transformer.",
+            match="NearestMeanResponseImputer: Column b has no missing values, cannot use this transformer.",
         ):
             x.fit(df, df["c"])
 
