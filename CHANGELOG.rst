@@ -16,9 +16,17 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
-1.3.1 (unreleased)
+1.3.2 (unreleased)
 ------------------
+Changed
+^^^^^^^
 
+- refactored build tools and package config into pyproject.toml `#271 <https://github.com/lvgig/tubular/pull/271>`_
+- set up automatic versioning using setuptools-scm `#271 <https://github.com/lvgig/tubular/pull/271>`_
+
+
+1.3.1 (2024-07-18)
+------------------
 Changed
 ^^^^^^^
 
