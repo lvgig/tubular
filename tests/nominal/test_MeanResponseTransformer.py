@@ -1480,6 +1480,26 @@ class TestTransform(GenericTransformTests):
                 actual_type == expected_type
             ), f"{x.classname} should output columns with type determine by the return_type param, expected {expected_type} but got {actual_type}"
 
+    def test_learnt_values_not_modified(self):
+        """Test that the mappings from fit are not changed in transform."""
+        df = create_MeanResponseTransformer_test_df()
+
+        x = MeanResponseTransformer(columns="b")
+
+        x.fit(df, df["a"])
+
+        x2 = MeanResponseTransformer(columns="b")
+
+        x2.fit(df, df["a"])
+
+        x2.transform(df)
+
+        ta.equality.assert_equal_dispatch(
+            expected=x.mappings,
+            actual=x2.mappings,
+            msg="Mean response values not changed in transform",
+        )
+
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
     """
