@@ -5,7 +5,6 @@ from. These transformers contain key checks to be applied in all cases.
 from __future__ import annotations
 
 import warnings
-from importlib.metadata import version
 
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -46,9 +45,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
     verbose : bool
         Print statements to show which methods are being run or not.
 
-    version_ : str
-        Version number (from contextlib.version).
-
     """
 
     def classname(self) -> str:
@@ -61,8 +57,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         copy: bool | None = None,
         verbose: bool = False,
     ) -> None:
-        self.version_ = version("tubular")
-
         if not isinstance(verbose, bool):
             msg = f"{self.classname()}: verbose must be a bool"
             raise TypeError(msg)
