@@ -68,6 +68,7 @@ Changed
 - Refactored OHE transformer tests to align with new testing framework. 
 - Moved fixtures relating only to a single test out of conftest and into testing script where utilised.
 - !!!Introduced dependency on Sklearn's OneHotEncoder by adding test to check OHE transformer (which we are calling from within our OHE wrapper) is fit before transform 
+- Refactored NearestMeanResponseImputer in line with new testing framework.
 
 
 Removed

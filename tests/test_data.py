@@ -34,6 +34,17 @@ def create_numeric_df_1():
     )
 
 
+def create_numeric_df_2():
+    """Example with numeric dataframe that includes missings."""
+    return pd.DataFrame(
+        {
+            "a": [1, 1, 2, 3, 3, np.nan],
+            "b": [np.nan, np.nan, 1, 3, 3, 4],
+            "c": [2, 3, 2, 1, 4, 1],
+        },
+    )
+
+
 def create_object_df():
     """Example with object columns - c is numeric target"""
     return pd.DataFrame(

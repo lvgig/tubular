@@ -13,6 +13,7 @@ import tubular.base as base
 from tests.test_data import (
     create_is_between_dates_df_1,
     create_numeric_df_1,
+    create_numeric_df_2,
     create_object_df,
 )
 
@@ -293,6 +294,7 @@ def minimal_dataframe_lookup() -> dict[str, pd.DataFrame]:
     """
 
     num_df = create_numeric_df_1()
+    nan_df = create_numeric_df_2()
     object_df = create_object_df()
     date_df = create_is_between_dates_df_1()
 
@@ -323,6 +325,13 @@ def minimal_dataframe_lookup() -> dict[str, pd.DataFrame]:
     ]
     for transformer in other_num_transformers:
         min_df_dict[transformer] = num_df
+
+    # Some transformers require missing values to work
+    other_nan_transformers = [
+        "NearestMeanResponseImputer",
+    ]
+    for transformer in other_nan_transformers:
+        min_df_dict[transformer] = nan_df
 
     return min_df_dict
 
