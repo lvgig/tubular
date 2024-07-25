@@ -8,60 +8,10 @@ import warnings
 import numpy as np
 import pandas as pd
 
-from tubular.base import BaseTransformer
+from tubular.base import BaseTransformer, BaseTwoColumnTransformer
 
 
-class BaseDateTransformer(BaseTransformer):
-    """
-    Extends BaseTransformer for datetime scenarios.
-
-    Parameters
-    ----------
-    columns : List[str]
-        List of 2 columns. First column will be subtracted from second.
-
-    new_column_name : str
-        Name for the new year column.
-
-    drop_original : bool
-        Flag for whether to drop the original columns.
-
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init method.
-
-    Attributes
-    ----------
-    columns : List[str]
-        List of 2 columns. First column will be subtracted from second.
-
-    new_column_name : str
-        Name for the new year column.
-
-    drop_original : bool
-        Flag for whether to drop the original columns.
-
-    """
-
-    def __init__(
-        self,
-        columns: list,
-        new_column_name: str,
-        drop_original: bool = False,
-        **kwargs: dict[str, bool],
-    ) -> None:
-        super().__init__(columns=columns, **kwargs)
-
-        if not (isinstance(new_column_name, str)):
-            msg = f"{self.classname()}: new_column_name should be str"
-            raise TypeError(msg)
-
-        if not (isinstance(drop_original, bool)):
-            msg = f"{self.classname()}: drop_original should be bool"
-            raise TypeError(msg)
-
-        self.new_column_name = new_column_name
-        self.drop_original = drop_original
-
+class DateTransformerMixin:
     def check_columns_are_date_or_datetime(
         self,
         X: pd.DataFrame,
@@ -112,6 +62,24 @@ class BaseDateTransformer(BaseTransformer):
                 msg,
             )
 
+
+class BaseDateTransformer(DateTransformerMixin, BaseTransformer):
+    """
+    Extends BaseTransformer for datetime scenarios.
+
+    """
+
+    def __init__(
+        self,
+        columns: list[str],
+        new_column_name: str | None = None,
+        drop_original: bool = False,
+        **kwargs: dict[str, bool],
+    ) -> None:
+        super().__init__(columns=columns, **kwargs)
+        self.new_column_name = new_column_name
+        self.drop_original = drop_original
+
     def transform(
         self,
         X: pd.DataFrame,
@@ -141,54 +109,45 @@ class BaseDateTransformer(BaseTransformer):
         return X
 
 
-class BaseDateTwoColumnTransformer(BaseDateTransformer):
-    """
-    Extends BaseDateTransformer for 2 column scenarios
-
-    Parameters
-    ----------
-    columns : List[str]
-        List of 2 columns. First column will be subtracted from second.
-
-    new_column_name : str
-        Name for the new year column.
-
-    drop_original : bool
-        Flag for whether to drop the original columns.
-
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init method.
-
-    Attributes
-    ----------
-    columns : List[str]
-        List of 2 columns. First column will be subtracted from second.
-
-    new_column_name : str
-        Name for the new year column.
-
-    drop_original : bool
-        Flag for whether to drop the original columns.
-
-    """
-
+class BaseDateTwoColumnTransformer(DateTransformerMixin, BaseTwoColumnTransformer):
     def __init__(
         self,
-        columns: list,
-        new_column_name: str,
+        columns: list[str],
+        new_column_name: str | None = None,
         drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
-        super().__init__(
-            columns=columns,
-            new_column_name=new_column_name,
-            drop_original=drop_original,
-            **kwargs,
-        )
+        super().__init__(columns=columns, new_column_name=new_column_name, **kwargs)
 
-        if len(columns) != 2:
-            msg = f"{self.classname()}: This transformer works with two columns only"
-            raise ValueError(msg)
+        self.drop_original = drop_original
+
+    def transform(
+        self,
+        X: pd.DataFrame,
+        datetime_only: bool = False,
+    ) -> pd.DataFrame:
+        """Base transform method, calls parent transform and validates data.
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data containing self.columns
+
+        datetime_only: bool
+            Indicates whether ONLY datetime types are accepted
+
+        Returns
+        -------
+        X : pd.DataFrame
+            Validated data
+
+        """
+
+        X = super().transform(X)
+
+        self.check_columns_are_date_or_datetime(X, datetime_only=datetime_only)
+
+        return X
 
 
 class DateDiffLeapYearTransformer(BaseDateTwoColumnTransformer):
