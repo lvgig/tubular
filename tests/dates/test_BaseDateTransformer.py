@@ -5,8 +5,10 @@ import pytest
 
 from tests.base_tests import (
     ColumnStrListInitTests,
+    DropOriginalInitMixinTests,
     GenericFitTests,
     GenericTransformTests,
+    NewColumnNameInitMixintests,
     OtherBaseBehaviourTests,
 )
 
@@ -111,7 +113,11 @@ class DatesMixinTransformTests:
             x.transform(df)
 
 
-class TestInit(ColumnStrListInitTests):
+class TestInit(
+    NewColumnNameInitMixintests,
+    DropOriginalInitMixinTests,
+    ColumnStrListInitTests,
+):
     """Generic tests for transformer.init()."""
 
     @classmethod

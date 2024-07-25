@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 from tubular.base import BaseTransformer, BaseTwoColumnTransformer
-from tubular.mixins import DropOriginalMixin
+from tubular.mixins import DropOriginalMixin, NewColumnNameMixin
 
 
 class DateTransformerMixin:
@@ -80,8 +80,7 @@ class BaseDateTransformer(DateTransformerMixin, DropOriginalMixin, BaseTransform
         super().__init__(columns=columns, **kwargs)
 
         DropOriginalMixin.set_drop_original_column(self, drop_original)
-
-        self.new_column_name = new_column_name
+        NewColumnNameMixin.check_and_set_new_column_name(self, new_column_name)
 
     def transform(
         self,
@@ -127,8 +126,7 @@ class BaseDateTwoColumnTransformer(
         super().__init__(columns=columns, **kwargs)
 
         DropOriginalMixin.set_drop_original_column(self, drop_original)
-
-        self.new_column_name = new_column_name
+        NewColumnNameMixin.check_and_set_new_column_name(self, new_column_name)
 
     def transform(
         self,

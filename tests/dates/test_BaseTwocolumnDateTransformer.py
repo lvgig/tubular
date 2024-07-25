@@ -1,13 +1,19 @@
 from tests.base_tests import (
+    DropOriginalInitMixinTests,
     GenericFitTests,
     GenericTransformTests,
+    NewColumnNameInitMixintests,
     OtherBaseBehaviourTests,
     TwoColumnListInitTests,
 )
 from tests.dates.test_BaseDateTransformer import DatesMixinTransformTests
 
 
-class TestInit(TwoColumnListInitTests):
+class TestInit(
+    NewColumnNameInitMixintests,
+    DropOriginalInitMixinTests,
+    TwoColumnListInitTests,
+):
     """Generic tests for transformer.init()."""
 
     @classmethod
