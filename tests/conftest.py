@@ -137,9 +137,6 @@ def minimal_attribute_dict():
         "BaseTransformer": {
             "columns": ["a"],
         },
-        "BaseTwoColumnTransformer": {
-            "columns": ["a", "b"],
-        },
         "BetweenDatesTransformer": {
             "new_column_name": "c",
             "columns": ["a", "c", "b"],

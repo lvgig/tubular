@@ -2,11 +2,16 @@ from __future__ import annotations
 
 import pandas as pd  # noqa: TCH002
 
-from tubular.base import BaseTwoColumnTransformer
-from tubular.mixins import DropOriginalMixin, NewColumnNameMixin
+from tubular.base import BaseTransformer
+from tubular.mixins import DropOriginalMixin, NewColumnNameMixin, TwoColumnMixin
 
 
-class EqualityChecker(DropOriginalMixin, NewColumnNameMixin, BaseTwoColumnTransformer):
+class EqualityChecker(
+    DropOriginalMixin,
+    NewColumnNameMixin,
+    TwoColumnMixin,
+    BaseTransformer,
+):
     """Transformer to check if two columns are equal.
 
     Parameters
@@ -34,6 +39,7 @@ class EqualityChecker(DropOriginalMixin, NewColumnNameMixin, BaseTwoColumnTransf
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
+        TwoColumnMixin.check_two_columns(self, columns)
         DropOriginalMixin.set_drop_original_column(self, drop_original)
         NewColumnNameMixin.check_and_set_new_column_name(self, new_column_name)
 

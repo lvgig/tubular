@@ -71,6 +71,19 @@ class NewColumnNameMixin:
         self.new_column_name = new_column_name
 
 
+class TwoColumnMixin:
+    """helper to validate columns when exactly two columns are required"""
+
+    def check_two_columns(self, columns: list[str] | str) -> None:
+        if not (isinstance(columns, list)):
+            msg = f"{self.classname()}: columns should be list"
+            raise TypeError(msg)
+
+        if len(columns) != 2:
+            msg = f"{self.classname()}: This transformer works with two columns only"
+            raise ValueError(msg)
+
+
 class WeightColumnMixin:
     def check_weights_column(self, X: pd.DataFrame, weights_column: str) -> None:
         """Helper method for validating weights column in dataframe.

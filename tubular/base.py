@@ -241,39 +241,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
                 raise ValueError(f"{self.classname()}: variable " + c + " is not in X")
 
 
-class BaseTwoColumnTransformer(BaseTransformer):
-    """Transformer that takes a list of two columns as an argument, as well as new_column_name
-
-    Inherits from BaseTransformer, all current transformers that use this argument also output a new column
-    Inherits fit and transform methods from BaseTransformer (required by sklearn transformers), simple input checking
-    and functionality to copy X prior to transform.
-
-    Parameters
-    ----------
-    columns : list
-        Column pair to apply the transformer to, must be list, cannot be None
-
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.__init__().
-
-    """
-
-    def __init__(
-        self,
-        columns: list[str],
-        **kwargs: dict[str, bool],
-    ) -> None:
-        super().__init__(columns=columns, **kwargs)
-
-        if not (isinstance(columns, list)):
-            msg = f"{self.classname()}: columns should be list"
-            raise TypeError(msg)
-
-        if len(columns) != 2:
-            msg = f"{self.classname()}: This transformer works with two columns only"
-            raise ValueError(msg)
-
-
 class DataFrameMethodTransformer(DropOriginalMixin, BaseTransformer):
 
     """Tranformer that applies a pandas.DataFrame method.

@@ -8,8 +8,8 @@ import warnings
 import numpy as np
 import pandas as pd
 
-from tubular.base import BaseTransformer, BaseTwoColumnTransformer
-from tubular.mixins import DropOriginalMixin, NewColumnNameMixin
+from tubular.base import BaseTransformer
+from tubular.mixins import DropOriginalMixin, NewColumnNameMixin, TwoColumnMixin
 
 
 class DateTransformerMixin:
@@ -127,12 +127,11 @@ class BaseDateTransformer(DateTransformerMixin, DropOriginalMixin, BaseTransform
 
 
 class BaseDateTwoColumnTransformer(
-    DateTransformerMixin,
-    DropOriginalMixin,
-    BaseTwoColumnTransformer,
+    TwoColumnMixin,
+    BaseDateTransformer,
 ):
 
-    """Extends BaseTwoColumnTransformer for datetime scenarios
+    """Extends BaseDateTransformer for transformers which accept exactly two columns
 
     Parameters
     ----------
@@ -158,38 +157,14 @@ class BaseDateTwoColumnTransformer(
         drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
-        super().__init__(columns=columns, **kwargs)
+        super().__init__(
+            columns=columns,
+            new_column_name=new_column_name,
+            drop_original=drop_original,
+            **kwargs,
+        )
 
-        DropOriginalMixin.set_drop_original_column(self, drop_original)
-        NewColumnNameMixin.check_and_set_new_column_name(self, new_column_name)
-
-    def transform(
-        self,
-        X: pd.DataFrame,
-        datetime_only: bool = False,
-    ) -> pd.DataFrame:
-        """Base transform method, calls parent transform and validates data.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            Data containing self.columns
-
-        datetime_only: bool
-            Indicates whether ONLY datetime types are accepted
-
-        Returns
-        -------
-        X : pd.DataFrame
-            Validated data
-
-        """
-
-        X = super().transform(X)
-
-        self.check_columns_are_date_or_datetime(X, datetime_only=datetime_only)
-
-        return X
+        TwoColumnMixin.check_two_columns(self, columns)
 
 
 class DateDiffLeapYearTransformer(BaseDateTwoColumnTransformer):
