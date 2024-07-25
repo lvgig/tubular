@@ -16,7 +16,15 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
-1.3.1 (unreleased)
+1.3.2 (unreleased)
+------------------
+
+Changed
+^^^^^^^
+
+- Refactored tests for InteractionTransformer
+
+1.3.1 (2024-07-17)
 ------------------
 
 Changed
