@@ -144,6 +144,36 @@ class DropOriginalInitMixinTests:
             uninitialized_transformers[self.transformer_name](**args)
 
 
+class NewColumnNameInitMixintests:
+    """
+    Tests for BaseTransformer.init() behaviour specific to when a transformer accepts a "new_column_name" column.
+    Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
+    """
+
+    @pytest.mark.parametrize(
+        "new_column_type",
+        [1, True, {"a": 1}, [1, 2], None, np.inf, np.nan],
+    )
+    def test_new_column_name_type_error(
+        self,
+        new_column_type,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test an error is raised if any type other than str passed to new_column_name"""
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["new_column_name"] = new_column_type
+
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                f"{self.transformer_name}: new_column_name should be str",
+            ),
+        ):
+            uninitialized_transformers[self.transformer_name](**args)
+
+
 class WeightColumnInitMixinTests:
     """
     Tests for BaseTransformer.init() behaviour specific to when a transformer takes accepts a weight column.
@@ -210,29 +240,6 @@ class TwoColumnListInitTests(ColumnStrListInitTests):
             ValueError,
             match=re.escape(
                 f"{self.transformer_name}: This transformer works with two columns only",
-            ),
-        ):
-            uninitialized_transformers[self.transformer_name](**args)
-
-    @pytest.mark.parametrize(
-        "new_column_type",
-        [1, True, {"a": 1}, [1, 2], None, np.inf, np.nan],
-    )
-    def test_new_column_name_type_error(
-        self,
-        new_column_type,
-        minimal_attribute_dict,
-        uninitialized_transformers,
-    ):
-        """Test an error is raised if any type other than str passed to new_column_name"""
-
-        args = minimal_attribute_dict[self.transformer_name].copy()
-        args["new_column_name"] = new_column_type
-
-        with pytest.raises(
-            TypeError,
-            match=re.escape(
-                f"{self.transformer_name}: new_column_name should be str",
             ),
         ):
             uninitialized_transformers[self.transformer_name](**args)

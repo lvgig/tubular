@@ -124,9 +124,11 @@ class BaseDateTwoColumnTransformer(
         drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
-        super().__init__(columns=columns, new_column_name=new_column_name, **kwargs)
+        super().__init__(columns=columns, **kwargs)
 
         DropOriginalMixin.set_drop_original_column(self, drop_original)
+
+        self.new_column_name = new_column_name
 
     def transform(
         self,

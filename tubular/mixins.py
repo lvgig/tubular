@@ -60,6 +60,17 @@ class DropOriginalMixin:
         return X
 
 
+class NewColumnNameMixin:
+    """Helper to validate and set"""
+
+    def check_and_set_new_column_name(self, new_column_name: str) -> None:
+        if not (isinstance(new_column_name, str)):
+            msg = f"{self.classname()}: new_column_name should be str"
+            raise TypeError(msg)
+
+        self.new_column_name = new_column_name
+
+
 class WeightColumnMixin:
     def check_weights_column(self, X: pd.DataFrame, weights_column: str) -> None:
         """Helper method for validating weights column in dataframe.

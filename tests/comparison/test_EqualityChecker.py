@@ -6,13 +6,18 @@ from tests.base_tests import (
     DropOriginalInitMixinTests,
     GenericFitTests,
     GenericTransformTests,
+    NewColumnNameInitMixintests,
     OtherBaseBehaviourTests,
     TwoColumnListInitTests,
 )
 from tubular.comparison import EqualityChecker
 
 
-class TestInit(DropOriginalInitMixinTests, TwoColumnListInitTests):
+class TestInit(
+    DropOriginalInitMixinTests,
+    NewColumnNameInitMixintests,
+    TwoColumnListInitTests,
+):
     """Generic tests for transformer.init()."""
 
     @classmethod
