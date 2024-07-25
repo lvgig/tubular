@@ -61,7 +61,7 @@ class DropOriginalMixin:
 
 
 class NewColumnNameMixin:
-    """Helper to validate and set"""
+    """Helper to validate and set new_column_name attribute"""
 
     def check_and_set_new_column_name(self, new_column_name: str) -> None:
         if not (isinstance(new_column_name, str)):

@@ -13,6 +13,8 @@ from tubular.mixins import DropOriginalMixin, NewColumnNameMixin
 
 
 class DateTransformerMixin:
+    """Class to contain methods specific to datetime transformers"""
+
     def check_columns_are_date_or_datetime(
         self,
         X: pd.DataFrame,
@@ -66,8 +68,21 @@ class DateTransformerMixin:
 
 class BaseDateTransformer(DateTransformerMixin, DropOriginalMixin, BaseTransformer):
     """
-    Extends BaseTransformer for datetime scenarios.
+    Extends BaseTransformer for datetime scenarios
 
+    Parameters
+    ----------
+    columns : List[str]
+        List of 2 columns. First column will be subtracted from second.
+
+    new_column_name : str
+        Name for the new year column.
+
+    drop_original : bool
+        Flag for whether to drop the original columns.
+
+    **kwargs
+        Arbitrary keyword arguments passed onto BaseTransformer.init method.
     """
 
     def __init__(
@@ -116,6 +131,26 @@ class BaseDateTwoColumnTransformer(
     DropOriginalMixin,
     BaseTwoColumnTransformer,
 ):
+
+    """Extends BaseTwoColumnTransformer for datetime scenarios
+
+    Parameters
+    ----------
+    columns : list
+        Either a list of str values or a string giving which columns in a input pandas.DataFrame the transformer
+        will be applied to.
+
+    new_column_name : str
+        Name for the new year column.
+
+    drop_original : bool
+        Flag for whether to drop the original columns.
+
+    **kwargs
+        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+
+    """
+
     def __init__(
         self,
         columns: list[str],
