@@ -28,11 +28,11 @@ class EqualityChecker(BaseDropOriginalMixin, BaseTwoColumnTransformer):
     def __init__(
         self,
         columns: list,
-        new_column_name: str,
+        new_col_name: str,
         drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
-        super().__init__(columns=columns, new_col_name=new_column_name, **kwargs)
+        super().__init__(columns=columns, new_col_name=new_col_name, **kwargs)
 
         BaseDropOriginalMixin.set_drop_original_column(self, drop_original)
 

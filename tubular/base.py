@@ -264,7 +264,7 @@ class BaseTwoColumnTransformer(BaseTransformer):
     def __init__(
         self,
         columns: list[str],
-        new_column_name: str,
+        new_col_name: str,
         **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
@@ -277,11 +277,11 @@ class BaseTwoColumnTransformer(BaseTransformer):
             msg = f"{self.classname()}: This transformer works with two columns only"
             raise ValueError(msg)
 
-        if not (isinstance(new_column_name, str)):
+        if not (isinstance(new_col_name, str)):
             msg = f"{self.classname()}: new_col_name should be str"
             raise TypeError(msg)
 
-        self.new_column_name = new_column_name
+        self.new_col_name = new_col_name
 
 
 class DataFrameMethodTransformer(BaseDropOriginalMixin, BaseTransformer):
