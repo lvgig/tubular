@@ -11,7 +11,7 @@ from tests.dates.test_BaseDateTransformer import (
 class GenericTwoColumnDatesInitTests:
     """Generic tests for Init Dates Transformers which take two columns"""
 
-    @pytest.mark.parametrize("columns", [["a"], ["a", "b", "c"]])
+    @pytest.mark.parametrize("columns", ["a", ["a", "b", "c"]])
     def test_not_two_columns_error(
         self,
         uninitialized_transformers,
@@ -21,7 +21,9 @@ class GenericTwoColumnDatesInitTests:
         """ "test that two correct error raised when passed more or less than two columns"""
 
         init_args = minimal_attribute_dict[self.transformer_name]
-        init_args[columns] = columns
+        print(init_args)
+        init_args["columns"] = columns
+        print(init_args)
 
         msg = f"{self.transformer_name}: This transformer works with two columns only"
 
@@ -29,7 +31,7 @@ class GenericTwoColumnDatesInitTests:
             ValueError,
             match=msg,
         ):
-            uninitialized_transformers[self.transformer_name](init_args)
+            uninitialized_transformers[self.transformer_name](*init_args)
 
 
 class TestInit(ColumnStrListInitTests, GenericTwoColumnDatesInitTests):
