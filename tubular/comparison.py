@@ -3,10 +3,10 @@ from __future__ import annotations
 import pandas as pd  # noqa: TCH002
 
 from tubular.base import BaseTwoColumnTransformer
-from tubular.mixins import BaseDropOriginalMixin
+from tubular.mixins import DropOriginalMixin
 
 
-class EqualityChecker(BaseDropOriginalMixin, BaseTwoColumnTransformer):
+class EqualityChecker(DropOriginalMixin, BaseTwoColumnTransformer):
     """Transformer to check if two columns are equal.
 
     Parameters
@@ -34,7 +34,7 @@ class EqualityChecker(BaseDropOriginalMixin, BaseTwoColumnTransformer):
     ) -> None:
         super().__init__(columns=columns, new_column_name=new_column_name, **kwargs)
 
-        BaseDropOriginalMixin.set_drop_original_column(self, drop_original)
+        DropOriginalMixin.set_drop_original_column(self, drop_original)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Create a column which is populated by the boolean
@@ -56,7 +56,7 @@ class EqualityChecker(BaseDropOriginalMixin, BaseTwoColumnTransformer):
         X[self.new_column_name] = X[self.columns[0]] == X[self.columns[1]]
 
         # Drop original columns if self.drop_original is True
-        BaseDropOriginalMixin.drop_original_column(
+        DropOriginalMixin.drop_original_column(
             self,
             X,
             self.drop_original,

@@ -13,7 +13,7 @@ from sklearn.preprocessing import (
 )
 
 from tubular.base import BaseTransformer, DataFrameMethodTransformer
-from tubular.mixins import BaseDropOriginalMixin
+from tubular.mixins import DropOriginalMixin
 
 
 class BaseNumericTransformer(BaseTransformer):
@@ -107,7 +107,7 @@ class BaseNumericTransformer(BaseTransformer):
         return X
 
 
-class LogTransformer(BaseNumericTransformer, BaseDropOriginalMixin):
+class LogTransformer(BaseNumericTransformer, DropOriginalMixin):
     """Transformer to apply log transformation.
 
     Transformer has the option to add 1 to the columns to log and drop the

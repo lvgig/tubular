@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 
-class BaseDropOriginalMixin:
+class DropOriginalMixin:
     """Mixin class to validate and apply 'drop_original' argument used by various transformers.
 
     Transformer deletes transformer input columns depending on boolean argument.
