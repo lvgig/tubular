@@ -8,10 +8,10 @@ import warnings
 import numpy as np
 import pandas as pd
 
-from tubular.base import BaseTransformer
+from tubular.base import BaseTransformer, BaseTwoColumnTransformer
 
 
-class BaseDateTransformer(BaseTransformer):
+class DateTransformerMixin:
     """
     Extends BaseTransformer for datetime scenarios.
 
@@ -141,54 +141,12 @@ class BaseDateTransformer(BaseTransformer):
         return X
 
 
-class BaseDateTwoColumnTransformer(BaseDateTransformer):
-    """
-    Extends BaseDateTransformer for 2 column scenarios
+class BaseDateTransformer(BaseTransformer, DateTransformerMixin):
+    pass
 
-    Parameters
-    ----------
-    columns : List[str]
-        List of 2 columns. First column will be subtracted from second.
 
-    new_column_name : str
-        Name for the new year column.
-
-    drop_original : bool
-        Flag for whether to drop the original columns.
-
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init method.
-
-    Attributes
-    ----------
-    columns : List[str]
-        List of 2 columns. First column will be subtracted from second.
-
-    new_column_name : str
-        Name for the new year column.
-
-    drop_original : bool
-        Flag for whether to drop the original columns.
-
-    """
-
-    def __init__(
-        self,
-        columns: list,
-        new_column_name: str,
-        drop_original: bool = False,
-        **kwargs: dict[str, bool],
-    ) -> None:
-        super().__init__(
-            columns=columns,
-            new_column_name=new_column_name,
-            drop_original=drop_original,
-            **kwargs,
-        )
-
-        if len(columns) != 2:
-            msg = f"{self.classname()}: This transformer works with two columns only"
-            raise ValueError(msg)
+class BaseDateTwoColumnTransformer(BaseTwoColumnTransformer, DateTransformerMixin):
+    pass
 
 
 class DateDiffLeapYearTransformer(BaseDateTwoColumnTransformer):
