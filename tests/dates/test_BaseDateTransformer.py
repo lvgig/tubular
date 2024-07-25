@@ -103,8 +103,6 @@ class GenericDatesTransformTests:
         present_types = (
             {"datetime64", "date"} if datetime_col == 0 else {"date", "datetime64"}
         )
-        print("***********************************************************")
-        print(df)
         msg = rf"Columns fed to datetime transformers should be \['datetime64', 'date'\] and have consistent types, but found {present_types}. Please use ToDatetimeTransformer to standardise"
         with pytest.raises(
             TypeError,
