@@ -68,7 +68,7 @@ def create_date_diff_different_dtypes():
     )
 
 
-class DatesTransformMixinTests:
+class GenericDatesTransformTests:
     """Generic tests for Dates Transformers"""
 
     @pytest.mark.parametrize(
@@ -127,7 +127,7 @@ class TestFit(GenericFitTests):
         cls.transformer_name = "BaseDateTransformer"
 
 
-class TestTransform(GenericTransformTests, DatesTransformMixinTests):
+class TestTransform(GenericTransformTests, GenericDatesTransformTests):
     """Tests for BaseDateTransformer.transform."""
 
     @classmethod
