@@ -12,8 +12,36 @@ from tubular.base import BaseTransformer
 from tubular.mixins import DropOriginalMixin, NewColumnNameMixin, TwoColumnMixin
 
 
-class DateTransformerMixin:
-    """Class to contain methods specific to datetime transformers"""
+class BaseDateTransformer(DropOriginalMixin, BaseTransformer):
+    """
+    Extends BaseTransformer for datetime scenarios
+
+    Parameters
+    ----------
+    columns : List[str]
+        List of 2 columns. First column will be subtracted from second.
+
+    new_column_name : str
+        Name for the new year column.
+
+    drop_original : bool
+        Flag for whether to drop the original columns.
+
+    **kwargs
+        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+    """
+
+    def __init__(
+        self,
+        columns: list[str],
+        new_column_name: str | None = None,
+        drop_original: bool = False,
+        **kwargs: dict[str, bool],
+    ) -> None:
+        super().__init__(columns=columns, **kwargs)
+
+        DropOriginalMixin.set_drop_original_column(self, drop_original)
+        NewColumnNameMixin.check_and_set_new_column_name(self, new_column_name)
 
     def check_columns_are_date_or_datetime(
         self,
@@ -64,38 +92,6 @@ class DateTransformerMixin:
             raise TypeError(
                 msg,
             )
-
-
-class BaseDateTransformer(DateTransformerMixin, DropOriginalMixin, BaseTransformer):
-    """
-    Extends BaseTransformer for datetime scenarios
-
-    Parameters
-    ----------
-    columns : List[str]
-        List of 2 columns. First column will be subtracted from second.
-
-    new_column_name : str
-        Name for the new year column.
-
-    drop_original : bool
-        Flag for whether to drop the original columns.
-
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.init method.
-    """
-
-    def __init__(
-        self,
-        columns: list[str],
-        new_column_name: str | None = None,
-        drop_original: bool = False,
-        **kwargs: dict[str, bool],
-    ) -> None:
-        super().__init__(columns=columns, **kwargs)
-
-        DropOriginalMixin.set_drop_original_column(self, drop_original)
-        NewColumnNameMixin.check_and_set_new_column_name(self, new_column_name)
 
     def transform(
         self,
