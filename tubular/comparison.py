@@ -14,7 +14,7 @@ class EqualityChecker(BaseDropOriginalMixin, BaseTwoColumnTransformer):
     columns: list
         List containing names of the two columns to check.
 
-    new_col_name: string
+    new_column_name: string
         string containing the name of the new column.
 
     drop_original: boolean = False
@@ -28,11 +28,11 @@ class EqualityChecker(BaseDropOriginalMixin, BaseTwoColumnTransformer):
     def __init__(
         self,
         columns: list,
-        new_col_name: str,
+        new_column_name: str,
         drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
-        super().__init__(columns=columns, new_col_name=new_col_name, **kwargs)
+        super().__init__(columns=columns, new_column_name=new_column_name, **kwargs)
 
         BaseDropOriginalMixin.set_drop_original_column(self, drop_original)
 
@@ -53,7 +53,7 @@ class EqualityChecker(BaseDropOriginalMixin, BaseTwoColumnTransformer):
         """
         X = super().transform(X)
 
-        X[self.new_col_name] = X[self.columns[0]] == X[self.columns[1]]
+        X[self.new_column_name] = X[self.columns[0]] == X[self.columns[1]]
 
         # Drop original columns if self.drop_original is True
         BaseDropOriginalMixin.drop_original_column(

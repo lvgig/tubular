@@ -227,12 +227,12 @@ class TwoColumnListInitTests(ColumnStrListInitTests):
         """Test an error is raised if any type other than str passed to new_column_name"""
 
         args = minimal_attribute_dict[self.transformer_name].copy()
-        args["new_col_name"] = new_column_type
+        args["new_column_name"] = new_column_type
 
         with pytest.raises(
             TypeError,
             match=re.escape(
-                f"{self.transformer_name}: new_col_name should be str",
+                f"{self.transformer_name}: new_column_name should be str",
             ),
         ):
             uninitialized_transformers[self.transformer_name](**args)
