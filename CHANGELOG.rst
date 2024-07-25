@@ -21,12 +21,12 @@ Each individual change should have a link to the pull request after the descript
 
 Changed
 ^^^^^^^
-- Refactored BaseDateTransformer, BaseDateTwoColumnTransformer and associated testing  `#280 <https://github.com/lvgig/tubular/pull/280>`_
+- Refactored BaseDateTransformer, BaseDateTwoColumnTransformer and associated testing  `#273 <https://github.com/lvgig/tubular/pull/273>`_
 
 Added
 ^^^^^
 
-- mixin class to handle new_column_name arguments `#280 <https://github.com/lvgig/tubular/pull/280>`_
+- mixin class to handle new_column_name arguments `#273 <https://github.com/lvgig/tubular/pull/273>`_
 
 1.3.1 (2024-07-18)
 ------------------
