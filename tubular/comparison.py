@@ -39,9 +39,9 @@ class EqualityChecker(
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
-        TwoColumnMixin.check_two_columns(self, columns)
-        DropOriginalMixin.set_drop_original_column(self, drop_original)
-        NewColumnNameMixin.check_and_set_new_column_name(self, new_column_name)
+        self.check_two_columns(columns)
+        self.set_drop_original_column(drop_original)
+        self.check_and_set_new_column_name(new_column_name)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Create a column which is populated by the boolean

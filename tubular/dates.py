@@ -12,7 +12,7 @@ from tubular.base import BaseTransformer
 from tubular.mixins import DropOriginalMixin, NewColumnNameMixin, TwoColumnMixin
 
 
-class BaseDateTransformer(DropOriginalMixin, BaseTransformer):
+class BaseDateTransformer(NewColumnNameMixin, DropOriginalMixin, BaseTransformer):
     """
     Extends BaseTransformer for datetime scenarios
 
@@ -40,8 +40,8 @@ class BaseDateTransformer(DropOriginalMixin, BaseTransformer):
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
-        DropOriginalMixin.set_drop_original_column(self, drop_original)
-        NewColumnNameMixin.check_and_set_new_column_name(self, new_column_name)
+        self.set_drop_original_column(drop_original)
+        self.check_and_set_new_column_name(new_column_name)
 
     def check_columns_are_date_or_datetime(
         self,
@@ -160,7 +160,7 @@ class BaseDateTwoColumnTransformer(
             **kwargs,
         )
 
-        TwoColumnMixin.check_two_columns(self, columns)
+        self.check_two_columns(columns)
 
 
 class DateDiffLeapYearTransformer(BaseDateTwoColumnTransformer):
