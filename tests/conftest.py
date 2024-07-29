@@ -137,10 +137,6 @@ def minimal_attribute_dict():
         "BaseTransformer": {
             "columns": ["a"],
         },
-        "BaseTwoColumnTransformer": {
-            "columns": ["a", "b"],
-            "new_col_name": "c",
-        },
         "BetweenDatesTransformer": {
             "new_column_name": "c",
             "columns": ["a", "c", "b"],
@@ -195,7 +191,7 @@ def minimal_attribute_dict():
         },
         "EqualityChecker": {
             "columns": ["a", "b"],
-            "new_col_name": "c",
+            "new_column_name": "c",
             "drop_original": True,
         },
         "GroupRareLevelsTransformer": {
