@@ -123,7 +123,7 @@ class TestInit:
 
 
 class TestCheckNumericColumns:
-    """Tests for the check_numeric_columns method."""
+    """Tests for the _check_numeric method."""
 
     def test_exception_raised(self):
         """Test an exception is raised if non numeric columns are passed in X."""
@@ -135,7 +135,7 @@ class TestCheckNumericColumns:
             TypeError,
             match=r"""ScalingTransformer: The following columns are not numeric in X; \['b', 'c'\]""",
         ):
-            x.check_numeric_columns(df)
+            x._check_numeric(df)
 
     def test_X_returned(self):
         """Test that the input X is returned from the method."""
@@ -143,7 +143,7 @@ class TestCheckNumericColumns:
 
         x = ScalingTransformer(columns=["a"], scaler_type="standard")
 
-        df_returned = x.check_numeric_columns(df)
+        df_returned = x._check_numeric(df)
 
         ta.equality.assert_equal_dispatch(
             expected=df,
@@ -171,8 +171,8 @@ class TestFit:
         ):
             x.fit(df)
 
-    def test_check_numeric_columns_call(self, mocker):
-        """Test the call to ScalingTransformer.check_numeric_columns."""
+    def test_check_numeric_call(self, mocker):
+        """Test the call to ScalingTransformer._check_numeric."""
         df = d.create_df_2()
 
         x = ScalingTransformer(columns=["a"], scaler_type="standard")
@@ -182,7 +182,7 @@ class TestFit:
         with ta.functions.assert_function_call(
             mocker,
             tubular.numeric.ScalingTransformer,
-            "check_numeric_columns",
+            "_check_numeric",
             expected_call_args,
             return_value=d.create_df_2(),
         ):
@@ -265,7 +265,7 @@ class TestTransform:
             x.transform(df)
 
     def test_check_numeric_columns_call(self, mocker):
-        """Test the call to ScalingTransformer.check_numeric_columns."""
+        """Test the call to ScalingTransformer._check_numeric."""
         df = d.create_df_2()
 
         x = ScalingTransformer(columns=["a"], scaler_type="standard")
@@ -276,7 +276,7 @@ class TestTransform:
 
         with ta.functions.assert_function_call(
             mocker,
-            tubular.base.BaseTransformer,
+            tubular.numeric.BaseNumericTransformer,
             "transform",
             expected_call_args,
             return_value=d.create_df_2(),
