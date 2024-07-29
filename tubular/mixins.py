@@ -74,7 +74,7 @@ class NewColumnNameMixin:
 class TwoColumnMixin:
     """helper to validate columns when exactly two columns are required"""
 
-    def check_two_columns(self, columns: list[str] | str) -> None:
+    def check_two_columns(self, columns: list[str]) -> None:
         if not (isinstance(columns, list)):
             msg = f"{self.classname()}: columns should be list"
             raise TypeError(msg)
