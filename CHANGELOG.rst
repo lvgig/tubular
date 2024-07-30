@@ -16,7 +16,18 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
-1.3.1 (unreleased)
+1.3.2 (unreleased)
+------------------
+
+Changed
+^^^^^^^
+
+- Refactored BaseDateTransformer, BaseDateTwoColumnTransformer and associated testing  `#273 <https://github.com/lvgig/tubular/pull/273>`_
+- BaseTwoColumnTransformer removed in favour of mixin classes TwoColumnMixin and NewColumnNameMixin to handle validation of two columns and new_column_name arguments `#273 <https://github.com/lvgig/tubular/pull/273>`_
+- Refactored tests for InteractionTransformer  `#283 <https://github.com/lvgig/tubular/pull/283>`_
+
+
+1.3.1 (2024-07-18)
 ------------------
 
 Changed
@@ -28,6 +39,7 @@ Changed
 - Refactored MEanResponseTransformer tests in new format `#262 <https://github.com/lvgig/tubular/pull/262>`_
 - Created BaseNumericTransformer class to support test refactor of numeric file `#266 <https://github.com/lvgig/tubular/pull/266>`_
 - Updated testing approach for LogTransformer `#268 <https://github.com/lvgig/tubular/pull/268>`_
+
 
 1.3.0 (2024-06-13)
 ------------------
