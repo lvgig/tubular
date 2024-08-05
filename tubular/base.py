@@ -10,7 +10,6 @@ import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
-from tubular._version import __version__
 from tubular.mixins import DropOriginalMixin
 
 pd.options.mode.copy_on_write = True
