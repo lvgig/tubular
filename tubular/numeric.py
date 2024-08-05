@@ -13,7 +13,7 @@ from sklearn.preprocessing import (
 )
 
 from tubular.base import BaseTransformer, DataFrameMethodTransformer
-from tubular.mixins import BaseDropOriginalMixin
+from tubular.mixins import DropOriginalMixin
 
 
 class BaseNumericTransformer(BaseTransformer):
@@ -107,7 +107,7 @@ class BaseNumericTransformer(BaseTransformer):
         return X
 
 
-class LogTransformer(BaseNumericTransformer, BaseDropOriginalMixin):
+class LogTransformer(BaseNumericTransformer, DropOriginalMixin):
     """Transformer to apply log transformation.
 
     Transformer has the option to add 1 to the columns to log and drop the
@@ -558,7 +558,7 @@ class ScalingTransformer(BaseTransformer):
         return X
 
 
-class InteractionTransformer(BaseTransformer):
+class InteractionTransformer(BaseNumericTransformer):
     """Transformer that generates interaction features.
     Transformer generates a new column  for all combinations from the selected columns up to the maximum degree
     provided. (For sklearn version higher than 1.0.0>, only interaction of a degree higher or equal to the minimum

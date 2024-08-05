@@ -413,6 +413,10 @@ class NearestMeanResponseImputer(BaseImputer):
         """
         super().fit(X, y)
 
+        if not isinstance(y, pd.Series):
+            msg = "unexpected type for y, should be a pd.Series"
+            raise TypeError(msg)
+
         n_nulls = y.isna().sum()
 
         if n_nulls > 0:

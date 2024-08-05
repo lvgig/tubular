@@ -10,7 +10,7 @@ from sklearn.preprocessing import OneHotEncoder
 
 from tubular.base import BaseTransformer
 from tubular.mapping import BaseMappingTransformMixin
-from tubular.mixins import BaseDropOriginalMixin, WeightColumnMixin
+from tubular.mixins import DropOriginalMixin, WeightColumnMixin
 
 
 class BaseNominalTransformer(BaseTransformer):
@@ -1036,7 +1036,7 @@ class OrdinalEncoderTransformer(
         return BaseMappingTransformMixin.transform(self, X)
 
 
-class OneHotEncodingTransformer(BaseDropOriginalMixin, BaseTransformer, OneHotEncoder):
+class OneHotEncodingTransformer(DropOriginalMixin, BaseTransformer, OneHotEncoder):
     """Transformer to convert cetegorical variables into dummy columns.
 
     Extends the sklearn OneHotEncoder class to provide easy renaming of dummy columns.
@@ -1108,7 +1108,7 @@ class OneHotEncodingTransformer(BaseDropOriginalMixin, BaseTransformer, OneHotEn
 
         self.separator = separator
 
-        BaseDropOriginalMixin.set_drop_original_column(self, drop_original)
+        DropOriginalMixin.set_drop_original_column(self, drop_original)
 
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Gets list of levels for each column to be transformed. This defines which dummy columns
@@ -1254,7 +1254,7 @@ class OneHotEncodingTransformer(BaseDropOriginalMixin, BaseTransformer, OneHotEn
                     )
 
         # Drop original columns if self.drop_original is True
-        BaseDropOriginalMixin.drop_original_column(
+        DropOriginalMixin.drop_original_column(
             self,
             X,
             self.drop_original,

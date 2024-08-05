@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 
-class BaseDropOriginalMixin:
+class DropOriginalMixin:
     """Mixin class to validate and apply 'drop_original' argument used by various transformers.
 
     Transformer deletes transformer input columns depending on boolean argument.
@@ -58,6 +58,30 @@ class BaseDropOriginalMixin:
                 del X[col]
 
         return X
+
+
+class NewColumnNameMixin:
+    """Helper to validate and set new_column_name attribute"""
+
+    def check_and_set_new_column_name(self, new_column_name: str) -> None:
+        if not (isinstance(new_column_name, str)):
+            msg = f"{self.classname()}: new_column_name should be str"
+            raise TypeError(msg)
+
+        self.new_column_name = new_column_name
+
+
+class TwoColumnMixin:
+    """helper to validate columns when exactly two columns are required"""
+
+    def check_two_columns(self, columns: list[str]) -> None:
+        if not (isinstance(columns, list)):
+            msg = f"{self.classname()}: columns should be list"
+            raise TypeError(msg)
+
+        if len(columns) != 2:
+            msg = f"{self.classname()}: This transformer works with two columns only"
+            raise ValueError(msg)
 
 
 class WeightColumnMixin:

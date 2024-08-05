@@ -6,13 +6,18 @@ from tests.base_tests import (
     DropOriginalInitMixinTests,
     GenericFitTests,
     GenericTransformTests,
+    NewColumnNameInitMixintests,
     OtherBaseBehaviourTests,
     TwoColumnListInitTests,
 )
 from tubular.comparison import EqualityChecker
 
 
-class TestInit(DropOriginalInitMixinTests, TwoColumnListInitTests):
+class TestInit(
+    DropOriginalInitMixinTests,
+    NewColumnNameInitMixintests,
+    TwoColumnListInitTests,
+):
     """Generic tests for transformer.init()."""
 
     @classmethod
@@ -48,7 +53,7 @@ class TestTransform(GenericTransformTests):
 
         example_transformer = EqualityChecker(
             columns=["b", "c"],
-            new_col_name="bool_logic",
+            new_column_name="bool_logic",
         )
         actual = example_transformer.transform(test_dataframe)
 
@@ -73,7 +78,7 @@ class TestTransform(GenericTransformTests):
 
         example_transformer = EqualityChecker(
             columns=["b", "c"],
-            new_col_name="bool_logic",
+            new_column_name="bool_logic",
             drop_original=True,
         )
         actual = example_transformer.transform(test_dataframe)

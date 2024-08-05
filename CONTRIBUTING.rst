@@ -15,8 +15,9 @@ We have some general requirements for all contributions then specific requiremen
 
 Set up development environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+For External contributors, first create your own fork of this repo.
 
-First clone the repository;
+Then clone the fork (or this repository if internal);
 
    .. code::
 

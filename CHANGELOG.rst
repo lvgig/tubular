@@ -18,12 +18,15 @@ Each individual change should have a link to the pull request after the descript
 
 1.3.2 (unreleased)
 ------------------
+
 Changed
 ^^^^^^^
 
+- Refactored BaseDateTransformer, BaseDateTwoColumnTransformer and associated testing  `#273 <https://github.com/lvgig/tubular/pull/273>`_
+- BaseTwoColumnTransformer removed in favour of mixin classes TwoColumnMixin and NewColumnNameMixin to handle validation of two columns and new_column_name arguments `#273 <https://github.com/lvgig/tubular/pull/273>`_
+- Refactored tests for InteractionTransformer  `#283 <https://github.com/lvgig/tubular/pull/283>`_
 - refactored build tools and package config into pyproject.toml `#271 <https://github.com/lvgig/tubular/pull/271>`_
 - set up automatic versioning using setuptools-scm `#271 <https://github.com/lvgig/tubular/pull/271>`_
-
 
 1.3.1 (2024-07-18)
 ------------------
@@ -35,6 +38,7 @@ Changed
 - DatetimeInfoExtractor.mappings_provided changed from a dict.keys() object to list so transformer is serialisable. `#258 <https://github.com/lvgig/tubular/pull/258>`_
 - Created BaseNumericTransformer class to support test refactor of numeric file
 - Updated testing approach for LogTransformer
+
 
 1.3.0 (2024-06-13)
 ------------------
@@ -75,6 +79,7 @@ Changed
 - Refactored OHE transformer tests to align with new testing framework. 
 - Moved fixtures relating only to a single test out of conftest and into testing script where utilised.
 - !!!Introduced dependency on Sklearn's OneHotEncoder by adding test to check OHE transformer (which we are calling from within our OHE wrapper) is fit before transform 
+- Refactored NearestMeanResponseImputer in line with new testing framework.
 
 
 Removed
