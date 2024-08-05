@@ -10,7 +10,6 @@ import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
-from tubular._version import __version__
 from tubular.mixins import DropOriginalMixin
 
 pd.options.mode.copy_on_write = True
@@ -46,9 +45,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
     verbose : bool
         Print statements to show which methods are being run or not.
 
-    version_ : str
-        Version number (__version__ attribute from _version.py).
-
     """
 
     def classname(self) -> str:
@@ -61,8 +57,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         copy: bool | None = None,
         verbose: bool = False,
     ) -> None:
-        self.version_ = __version__
-
         if not isinstance(verbose, bool):
             msg = f"{self.classname()}: verbose must be a bool"
             raise TypeError(msg)

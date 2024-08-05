@@ -1,7 +1,0 @@
-### profile may optionally select or skip tests
-
-# skip B101 test (assert used) in test scripts which uses
-# assert as the functions are intended to be used in tests
-assert_used:
-  skips: ['*/test_*.py']
-

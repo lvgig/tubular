@@ -25,11 +25,11 @@ Changed
 - Refactored BaseDateTransformer, BaseDateTwoColumnTransformer and associated testing  `#273 <https://github.com/lvgig/tubular/pull/273>`_
 - BaseTwoColumnTransformer removed in favour of mixin classes TwoColumnMixin and NewColumnNameMixin to handle validation of two columns and new_column_name arguments `#273 <https://github.com/lvgig/tubular/pull/273>`_
 - Refactored tests for InteractionTransformer  `#283 <https://github.com/lvgig/tubular/pull/283>`_
-
+- refactored build tools and package config into pyproject.toml `#271 <https://github.com/lvgig/tubular/pull/271>`_
+- set up automatic versioning using setuptools-scm `#271 <https://github.com/lvgig/tubular/pull/271>`_
 
 1.3.1 (2024-07-18)
 ------------------
-
 Changed
 ^^^^^^^
 
