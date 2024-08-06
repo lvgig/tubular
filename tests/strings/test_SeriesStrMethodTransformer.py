@@ -85,48 +85,28 @@ class TestInit(ColumnStrListInitTests, NewColumnNameInitMixintests):
         ):
             uninitialized_transformers[self.transformer_name](**args)
 
+    @pytest.mark.parametrize(
+        "na_dict_key",
+        [{"a": 1, 2: "b"}, {"a": 1, (1, 2): "b"}],
+    )
+    def test_invalid_pd_kwargs_key_errors(
+        self,
+        na_dict_key,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test that an exceptions are raised for invalid pd_kwargs key types."""
 
-#         with pytest.raises(
-#             TypeError,
-#             match=r"""SeriesStrMethodTransformer: unexpected type \(\<class 'int'\>\) for pd_method_kwargs key in position 1, must be str""",
-#         ):
-#             SeriesStrMethodTransformer(
-#                 new_column_name="a",
-#                 pd_method_name="find",
-#                 columns=["b"],
-#                 pd_method_kwargs={"a": 1, 2: "b"},
-#             )
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["pd_method_kwargs"] = na_dict_key
 
-#     def test_exception_raised_non_pandas_method_passed(self):
-#         """Test and exception is raised if a non pd.Series.str method is passed for pd_method_name."""
-#         with pytest.raises(
-#             AttributeError,
-#             match="""SeriesStrMethodTransformer: error accessing "str.b" method on pd.Series object - pd_method_name should be a pd.Series.str method""",
-#         ):
-#             SeriesStrMethodTransformer(
-#                 new_column_name="a",
-#                 pd_method_name="b",
-#                 columns=["b"],
-#             )
-
-#     def test_attributes_set(self):
-#         """Test that the values passed for new_column_name, pd_method_name are saved to attributes on the object."""
-#         x = SeriesStrMethodTransformer(
-#             new_column_name="a",
-#             pd_method_name="find",
-#             columns=["b"],
-#             pd_method_kwargs={"d": 1},
-#         )
-
-#         ta.classes.test_object_attributes(
-#             obj=x,
-#             expected_attributes={
-#                 "new_column_name": "a",
-#                 "pd_method_name": "find",
-#                 "pd_method_kwargs": {"d": 1},
-#             },
-#             msg="Attributes for SeriesStrMethodTransformer set in init",
-#         )
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                f"{self.transformer_name}: all keys in pd_method_kwargs must be a string value",
+            ),
+        ):
+            uninitialized_transformers[self.transformer_name](**args)
 
 
 # class TestTransform:

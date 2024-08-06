@@ -77,9 +77,9 @@ class SeriesStrMethodTransformer(NewColumnNameMixin, BaseTransformer):
                 msg = f"{self.classname()}: pd_method_kwargs should be provided as a dict or defaulted to None"
                 raise TypeError(msg)
 
-        for i, k in enumerate(pd_method_kwargs.keys()):
-            if type(k) is not str:
-                msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
+        for key in pd_method_kwargs:
+            if type(key) is not str:
+                msg = f"{self.classname()}: all keys in pd_method_kwargs must be a string value"
                 raise TypeError(msg)
 
         self.check_and_set_new_column_name(new_column_name)
