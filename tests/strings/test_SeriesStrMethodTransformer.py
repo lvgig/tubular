@@ -50,24 +50,41 @@ class TestInit(ColumnStrListInitTests, NewColumnNameInitMixintests):
                 columns=["b", "c"],
             )
 
+    def test_exception_raised_non_pandas_method_passed(self):
+        """Test and exception is raised if a non pd.Series.str method is passed for pd_method_name."""
+        with pytest.raises(
+            AttributeError,
+            match="""SeriesStrMethodTransformer: error accessing "str.b" method on pd.Series object - pd_method_name should be a pd.Series.str method""",
+        ):
+            SeriesStrMethodTransformer(
+                new_column_name="a",
+                pd_method_name="b",
+                columns=["b"],
+            )
 
-#     column length 1
-#     pd_method_name str
-#     pd_method_kwargs dict
+    @pytest.mark.parametrize(
+        "non_dict",
+        [1, "a", True, [1, 2], np.inf, np.nan],
+    )
+    def test_invalid_pd_kwargs_type_errors(
+        self,
+        non_dict,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test that an exceptions are raised for invalid pd_kwargs types."""
 
-#     def test_invalid_input_type_errors(self):
-#         """Test that an exceptions are raised for invalid input types."""
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["pd_method_kwargs"] = non_dict
 
-#         with pytest.raises(
-#             TypeError,
-#             match=r"""SeriesStrMethodTransformer: pd_method_kwargs should be a dict but got type \<class 'int'\>""",
-#         ):
-#             SeriesStrMethodTransformer(
-#                 new_column_name="a",
-#                 pd_method_name="find",
-#                 columns=["b"],
-#                 pd_method_kwargs=1,
-#             )
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                f"{self.transformer_name}: pd_method_kwargs should be provided as a dict or defaulted to None",
+            ),
+        ):
+            uninitialized_transformers[self.transformer_name](**args)
+
 
 #         with pytest.raises(
 #             TypeError,

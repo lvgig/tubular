@@ -74,7 +74,7 @@ class SeriesStrMethodTransformer(NewColumnNameMixin, BaseTransformer):
             pd_method_kwargs = {}
         else:
             if type(pd_method_kwargs) is not dict:
-                msg = f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
+                msg = f"{self.classname()}: pd_method_kwargs should be provided as a dict or defaulted to None"
                 raise TypeError(msg)
 
         for i, k in enumerate(pd_method_kwargs.keys()):
