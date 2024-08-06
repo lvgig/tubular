@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from tests.base_tests import ColumnStrListInitTests, NewColumnNameInitMixintests
+from tubular.strings import SeriesStrMethodTransformer
 
 
 class TestInit(ColumnStrListInitTests, NewColumnNameInitMixintests):
@@ -35,6 +36,19 @@ class TestInit(ColumnStrListInitTests, NewColumnNameInitMixintests):
             ),
         ):
             uninitialized_transformers[self.transformer_name](**args)
+
+    def test_list_length(self):
+        """Test that an error is raised if columns list contains more than a single element"""
+
+        with pytest.raises(
+            ValueError,
+            match="SeriesStrMethodTransformer: columns arg should contain only 1 column name but got 2",
+        ):
+            SeriesStrMethodTransformer(
+                new_column_name="a",
+                pd_method_name=1,
+                columns=["b", "c"],
+            )
 
 
 #     column length 1
