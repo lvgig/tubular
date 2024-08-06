@@ -60,11 +60,11 @@ class SeriesStrMethodTransformer(NewColumnNameMixin, BaseTransformer):
         pd_method_kwargs: dict[str, object] | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
+        super().__init__(columns=columns, copy=copy, **kwargs)
+
         if len(columns) > 1:
             msg = f"{self.classname()}: columns arg should contain only 1 column name but got {len(columns)}"
             raise ValueError(msg)
-
-        super().__init__(columns=columns, copy=copy, **kwargs)
 
         if type(pd_method_name) is not str:
             msg = f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
