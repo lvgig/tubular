@@ -1,12 +1,13 @@
+import test_aide as ta
+
+import tests.test_data as d
 from tests.base_tests import (
     ColumnStrListInitTests,
+    GenericTransformTests,
     NewColumnNameInitMixintests,
     SeparatorInitMixintests,
 )
-
-# @pytest.fixture()
-# def concatenate_str():
-#     return StringConcatenator(columns=["a", "b"], new_column="merged_values")
+from tubular.strings import StringConcatenator
 
 
 class TestInit(
@@ -21,54 +22,48 @@ class TestInit(
         cls.transformer_name = "StringConcatenator"
 
 
-# class TestTransform:
-#     """Tests for the StringConcatenator.transform method."""
+class TestTransform(GenericTransformTests):
+    """Tests for transformer.transform."""
 
-#     def test_super_transform_called(self, mocker, concatenate_str):
-#         """Test that BaseTransformer.transform called."""
-#         df = d.create_df_7()
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "StringConcatenator"
 
-#         expected_call_args = {0: {"args": (d.create_df_7(),), "kwargs": {}}}
+    def test_correct_df_returned_1(self):
+        """Test that correct df is returned after transformation."""
+        df = d.create_df_1()
+        expected_df = df.copy()
 
-#         with ta.functions.assert_function_call(
-#             mocker,
-#             tubular.base.BaseTransformer,
-#             "transform",
-#             expected_call_args,
-#         ):
-#             concatenate_str.transform(df)
+        x = StringConcatenator(
+            columns=["a", "b"],
+            new_column_name="merged_values",
+        )
 
-#     def test_correct_df_returned_1(self, concatenate_str):
-#         """Test that correct df is returned after transformation."""
-#         df = d.create_df_1()
+        df_transformed = x.transform(df)
+        expected_df["merged_values"] = ["1 a", "2 b", "3 c", "4 d", "5 e", "6 f"]
 
-#         df_transformed = concatenate_str.transform(df)
+        ta.equality.assert_frame_equal_msg(
+            df_transformed,
+            expected_df,
+            "Incorrect dataframe returned after StringConcatenator transform",
+        )
 
-#         expected_df = df.copy()
-#         expected_df["merged_values"] = ["1 a", "2 b", "3 c", "4 d", "5 e", "6 f"]
+    def test_correct_df_returned_2(self):
+        """Test that correct df is returned after transformation."""
+        df = d.create_df_1()
+        expected_df = df.copy()
 
-#         ta.equality.assert_frame_equal_msg(
-#             df_transformed,
-#             expected_df,
-#             "Incorrect dataframe returned after StringConcatenator transform",
-#         )
+        x = StringConcatenator(
+            columns=["a", "b"],
+            new_column_name="merged_values",
+            separator=":",
+        )
 
-#     def test_correct_df_returned_2(self):
-#         """Test that correct df is returned after transformation."""
-#         df = d.create_df_1()
+        df_transformed = x.transform(df)
+        expected_df["merged_values"] = ["1:a", "2:b", "3:c", "4:d", "5:e", "6:f"]
 
-#         x = StringConcatenator(
-#             columns=["a", "b"],
-#             new_column="merged_values",
-#             separator=":",
-#         )
-#         df_transformed = x.transform(df)
-
-#         expected_df = df.copy()
-#         expected_df["merged_values"] = ["1:a", "2:b", "3:c", "4:d", "5:e", "6:f"]
-
-#         ta.equality.assert_frame_equal_msg(
-#             df_transformed,
-#             expected_df,
-#             "Incorrect dataframe returned after StringConcatenator transform",
-#         )
+        ta.equality.assert_frame_equal_msg(
+            df_transformed,
+            expected_df,
+            "Incorrect dataframe returned after StringConcatenator transform",
+        )
