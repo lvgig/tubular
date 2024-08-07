@@ -25,6 +25,7 @@ Changed
 - Refactored BaseDateTransformer, BaseDateTwoColumnTransformer and associated testing  `#273 <https://github.com/lvgig/tubular/pull/273>`_
 - BaseTwoColumnTransformer removed in favour of mixin classes TwoColumnMixin and NewColumnNameMixin to handle validation of two columns and new_column_name arguments `#273 <https://github.com/lvgig/tubular/pull/273>`_
 - Refactored tests for InteractionTransformer  `#283 <https://github.com/lvgig/tubular/pull/283>`_
+- Refactored tests for StringConcatenator and SeriesStrMethodTransformer, added separator mixin class. `#278 <https://github.com/lvgig/tubular/issues/278>`_ and `#279 <https://github.com/lvgig/tubular/issues/279>`_
 
 
 1.3.1 (2024-07-18)

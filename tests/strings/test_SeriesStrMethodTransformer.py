@@ -182,39 +182,6 @@ class TestTransform(GenericTransformTests):
             msg_tag="Unexpected values in SeriesStrMethodTransformer.transform with pad, overwriting original column",
         )
 
-    def test_attributes_unchanged_by_transform(self):
-        """Test that attributes set in init are unchanged by the transform method."""
-        df = d.create_df_7()
-
-        x = SeriesStrMethodTransformer(
-            new_column_name="b",
-            pd_method_name="pad",
-            columns=["b"],
-            pd_method_kwargs={"width": 10},
-        )
-
-        x2 = SeriesStrMethodTransformer(
-            new_column_name="b",
-            pd_method_name="pad",
-            columns=["b"],
-            pd_method_kwargs={"width": 10},
-        )
-
-        x.transform(df)
-
-        assert (
-            x.new_column_name == x2.new_column_name
-        ), "new_column_name changed by SeriesDtMethodTransformer.transform"
-        assert (
-            x.pd_method_name == x2.pd_method_name
-        ), "pd_method_name changed by SeriesDtMethodTransformer.transform"
-        assert (
-            x.columns == x2.columns
-        ), "columns changed by SeriesDtMethodTransformer.transform"
-        assert (
-            x.pd_method_kwargs == x2.pd_method_kwargs
-        ), "pd_method_kwargs changed by SeriesDtMethodTransformer.transform"
-
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
     """

@@ -5,6 +5,7 @@ from tests.base_tests import (
     ColumnStrListInitTests,
     GenericTransformTests,
     NewColumnNameInitMixintests,
+    OtherBaseBehaviourTests,
     SeparatorInitMixintests,
 )
 from tubular.strings import StringConcatenator
@@ -67,3 +68,15 @@ class TestTransform(GenericTransformTests):
             expected_df,
             "Incorrect dataframe returned after StringConcatenator transform",
         )
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "StringConcatenator"
