@@ -1,3 +1,6 @@
+from contextlib import suppress
+from importlib.metadata import version
+
 from tubular import (
     base,
     capping,
@@ -9,4 +12,6 @@ from tubular import (
     numeric,
     strings,
 )
-from tubular._version import __version__
+
+with suppress(ModuleNotFoundError):
+    __version__ = version("tubular")

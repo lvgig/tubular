@@ -1,0 +1,141 @@
+[build-system]
+requires = [
+    "setuptools >= 61.0",
+    "wheel",
+    "setuptools-scm[toml]>=6.0"
+   ]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["tubular"]
+
+[tool.setuptools_scm]
+# can be empty if no extra settings are needed, presence enables setuptools_scm
+
+[project]
+name = "tubular"
+dynamic = ["version"]
+dependencies = [
+    "pandas>=1.5.0",
+    "scikit-learn>=1.2.0"
+]
+requires-python = ">=3.8"
+authors = [{ name = "LV GI Data Science Team", email="#DataSciencePackages@lv.co.uk"}]
+description = "Package to perform pre processing steps for machine learning models"
+readme = {file = "README.md", content-type = "text/markdown"}
+license = {file = "LICENSE"}
+keywords = ["data science", "feature engineering", "data transforms", "pipeline", "sklearn", "machine learning", "ML", "DS"]
+classifiers=[
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: BSD License",
+]
+
+[project.optional-dependencies]
+dev = [
+    "test-aide>=0.1.0",
+    "pytest>=5.4.1",
+    "pytest-mock>=3.5.1",
+    "pytest-cov>=2.10.1",
+    "pre-commit==2.15.0 ",
+    "ruff==0.2.2",
+    ]
+
+[project.urls]
+Documentation = "https://tubular.readthedocs.io/en/latest/index.html"
+Repository = "https://github.com/lvgig/tubular"
+Issues = "https://github.com/lvgig/tubular/issues"
+Changelog = "https://github.com/lvgig/tubular/CHANGELOG.md"
+
+[tool.ruff]
+# Same as Black.
+line-length = 88
+
+# Assume Python 3.8.
+target-version = "py38"
+
+[tool.ruff.lint]
+# Enable the pycodestyle (`E`) and Pyflakes (`F`) rules by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+select = [
+    "A",
+    "ANN",
+    "ASYNC",
+    "B", # bugbear 
+    "C4",
+    "COM",
+    "DTZ",
+    "E", # pycodestyle
+    "EM",
+    "F", # Pyflakes
+    "FA",
+    "FLY",
+    "I",
+    "INT",
+    "ISC",
+    "NPY",
+    "PD",
+    "PERF",
+    "PGH",
+    "PIE",
+    "PLC",
+    "PLE",
+    "PLW",
+    "PYI",
+    "Q",
+    "RET",
+    "RSE",
+    "S", # Bandit
+    "SIM",
+    "SLOT",
+    "T10",
+    "TCH",
+    "TID",
+    "UP",
+    "W", # pycodestyle warnings
+    "YTT",
+]
+
+# Enabled to allow direct type comparisons using is and is not under E721 (see https://docs.astral.sh/ruff/rules/type-comparison/)
+preview = true
+
+# ignore E501 - linelength limit (covered by black except in docstrings) 
+# and PD901 - use of df variable name
+ignore = ["E501", "PD901", "ANN101"]
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Exclude a variety of commonly ignored directories.
+exclude = [".git", "__pycache__", "build", "dist", "source"]
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Ignore `E402` (import violations) in all `__init__.py` file.
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402", "F401"]
+"tests/*" = ["ANN", "S101"]
+
+
+[tool.coverage.run]
+branch = true
+
+include = ["tubular/*"]
+
+omit = [
+      "tests/*",
+]
+
+[tool.coverage.report]
+
+show_missing = true
+
+fail_under = 80
