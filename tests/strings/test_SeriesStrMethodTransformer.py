@@ -21,6 +21,7 @@ class TestInit(ColumnStrListInitTests, NewColumnNameInitMixintests):
     def setup_class(cls):
         cls.transformer_name = "SeriesStrMethodTransformer"
 
+    # Duplicated here as base test sets "columns" to a list of len(2), not viable for this transformer
     @pytest.mark.parametrize(
         "non_string",
         [1, True, {"a": 1}, [1, 2], None, np.inf, np.nan],

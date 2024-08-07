@@ -261,7 +261,8 @@ def minimal_attribute_dict():
         },
         "StringConcatenator": {
             "columns": ["a", "b"],
-            "new_column": "c",
+            "new_column_name": "c",
+            "separator": "-",
         },
         "ToDatetimeTransformer": {
             "new_column_name": "b",

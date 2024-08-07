@@ -5,7 +5,7 @@ from __future__ import annotations
 import pandas as pd
 
 from tubular.base import BaseTransformer
-from tubular.mixins import NewColumnNameMixin
+from tubular.mixins import NewColumnNameMixin, SeparatorColumnMixin
 
 
 class SeriesStrMethodTransformer(NewColumnNameMixin, BaseTransformer):
@@ -123,14 +123,14 @@ class SeriesStrMethodTransformer(NewColumnNameMixin, BaseTransformer):
         return X
 
 
-class StringConcatenator(BaseTransformer):
+class StringConcatenator(NewColumnNameMixin, SeparatorColumnMixin, BaseTransformer):
     """Transformer to combine data from specified columns, of mixed datatypes, into a new column containing one string.
 
     Parameters
     ----------
     columns : str or list of str
         Columns to concatenate.
-    new_column : str, default = "new_column"
+    new_column_name : str, default = "new_column"
         New column name
     separator : str, default = " "
         Separator for the new string value
@@ -139,22 +139,14 @@ class StringConcatenator(BaseTransformer):
     def __init__(
         self,
         columns: str | list[str],
-        new_column: str = "new_column",
+        new_column_name: str = "new_column",
         separator: str = " ",
+        **kwargs: dict[str, bool],
     ) -> None:
-        super().__init__(columns=columns)
+        super().__init__(columns=columns, **kwargs)
 
-        if not isinstance(new_column, str):
-            msg = f"{self.classname()}: new_column should be a str"
-            raise TypeError(msg)
-
-        self.new_column = new_column
-
-        if not isinstance(separator, str):
-            msg = f"{self.classname()}: The separator should be a str"
-            raise TypeError(msg)
-
-        self.separator = separator
+        self.check_and_set_new_column_name(new_column_name)
+        self.check_and_set_separator_column(separator)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Combine data from specified columns, of mixed datatypes, into a new column containing one string.
@@ -172,7 +164,7 @@ class StringConcatenator(BaseTransformer):
         """
         X = super().transform(X)
 
-        X[self.new_column] = (
+        X[self.new_column_name] = (
             X[self.columns].astype(str).apply(self.separator.join, axis=1)
         )
 
