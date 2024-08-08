@@ -5,9 +5,10 @@ from __future__ import annotations
 import pandas as pd
 
 from tubular.base import BaseTransformer
+from tubular.mixins import NewColumnNameMixin, SeparatorColumnMixin
 
 
-class SeriesStrMethodTransformer(BaseTransformer):
+class SeriesStrMethodTransformer(NewColumnNameMixin, BaseTransformer):
     """Tranformer that applies a pandas.Series.str method.
 
     Transformer assigns the output of the method to a new column. It is possible to
@@ -25,14 +26,13 @@ class SeriesStrMethodTransformer(BaseTransformer):
         The name of the column to be assigned to the output of running the pd.Series.str in transform.
 
     pd_method_name : str
-        The name of the pandas.Series.str method to call.
+        The name of the pandas.Series.str method to call e.g. 'split' or 'replace'
 
-    columns : str
-        Column to apply the transformer to. If a str is passed this is put into a list. Value passed
-        in columns is saved in the columns attribute on the object. Note this has no default value so
-        the user has to specify the columns when initialising the transformer. This is avoid likely
-        when the user forget to set columns, in this case all columns would be picked up when super
-        transform runs.
+    columns : list
+        Name of column to apply the transformer to. This needs to be passed as a list of length 1. Value passed
+        in columns is saved in the columns attribute of the object. Note this has no default value so
+        the user has to specify the column when initialising the transformer. This is to avoid all columns
+        being picked up when super transform runs if the user forgets an input.
 
     pd_method_kwargs : dict, default = {}
         A dictionary of keyword arguments to be passed to the pd.Series.str method when it is called.
@@ -55,20 +55,16 @@ class SeriesStrMethodTransformer(BaseTransformer):
         self,
         new_column_name: str,
         pd_method_name: str,
-        columns: str,
+        columns: list,
         copy: bool | None = None,
         pd_method_kwargs: dict[str, object] | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
-        if type(columns) is list and len(columns) > 1:
-            msg = f"{self.classname()}: columns arg should contain only 1 column name but got {len(columns)}"
-            raise ValueError(msg)
-
         super().__init__(columns=columns, copy=copy, **kwargs)
 
-        if type(new_column_name) is not str:
-            msg = f"{self.classname()}: unexpected type ({type(new_column_name)}) for new_column_name, must be str"
-            raise TypeError(msg)
+        if len(columns) > 1:
+            msg = f"{self.classname()}: columns arg should contain only 1 column name but got {len(columns)}"
+            raise ValueError(msg)
 
         if type(pd_method_name) is not str:
             msg = f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
@@ -78,15 +74,16 @@ class SeriesStrMethodTransformer(BaseTransformer):
             pd_method_kwargs = {}
         else:
             if type(pd_method_kwargs) is not dict:
-                msg = f"{self.classname()}: pd_method_kwargs should be a dict but got type {type(pd_method_kwargs)}"
+                msg = f"{self.classname()}: pd_method_kwargs should be provided as a dict or defaulted to None"
                 raise TypeError(msg)
 
-        for i, k in enumerate(pd_method_kwargs.keys()):
-            if type(k) is not str:
-                msg = f"{self.classname()}: unexpected type ({type(k)}) for pd_method_kwargs key in position {i}, must be str"
+        for key in pd_method_kwargs:
+            if type(key) is not str:
+                msg = f"{self.classname()}: all keys in pd_method_kwargs must be a string value"
                 raise TypeError(msg)
 
-        self.new_column_name = new_column_name
+        self.check_and_set_new_column_name(new_column_name)
+
         self.pd_method_name = pd_method_name
         self.pd_method_kwargs = pd_method_kwargs
 
@@ -126,14 +123,14 @@ class SeriesStrMethodTransformer(BaseTransformer):
         return X
 
 
-class StringConcatenator(BaseTransformer):
+class StringConcatenator(NewColumnNameMixin, SeparatorColumnMixin, BaseTransformer):
     """Transformer to combine data from specified columns, of mixed datatypes, into a new column containing one string.
 
     Parameters
     ----------
     columns : str or list of str
         Columns to concatenate.
-    new_column : str, default = "new_column"
+    new_column_name : str, default = "new_column"
         New column name
     separator : str, default = " "
         Separator for the new string value
@@ -142,22 +139,14 @@ class StringConcatenator(BaseTransformer):
     def __init__(
         self,
         columns: str | list[str],
-        new_column: str = "new_column",
+        new_column_name: str = "new_column",
         separator: str = " ",
+        **kwargs: dict[str, bool],
     ) -> None:
-        super().__init__(columns=columns)
+        super().__init__(columns=columns, **kwargs)
 
-        if not isinstance(new_column, str):
-            msg = f"{self.classname()}: new_column should be a str"
-            raise TypeError(msg)
-
-        self.new_column = new_column
-
-        if not isinstance(separator, str):
-            msg = f"{self.classname()}: The separator should be a str"
-            raise TypeError(msg)
-
-        self.separator = separator
+        self.check_and_set_new_column_name(new_column_name)
+        self.check_and_set_separator_column(separator)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Combine data from specified columns, of mixed datatypes, into a new column containing one string.
@@ -175,7 +164,7 @@ class StringConcatenator(BaseTransformer):
         """
         X = super().transform(X)
 
-        X[self.new_column] = (
+        X[self.new_column_name] = (
             X[self.columns].astype(str).apply(self.separator.join, axis=1)
         )
 

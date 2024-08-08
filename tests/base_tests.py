@@ -174,6 +174,36 @@ class NewColumnNameInitMixintests:
             uninitialized_transformers[self.transformer_name](**args)
 
 
+class SeparatorInitMixintests:
+    """
+    Tests for BaseTransformer.init() behaviour specific to when a transformer accepts a "separator" column.
+    Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
+    """
+
+    @pytest.mark.parametrize(
+        "separator",
+        [1, True, {"a": 1}, [1, 2], None, np.inf, np.nan],
+    )
+    def test_separator_type_error(
+        self,
+        separator,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test an error is raised if any type other than str passed to separator"""
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["separator"] = separator
+
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                f"{self.transformer_name}: separator should be str",
+            ),
+        ):
+            uninitialized_transformers[self.transformer_name](**args)
+
+
 class WeightColumnInitMixinTests:
     """
     Tests for BaseTransformer.init() behaviour specific to when a transformer takes accepts a weight column.
