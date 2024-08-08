@@ -1,5 +1,5 @@
 from contextlib import suppress
-from importlib.metadata import version
+from importlib.metadata import PackageNotFoundError, version
 
 from tubular import (
     base,
@@ -13,5 +13,5 @@ from tubular import (
     strings,
 )
 
-with suppress(ModuleNotFoundError):
+with suppress(PackageNotFoundError):
     __version__ = version("tubular")
