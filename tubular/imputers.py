@@ -390,6 +390,8 @@ class NearestMeanResponseImputer(BaseImputer):
 
     """
 
+    FITS = True
+
     def __init__(
         self,
         columns: str | list[str] | None = None,
@@ -397,7 +399,7 @@ class NearestMeanResponseImputer(BaseImputer):
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
-    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
+    def fit(self, X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
         """Calculate mean values to impute with.
 
         Parameters
@@ -411,11 +413,8 @@ class NearestMeanResponseImputer(BaseImputer):
             to the average response of the unknown levels is selected as the imputation value.
 
         """
-        super().fit(X, y)
 
-        if not isinstance(y, pd.Series):
-            msg = "unexpected type for y, should be a pd.Series"
-            raise TypeError(msg)
+        super().fit(X, y)
 
         n_nulls = y.isna().sum()
 

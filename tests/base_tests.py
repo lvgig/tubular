@@ -292,7 +292,7 @@ class GenericFitTests:
 
         x = initialized_transformers[self.transformer_name]
 
-        x_fitted = x.fit(df, df["c"])
+        x_fitted = x.fit(df, df["a"])
 
         assert (
             x_fitted is x
@@ -310,7 +310,7 @@ class GenericFitTests:
 
         x = initialized_transformers[self.transformer_name]
 
-        x.fit(df)
+        x.fit(df, df["a"])
 
         ta.equality.assert_equal_dispatch(
             expected=original_df,
@@ -423,7 +423,7 @@ class WeightColumnFitMixinTests:
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
-        x_fitted = transformer.fit(df)
+        x_fitted = transformer.fit(df, df["a"])
 
         assert (
             x_fitted is transformer
@@ -448,7 +448,7 @@ class WeightColumnFitMixinTests:
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
-        transformer.fit(df)
+        transformer.fit(df, df["a"])
         ta.equality.assert_equal_dispatch(
             expected=original_df,
             actual=df,
@@ -486,7 +486,7 @@ class WeightColumnFitMixinTests:
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
         with pytest.raises(ValueError, match=expected_message):
-            transformer.fit(df)
+            transformer.fit(df, df["a"])
 
     def get_df_error_combos():
         return [
@@ -526,7 +526,7 @@ class WeightColumnFitMixinTests:
             args["weights_column"] = weight_column
 
             transformer = uninitialized_transformers[self.transformer_name](**args)
-            transformer.fit(df)
+            transformer.fit(df, df["a"])
 
     def test_weight_not_in_X_error(
         self,
@@ -551,7 +551,7 @@ class WeightColumnFitMixinTests:
             args["weights_column"] = weight_column
 
             transformer = uninitialized_transformers[self.transformer_name](**args)
-            transformer.fit(df)
+            transformer.fit(df, df["a"])
 
     def test_zero_total_weight_error(
         self,
@@ -573,7 +573,7 @@ class WeightColumnFitMixinTests:
             ValueError,
             match="total sample weights are not greater than 0",
         ):
-            transformer.fit(df)
+            transformer.fit(df, df["a"])
 
 
 class GenericTransformTests:
@@ -595,7 +595,7 @@ class GenericTransformTests:
 
         x = initialized_transformers[self.transformer_name]
 
-        x_fitted = x.fit(df, df["c"])
+        x_fitted = x.fit(df, df["a"])
 
         with pytest.raises(
             TypeError,
@@ -610,7 +610,7 @@ class GenericTransformTests:
 
         x = initialized_transformers[self.transformer_name]
 
-        x = x.fit(df, df["c"])
+        x = x.fit(df, df["a"])
 
         df = df.head(0)
 
@@ -632,7 +632,7 @@ class GenericTransformTests:
 
         x = initialized_transformers[self.transformer_name]
 
-        x = x.fit(df, df["c"])
+        x = x.fit(df, df["a"])
 
         _ = x.transform(df)
 
