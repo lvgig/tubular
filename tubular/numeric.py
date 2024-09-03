@@ -13,7 +13,7 @@ from sklearn.preprocessing import (
 )
 
 from tubular.base import BaseTransformer, DataFrameMethodTransformer
-from tubular.mixins import DropOriginalMixin
+from tubular.mixins import DropOriginalMixin, NewColumnNameMixin, TwoColumnMixin
 
 
 class BaseNumericTransformer(BaseTransformer):
@@ -312,7 +312,11 @@ class CutTransformer(BaseTransformer):
         return X
 
 
-class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
+class TwoColumnOperatorTransformer(
+    NewColumnNameMixin,
+    TwoColumnMixin,
+    DataFrameMethodTransformer,
+):
     """This transformer applies a pandas.DataFrame method to two columns (add, sub, mul, div, mod, pow).
 
     Transformer assigns the output of the method to a new column. The method will be applied
@@ -378,16 +382,9 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
                 msg = f"{self.classname()}: pd_method_kwargs 'axis' must be 0 or 1"
                 raise ValueError(msg)
 
-        if type(columns) is not list:
-            msg = f"{self.classname()}: columns must be a list containing two column names but got {columns}"
-            raise TypeError(msg)
-
-        if len(columns) != 2:
-            msg = f"{self.classname()}: columns must be a list containing two column names but got {columns}"
-            raise ValueError(msg)
-
-        self.column1_name = columns[0]
-        self.column2_name = columns[1]
+        # Set above call to super as DFMTransformer accepts columns, but this transformer only ever needs one
+        # To avoid inherited tests failing set this first
+        self.check_and_set_new_column_name(new_column_name)
 
         # call DataFrameMethodTransformer.__init__
         # This class will inherit all the below attributes from DataFrameMethodTransformer
@@ -398,6 +395,10 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
             pd_method_kwargs=pd_method_kwargs,
             **kwargs,
         )
+
+        self.check_two_columns(columns)
+        self.column1_name = columns[0]
+        self.column2_name = columns[1]
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform input data by applying the chosen method to the two specified columns.
@@ -419,7 +420,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
             msg = f"{self.classname()}: input columns in X must contain only numeric values"
             raise TypeError(msg)
 
-        X[self.new_column_names] = getattr(X[[self.column1_name]], self.pd_method_name)(
+        X[self.new_column_name] = getattr(X[[self.column1_name]], self.pd_method_name)(
             X[self.column2_name],
             **self.pd_method_kwargs,
         )
