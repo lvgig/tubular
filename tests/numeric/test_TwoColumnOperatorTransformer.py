@@ -1,7 +1,11 @@
 import pytest
+import test_aide as ta
 
+import tests.test_data as d
 from tests.base_tests import (
+    GenericTransformTests,
     NewColumnNameInitMixintests,
+    OtherBaseBehaviourTests,
     TwoColumnListInitTests,
 )
 from tubular.numeric import TwoColumnOperatorTransformer
@@ -44,86 +48,61 @@ class TestInit(
             )
 
 
-# class TestTwoColumnOperatorTransformerTransform:
-#     @pytest.mark.parametrize(
-#         "pd_method_name",
-#         [
-#             ("mul"),
-#             ("div"),
-#             ("pow"),
-#         ],
-#     )
-#     def test_pandas_method_called(self, mocker, pd_method_name):
-#         """Test that the pandas method is called as expected (with kwargs passed) during transform."""
-#         spy = mocker.spy(pd.DataFrame, pd_method_name)
+class TestTransform(GenericTransformTests):
+    """Tests for transformer.transform."""
 
-#         pd_method_kwargs = {"axis": 0}
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "TwoColumnOperatorTransformer"
 
-#         data = d.create_df_11()
-#         x = TwoColumnOperatorTransformer(
-#             pd_method_name,
-#             ["a", "b"],
-#             "c",
-#         )
-#         x.transform(data)
+    @pytest.mark.parametrize(
+        ("pd_method_name", "output"),
+        [
+            (
+                "mul",
+                [4, 10, 18],
+            ),
+            ("div", [0.25, 0.4, 0.5]),
+            ("pow", [1, 32, 729]),
+        ],
+    )
+    def test_expected_output(self, pd_method_name, output):
+        """Tests that the output given by TwoColumnOperatorTransformer is as you would expect."""
+        expected = d.create_df_11()
+        expected["c"] = output
+        x = TwoColumnOperatorTransformer(
+            pd_method_name,
+            ["a", "b"],
+            "c",
+        )
+        actual = x.transform(d.create_df_11())
+        ta.equality.assert_frame_equal_msg(
+            actual=actual,
+            expected=expected,
+            msg_tag="TwoColumnMethod transformer does not produce the expected output",
+        )
 
-#         # pull out positional and keyword args to target the call
-#         print(spy.call_args_list)
-#         call_args = spy.call_args_list[0]
-#         call_pos_args = call_args[0]
-#         call_kwargs = call_args[1]
+    def test_non_numeric_error(self):
+        x = TwoColumnOperatorTransformer(
+            "mul",
+            ["a", "b"],
+            "c",
+        )
 
-#         # test keyword are as expected
-#         ta.equality.assert_dict_equal_msg(
-#             actual=call_kwargs,
-#             expected=pd_method_kwargs,
-#             msg_tag=f"""Keyword arg assert for '{pd_method_name}'""",
-#         )
+        with pytest.raises(
+            TypeError,
+            match="TwoColumnOperatorTransformer: input columns in X must contain only numeric values",
+        ):
+            x.transform(d.create_df_8())
 
-#         # test positional args are as expected
-#         ta.equality.assert_list_tuple_equal_msg(
-#             actual=call_pos_args,
-#             # 'a' is indexed as a list here because that's how DataFrameMethodTransformer.__init__ stores the columns attribute
-#             expected=(data[["a"]], data["b"]),
-#             msg_tag=f"""Positional arg assert for {pd_method_name}""",
-#         )
 
-#     @pytest.mark.parametrize(
-#         ("pd_method_name", "output"),
-#         [
-#             (
-#                 "mul",
-#                 [4, 10, 18],
-#             ),
-#             ("div", [0.25, 0.4, 0.5]),
-#             ("pow", [1, 32, 729]),
-#         ],
-#     )
-#     def test_expected_output(self, pd_method_name, output):
-#         """Tests that the output given by TwoColumnOperatorTransformer is as you would expect."""
-#         expected = d.create_df_11()
-#         expected["c"] = output
-#         x = TwoColumnOperatorTransformer(
-#             pd_method_name,
-#             ["a", "b"],
-#             "c",
-#         )
-#         actual = x.transform(d.create_df_11())
-#         ta.equality.assert_frame_equal_msg(
-#             actual=actual,
-#             expected=expected,
-#             msg_tag="TwoColumnMethod transformer does not produce the expected output",
-#         )
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
 
-#     def test_non_numeric_error(self):
-#         x = TwoColumnOperatorTransformer(
-#             "mul",
-#             ["a", "b"],
-#             "c",
-#         )
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
 
-#         with pytest.raises(
-#             TypeError,
-#             match="TwoColumnOperatorTransformer: input columns in X must contain only numeric values",
-#         ):
-#             x.transform(d.create_df_8())
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "TwoColumnOperatorTransformer"
