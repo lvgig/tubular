@@ -382,8 +382,8 @@ class TwoColumnOperatorTransformer(
                 msg = f"{self.classname()}: pd_method_kwargs 'axis' must be 0 or 1"
                 raise ValueError(msg)
 
-        # Set above call to super as DFMTransformer accepts columns, but this transformer only ever needs one
-        # To avoid inherited tests failing set this first
+        # check_and_set_new_column_name function needs to be called before calling DataFrameMethodTransformer.__init__
+        # DFTransformer uses 'new_column_names' not 'new_column_name' so generic tests fail on regex if not ordered in this way
         self.check_and_set_new_column_name(new_column_name)
 
         # call DataFrameMethodTransformer.__init__
@@ -411,7 +411,7 @@ class TwoColumnOperatorTransformer(
         -------
             pd.DataFrame: Input X with an additional column.
         """
-        # call BaseTransformer.transform
+        # call DataFrameMethodTransformer.transform
         X = super(DataFrameMethodTransformer, self).transform(X)
 
         is_numeric = X[self.columns].apply(pd.api.types.is_numeric_dtype, axis=0)
