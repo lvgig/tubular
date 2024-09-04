@@ -241,7 +241,7 @@ class TwoColumnListInitTests(ColumnStrListInitTests):
         minimal_attribute_dict,
         uninitialized_transformers,
     ):
-        """Test an error is raised if columns is not passed as a string not a list."""
+        """Test an error is raised if columns is passed as a string not a list."""
 
         args = minimal_attribute_dict[self.transformer_name].copy()
         args["columns"] = non_list

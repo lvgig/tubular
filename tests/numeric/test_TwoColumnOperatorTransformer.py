@@ -1,62 +1,33 @@
-import pandas as pd
 import pytest
 import test_aide as ta
 
 import tests.test_data as d
-import tubular
+from tests.base_tests import (
+    GenericTransformTests,
+    NewColumnNameInitMixintests,
+    OtherBaseBehaviourTests,
+    TwoColumnListInitTests,
+)
 from tubular.numeric import TwoColumnOperatorTransformer
 
+# @pytest.fixture(scope="module", autouse=True)
+# def example_transformer():
+#     return TwoColumnOperatorTransformer(
+#         "mul",
+#         ["a", "b"],
+#         "c",
+#     )
 
-@pytest.fixture(scope="module", autouse=True)
-def example_transformer():
-    return TwoColumnOperatorTransformer(
-        "mul",
-        ["a", "b"],
-        "c",
-    )
 
+class TestInit(
+    NewColumnNameInitMixintests,
+    TwoColumnListInitTests,
+):
+    """Generic tests for transformer.init()."""
 
-class TestTwoColumnOperatorTransformerInit:
-    """Tests for TwoColumnMethodTransformer.__init__()."""
-
-    def test_column_type_error(self):
-        """Checks that an error is raised if the column type is not a list."""
-        with pytest.raises(
-            TypeError,
-            match="columns must be a list containing two column names",
-        ):
-            TwoColumnOperatorTransformer(
-                "mul",
-                "a, b",
-                "c",
-                pd_method_kwargs={"axis": 1},
-            )
-
-    def test_column_size_1_error(self):
-        """Checks that the column is of length 2."""
-        with pytest.raises(
-            ValueError,
-            match="columns must be a list containing two column names",
-        ):
-            TwoColumnOperatorTransformer(
-                "mul",
-                ["a"],
-                "c",
-                pd_method_kwargs={"axis": 1},
-            )
-
-    def test_empty_list_error(self):
-        """Checks that the list is not empty"""
-        with pytest.raises(
-            ValueError,
-            match="columns must be a list containing two column names",
-        ):
-            TwoColumnOperatorTransformer(
-                "mul",
-                [],
-                "c",
-                pd_method_kwargs={"axis": 1},
-            )
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "TwoColumnOperatorTransformer"
 
     def test_axis_not_present_error(self):
         """Checks that an error is raised if no axis element present in pd_method_kwargs dict."""
@@ -76,74 +47,13 @@ class TestTwoColumnOperatorTransformerInit:
                 pd_method_kwargs={"axis": 2},
             )
 
-    # TODO replace this with behaviour tests for DataFrameMethodTransformer init error handling
-    def test_DataFrameMethodTransformer_init_call(self, mocker):
-        """Tests that the .__init__ method is called from the parent DataFrameMethodTransformer class."""
-        expected_call_args = {
-            0: {
-                "args": (),
-                "kwargs": {
-                    "new_column_names": "c",
-                    "pd_method_name": "mul",
-                    "columns": ["a", "b"],
-                    "pd_method_kwargs": {"axis": 0},
-                },
-            },
-        }
 
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.DataFrameMethodTransformer,
-            "__init__",
-            expected_call_args,
-            return_value=None,
-        ):
-            TwoColumnOperatorTransformer("mul", ["a", "b"], "c")
+class TestTransform(GenericTransformTests):
+    """Tests for transformer.transform."""
 
-
-class TestTwoColumnOperatorTransformerTransform:
-    @pytest.mark.parametrize(
-        "pd_method_name",
-        [
-            ("mul"),
-            ("div"),
-            ("pow"),
-        ],
-    )
-    def test_pandas_method_called(self, mocker, pd_method_name):
-        """Test that the pandas method is called as expected (with kwargs passed) during transform."""
-        spy = mocker.spy(pd.DataFrame, pd_method_name)
-
-        pd_method_kwargs = {"axis": 0}
-
-        data = d.create_df_11()
-        x = TwoColumnOperatorTransformer(
-            pd_method_name,
-            ["a", "b"],
-            "c",
-        )
-        x.transform(data)
-
-        # pull out positional and keyword args to target the call
-        print(spy.call_args_list)
-        call_args = spy.call_args_list[0]
-        call_pos_args = call_args[0]
-        call_kwargs = call_args[1]
-
-        # test keyword are as expected
-        ta.equality.assert_dict_equal_msg(
-            actual=call_kwargs,
-            expected=pd_method_kwargs,
-            msg_tag=f"""Keyword arg assert for '{pd_method_name}'""",
-        )
-
-        # test positional args are as expected
-        ta.equality.assert_list_tuple_equal_msg(
-            actual=call_pos_args,
-            # 'a' is indexed as a list here because that's how DataFrameMethodTransformer.__init__ stores the columns attribute
-            expected=(data[["a"]], data["b"]),
-            msg_tag=f"""Positional arg assert for {pd_method_name}""",
-        )
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "TwoColumnOperatorTransformer"
 
     @pytest.mark.parametrize(
         ("pd_method_name", "output"),
@@ -184,3 +94,15 @@ class TestTwoColumnOperatorTransformerTransform:
             match="TwoColumnOperatorTransformer: input columns in X must contain only numeric values",
         ):
             x.transform(d.create_df_8())
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "TwoColumnOperatorTransformer"
