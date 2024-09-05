@@ -406,6 +406,28 @@ class GenericFitTests:
             )
 
 
+class CheckNumericFitMixinTests:
+    """
+    Tests for BaseTransformer.init() behaviour specific to when a transformer used.
+    Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
+    """
+
+    def test_exception_raised(self, initialized_transformers, minimal_dataframe_lookup):
+        """Test an exception is raised if non numeric columns are passed in X."""
+        df = minimal_dataframe_lookup[self.transformer_name]
+        df["a"] = "string"
+
+        x = initialized_transformers[self.transformer_name]
+
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                f"{self.transformer_name}: The following columns are not numeric in X; ['a']",
+            ),
+        ):
+            x.fit(df)
+
+
 class WeightColumnFitMixinTests:
     def test_fit_returns_self_weighted(
         self,

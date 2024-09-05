@@ -1,7 +1,9 @@
 import pytest
 
 from tests.base_tests import (
+    CheckNumericFitMixinTests,
     ColumnStrListInitTests,
+    GenericFitTests,
 )
 from tubular.numeric import PCATransformer
 
@@ -118,8 +120,13 @@ class TestInit(
 #         )
 
 
-# class TestFit:
-#     """Tests for PCATransformer.fit()."""
+class TestFit(CheckNumericFitMixinTests, GenericFitTests):
+    """Generic tests for transformer.fit()"""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "PCATransformer"
+
 
 #     def test_super_fit_call(self, mocker):
 #         """Test the call to BaseTransformer.fit."""
