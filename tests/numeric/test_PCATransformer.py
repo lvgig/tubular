@@ -1,5 +1,6 @@
 import pytest
 
+import tests.test_data as d
 from tests.base_tests import (
     CheckNumericFitMixinTests,
     ColumnStrListInitTests,
@@ -90,36 +91,6 @@ class TestInit(
             PCATransformer(columns="b", n_components=0.3, svd_solver="arpack")
 
 
-# class TestCheckNumericColumns:
-#     """Tests for the check_numeric_columns method."""
-
-#     def test_exception_raised(self):
-#         """Test an exception is raised if non numeric columns are passed in X."""
-#         df = d.create_df_2()
-
-#         x = PCATransformer(columns=["a", "b", "c"], n_components=2)
-
-#         with pytest.raises(
-#             TypeError,
-#             match=r"""PCATransformer: The following columns are not numeric in X; \['b', 'c'\]""",
-#         ):
-#             x.check_numeric_columns(df)
-
-#     def test_X_returned(self):
-#         """Test that the input X is returned from the method."""
-#         df = d.create_df_2()
-
-#         x = PCATransformer(columns=["a"], n_components=2)
-
-#         df_returned = x.check_numeric_columns(df)
-
-#         ta.equality.assert_equal_dispatch(
-#             expected=df,
-#             actual=df_returned,
-#             msg="unexepcted object returned from check_numeric_columns",
-#         )
-
-
 class TestFit(CheckNumericFitMixinTests, GenericFitTests):
     """Generic tests for transformer.fit()"""
 
@@ -127,67 +98,22 @@ class TestFit(CheckNumericFitMixinTests, GenericFitTests):
     def setup_class(cls):
         cls.transformer_name = "PCATransformer"
 
+    def test_to_arpack_n_compontes_value_error(self):
+        """Test that an exception is raised if svd solver is arpack and n_components greater than nb samples or features."""
+        with pytest.raises(
+            ValueError,
+            match=r"""PCATransformer: n_components 10 must be between 1 and min\(n_samples 10, n_features 2\) is 2 with svd_solver 'arpack'""",
+        ):
+            # must be between 1 and min(n_samples 10, n_features 2) is 2 with svd_solver arpack
+            df = d.create_numeric_df_1()
 
-#     def test_super_fit_call(self, mocker):
-#         """Test the call to BaseTransformer.fit."""
-#         df = d.create_numeric_df_1()
+            x = PCATransformer(columns=["a", "b"], n_components=10, svd_solver="arpack")
 
-#         x = PCATransformer(columns=["a", "b"], n_components=1)
+            x.fit(df)
 
-#         expected_call_args = {
-#             0: {"args": (d.create_numeric_df_1(), None), "kwargs": {}},
-#         }
 
-#         with ta.functions.assert_function_call(
-#             mocker,
-#             tubular.base.BaseTransformer,
-#             "fit",
-#             expected_call_args,
-#         ):
-#             x.fit(df)
-
-#     def test_check_numeric_columns_call(self, mocker):
-#         """Test the call to PCATransformer.check_numeric_columns."""
-#         df = d.create_numeric_df_1()
-
-#         x = PCATransformer(columns=["a", "b"], n_components=1)
-
-#         expected_call_args = {0: {"args": (d.create_numeric_df_1(),), "kwargs": {}}}
-
-#         with ta.functions.assert_function_call(
-#             mocker,
-#             tubular.numeric.PCATransformer,
-#             "check_numeric_columns",
-#             expected_call_args,
-#             return_value=d.create_numeric_df_1(),
-#         ):
-#             x.fit(df)
-
-#     def test_to_arpack_n_compontes_value_error(self):
-#         """Test that an exception is raised if svd solver is arpack and n_components greater than nb samples or features."""
-#         with pytest.raises(
-#             ValueError,
-#             match=r"""PCATransformer: n_components 10 must be between 1 and min\(n_samples 10, n_features 2\) is 2 with svd_solver 'arpack'""",
-#         ):
-#             # must be between 1 and min(n_samples 10, n_features 2) is 2 with svd_solver arpack
-#             df = d.create_numeric_df_1()
-
-#             x = PCATransformer(columns=["a", "b"], n_components=10, svd_solver="arpack")
-
-#             x.fit(df)
-
-#     def test_return_self(self):
-#         """Test that fit returns self."""
-#         df = d.create_numeric_df_1()
-
-#         x = PCATransformer(columns=["a", "b"])
-
-#         x_fitted = x.fit(df)
-
-#         assert (
-#             x_fitted is x
-#         ), "return value from PCATransformer.fit not as expected (self)."
-
+# class TestTransform:
+#     """Tests for PCATransformer.transform()."""
 
 # def create_svd_sovler_output():
 #     svd_sovler_output = {}
@@ -293,10 +219,6 @@ class TestFit(CheckNumericFitMixinTests, GenericFitTests):
 #         },
 #     )
 #     return svd_sovler_output
-
-
-# class TestTransform:
-#     """Tests for PCATransformer.transform()."""
 
 #     def test_super_transform_called(self, mocker):
 #         """Test that BaseTransformer.transform called."""
