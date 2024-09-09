@@ -80,6 +80,16 @@ class TestTransform(BaseNumericTransformerTransformTests):
         )
         pd.testing.assert_frame_equal(transformed_df, expected_df)
 
+    def test_max_abs_scaling(self):
+        """Test max absolute scaling works correctly."""
+        df = pd.DataFrame({"a": [-3, -2, -1], "b": [1, 2, 3]})
+        transformer = ScalingTransformer(columns=["a", "b"], scaler_type="max_abs")
+        transformer.fit(df)
+        transformed_df = transformer.transform(df)
+
+        expected_df = pd.DataFrame({"a": [-1, -2 / 3, -1 / 3], "b": [1 / 3, 2 / 3, 1]})
+        pd.testing.assert_frame_equal(transformed_df, expected_df)
+
     def test_transform_min_max_raises(self):
         """Test that transform scales negative values correctly with MinMaxScaler."""
         df = pd.DataFrame({"a": [-3, -2, -1]})  # Example for Min-Max scalingcode
