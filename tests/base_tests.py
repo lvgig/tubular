@@ -696,7 +696,7 @@ class DropOriginalTransformMixinTests:
 
         x = initialized_transformers[self.transformer_name]
 
-        x.columns = ["a"]
+        other_columns = list(set(df.columns) - set(x.columns))
         x.drop_original = True
 
         x.fit(df)
@@ -704,8 +704,8 @@ class DropOriginalTransformMixinTests:
         df_transformed = x.transform(df)
 
         ta.equality.assert_equal_dispatch(
-            expected=df[["b", "c"]],
-            actual=df_transformed[["b", "c"]],
+            expected=df[other_columns],
+            actual=df_transformed[other_columns],
             msg=f"{self.transformer_name}.transform has changed other columns unexpectedly",
         )
 

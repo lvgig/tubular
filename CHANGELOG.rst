@@ -30,7 +30,8 @@ Changed
 - refactored build tools and package config into pyproject.toml `#271 <https://github.com/lvgig/tubular/pull/271>`_
 - set up automatic versioning using setuptools-scm `#271 <https://github.com/lvgig/tubular/pull/271>`_
 - Refactored TwoColumnOperatorTransformer tests in new format `#283 <https://github.com/lvgig/tubular/issues/274>`_
-
+- Refactored BetweenDatesTransformer tests in new format `#294 <https://github.com/lvgig/tubular/issues/294>`
+- As part of above, edited dates file transformers to use BaseDropOriginalMixin in transform
 
 1.3.1 (2024-07-18)
 ------------------
