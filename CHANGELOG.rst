@@ -32,6 +32,7 @@ Changed
 - Refactored TwoColumnOperatorTransformer tests in new format `#283 <https://github.com/lvgig/tubular/issues/274>`_
 - Refactored BetweenDatesTransformer tests in new format `#294 <https://github.com/lvgig/tubular/issues/294>`
 - As part of above, edited dates file transformers to use BaseDropOriginalMixin in transform
+- Refactored DateDifferenceTransformer tests in new format. Had to turn off autodefine new_column_name functionality to match generic test expectations. Suggest we look to turn back on in the future. `#296 https://github.com/lvgig/tubular/issues/296`
 
 1.3.1 (2024-07-18)
 ------------------

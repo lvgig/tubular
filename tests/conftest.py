@@ -175,7 +175,7 @@ def minimal_attribute_dict():
         },
         "DateDifferenceTransformer": {
             "columns": ["a", "b"],
-            "new_column_name": "c",
+            "new_column_name": "new_column",
         },
         "DateDiffLeapYearTransformer": {
             "columns": ["a", "b"],
