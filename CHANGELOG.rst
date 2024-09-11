@@ -30,7 +30,7 @@ Changed
 - refactored build tools and package config into pyproject.toml `#271 <https://github.com/lvgig/tubular/pull/271>`_
 - set up automatic versioning using setuptools-scm `#271 <https://github.com/lvgig/tubular/pull/271>`_
 - Refactored TwoColumnOperatorTransformer tests in new format `#283 <https://github.com/lvgig/tubular/issues/274>`_
-
+- Refactored tests for NullIndicator `#301 <https://github.com/lvgig/tubular/issues/301>`
 
 1.3.1 (2024-07-18)
 ------------------
