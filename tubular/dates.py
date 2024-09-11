@@ -206,9 +206,6 @@ class DateDiffLeapYearTransformer(BaseDateTwoColumnTransformer):
         drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
-        if not new_column_name:
-            new_column_name = f"{columns[1]}_{columns[0]}_datediff"
-
         super().__init__(
             columns=columns,
             new_column_name=new_column_name,
