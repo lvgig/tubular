@@ -32,6 +32,7 @@ Changed
 - Refactored TwoColumnOperatorTransformer tests in new format `#283 <https://github.com/lvgig/tubular/issues/274>`_
 - Refactored BetweenDatesTransformer tests in new format `#294 <https://github.com/lvgig/tubular/issues/294>`
 - As part of above, edited dates file transformers to use BaseDropOriginalMixin in transform
+- Edited base testing setup for dates file, created new BaseDatetimeTransformer class
 
 1.3.1 (2024-07-18)
 ------------------

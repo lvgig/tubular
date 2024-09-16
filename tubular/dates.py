@@ -73,16 +73,18 @@ class BaseGenericDateTransformer(
             allowed_types = [*allowed_types, date_type]
 
         for col in self.columns:
-            if pd.api.types.is_datetime64_any_dtype(X[col]):
+            is_datetime = pd.api.types.is_datetime64_any_dtype(X[col])
+            is_date = pd.api.types.infer_dtype(X[col]) == date_type
+            if is_datetime:
                 type_dict[col] = datetime_type
 
-            elif (not datetime_only) and (
-                pd.api.types.infer_dtype(X[col]) == date_type
-            ):
+            elif (not datetime_only) and (is_date):
                 type_dict[col] = date_type
 
             else:
-                msg = f"{self.classname()}: {col} type should be in {allowed_types} but got {X[col].dtype}"
+                col_dtype = date_type if is_date else X[col].dtype
+
+                msg = f"{self.classname()}: {col} type should be in {allowed_types} but got {col_dtype}"
                 raise TypeError(msg)
 
         present_types = set(type_dict.values())
@@ -671,7 +673,7 @@ class SeriesDtMethodTransformer(BaseDatetimeTransformer):
             running the pd.Series.dt method.
 
         """
-        X = super().transform(X, datetime_only=True)
+        X = super().transform(X)
 
         if self._callable:
             X[self.new_column_name] = getattr(
@@ -1098,7 +1100,7 @@ class DatetimeInfoExtractor(BaseDatetimeTransformer):
         X : pd.DataFrame
             Transformed input X with added columns of extracted information.
         """
-        X = super().transform(X, datetime_only=True)
+        X = super().transform(X)
 
         for col in self.columns:
             for include_option in self.include:
@@ -1297,7 +1299,7 @@ class DatetimeSinusoidCalculator(BaseDatetimeTransformer):
         X : pd.DataFrame
             Input X with additional columns added, these are named "<method>_<original_column>"
         """
-        X = super().transform(X, datetime_only=True)
+        X = super().transform(X)
 
         for column in self.columns:
             if not isinstance(self.units, dict):
