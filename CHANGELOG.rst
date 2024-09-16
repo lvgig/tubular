@@ -31,6 +31,7 @@ Changed
 - set up automatic versioning using setuptools-scm `#271 <https://github.com/lvgig/tubular/pull/271>`_
 - Refactored TwoColumnOperatorTransformer tests in new format `#274 <https://github.com/lvgig/tubular/issues/274>`_
 - Refactored PCATransformer tests in new format `#277 <https://github.com/lvgig/tubular/issues/277>`_
+- Refactored tests for NullIndicator `#301 <https://github.com/lvgig/tubular/issues/301>`_
 
 
 1.3.1 (2024-07-18)
