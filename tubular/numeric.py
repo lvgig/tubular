@@ -13,7 +13,12 @@ from sklearn.preprocessing import (
 )
 
 from tubular.base import BaseTransformer, DataFrameMethodTransformer
-from tubular.mixins import DropOriginalMixin, NewColumnNameMixin, TwoColumnMixin
+from tubular.mixins import (
+    CheckNumericMixin,
+    DropOriginalMixin,
+    NewColumnNameMixin,
+    TwoColumnMixin,
+)
 
 
 class BaseNumericTransformer(BaseTransformer):
@@ -428,7 +433,7 @@ class TwoColumnOperatorTransformer(
         return X
 
 
-class ScalingTransformer(BaseTransformer):
+class ScalingTransformer(CheckNumericMixin, BaseTransformer):
     """Transformer to perform scaling of numeric columns.
 
     Transformer can apply min max scaling, max absolute scaling or standardisation (subtract mean and divide by std).
@@ -492,30 +497,6 @@ class ScalingTransformer(BaseTransformer):
 
         super().__init__(columns=columns, **kwargs)
 
-    def check_numeric_columns(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Method to check all columns (specicifed in self.columns) in X are all numeric.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            Data containing columns to check.
-
-        """
-        numeric_column_types = X[self.columns].apply(
-            pd.api.types.is_numeric_dtype,
-            axis=0,
-        )
-
-        if not numeric_column_types.all():
-            non_numeric_columns = list(
-                numeric_column_types.loc[~numeric_column_types].index,
-            )
-
-            msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
-            raise TypeError(msg)
-
-        return X
-
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Fit scaler to input data.
 
@@ -530,7 +511,7 @@ class ScalingTransformer(BaseTransformer):
         """
         super().fit(X, y)
 
-        X = self.check_numeric_columns(X)
+        X = CheckNumericMixin.check_numeric_columns(self, X)
 
         self.scaler.fit(X[self.columns])
 
@@ -552,7 +533,7 @@ class ScalingTransformer(BaseTransformer):
         """
         X = super().transform(X)
 
-        X = self.check_numeric_columns(X)
+        X = CheckNumericMixin.check_numeric_columns(self, X)
 
         X[self.columns] = self.scaler.transform(X[self.columns])
 
@@ -707,7 +688,7 @@ class InteractionTransformer(BaseNumericTransformer):
         return X
 
 
-class PCATransformer(BaseTransformer):
+class PCATransformer(CheckNumericMixin, BaseTransformer):
     """Transformer that generates variables using Principal component analysis (PCA).
     Linear dimensionality reduction using Singular Value Decomposition of the
     data to project it to a lower dimensional space.
@@ -844,30 +825,6 @@ class PCATransformer(BaseTransformer):
         self.feature_names_out = None
         self.n_components_ = None
 
-    def check_numeric_columns(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Method to check all columns (specicifed in self.columns) in X are all numeric.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            Data containing columns to check.
-
-        """
-        numeric_column_types = X[self.columns].apply(
-            pd.api.types.is_numeric_dtype,
-            axis=0,
-        )
-
-        if not numeric_column_types.all():
-            non_numeric_columns = list(
-                numeric_column_types.loc[~numeric_column_types].index,
-            )
-
-            msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
-            raise TypeError(msg)
-
-        return X
-
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Fit PCA to input data.
 
@@ -882,7 +839,7 @@ class PCATransformer(BaseTransformer):
         """
         super().fit(X, y)
 
-        X = self.check_numeric_columns(X)
+        X = CheckNumericMixin.check_numeric_columns(self, X)
 
         if self.n_components != "mle":
             if 0 < self.n_components <= min(X[self.columns].shape):
@@ -914,7 +871,7 @@ class PCATransformer(BaseTransformer):
             running the  product pandas DataFrame method on identified combinations.
         """
         X = super().transform(X)
-        X = self.check_numeric_columns(X)
+        X = CheckNumericMixin.check_numeric_columns(self, X)
         X[self.feature_names_out] = self.pca.transform(X[self.columns])
 
         return X

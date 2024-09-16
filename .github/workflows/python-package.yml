@@ -42,7 +42,7 @@ jobs:
 
       - name: Upload coverage pytest html test results to github
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: coverage-html-pytest-results
           path: htmlcov
