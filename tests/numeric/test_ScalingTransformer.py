@@ -171,23 +171,6 @@ class TestFit:
         ):
             x.fit(df)
 
-    def test_check_numeric_columns_call(self, mocker):
-        """Test the call to ScalingTransformer.check_numeric_columns."""
-        df = d.create_df_2()
-
-        x = ScalingTransformer(columns=["a"], scaler_type="standard")
-
-        expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.numeric.ScalingTransformer,
-            "check_numeric_columns",
-            expected_call_args,
-            return_value=d.create_df_2(),
-        ):
-            x.fit(df)
-
     @pytest.mark.parametrize(
         ("scaler_type", "scaler_type_str"),
         [
@@ -264,24 +247,27 @@ class TestTransform:
         ):
             x.transform(df)
 
-    def test_check_numeric_columns_call(self, mocker):
-        """Test the call to ScalingTransformer.check_numeric_columns."""
-        df = d.create_df_2()
+    # When updating to new testing structure have the transform of this class inherit from CheckNumericFitMixinTests
+    # to cover this test
 
-        x = ScalingTransformer(columns=["a"], scaler_type="standard")
+    # def test_check_numeric_columns_call(self, mocker):
+    #     """Test the call to ScalingTransformer.check_numeric_columns."""
+    #     df = d.create_df_2()
 
-        x.fit(df)
+    #     x = ScalingTransformer(columns=["a"], scaler_type="standard")
 
-        expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
+    #     x.fit(df)
 
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-            return_value=d.create_df_2(),
-        ):
-            x.transform(df)
+    #     expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
+
+    #     with ta.functions.assert_function_call(
+    #         mocker,
+    #         tubular.base.BaseTransformer,
+    #         "transform",
+    #         expected_call_args,
+    #         return_value=d.create_df_2(),
+    #     ):
+    #         x.transform(df)
 
     @pytest.mark.parametrize(
         ("scaler_type", "scaler_type_str"),
