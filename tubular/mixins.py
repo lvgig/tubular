@@ -4,6 +4,31 @@ import numpy as np
 import pandas as pd
 
 
+class CheckNumericMixin:
+    def check_numeric_columns(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Helper function for checking column args are numeric for numeric transformers.
+
+        Args:
+        ----
+            X (pd.DataFrame): Data containing columns to check.
+
+        """
+        numeric_column_types = X[self.columns].apply(
+            pd.api.types.is_numeric_dtype,
+            axis=0,
+        )
+
+        if not numeric_column_types.all():
+            non_numeric_columns = list(
+                numeric_column_types.loc[~numeric_column_types].index,
+            )
+
+            msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
+            raise TypeError(msg)
+
+        return X
+
+
 class DropOriginalMixin:
     """Mixin class to validate and apply 'drop_original' argument used by various transformers.
 
