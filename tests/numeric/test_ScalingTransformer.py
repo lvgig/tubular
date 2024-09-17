@@ -34,18 +34,6 @@ class TestFit(BaseNumericTransformerFitTests):
         cls.transformer_name = "ScalingTransformer"
         cls.scaler_type = "standard"
 
-    def test_non_numeric_exception_raised(self):
-        """Test that an exception is raised when non-numeric data is passed to fit."""
-        df = pd.DataFrame({"a": ["non-numeric", 1, 2]})
-
-        transformer = ScalingTransformer(columns=["a"], scaler_type="standard")
-
-        with pytest.raises(
-            TypeError,
-            match=rf"{self.transformer_name}: The following columns are not numeric in X; \['a'\]",
-        ):
-            transformer.fit(df)
-
 
 class TestTransform(BaseNumericTransformerTransformTests):
     """Tests for ScalingTransformer.transform()"""
