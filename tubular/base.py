@@ -10,8 +10,7 @@ import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
-from tubular._version import __version__
-from tubular.mixins import BaseDropOriginalMixin
+from tubular.mixins import DropOriginalMixin
 
 pd.options.mode.copy_on_write = True
 
@@ -46,9 +45,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
     verbose : bool
         Print statements to show which methods are being run or not.
 
-    version_ : str
-        Version number (__version__ attribute from _version.py).
-
     """
 
     def classname(self) -> str:
@@ -61,8 +57,6 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         copy: bool | None = None,
         verbose: bool = False,
     ) -> None:
-        self.version_ = __version__
-
         if not isinstance(verbose, bool):
             msg = f"{self.classname()}: verbose must be a bool"
             raise TypeError(msg)
@@ -241,50 +235,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
                 raise ValueError(f"{self.classname()}: variable " + c + " is not in X")
 
 
-class BaseTwoColumnTransformer(BaseTransformer):
-    """Transformer that takes a list of two columns as an argument, as well as new_column_name
-
-    Inherits from BaseTransformer, all current transformers that use this argument also output a new column
-    Inherits fit and transform methods from BaseTransformer (required by sklearn transformers), simple input checking
-    and functionality to copy X prior to transform.
-
-    Parameters
-    ----------
-    columns : list
-        Column pair to apply the transformer to, must be list, cannot be None
-
-    new_col_name : str
-        Name of new column being created, must be str, cannot be None
-
-    **kwargs
-        Arbitrary keyword arguments passed onto BaseTransformer.__init__().
-
-    """
-
-    def __init__(
-        self,
-        columns: list[str],
-        new_col_name: str,
-        **kwargs: dict[str, bool],
-    ) -> None:
-        super().__init__(columns=columns, **kwargs)
-
-        if not (isinstance(columns, list)):
-            msg = f"{self.classname()}: columns should be list"
-            raise TypeError(msg)
-
-        if len(columns) != 2:
-            msg = f"{self.classname()}: This transformer works with two columns only"
-            raise ValueError(msg)
-
-        if not (isinstance(new_col_name, str)):
-            msg = f"{self.classname()}: new_col_name should be str"
-            raise TypeError(msg)
-
-        self.new_col_name = new_col_name
-
-
-class DataFrameMethodTransformer(BaseDropOriginalMixin, BaseTransformer):
+class DataFrameMethodTransformer(DropOriginalMixin, BaseTransformer):
 
     """Tranformer that applies a pandas.DataFrame method.
 
@@ -374,7 +325,7 @@ class DataFrameMethodTransformer(BaseDropOriginalMixin, BaseTransformer):
         self.pd_method_name = pd_method_name
         self.pd_method_kwargs = pd_method_kwargs
 
-        BaseDropOriginalMixin.set_drop_original_column(self, drop_original)
+        DropOriginalMixin.set_drop_original_column(self, drop_original)
 
         try:
             df = pd.DataFrame()
@@ -409,7 +360,7 @@ class DataFrameMethodTransformer(BaseDropOriginalMixin, BaseTransformer):
         )
 
         # Drop original columns if self.drop_original is True
-        BaseDropOriginalMixin.drop_original_column(
+        DropOriginalMixin.drop_original_column(
             self,
             X,
             self.drop_original,

@@ -1,17 +1,24 @@
 from tests.base_tests import (
+    DropOriginalInitMixinTests,
     GenericFitTests,
     GenericTransformTests,
+    NewColumnNameInitMixintests,
     OtherBaseBehaviourTests,
     TwoColumnListInitTests,
 )
+from tests.dates.test_BaseDateTransformer import DatesMixinTransformTests
 
 
-class TestInit(TwoColumnListInitTests):
+class TestInit(
+    NewColumnNameInitMixintests,
+    DropOriginalInitMixinTests,
+    TwoColumnListInitTests,
+):
     """Generic tests for transformer.init()."""
 
     @classmethod
     def setup_class(cls):
-        cls.transformer_name = "BaseTwoColumnTransformer"
+        cls.transformer_name = "BaseDateTwoColumnTransformer"
 
 
 class TestFit(GenericFitTests):
@@ -19,13 +26,15 @@ class TestFit(GenericFitTests):
 
     @classmethod
     def setup_class(cls):
-        cls.transformer_name = "BaseTwoColumnTransformer"
+        cls.transformer_name = "BaseDateTwoColumnTransformer"
 
 
-class TestTransform(GenericTransformTests):
+class TestTransform(GenericTransformTests, DatesMixinTransformTests):
+    """Tests for BaseTwoColumnDateTransformer.transform."""
+
     @classmethod
     def setup_class(cls):
-        cls.transformer_name = "BaseTwoColumnTransformer"
+        cls.transformer_name = "BaseDateTwoColumnTransformer"
 
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
@@ -37,4 +46,4 @@ class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
 
     @classmethod
     def setup_class(cls):
-        cls.transformer_name = "BaseTwoColumnTransformer"
+        cls.transformer_name = "BaseDateTwoColumnTransformer"

@@ -144,6 +144,66 @@ class DropOriginalInitMixinTests:
             uninitialized_transformers[self.transformer_name](**args)
 
 
+class NewColumnNameInitMixintests:
+    """
+    Tests for BaseTransformer.init() behaviour specific to when a transformer accepts a "new_column_name" column.
+    Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
+    """
+
+    @pytest.mark.parametrize(
+        "new_column_type",
+        [1, True, {"a": 1}, [1, 2], None, np.inf, np.nan],
+    )
+    def test_new_column_name_type_error(
+        self,
+        new_column_type,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test an error is raised if any type other than str passed to new_column_name"""
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["new_column_name"] = new_column_type
+
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                f"{self.transformer_name}: new_column_name should be str",
+            ),
+        ):
+            uninitialized_transformers[self.transformer_name](**args)
+
+
+class SeparatorInitMixintests:
+    """
+    Tests for BaseTransformer.init() behaviour specific to when a transformer accepts a "separator" column.
+    Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
+    """
+
+    @pytest.mark.parametrize(
+        "separator",
+        [1, True, {"a": 1}, [1, 2], None, np.inf, np.nan],
+    )
+    def test_separator_type_error(
+        self,
+        separator,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+    ):
+        """Test an error is raised if any type other than str passed to separator"""
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["separator"] = separator
+
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                f"{self.transformer_name}: separator should be str",
+            ),
+        ):
+            uninitialized_transformers[self.transformer_name](**args)
+
+
 class WeightColumnInitMixinTests:
     """
     Tests for BaseTransformer.init() behaviour specific to when a transformer takes accepts a weight column.
@@ -181,7 +241,7 @@ class TwoColumnListInitTests(ColumnStrListInitTests):
         minimal_attribute_dict,
         uninitialized_transformers,
     ):
-        """Test an error is raised if columns is not passed as a string not a list."""
+        """Test an error is raised if columns is passed as a string not a list."""
 
         args = minimal_attribute_dict[self.transformer_name].copy()
         args["columns"] = non_list
@@ -214,29 +274,6 @@ class TwoColumnListInitTests(ColumnStrListInitTests):
         ):
             uninitialized_transformers[self.transformer_name](**args)
 
-    @pytest.mark.parametrize(
-        "new_column_type",
-        [1, True, {"a": 1}, [1, 2], None, np.inf, np.nan],
-    )
-    def test_new_column_name_type_error(
-        self,
-        new_column_type,
-        minimal_attribute_dict,
-        uninitialized_transformers,
-    ):
-        """Test an error is raised if any type other than str passed to new_column_name"""
-
-        args = minimal_attribute_dict[self.transformer_name].copy()
-        args["new_col_name"] = new_column_type
-
-        with pytest.raises(
-            TypeError,
-            match=re.escape(
-                f"{self.transformer_name}: new_col_name should be str",
-            ),
-        ):
-            uninitialized_transformers[self.transformer_name](**args)
-
 
 class GenericFitTests:
     """
@@ -255,7 +292,7 @@ class GenericFitTests:
 
         x = initialized_transformers[self.transformer_name]
 
-        x_fitted = x.fit(df, df["c"])
+        x_fitted = x.fit(df, df["a"])
 
         assert (
             x_fitted is x
@@ -273,7 +310,7 @@ class GenericFitTests:
 
         x = initialized_transformers[self.transformer_name]
 
-        x.fit(df)
+        x.fit(df, df["a"])
 
         ta.equality.assert_equal_dispatch(
             expected=original_df,
@@ -369,6 +406,28 @@ class GenericFitTests:
             )
 
 
+class CheckNumericFitMixinTests:
+    """
+    Tests for BaseTransformer.init() behaviour specific to when a transformer used.
+    Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
+    """
+
+    def test_exception_raised(self, initialized_transformers, minimal_dataframe_lookup):
+        """Test an exception is raised if non numeric columns are passed in X."""
+        df = minimal_dataframe_lookup[self.transformer_name]
+        df["a"] = "string"
+
+        x = initialized_transformers[self.transformer_name]
+
+        with pytest.raises(
+            TypeError,
+            match=re.escape(
+                f"{self.transformer_name}: The following columns are not numeric in X; ['a']",
+            ),
+        ):
+            x.fit(df)
+
+
 class WeightColumnFitMixinTests:
     def test_fit_returns_self_weighted(
         self,
@@ -386,7 +445,7 @@ class WeightColumnFitMixinTests:
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
-        x_fitted = transformer.fit(df)
+        x_fitted = transformer.fit(df, df["a"])
 
         assert (
             x_fitted is transformer
@@ -411,7 +470,7 @@ class WeightColumnFitMixinTests:
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
-        transformer.fit(df)
+        transformer.fit(df, df["a"])
         ta.equality.assert_equal_dispatch(
             expected=original_df,
             actual=df,
@@ -449,7 +508,7 @@ class WeightColumnFitMixinTests:
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
         with pytest.raises(ValueError, match=expected_message):
-            transformer.fit(df)
+            transformer.fit(df, df["a"])
 
     def get_df_error_combos():
         return [
@@ -489,7 +548,7 @@ class WeightColumnFitMixinTests:
             args["weights_column"] = weight_column
 
             transformer = uninitialized_transformers[self.transformer_name](**args)
-            transformer.fit(df)
+            transformer.fit(df, df["a"])
 
     def test_weight_not_in_X_error(
         self,
@@ -514,7 +573,7 @@ class WeightColumnFitMixinTests:
             args["weights_column"] = weight_column
 
             transformer = uninitialized_transformers[self.transformer_name](**args)
-            transformer.fit(df)
+            transformer.fit(df, df["a"])
 
     def test_zero_total_weight_error(
         self,
@@ -536,7 +595,7 @@ class WeightColumnFitMixinTests:
             ValueError,
             match="total sample weights are not greater than 0",
         ):
-            transformer.fit(df)
+            transformer.fit(df, df["a"])
 
 
 class GenericTransformTests:
@@ -558,7 +617,7 @@ class GenericTransformTests:
 
         x = initialized_transformers[self.transformer_name]
 
-        x_fitted = x.fit(df, df["c"])
+        x_fitted = x.fit(df, df["a"])
 
         with pytest.raises(
             TypeError,
@@ -573,7 +632,7 @@ class GenericTransformTests:
 
         x = initialized_transformers[self.transformer_name]
 
-        x = x.fit(df, df["c"])
+        x = x.fit(df, df["a"])
 
         df = df.head(0)
 
@@ -595,7 +654,7 @@ class GenericTransformTests:
 
         x = initialized_transformers[self.transformer_name]
 
-        x = x.fit(df, df["c"])
+        x = x.fit(df, df["a"])
 
         _ = x.transform(df)
 
@@ -659,7 +718,7 @@ class DropOriginalTransformMixinTests:
 
         x = initialized_transformers[self.transformer_name]
 
-        x.columns = ["a"]
+        other_columns = list(set(df.columns) - set(x.columns))
         x.drop_original = True
 
         x.fit(df)
@@ -667,8 +726,8 @@ class DropOriginalTransformMixinTests:
         df_transformed = x.transform(df)
 
         ta.equality.assert_equal_dispatch(
-            expected=df[["b", "c"]],
-            actual=df_transformed[["b", "c"]],
+            expected=df[other_columns],
+            actual=df_transformed[other_columns],
             msg=f"{self.transformer_name}.transform has changed other columns unexpectedly",
         )
 

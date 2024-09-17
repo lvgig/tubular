@@ -13,7 +13,12 @@ from sklearn.preprocessing import (
 )
 
 from tubular.base import BaseTransformer, DataFrameMethodTransformer
-from tubular.mixins import BaseDropOriginalMixin
+from tubular.mixins import (
+    CheckNumericMixin,
+    DropOriginalMixin,
+    NewColumnNameMixin,
+    TwoColumnMixin,
+)
 
 
 class BaseNumericTransformer(BaseTransformer):
@@ -109,7 +114,7 @@ class BaseNumericTransformer(BaseTransformer):
         return X
 
 
-class LogTransformer(BaseNumericTransformer, BaseDropOriginalMixin):
+class LogTransformer(BaseNumericTransformer, DropOriginalMixin):
     """Transformer to apply log transformation.
 
     Transformer has the option to add 1 to the columns to log and drop the
@@ -314,7 +319,11 @@ class CutTransformer(BaseTransformer):
         return X
 
 
-class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
+class TwoColumnOperatorTransformer(
+    NewColumnNameMixin,
+    TwoColumnMixin,
+    DataFrameMethodTransformer,
+):
     """This transformer applies a pandas.DataFrame method to two columns (add, sub, mul, div, mod, pow).
 
     Transformer assigns the output of the method to a new column. The method will be applied
@@ -380,16 +389,9 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
                 msg = f"{self.classname()}: pd_method_kwargs 'axis' must be 0 or 1"
                 raise ValueError(msg)
 
-        if type(columns) is not list:
-            msg = f"{self.classname()}: columns must be a list containing two column names but got {columns}"
-            raise TypeError(msg)
-
-        if len(columns) != 2:
-            msg = f"{self.classname()}: columns must be a list containing two column names but got {columns}"
-            raise ValueError(msg)
-
-        self.column1_name = columns[0]
-        self.column2_name = columns[1]
+        # check_and_set_new_column_name function needs to be called before calling DataFrameMethodTransformer.__init__
+        # DFTransformer uses 'new_column_names' not 'new_column_name' so generic tests fail on regex if not ordered in this way
+        self.check_and_set_new_column_name(new_column_name)
 
         # call DataFrameMethodTransformer.__init__
         # This class will inherit all the below attributes from DataFrameMethodTransformer
@@ -400,6 +402,10 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
             pd_method_kwargs=pd_method_kwargs,
             **kwargs,
         )
+
+        self.check_two_columns(columns)
+        self.column1_name = columns[0]
+        self.column2_name = columns[1]
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform input data by applying the chosen method to the two specified columns.
@@ -412,7 +418,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         -------
             pd.DataFrame: Input X with an additional column.
         """
-        # call BaseTransformer.transform
+        # call DataFrameMethodTransformer.transform
         X = super(DataFrameMethodTransformer, self).transform(X)
 
         is_numeric = X[self.columns].apply(pd.api.types.is_numeric_dtype, axis=0)
@@ -421,7 +427,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
             msg = f"{self.classname()}: input columns in X must contain only numeric values"
             raise TypeError(msg)
 
-        X[self.new_column_names] = getattr(X[[self.column1_name]], self.pd_method_name)(
+        X[self.new_column_name] = getattr(X[[self.column1_name]], self.pd_method_name)(
             X[self.column2_name],
             **self.pd_method_kwargs,
         )
@@ -531,7 +537,7 @@ class ScalingTransformer(BaseNumericTransformer):
         return X
 
 
-class InteractionTransformer(BaseTransformer):
+class InteractionTransformer(BaseNumericTransformer):
     """Transformer that generates interaction features.
     Transformer generates a new column  for all combinations from the selected columns up to the maximum degree
     provided. (For sklearn version higher than 1.0.0>, only interaction of a degree higher or equal to the minimum
@@ -679,7 +685,7 @@ class InteractionTransformer(BaseTransformer):
         return X
 
 
-class PCATransformer(BaseTransformer):
+class PCATransformer(CheckNumericMixin, BaseTransformer):
     """Transformer that generates variables using Principal component analysis (PCA).
     Linear dimensionality reduction using Singular Value Decomposition of the
     data to project it to a lower dimensional space.
@@ -816,30 +822,6 @@ class PCATransformer(BaseTransformer):
         self.feature_names_out = None
         self.n_components_ = None
 
-    def check_numeric_columns(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Method to check all columns (specicifed in self.columns) in X are all numeric.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            Data containing columns to check.
-
-        """
-        numeric_column_types = X[self.columns].apply(
-            pd.api.types.is_numeric_dtype,
-            axis=0,
-        )
-
-        if not numeric_column_types.all():
-            non_numeric_columns = list(
-                numeric_column_types.loc[~numeric_column_types].index,
-            )
-
-            msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
-            raise TypeError(msg)
-
-        return X
-
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Fit PCA to input data.
 
@@ -854,7 +836,7 @@ class PCATransformer(BaseTransformer):
         """
         super().fit(X, y)
 
-        X = self.check_numeric_columns(X)
+        X = CheckNumericMixin.check_numeric_columns(self, X)
 
         if self.n_components != "mle":
             if 0 < self.n_components <= min(X[self.columns].shape):
@@ -886,7 +868,7 @@ class PCATransformer(BaseTransformer):
             running the  product pandas DataFrame method on identified combinations.
         """
         X = super().transform(X)
-        X = self.check_numeric_columns(X)
+        X = CheckNumericMixin.check_numeric_columns(self, X)
         X[self.feature_names_out] = self.pca.transform(X[self.columns])
 
         return X

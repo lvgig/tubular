@@ -16,17 +16,37 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
-1.3.1 (unreleased)
+1.3.2 (unreleased)
 ------------------
 
+Changed
+^^^^^^^
+
+- Refactored BaseDateTransformer, BaseDateTwoColumnTransformer and associated testing  `#273 <https://github.com/lvgig/tubular/pull/273>`_
+- BaseTwoColumnTransformer removed in favour of mixin classes TwoColumnMixin and NewColumnNameMixin to handle validation of two columns and new_column_name arguments `#273 <https://github.com/lvgig/tubular/pull/273>`_
+- Refactored tests for InteractionTransformer  `#283 <https://github.com/lvgig/tubular/pull/283>`_
+- Refactored tests for StringConcatenator and SeriesStrMethodTransformer, added separator mixin class. `#286 <https://github.com/lvgig/tubular/pull/286>`_
+- Refactored MeanResponseTransformer tests in new format `#262 <https://github.com/lvgig/tubular/pull/262>`_
+- refactored build tools and package config into pyproject.toml `#271 <https://github.com/lvgig/tubular/pull/271>`_
+- set up automatic versioning using setuptools-scm `#271 <https://github.com/lvgig/tubular/pull/271>`_
+- Refactored TwoColumnOperatorTransformer tests in new format `#274 <https://github.com/lvgig/tubular/issues/274>`_
+- Refactored PCATransformer tests in new format `#277 <https://github.com/lvgig/tubular/issues/277>`_
+- Refactored tests for NullIndicator `#301 <https://github.com/lvgig/tubular/issues/301>`_
+- Refactored BetweenDatesTransformer tests in new format `#294 <https://github.com/lvgig/tubular/issues/294>`_
+- As part of above, edited dates file transformers to use BaseDropOriginalMixin in transform
+
+
+1.3.1 (2024-07-18)
+------------------
 Changed
 ^^^^^^^
 
 - Refactored NominalToIntegerTransformer tests in new format `#261 <https://github.com/lvgig/tubular/pull/261>`_
 - Refactored GroupRareLevelsTransformer tests in new format `#259 <https://github.com/lvgig/tubular/pull/259>`_
 - DatetimeInfoExtractor.mappings_provided changed from a dict.keys() object to list so transformer is serialisable. `#258 <https://github.com/lvgig/tubular/pull/258>`_
-- Created BaseNumericTransformer class to support test refactor of numeric file
-- Updated testing approach for LogTransformer
+- Created BaseNumericTransformer class to support test refactor of numeric file `#266 <https://github.com/lvgig/tubular/pull/266>`_
+- Updated testing approach for LogTransformer `#268 <https://github.com/lvgig/tubular/pull/268>`_
+
 
 1.3.0 (2024-06-13)
 ------------------

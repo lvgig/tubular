@@ -33,8 +33,7 @@ class GenericImputerTransformTests:
         df = d.create_df_1()
 
         transformer = initialized_transformers[self.transformer_name]
-        transformer.impute_values_ = {"a": 1}
-
+        transformer.impute_values_ = {"b": 1}
         impute_values = deepcopy(transformer.impute_values_)
 
         transformer.transform(df)
@@ -156,7 +155,7 @@ class GenericImputerTransformTestsWeight:
         """Expected output for test_nulls_imputed_correctly_weights."""
         df = d.create_df_9()
 
-        for col in ["a"]:
+        for col in ["b"]:
             df.loc[df[col].isna(), col] = 4
 
         return df
@@ -182,7 +181,7 @@ class GenericImputerTransformTestsWeight:
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
         # set the impute values dict directly rather than fitting x on df so test works with helpers
-        transformer.impute_values_ = {"a": 4}
+        transformer.impute_values_ = {"b": 4}
 
         df_transformed = transformer.transform(df)
 

@@ -9,11 +9,12 @@ import numpy as np
 import pandas as pd
 
 from tubular.base import BaseTransformer
+from tubular.mixins import DropOriginalMixin, NewColumnNameMixin, TwoColumnMixin
 
 
-class BaseDateTransformer(BaseTransformer):
+class BaseDateTransformer(NewColumnNameMixin, DropOriginalMixin, BaseTransformer):
     """
-    Extends BaseTransformer for datetime scenarios.
+    Extends BaseTransformer for datetime scenarios
 
     Parameters
     ----------
@@ -28,39 +29,19 @@ class BaseDateTransformer(BaseTransformer):
 
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
-
-    Attributes
-    ----------
-    columns : List[str]
-        List of 2 columns. First column will be subtracted from second.
-
-    new_column_name : str
-        Name for the new year column.
-
-    drop_original : bool
-        Flag for whether to drop the original columns.
-
     """
 
     def __init__(
         self,
-        columns: list,
-        new_column_name: str,
+        columns: list[str],
+        new_column_name: str | None = None,
         drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
-        if not (isinstance(new_column_name, str)):
-            msg = f"{self.classname()}: new_column_name should be str"
-            raise TypeError(msg)
-
-        if not (isinstance(drop_original, bool)):
-            msg = f"{self.classname()}: drop_original should be bool"
-            raise TypeError(msg)
-
-        self.new_column_name = new_column_name
-        self.drop_original = drop_original
+        self.set_drop_original_column(drop_original)
+        self.check_and_set_new_column_name(new_column_name)
 
     def check_columns_are_date_or_datetime(
         self,
@@ -141,14 +122,18 @@ class BaseDateTransformer(BaseTransformer):
         return X
 
 
-class BaseDateTwoColumnTransformer(BaseDateTransformer):
-    """
-    Extends BaseDateTransformer for 2 column scenarios
+class BaseDateTwoColumnTransformer(
+    TwoColumnMixin,
+    BaseDateTransformer,
+):
+
+    """Extends BaseDateTransformer for transformers which accept exactly two columns
 
     Parameters
     ----------
-    columns : List[str]
-        List of 2 columns. First column will be subtracted from second.
+    columns : list
+        Either a list of str values or a string giving which columns in a input pandas.DataFrame the transformer
+        will be applied to.
 
     new_column_name : str
         Name for the new year column.
@@ -159,23 +144,12 @@ class BaseDateTwoColumnTransformer(BaseDateTransformer):
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
 
-    Attributes
-    ----------
-    columns : List[str]
-        List of 2 columns. First column will be subtracted from second.
-
-    new_column_name : str
-        Name for the new year column.
-
-    drop_original : bool
-        Flag for whether to drop the original columns.
-
     """
 
     def __init__(
         self,
-        columns: list,
-        new_column_name: str,
+        columns: list[str],
+        new_column_name: str | None = None,
         drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
@@ -186,9 +160,7 @@ class BaseDateTwoColumnTransformer(BaseDateTransformer):
             **kwargs,
         )
 
-        if len(columns) != 2:
-            msg = f"{self.classname()}: This transformer works with two columns only"
-            raise ValueError(msg)
+        self.check_two_columns(columns)
 
 
 class DateDiffLeapYearTransformer(BaseDateTwoColumnTransformer):
@@ -319,9 +291,13 @@ class DateDiffLeapYearTransformer(BaseDateTwoColumnTransformer):
 
         X[self.new_column_name] = X.apply(self.calculate_age, axis=1)
 
-        if self.drop_original:
-            for col in self.columns:
-                del X[col]
+        # Drop original columns if self.drop_original is True
+        DropOriginalMixin.drop_original_column(
+            self,
+            X,
+            self.drop_original,
+            self.columns,
+        )
 
         return X
 
@@ -402,9 +378,13 @@ class DateDifferenceTransformer(BaseDateTwoColumnTransformer):
             X[self.columns[1]] - X[self.columns[0]]
         ) / np.timedelta64(1, self.units)
 
-        if self.drop_original:
-            for col in self.columns:
-                del X[col]
+        # Drop original columns if self.drop_original is True
+        DropOriginalMixin.drop_original_column(
+            self,
+            X,
+            self.drop_original,
+            self.columns,
+        )
 
         return X
 
@@ -484,9 +464,13 @@ class ToDatetimeTransformer(BaseDateTransformer):
             **self.to_datetime_kwargs,
         )
 
-        if self.drop_original:
-            for col in self.columns:
-                del X[col]
+        # Drop original columns if self.drop_original is True
+        DropOriginalMixin.drop_original_column(
+            self,
+            X,
+            self.drop_original,
+            self.columns,
+        )
 
         return X
 
@@ -643,9 +627,13 @@ class SeriesDtMethodTransformer(BaseDateTransformer):
                 self.pd_method_name,
             )
 
-        if self.drop_original:
-            for col in self.columns:
-                del X[col]
+        # Drop original columns if self.drop_original is True
+        DropOriginalMixin.drop_original_column(
+            self,
+            X,
+            self.drop_original,
+            self.columns,
+        )
 
         return X
 
@@ -787,9 +775,13 @@ class BetweenDatesTransformer(BaseDateTransformer):
 
         X[self.new_column_name] = lower_comparison & upper_comparison
 
-        if self.drop_original:
-            for col in self.columns:
-                del X[col]
+        # Drop original columns if self.drop_original is True
+        DropOriginalMixin.drop_original_column(
+            self,
+            X,
+            self.drop_original,
+            self.columns,
+        )
 
         return X
 
@@ -1060,9 +1052,13 @@ class DatetimeInfoExtractor(BaseDateTransformer):
                     include_option=include_option,
                 )
 
-        if self.drop_original:
-            for col in self.columns:
-                del X[col]
+        # Drop original columns if self.drop_original is True
+        DropOriginalMixin.drop_original_column(
+            self,
+            X,
+            self.drop_original,
+            self.columns,
+        )
 
         return X
 
@@ -1264,8 +1260,12 @@ class DatetimeSinusoidCalculator(BaseDateTransformer):
                     column_in_desired_unit * (2.0 * np.pi / desired_period),
                 )
 
-        if self.drop_original:
-            for col in self.columns:
-                del X[col]
+        # Drop original columns if self.drop_original is True
+        DropOriginalMixin.drop_original_column(
+            self,
+            X,
+            self.drop_original,
+            self.columns,
+        )
 
         return X

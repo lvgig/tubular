@@ -1,5 +1,3 @@
-import copy
-
 import numpy as np
 import pytest
 import test_aide as ta
@@ -31,43 +29,6 @@ class TestFit(GenericFitTests):
     def setup_class(cls):
         cls.transformer_name = "NearestMeanResponseImputer"
 
-    def test_fit_passed_series(
-        self,
-        initialized_transformers,
-        minimal_dataframe_lookup,
-    ):
-        """Test fit is passed a series as y argument."""
-
-        df = minimal_dataframe_lookup[self.transformer_name]
-
-        x = initialized_transformers[self.transformer_name]
-
-        with pytest.raises(
-            TypeError,
-            match="unexpected type for y, should be a pd.Series",
-        ):
-            x.fit(df)(columns=["c"], separator=333)
-
-    def test_fit_not_changing_data(
-        self,
-        initialized_transformers,
-        minimal_dataframe_lookup,
-    ):
-        """Test fit does not change X."""
-
-        df = minimal_dataframe_lookup[self.transformer_name]
-        original_df = copy.deepcopy(df)
-
-        x = initialized_transformers[self.transformer_name]
-
-        x.fit(df, df["c"])
-
-        ta.equality.assert_equal_dispatch(
-            expected=original_df,
-            actual=df,
-            msg="Check X not changing during fit",
-        )
-
     def test_null_values_in_response_error(self):
         """Test an error is raised if the response column contains null entries."""
         df = d.create_df_3()
@@ -78,17 +39,17 @@ class TestFit(GenericFitTests):
             ValueError,
             match="NearestMeanResponseImputer: y has 1 null values",
         ):
-            x.fit(df, df["c"])
+            x.fit(df, df["a"])
 
     def test_columns_with_no_nulls_error(self):
         """Test an error is raised if a non-response column contains no nulls."""
         df = d.create_numeric_df_1()
 
-        x = NearestMeanResponseImputer(columns=["a", "b"])
+        x = NearestMeanResponseImputer(columns=["b", "c"])
 
         with pytest.raises(
             ValueError,
-            match="NearestMeanResponseImputer: Column a has no missing values, cannot use this transformer.",
+            match="NearestMeanResponseImputer: Column b has no missing values, cannot use this transformer.",
         ):
             x.fit(df, df["c"])
 
@@ -96,14 +57,14 @@ class TestFit(GenericFitTests):
         """Test that the nearest response values learnt during fit are expected."""
         df = d.create_numeric_df_2()
 
-        x = NearestMeanResponseImputer(columns=["a", "b"])
+        x = NearestMeanResponseImputer(columns=["b", "c"])
 
-        x.fit(df, df["c"])
+        x.fit(df, df["a"])
 
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
-                "impute_values_": {"a": np.float64(2), "b": np.float64(3)},
+                "impute_values_": {"b": np.float64(3), "c": np.float64(2)},
             },
             msg="impute_values_ attribute",
         )

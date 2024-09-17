@@ -97,7 +97,7 @@ def minimal_attribute_dict():
     New transformers need to be added here"""
     return {
         "ArbitraryImputer": {
-            "columns": ["a"],
+            "columns": ["b"],
             "impute_value": 1,
         },
         "BaseCappingTransformer": {
@@ -120,7 +120,7 @@ def minimal_attribute_dict():
             "new_column_name": "bla",
         },
         "BaseImputer": {
-            "columns": ["a"],
+            "columns": ["b"],
         },
         "BaseMappingTransformer": {
             "mappings": {"a": {1: 2, 3: 4}},
@@ -136,10 +136,6 @@ def minimal_attribute_dict():
         },
         "BaseTransformer": {
             "columns": ["a"],
-        },
-        "BaseTwoColumnTransformer": {
-            "columns": ["a", "b"],
-            "new_col_name": "c",
         },
         "BetweenDatesTransformer": {
             "new_column_name": "c",
@@ -195,7 +191,7 @@ def minimal_attribute_dict():
         },
         "EqualityChecker": {
             "columns": ["a", "b"],
-            "new_col_name": "c",
+            "new_column_name": "c",
             "drop_original": True,
         },
         "GroupRareLevelsTransformer": {
@@ -211,19 +207,19 @@ def minimal_attribute_dict():
             "mappings": {"a": {1: 2, 3: 4}},
         },
         "MeanImputer": {
-            "columns": ["a"],
+            "columns": ["b"],
         },
         "MeanResponseTransformer": {
             "columns": ["b"],
         },
         "MedianImputer": {
-            "columns": ["a"],
+            "columns": ["b"],
         },
         "ModeImputer": {
-            "columns": ["a"],
+            "columns": ["b"],
         },
         "NearestMeanResponseImputer": {
-            "columns": ["a"],
+            "columns": ["b"],
         },
         "NominalToIntegerTransformer": {
             "columns": ["b"],
@@ -265,7 +261,8 @@ def minimal_attribute_dict():
         },
         "StringConcatenator": {
             "columns": ["a", "b"],
-            "new_column": "c",
+            "new_column_name": "c",
+            "separator": "-",
         },
         "ToDatetimeTransformer": {
             "new_column_name": "b",

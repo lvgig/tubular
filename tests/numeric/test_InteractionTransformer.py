@@ -1,66 +1,25 @@
-import contextlib
-import re
-
 import numpy as np
 import pandas as pd
 import pytest
 import test_aide as ta
 
 import tests.test_data as d
-import tubular
+from tests.numeric.test_BaseNumericTransformer import (
+    BaseNumericTransformerInitTests,
+    BaseNumericTransformerTransformTests,
+)
 from tubular.numeric import InteractionTransformer
 
 
-class TestInit:
+class TestInit(BaseNumericTransformerInitTests):
     """Tests for InteractionTransformer.init()."""
 
-    def test_super_init_called(self, mocker):
-        """Test that init calls BaseTransformer.init."""
-        expected_call_args = {
-            0: {
-                "args": (),
-                "kwargs": {"columns": ["b", "c"], "verbose": True},
-            },
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "__init__",
-            expected_call_args,
-        ), contextlib.suppress(AttributeError):
-            InteractionTransformer(
-                columns=["b", "c"],
-                min_degree=2,
-                max_degree=2,
-                verbose=True,
-            )
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "InteractionTransformer"
 
     def test_invalid_input_type_errors(self):
         """Test that an exceptions are raised for invalid input types."""
-        with pytest.raises(
-            TypeError,
-            match=re.escape(
-                "InteractionTransformer: columns must be a string or list with the columns to be pre-processed (if specified)",
-            ),
-        ):
-            InteractionTransformer(
-                columns=3.2,
-                min_degree=2,
-                max_degree=2,
-            )
-
-        with pytest.raises(
-            TypeError,
-            match=re.escape(
-                "InteractionTransformer: each element of columns should be a single (string) column name",
-            ),
-        ):
-            InteractionTransformer(
-                columns=["A", "B", 4],
-                min_degree=2,
-                max_degree=2,
-            )
 
         with pytest.raises(
             TypeError,
@@ -121,27 +80,13 @@ class TestInit:
                 max_degree=4,
             )
 
-    def test_attributes_set(self):
-        """Test that the values passed for columns, degrees are saved to attributes on the object."""
-        x = InteractionTransformer(
-            columns=["A", "B", "C"],
-            min_degree=2,
-            max_degree=3,
-        )
 
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "columns": ["A", "B", "C"],
-                "min_degree": 2,
-                "max_degree": 3,
-            },
-            msg="Attributes for InteractionTransformer set in init",
-        )
-
-
-class TestTransform:
+class TestTransform(BaseNumericTransformerTransformTests):
     """Tests for InteractionTransformer.transform()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "InteractionTransformer"
 
     def expected_df_1():
         """Expected output of test_expected_output_default_assignment."""
@@ -182,22 +127,6 @@ class TestTransform:
                 "a b": {0: 1.0, 1: 4.0, 2: 9.0, 3: np.nan, 4: 35.0, 5: 48.0, 6: np.nan},
             },
         )
-
-    def test_super_transform_called(self, mocker):
-        """Test that BaseTransformer.transform called."""
-        df = d.create_df_3()
-
-        x = InteractionTransformer(columns=["b", "c"])
-
-        expected_call_args = {0: {"args": (df.copy(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-        ):
-            x.transform(df)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
