@@ -243,7 +243,7 @@ def minimal_attribute_dict():
         },
         "ScalingTransformer": {
             "scaler_type": "standard",
-            "columns": ["a"],
+            "columns": ["a", "b"],
         },
         "SeriesDtMethodTransformer": {
             "new_column_name": "a",

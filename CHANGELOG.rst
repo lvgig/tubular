@@ -46,6 +46,7 @@ Changed
 - DatetimeInfoExtractor.mappings_provided changed from a dict.keys() object to list so transformer is serialisable. `#258 <https://github.com/lvgig/tubular/pull/258>`_
 - Created BaseNumericTransformer class to support test refactor of numeric file `#266 <https://github.com/lvgig/tubular/pull/266>`_
 - Updated testing approach for LogTransformer `#268 <https://github.com/lvgig/tubular/pull/268>`_
+- Refactored ScalingTransformer tests in new format `#284 <https://github.com/lvgig/tubular/pull/284>`_
 
 
 1.3.0 (2024-06-13)

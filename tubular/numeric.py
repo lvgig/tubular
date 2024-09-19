@@ -67,6 +67,8 @@ class BaseNumericTransformer(BaseTransformer):
             msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
             raise TypeError(msg)
 
+        return X
+
     def fit(
         self,
         X: pd.DataFrame,
@@ -433,7 +435,7 @@ class TwoColumnOperatorTransformer(
         return X
 
 
-class ScalingTransformer(CheckNumericMixin, BaseTransformer):
+class ScalingTransformer(BaseNumericTransformer):
     """Transformer to perform scaling of numeric columns.
 
     Transformer can apply min max scaling, max absolute scaling or standardisation (subtract mean and divide by std).
@@ -456,6 +458,13 @@ class ScalingTransformer(CheckNumericMixin, BaseTransformer):
 
     """
 
+    # Dictionary mapping scaler types to their corresponding sklearn classes
+    scaler_options = {
+        "min_max": MinMaxScaler,
+        "max_abs": MaxAbsScaler,
+        "standard": StandardScaler,
+    }
+
     def __init__(
         self,
         columns: str | list[str] | None,
@@ -465,31 +474,25 @@ class ScalingTransformer(CheckNumericMixin, BaseTransformer):
     ) -> None:
         if scaler_kwargs is None:
             scaler_kwargs = {}
-        else:
-            if type(scaler_kwargs) is not dict:
-                msg = f"{self.classname()}: scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
-                raise TypeError(msg)
+
+        # Validate scaler_kwargs type
+        if not isinstance(scaler_kwargs, dict):
+            msg = f"{self.classname()}: scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
+            raise TypeError(msg)
 
         for i, k in enumerate(scaler_kwargs.keys()):
-            if type(k) is not str:
+            if not isinstance(k, str):
                 msg = f"{self.classname()}: unexpected type ({type(k)}) for scaler_kwargs key in position {i}, must be str"
                 raise TypeError(msg)
 
-        allowed_scaler_values = ["min_max", "max_abs", "standard"]
-
-        if scaler_type not in allowed_scaler_values:
+        # Validate scaler_type
+        if scaler_type not in self.scaler_options:
+            allowed_scaler_values = list(self.scaler_options.keys())
             msg = f"{self.classname()}: scaler_type should be one of; {allowed_scaler_values}"
             raise ValueError(msg)
 
-        if scaler_type == "min_max":
-            self.scaler = MinMaxScaler(**scaler_kwargs)
-
-        elif scaler_type == "max_abs":
-            self.scaler = MaxAbsScaler(**scaler_kwargs)
-
-        elif scaler_type == "standard":
-            self.scaler = StandardScaler(**scaler_kwargs)
-
+        # Initialize scaler using the dictionary
+        self.scaler = self.scaler_options[scaler_type](**scaler_kwargs)
         # This attribute is not for use in any method
         # Here only as a fix to allow string representation of transformer.
         self.scaler_kwargs = scaler_kwargs
@@ -497,7 +500,7 @@ class ScalingTransformer(CheckNumericMixin, BaseTransformer):
 
         super().__init__(columns=columns, **kwargs)
 
-    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
+    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> ScalingTransformer:
         """Fit scaler to input data.
 
         Parameters
@@ -510,11 +513,7 @@ class ScalingTransformer(CheckNumericMixin, BaseTransformer):
 
         """
         super().fit(X, y)
-
-        X = CheckNumericMixin.check_numeric_columns(self, X)
-
         self.scaler.fit(X[self.columns])
-
         return self
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -532,8 +531,6 @@ class ScalingTransformer(CheckNumericMixin, BaseTransformer):
 
         """
         X = super().transform(X)
-
-        X = CheckNumericMixin.check_numeric_columns(self, X)
 
         X[self.columns] = self.scaler.transform(X[self.columns])
 
