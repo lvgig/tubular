@@ -1,398 +1,107 @@
 import pandas as pd
 import pytest
-import test_aide as ta
-from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler, StandardScaler
 
-import tests.test_data as d
-import tubular
+from tests.numeric.test_BaseNumericTransformer import (
+    BaseNumericTransformerFitTests,
+    BaseNumericTransformerInitTests,
+    BaseNumericTransformerTransformTests,
+)
 from tubular.numeric import ScalingTransformer
 
 
-class TestInit:
-    """Tests for ScalingTransformer.init()."""
+class TestInit(BaseNumericTransformerInitTests):
+    """Tests for ScalingTransformer.__init__()"""
 
-    def test_to_scaler_kwargs_type_error(self):
-        """Test that an exception is raised if scaler_kwargs is not a dict."""
-        with pytest.raises(
-            TypeError,
-            match=r"""ScalingTransformer: scaler_kwargs should be a dict but got type \<class 'int'\>""",
-        ):
-            ScalingTransformer(columns="b", scaler_type="standard", scaler_kwargs=1)
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "ScalingTransformer"
+        cls.scaler_type = "min_max"
 
-    def test_scaler_kwargs_key_type_error(self):
-        """Test that an exception is raised if scaler_kwargs has keys which are not str."""
-        with pytest.raises(
-            TypeError,
-            match=r"""ScalingTransformer: unexpected type \(\<class 'int'\>\) for scaler_kwargs key in position 1, must be str""",
-        ):
-            ScalingTransformer(
-                columns="b",
-                scaler_type="standard",
-                scaler_kwargs={"a": 1, 2: "b"},
-            )
-
-    def test_to_scaler_non_allowed_value_error(self):
-        """Test that an exception is raised if scaler_type is not one of the allowed values."""
+    def test_invalid_scaler_type(self):
+        """Test that an exception is raised for an invalid scaler type."""
         with pytest.raises(
             ValueError,
-            match=r"""ScalingTransformer: scaler_type should be one of; \['min_max', 'max_abs', 'standard'\]""",
+            match=r"ScalingTransformer: scaler_type should be one of; \['min_max', 'max_abs', 'standard'\]",
         ):
-            ScalingTransformer(columns="b", scaler_type="zzz", scaler_kwargs={"a": 1})
+            ScalingTransformer(columns=["a"], scaler_type="invalid_scaler")
 
-    @pytest.mark.parametrize(
-        ("scaler_type", "scaler_actual"),
-        [
-            ("min_max", MinMaxScaler),
-            ("max_abs", MaxAbsScaler),
-            ("standard", StandardScaler),
-        ],
-    )
-    def test_scaler_attribute_type(self, scaler_type, scaler_actual):
-        """Test that the scaler attribute is set to the correct type given what is passed when initialising the transformer."""
-        x = ScalingTransformer(columns="b", scaler_type=scaler_type)
 
-        assert (
-            type(x.scaler) is scaler_actual
-        ), f"unexpected scaler_type set in init for {scaler_type}"
+class TestFit(BaseNumericTransformerFitTests):
+    """Tests for ScalingTransformer.fit()"""
 
-    @pytest.mark.parametrize(
-        ("scaler_type", "scaler_type_str", "scaler_kwargs_value"),
-        [
-            ("min_max", "MinMaxScaler", {"feature_range": (0.5, 1.5)}),
-            ("max_abs", "MaxAbsScaler", {}),
-            (
-                "standard",
-                "StandardScaler",
-                {"with_mean": True, "with_std": True},
-            ),
-        ],
-    )
-    def test_scaler_initialised_with_scaler_kwargs(
-        self,
-        mocker,
-        scaler_type,
-        scaler_type_str,
-        scaler_kwargs_value,
-    ):
-        """Test that the scaler_type is initialised with the scaler_kwargs arguments."""
-        mocked = mocker.patch(
-            f"sklearn.preprocessing.{scaler_type_str}.__init__",
-            return_value=None,
-        )
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "ScalingTransformer"
+        cls.scaler_type = "standard"
 
-        ScalingTransformer(
-            columns="b",
-            scaler_type=scaler_type,
-            scaler_kwargs=scaler_kwargs_value,
-        )
 
-        assert mocked.call_count == 1, "unexpected number of calls to init"
+class TestTransform(BaseNumericTransformerTransformTests):
+    """Tests for ScalingTransformer.transform()"""
 
-        call_args = mocked.call_args_list[0]
-        call_pos_args = call_args[0]
-        call_kwargs = call_args[1]
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "ScalingTransformer"
+        cls.scaler_type = "min_max"
 
-        assert (
-            call_pos_args == ()
-        ), f"unexpected positional args in {scaler_type_str} init call"
+    def test_min_max_scaling(self):
+        """Test min-max scaling works correctly."""
+        df = pd.DataFrame({"a": [0, 1, 2], "b": [3, 4, 5]})
+        transformer = ScalingTransformer(columns=["a", "b"], scaler_type="min_max")
+        transformer.fit(df)  # transformer is fitted before transform
+        transformed_df = transformer.transform(df)
 
-        assert (
-            call_kwargs == scaler_kwargs_value
-        ), f"unexpected kwargs in {scaler_type_str} init call"
+        expected_df = pd.DataFrame({"a": [0, 0.5, 1], "b": [0, 0.5, 1]})
+        pd.testing.assert_frame_equal(transformed_df, expected_df)
 
-    def test_super_init_called(self, mocker):
-        """Test that super.__init__ called."""
-        expected_call_args = {
-            0: {
-                "args": (),
-                "kwargs": {"columns": ["a", "b"], "verbose": False},
+    def test_standard_scaling(self):
+        """Test standard scaling works correctly."""
+        df = pd.DataFrame({"a": [0, 1, 2], "b": [3, 4, 5]})
+        transformer = ScalingTransformer(columns=["a", "b"], scaler_type="standard")
+        transformer.fit(df)
+        transformed_df = transformer.transform(df)
+
+        expected_df = pd.DataFrame(
+            {
+                "a": [-1.22474487, 0, 1.22474487],  # Standardized values
+                "b": [-1.22474487, 0, 1.22474487],
             },
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "__init__",
-            expected_call_args,
-        ):
-            ScalingTransformer(
-                columns=["a", "b"],
-                scaler_type="standard",
-                verbose=False,
-            )
-
-
-class TestCheckNumericColumns:
-    """Tests for the check_numeric_columns method."""
-
-    def test_exception_raised(self):
-        """Test an exception is raised if non numeric columns are passed in X."""
-        df = d.create_df_2()
-
-        x = ScalingTransformer(columns=["a", "b", "c"], scaler_type="standard")
-
-        with pytest.raises(
-            TypeError,
-            match=r"""ScalingTransformer: The following columns are not numeric in X; \['b', 'c'\]""",
-        ):
-            x.check_numeric_columns(df)
-
-    def test_X_returned(self):
-        """Test that the input X is returned from the method."""
-        df = d.create_df_2()
-
-        x = ScalingTransformer(columns=["a"], scaler_type="standard")
-
-        df_returned = x.check_numeric_columns(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=df,
-            actual=df_returned,
-            msg="unexepcted object returned from check_numeric_columns",
         )
+        pd.testing.assert_frame_equal(transformed_df, expected_df)
 
+    def test_max_abs_scaling(self):
+        """Test max absolute scaling works correctly."""
+        df = pd.DataFrame({"a": [-3, -2, -1], "b": [1, 2, 3]})
+        transformer = ScalingTransformer(columns=["a", "b"], scaler_type="max_abs")
+        transformer.fit(df)
+        transformed_df = transformer.transform(df)
 
-class TestFit:
-    """Tests for ScalingTransformer.fit()."""
+        expected_df = pd.DataFrame({"a": [-1, -2 / 3, -1 / 3], "b": [1 / 3, 2 / 3, 1]})
+        pd.testing.assert_frame_equal(transformed_df, expected_df)
 
-    def test_super_fit_call(self, mocker):
-        """Test the call to BaseTransformer.fit."""
-        df = d.create_df_2()
+    def test_transform_min_max_raises(self):
+        """Test that transform scales negative values correctly with MinMaxScaler."""
+        df = pd.DataFrame({"a": [-3, -2, -1]})  # Example for Min-Max scalingcode
+        transformer = ScalingTransformer(columns=["a"], scaler_type="min_max")
+        transformer.fit(df)
 
-        x = ScalingTransformer(columns=["a"], scaler_type="standard")
+        transformed_df = transformer.transform(df)
 
-        expected_call_args = {0: {"args": (d.create_df_2(), None), "kwargs": {}}}
+        # Since MinMaxScaler scales the data to [0, 1] based on the min and max of the input,
+        # we calculate the expected scaled values for column 'a'
+        expected_df = pd.DataFrame({"a": [0, 0.5, 1]})
 
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "fit",
-            expected_call_args,
-        ):
-            x.fit(df)
+        pd.testing.assert_frame_equal(transformed_df, expected_df)
 
-    def test_check_numeric_columns_call(self, mocker):
-        """Test the call to ScalingTransformer.check_numeric_columns."""
-        df = d.create_df_2()
-
-        x = ScalingTransformer(columns=["a"], scaler_type="standard")
-
-        expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.numeric.ScalingTransformer,
-            "check_numeric_columns",
-            expected_call_args,
-            return_value=d.create_df_2(),
-        ):
-            x.fit(df)
-
-    @pytest.mark.parametrize(
-        ("scaler_type", "scaler_type_str"),
-        [
-            ("min_max", "MinMaxScaler"),
-            ("max_abs", "MaxAbsScaler"),
-            ("standard", "StandardScaler"),
-        ],
-    )
-    def test_scaler_fit_call(self, mocker, scaler_type, scaler_type_str):
-        """Test that the call to the scaler.fit method."""
-        df = d.create_df_3()
-
-        x = ScalingTransformer(
-            columns=["b", "c"],
-            scaler_type=scaler_type,
-            scaler_kwargs={},
+    def test_custom_scaler_args(self):
+        """Test that custom arguments passed to the scaler are correctly applied."""
+        df = pd.DataFrame({"a": [0, 1, 2]})
+        transformer = ScalingTransformer(
+            columns=["a"],
+            scaler_type="min_max",
+            scaler_kwargs={"feature_range": (0, 2)},
         )
+        transformer.fit(df)
+        transformed_df = transformer.transform(df)
 
-        mocked = mocker.patch(
-            f"sklearn.preprocessing.{scaler_type_str}.fit",
-            return_value=None,
-        )
-
-        x.fit(df)
-
-        assert mocked.call_count == 1, "unexpected number of calls to scaler fit"
-
-        call_args = mocked.call_args_list[0]
-        call_pos_args = call_args[0]
-        call_kwargs = call_args[1]
-
-        expected_positional_args = (df[["b", "c"]],)
-
-        ta.equality.assert_equal_dispatch(
-            expected=expected_positional_args,
-            actual=call_pos_args,
-            msg=f"unexpected positional args in {scaler_type_str} fit call",
-        )
-
-        assert call_kwargs == {}, f"unexpected kwargs in {scaler_type_str} fit call"
-
-    def test_return_self(self):
-        """Test that fit returns self."""
-        df = d.create_df_2()
-
-        x = ScalingTransformer(columns=["a"], scaler_type="standard")
-
-        x_fitted = x.fit(df)
-
-        assert (
-            x_fitted is x
-        ), "return value from ScalingTransformer.fit not as expected (self)."
-
-
-class TestTransform:
-    """Tests for ScalingTransformer.transform()."""
-
-    def test_super_transform_called(self, mocker):
-        """Test that BaseTransformer.transform called."""
-        df = d.create_df_2()
-
-        x = ScalingTransformer(columns=["a"], scaler_type="standard")
-
-        x.fit(df)
-
-        expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-            return_value=d.create_df_2(),
-        ):
-            x.transform(df)
-
-    def test_check_numeric_columns_call(self, mocker):
-        """Test the call to ScalingTransformer.check_numeric_columns."""
-        df = d.create_df_2()
-
-        x = ScalingTransformer(columns=["a"], scaler_type="standard")
-
-        x.fit(df)
-
-        expected_call_args = {0: {"args": (d.create_df_2(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-            return_value=d.create_df_2(),
-        ):
-            x.transform(df)
-
-    @pytest.mark.parametrize(
-        ("scaler_type", "scaler_type_str"),
-        [
-            ("min_max", "MinMaxScaler"),
-            ("max_abs", "MaxAbsScaler"),
-            ("standard", "StandardScaler"),
-        ],
-    )
-    def test_scaler_transform_call(self, mocker, scaler_type, scaler_type_str):
-        """Test that the call to the scaler.transform method."""
-        df = d.create_df_3()
-
-        x = ScalingTransformer(
-            columns=["b", "c"],
-            scaler_type=scaler_type,
-            scaler_kwargs={},
-        )
-
-        x.fit(df)
-
-        mocked = mocker.patch(
-            f"sklearn.preprocessing.{scaler_type_str}.transform",
-            return_value=df[["b", "c"]],
-        )
-
-        x.transform(df)
-
-        assert mocked.call_count == 1, "unexpected number of calls to scaler fit"
-
-        call_args = mocked.call_args_list[0]
-        call_pos_args = call_args[0]
-        call_kwargs = call_args[1]
-
-        expected_positional_args = (df[["b", "c"]],)
-
-        ta.equality.assert_equal_dispatch(
-            expected=expected_positional_args,
-            actual=call_pos_args,
-            msg=f"unexpected positional args in {scaler_type_str} transform call",
-        )
-
-        assert (
-            call_kwargs == {}
-        ), f"unexpected kwargs in {scaler_type_str} transform call"
-
-    @pytest.mark.parametrize(
-        ("scaler_type", "scaler_type_str"),
-        [
-            ("min_max", "MinMaxScaler"),
-            ("max_abs", "MaxAbsScaler"),
-            ("standard", "StandardScaler"),
-        ],
-    )
-    def test_output_from_scaler_transform_set_to_columns(
-        self,
-        mocker,
-        scaler_type,
-        scaler_type_str,
-    ):
-        """Test that the call to the scaler.transform method."""
-        df = d.create_df_3()
-
-        x = ScalingTransformer(
-            columns=["b", "c"],
-            scaler_type=scaler_type,
-            scaler_kwargs={},
-        )
-
-        x.fit(df)
-
-        scaler_transform_output = pd.DataFrame(
-            {"b": [1, 2, 3, 4, 5, 6, 7], "c": [7, 6, 5, 4, 3, 2, 1]},
-        )
-
-        mocker.patch(
-            f"sklearn.preprocessing.{scaler_type_str}.transform",
-            return_value=scaler_transform_output,
-        )
-
-        df_transformed = x.transform(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=scaler_transform_output,
-            actual=df_transformed[["b", "c"]],
-            msg=f"output from {scaler_type_str} transform not assigned to columns",
-        )
-
-    @pytest.mark.parametrize("columns", [("b"), ("c"), (["b", "c"])])
-    @pytest.mark.parametrize(
-        ("scaler_type", "scaler_type_str"),
-        [
-            ("min_max", "MinMaxScaler"),
-            ("max_abs", "MaxAbsScaler"),
-            ("standard", "StandardScaler"),
-        ],
-    )
-    def test_return_type(self, scaler_type, scaler_type_str, columns):
-        """Test that transform returns a pd.DataFrame."""
-        df = d.create_df_3()
-
-        x = ScalingTransformer(
-            columns=columns,
-            scaler_type=scaler_type,
-            scaler_kwargs={},
-        )
-
-        x.fit(df)
-
-        df_transformed = x.transform(df)
-
-        assert (
-            type(df_transformed) is pd.DataFrame
-        ), "unexpected output type from transform"
+        expected_df = pd.DataFrame({"a": [0, 1, 2]}, dtype=float)
+        pd.testing.assert_frame_equal(transformed_df, expected_df, check_dtype=True)

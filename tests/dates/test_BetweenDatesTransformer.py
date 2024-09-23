@@ -13,8 +13,8 @@ from tests.base_tests import (
     NewColumnNameInitMixintests,
     OtherBaseBehaviourTests,
 )
-from tests.dates.test_BaseDateTransformer import (
-    DatesMixinTransformTests,
+from tests.dates.test_BaseGenericDateTransformer import (
+    GenericDatesMixinTransformTests,
     create_date_diff_different_dtypes,
 )
 from tubular.dates import BetweenDatesTransformer
@@ -74,7 +74,7 @@ class TestInit(
 
 class TestTransform(
     GenericTransformTests,
-    DatesMixinTransformTests,
+    GenericDatesMixinTransformTests,
     DropOriginalTransformMixinTests,
 ):
     """Tests for BetweenDatesTransformer.transform."""

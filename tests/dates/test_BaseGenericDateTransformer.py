@@ -1,5 +1,7 @@
 import datetime
+from copy import deepcopy
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -70,21 +72,62 @@ def create_date_diff_different_dtypes():
     )
 
 
-class DatesMixinTransformTests:
+class GenericDatesMixinTransformTests:
     """Generic tests for Dates Transformers"""
 
     @pytest.mark.parametrize(
-        ("columns, datetime_col, date_col"),
+        ("bad_value", "bad_type"),
         [
-            (["date_col_1", "datetime_col_2"], 1, 0),
-            (["datetime_col_1", "date_col_2"], 0, 1),
+            (1, "int64"),
+            ("a", "object"),
+            (np.nan, "float64"),
+        ],
+    )
+    def test_non_datetypes_error(
+        self,
+        uninitialized_transformers,
+        minimal_attribute_dict,
+        minimal_dataframe_lookup,
+        bad_value,
+        bad_type,
+    ):
+        "Test that transform raises an error if columns contains non date types"
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        columns = args["columns"]
+
+        for i in range(len(columns)):
+            df = deepcopy(minimal_dataframe_lookup[self.transformer_name])
+            print(df)
+            col = columns[i]
+            df[col] = bad_value
+
+            x = uninitialized_transformers[self.transformer_name](
+                columns=columns,
+                new_column_name="c",
+            )
+
+            msg = (
+                rf"{col} type should be in \['datetime64', 'date'\] but got {bad_type}"
+            )
+
+            with pytest.raises(
+                TypeError,
+                match=msg,
+            ):
+                x.transform(df)
+
+    @pytest.mark.parametrize(
+        ("columns, datetime_col"),
+        [
+            (["date_col_1", "datetime_col_2"], 1),
+            (["datetime_col_1", "date_col_2"], 0),
         ],
     )
     def test_mismatched_datetypes_error(
         self,
         columns,
         datetime_col,
-        date_col,
         uninitialized_transformers,
     ):
         "Test that transform raises an error if one column is a date and one is datetime"
@@ -122,7 +165,7 @@ class TestInit(
 
     @classmethod
     def setup_class(cls):
-        cls.transformer_name = "BaseDateTransformer"
+        cls.transformer_name = "BaseGenericDateTransformer"
 
 
 class TestFit(GenericFitTests):
@@ -130,15 +173,15 @@ class TestFit(GenericFitTests):
 
     @classmethod
     def setup_class(cls):
-        cls.transformer_name = "BaseDateTransformer"
+        cls.transformer_name = "BaseGenericDateTransformer"
 
 
-class TestTransform(GenericTransformTests, DatesMixinTransformTests):
-    """Tests for BaseDateTransformer.transform."""
+class TestTransform(GenericTransformTests, GenericDatesMixinTransformTests):
+    """Tests for BaseGenericDateTransformer.transform."""
 
     @classmethod
     def setup_class(cls):
-        cls.transformer_name = "BaseDateTransformer"
+        cls.transformer_name = "BaseGenericDateTransformer"
 
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
@@ -150,4 +193,4 @@ class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
 
     @classmethod
     def setup_class(cls):
-        cls.transformer_name = "BaseDateTransformer"
+        cls.transformer_name = "BaseGenericDateTransformer"
