@@ -14,8 +14,8 @@ from tests.base_tests import (
     OtherBaseBehaviourTests,
     TwoColumnListInitTests,
 )
-from tests.dates.test_BaseDateTransformer import (
-    DatesMixinTransformTests,
+from tests.dates.test_BaseGenericDateTransformer import (
+    GenericDatesMixinTransformTests,
 )
 from tubular.dates import DateDifferenceTransformer
 
@@ -47,7 +47,7 @@ class TestInit(
 
 class TestTransform(
     GenericTransformTests,
-    DatesMixinTransformTests,
+    GenericDatesMixinTransformTests,
     DropOriginalTransformMixinTests,
 ):
     """Tests for DateDifferenceTransformer.transform()."""
