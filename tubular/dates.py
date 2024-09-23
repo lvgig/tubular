@@ -89,11 +89,9 @@ class BaseGenericDateTransformer(
 
         present_types = set(type_dict.values())
 
-        only_datetime_present = present_types == {datetime_type}
-        only_date_present = present_types == {date_type}
-        date_allowed = not datetime_only
+        valid_types = present_types.issubset(set(allowed_types))
 
-        if not only_datetime_present and not (date_allowed and only_date_present):
+        if not valid_types or len(present_types) > 1:
             msg = f"{self.classname()}: Columns fed to datetime transformers should be {allowed_types} and have consistent types, but found {present_types}. Please use ToDatetimeTransformer to standardise."
             raise TypeError(
                 msg,
