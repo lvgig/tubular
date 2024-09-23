@@ -13,8 +13,8 @@ from tests.base_tests import (
     NewColumnNameInitMixintests,
     TwoColumnListInitTests,
 )
-from tests.dates.test_BaseDateTransformer import (
-    DatesMixinTransformTests,
+from tests.dates.test_BaseGenericDateTransformer import (
+    GenericDatesMixinTransformTests,
 )
 from tubular.dates import DateDiffLeapYearTransformer
 
@@ -80,7 +80,7 @@ class TestInit(
 class TestTransform(
     DropOriginalTransformMixinTests,
     GenericTransformTests,
-    DatesMixinTransformTests,
+    GenericDatesMixinTransformTests,
 ):
     """Tests for DateDiffLeapYearTransformer.transform()."""
 
