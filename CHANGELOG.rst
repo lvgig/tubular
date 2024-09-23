@@ -34,6 +34,7 @@ Changed
 - Refactored tests for NullIndicator `#301 <https://github.com/lvgig/tubular/issues/301>`_
 - Refactored BetweenDatesTransformer tests in new format `#294 <https://github.com/lvgig/tubular/issues/294>`_
 - As part of above, edited dates file transformers to use BaseDropOriginalMixin in transform
+- Edited base testing setup for dates file, created new BaseDatetimeTransformer class
 
 
 1.3.1 (2024-07-18)

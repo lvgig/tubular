@@ -12,9 +12,13 @@ from tubular.base import BaseTransformer
 from tubular.mixins import DropOriginalMixin, NewColumnNameMixin, TwoColumnMixin
 
 
-class BaseDateTransformer(NewColumnNameMixin, DropOriginalMixin, BaseTransformer):
+class BaseGenericDateTransformer(
+    NewColumnNameMixin,
+    DropOriginalMixin,
+    BaseTransformer,
+):
     """
-    Extends BaseTransformer for datetime scenarios
+    Extends BaseTransformer for datetime/date scenarios
 
     Parameters
     ----------
@@ -69,25 +73,25 @@ class BaseDateTransformer(NewColumnNameMixin, DropOriginalMixin, BaseTransformer
             allowed_types = [*allowed_types, date_type]
 
         for col in self.columns:
-            if pd.api.types.is_datetime64_any_dtype(X[col]):
+            is_datetime = pd.api.types.is_datetime64_any_dtype(X[col])
+            is_date = pd.api.types.infer_dtype(X[col]) == date_type
+            if is_datetime:
                 type_dict[col] = datetime_type
 
-            elif (not datetime_only) and (
-                pd.api.types.infer_dtype(X[col]) == date_type
-            ):
+            elif (not datetime_only) and (is_date):
                 type_dict[col] = date_type
 
             else:
-                msg = f"{self.classname()}: {col} type should be in {allowed_types} but got {X[col].dtype}"
+                col_dtype = date_type if is_date else X[col].dtype
+
+                msg = f"{self.classname()}: {col} type should be in {allowed_types} but got {col_dtype}"
                 raise TypeError(msg)
 
         present_types = set(type_dict.values())
 
-        only_datetime_present = present_types == {datetime_type}
-        only_date_present = present_types == {date_type}
-        date_allowed = ~datetime_only
+        valid_types = present_types.issubset(set(allowed_types))
 
-        if not only_datetime_present and not (date_allowed and only_date_present):
+        if not valid_types or len(present_types) > 1:
             msg = f"{self.classname()}: Columns fed to datetime transformers should be {allowed_types} and have consistent types, but found {present_types}. Please use ToDatetimeTransformer to standardise."
             raise TypeError(
                 msg,
@@ -122,9 +126,63 @@ class BaseDateTransformer(NewColumnNameMixin, DropOriginalMixin, BaseTransformer
         return X
 
 
+class BaseDatetimeTransformer(BaseGenericDateTransformer):
+    """
+    Extends BaseTransformer for datetime scenarios
+
+    Parameters
+    ----------
+    columns : List[str]
+        List of 2 columns. First column will be subtracted from second.
+
+    new_column_name : str
+        Name for the new year column.
+
+    drop_original : bool
+        Flag for whether to drop the original columns.
+
+    **kwargs
+        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+    """
+
+    def __init__(
+        self,
+        columns: list[str],
+        new_column_name: str | None = None,
+        drop_original: bool = False,
+        **kwargs: dict[str, bool],
+    ) -> None:
+        super().__init__(
+            columns=columns,
+            new_column_name=new_column_name,
+            drop_original=drop_original,
+            **kwargs,
+        )
+
+    def transform(
+        self,
+        X: pd.DataFrame,
+    ) -> pd.DataFrame:
+        """base transform method for transformers that operate exclusively on datetime columns
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data containing self.columns
+
+        Returns
+        -------
+        X : pd.DataFrame
+            Validated data
+
+        """
+
+        return super().transform(X, datetime_only=True)
+
+
 class BaseDateTwoColumnTransformer(
     TwoColumnMixin,
-    BaseDateTransformer,
+    BaseGenericDateTransformer,
 ):
 
     """Extends BaseDateTransformer for transformers which accept exactly two columns
@@ -389,7 +447,7 @@ class DateDifferenceTransformer(BaseDateTwoColumnTransformer):
         return X
 
 
-class ToDatetimeTransformer(BaseDateTransformer):
+class ToDatetimeTransformer(BaseGenericDateTransformer):
     """Class to transform convert specified columns to datetime.
 
     Class simply uses the pd.to_datetime method on the specified columns.
@@ -475,7 +533,7 @@ class ToDatetimeTransformer(BaseDateTransformer):
         return X
 
 
-class SeriesDtMethodTransformer(BaseDateTransformer):
+class SeriesDtMethodTransformer(BaseDatetimeTransformer):
     """Tranformer that applies a pandas.Series.dt method.
 
     Transformer assigns the output of the method to a new column. It is possible to
@@ -613,7 +671,7 @@ class SeriesDtMethodTransformer(BaseDateTransformer):
             running the pd.Series.dt method.
 
         """
-        X = super().transform(X, datetime_only=True)
+        X = super().transform(X)
 
         if self._callable:
             X[self.new_column_name] = getattr(
@@ -638,7 +696,7 @@ class SeriesDtMethodTransformer(BaseDateTransformer):
         return X
 
 
-class BetweenDatesTransformer(BaseDateTransformer):
+class BetweenDatesTransformer(BaseGenericDateTransformer):
     """Transformer to generate a boolean column indicating if one date is between two others.
 
     If not all column_lower values are less than or equal to column_upper when transform is run
@@ -786,7 +844,7 @@ class BetweenDatesTransformer(BaseDateTransformer):
         return X
 
 
-class DatetimeInfoExtractor(BaseDateTransformer):
+class DatetimeInfoExtractor(BaseDatetimeTransformer):
     """Transformer to extract various features from datetime var.
 
     Parameters
@@ -1040,7 +1098,7 @@ class DatetimeInfoExtractor(BaseDateTransformer):
         X : pd.DataFrame
             Transformed input X with added columns of extracted information.
         """
-        X = super().transform(X, datetime_only=True)
+        X = super().transform(X)
 
         for col in self.columns:
             for include_option in self.include:
@@ -1063,7 +1121,7 @@ class DatetimeInfoExtractor(BaseDateTransformer):
         return X
 
 
-class DatetimeSinusoidCalculator(BaseDateTransformer):
+class DatetimeSinusoidCalculator(BaseDatetimeTransformer):
     """Transformer to derive a feature in a dataframe by calculating the
     sine or cosine of a datetime column in a given unit (e.g hour), with the option to scale
     period of the sine or cosine to match the natural period of the unit (e.g. 24).
@@ -1239,7 +1297,7 @@ class DatetimeSinusoidCalculator(BaseDateTransformer):
         X : pd.DataFrame
             Input X with additional columns added, these are named "<method>_<original_column>"
         """
-        X = super().transform(X, datetime_only=True)
+        X = super().transform(X)
 
         for column in self.columns:
             if not isinstance(self.units, dict):

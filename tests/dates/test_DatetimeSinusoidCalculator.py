@@ -219,19 +219,19 @@ class TestDatetimeSinusoidCalculatorInit:
 
 class TestDatetimeSinusoidCalculatorTransform:
     @pytest.mark.parametrize(
-        ("columns"),
+        ("bad_column", "bad_type"),
         [
-            ["numeric_col"],
-            ["string_col"],
-            ["bool_col"],
-            ["empty_col"],
-            ["date_col"],
+            ["numeric_col", "int64"],
+            ["string_col", "object"],
+            ["bool_col", "bool"],
+            ["empty_col", "object"],
+            ["date_col", "date"],
         ],
     )
-    def test_input_data_check_column_errors(self, columns):
+    def test_input_data_check_column_errors(self, bad_column, bad_type):
         """Check that errors are raised on a variety of different non datatypes"""
         x = DatetimeSinusoidCalculator(
-            columns,
+            bad_column,
             "cos",
             "month",
             12,
@@ -239,7 +239,7 @@ class TestDatetimeSinusoidCalculatorTransform:
 
         df = d.create_date_diff_incorrect_dtypes()
 
-        msg = rf"{x.classname()}: {columns[0]} type should be in \['datetime64'\] but got {df[columns[0]].dtype}"
+        msg = rf"{x.classname()}: {bad_column} type should be in \['datetime64'\] but got {bad_type}"
 
         with pytest.raises(TypeError, match=msg):
             x.transform(df)

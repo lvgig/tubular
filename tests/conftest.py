@@ -111,7 +111,11 @@ def minimal_attribute_dict():
             "mappings": {"a": {1: 2, 3: 4}},
             "adjust_column": "b",
         },
-        "BaseDateTransformer": {
+        "BaseGenericDateTransformer": {
+            "columns": ["a"],
+            "new_column_name": "bla",
+        },
+        "BaseDatetimeTransformer": {
             "columns": ["a"],
             "new_column_name": "bla",
         },
