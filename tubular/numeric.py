@@ -13,7 +13,12 @@ from sklearn.preprocessing import (
 )
 
 from tubular.base import BaseTransformer, DataFrameMethodTransformer
-from tubular.mixins import DropOriginalMixin, NewColumnNameMixin, TwoColumnMixin
+from tubular.mixins import (
+    CheckNumericMixin,
+    DropOriginalMixin,
+    NewColumnNameMixin,
+    TwoColumnMixin,
+)
 
 
 class BaseNumericTransformer(BaseTransformer):
@@ -61,6 +66,8 @@ class BaseNumericTransformer(BaseTransformer):
 
             msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
             raise TypeError(msg)
+
+        return X
 
     def fit(
         self,
@@ -428,7 +435,7 @@ class TwoColumnOperatorTransformer(
         return X
 
 
-class ScalingTransformer(BaseTransformer):
+class ScalingTransformer(BaseNumericTransformer):
     """Transformer to perform scaling of numeric columns.
 
     Transformer can apply min max scaling, max absolute scaling or standardisation (subtract mean and divide by std).
@@ -451,6 +458,13 @@ class ScalingTransformer(BaseTransformer):
 
     """
 
+    # Dictionary mapping scaler types to their corresponding sklearn classes
+    scaler_options = {
+        "min_max": MinMaxScaler,
+        "max_abs": MaxAbsScaler,
+        "standard": StandardScaler,
+    }
+
     def __init__(
         self,
         columns: str | list[str] | None,
@@ -460,31 +474,25 @@ class ScalingTransformer(BaseTransformer):
     ) -> None:
         if scaler_kwargs is None:
             scaler_kwargs = {}
-        else:
-            if type(scaler_kwargs) is not dict:
-                msg = f"{self.classname()}: scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
-                raise TypeError(msg)
+
+        # Validate scaler_kwargs type
+        if not isinstance(scaler_kwargs, dict):
+            msg = f"{self.classname()}: scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
+            raise TypeError(msg)
 
         for i, k in enumerate(scaler_kwargs.keys()):
-            if type(k) is not str:
+            if not isinstance(k, str):
                 msg = f"{self.classname()}: unexpected type ({type(k)}) for scaler_kwargs key in position {i}, must be str"
                 raise TypeError(msg)
 
-        allowed_scaler_values = ["min_max", "max_abs", "standard"]
-
-        if scaler_type not in allowed_scaler_values:
+        # Validate scaler_type
+        if scaler_type not in self.scaler_options:
+            allowed_scaler_values = list(self.scaler_options.keys())
             msg = f"{self.classname()}: scaler_type should be one of; {allowed_scaler_values}"
             raise ValueError(msg)
 
-        if scaler_type == "min_max":
-            self.scaler = MinMaxScaler(**scaler_kwargs)
-
-        elif scaler_type == "max_abs":
-            self.scaler = MaxAbsScaler(**scaler_kwargs)
-
-        elif scaler_type == "standard":
-            self.scaler = StandardScaler(**scaler_kwargs)
-
+        # Initialize scaler using the dictionary
+        self.scaler = self.scaler_options[scaler_type](**scaler_kwargs)
         # This attribute is not for use in any method
         # Here only as a fix to allow string representation of transformer.
         self.scaler_kwargs = scaler_kwargs
@@ -492,31 +500,7 @@ class ScalingTransformer(BaseTransformer):
 
         super().__init__(columns=columns, **kwargs)
 
-    def check_numeric_columns(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Method to check all columns (specicifed in self.columns) in X are all numeric.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            Data containing columns to check.
-
-        """
-        numeric_column_types = X[self.columns].apply(
-            pd.api.types.is_numeric_dtype,
-            axis=0,
-        )
-
-        if not numeric_column_types.all():
-            non_numeric_columns = list(
-                numeric_column_types.loc[~numeric_column_types].index,
-            )
-
-            msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
-            raise TypeError(msg)
-
-        return X
-
-    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
+    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> ScalingTransformer:
         """Fit scaler to input data.
 
         Parameters
@@ -529,11 +513,7 @@ class ScalingTransformer(BaseTransformer):
 
         """
         super().fit(X, y)
-
-        X = self.check_numeric_columns(X)
-
         self.scaler.fit(X[self.columns])
-
         return self
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -551,8 +531,6 @@ class ScalingTransformer(BaseTransformer):
 
         """
         X = super().transform(X)
-
-        X = self.check_numeric_columns(X)
 
         X[self.columns] = self.scaler.transform(X[self.columns])
 
@@ -707,7 +685,7 @@ class InteractionTransformer(BaseNumericTransformer):
         return X
 
 
-class PCATransformer(BaseTransformer):
+class PCATransformer(CheckNumericMixin, BaseTransformer):
     """Transformer that generates variables using Principal component analysis (PCA).
     Linear dimensionality reduction using Singular Value Decomposition of the
     data to project it to a lower dimensional space.
@@ -844,30 +822,6 @@ class PCATransformer(BaseTransformer):
         self.feature_names_out = None
         self.n_components_ = None
 
-    def check_numeric_columns(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Method to check all columns (specicifed in self.columns) in X are all numeric.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            Data containing columns to check.
-
-        """
-        numeric_column_types = X[self.columns].apply(
-            pd.api.types.is_numeric_dtype,
-            axis=0,
-        )
-
-        if not numeric_column_types.all():
-            non_numeric_columns = list(
-                numeric_column_types.loc[~numeric_column_types].index,
-            )
-
-            msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
-            raise TypeError(msg)
-
-        return X
-
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Fit PCA to input data.
 
@@ -882,7 +836,7 @@ class PCATransformer(BaseTransformer):
         """
         super().fit(X, y)
 
-        X = self.check_numeric_columns(X)
+        X = CheckNumericMixin.check_numeric_columns(self, X)
 
         if self.n_components != "mle":
             if 0 < self.n_components <= min(X[self.columns].shape):
@@ -914,7 +868,7 @@ class PCATransformer(BaseTransformer):
             running the  product pandas DataFrame method on identified combinations.
         """
         X = super().transform(X)
-        X = self.check_numeric_columns(X)
+        X = CheckNumericMixin.check_numeric_columns(self, X)
         X[self.feature_names_out] = self.pca.transform(X[self.columns])
 
         return X

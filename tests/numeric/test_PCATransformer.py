@@ -3,12 +3,23 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
-import tubular
+from tests.base_tests import (
+    CheckNumericFitMixinTests,
+    ColumnStrListInitTests,
+    GenericFitTests,
+    GenericTransformTests,
+)
 from tubular.numeric import PCATransformer
 
 
-class TestInit:
-    """Tests for PCATransformer.init()."""
+class TestInit(
+    ColumnStrListInitTests,
+):
+    """Generic tests for transformer.init()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "PCATransformer"
 
     def test_to_random_state_type_error(self):
         """Test that an exception is raised if random_state is not a int or None."""
@@ -82,91 +93,13 @@ class TestInit:
         ):
             PCATransformer(columns="b", n_components=0.3, svd_solver="arpack")
 
-    def test_super_init_called(self, mocker):
-        """Test that super.__init__ called."""
-        expected_call_args = {
-            0: {
-                "args": (),
-                "kwargs": {"columns": ["a", "b"], "verbose": False},
-            },
-        }
 
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "__init__",
-            expected_call_args,
-        ):
-            PCATransformer(columns=["a", "b"], n_components=1, verbose=False)
+class TestFit(CheckNumericFitMixinTests, GenericFitTests):
+    """Generic tests for transformer.fit()"""
 
-
-class TestCheckNumericColumns:
-    """Tests for the check_numeric_columns method."""
-
-    def test_exception_raised(self):
-        """Test an exception is raised if non numeric columns are passed in X."""
-        df = d.create_df_2()
-
-        x = PCATransformer(columns=["a", "b", "c"], n_components=2)
-
-        with pytest.raises(
-            TypeError,
-            match=r"""PCATransformer: The following columns are not numeric in X; \['b', 'c'\]""",
-        ):
-            x.check_numeric_columns(df)
-
-    def test_X_returned(self):
-        """Test that the input X is returned from the method."""
-        df = d.create_df_2()
-
-        x = PCATransformer(columns=["a"], n_components=2)
-
-        df_returned = x.check_numeric_columns(df)
-
-        ta.equality.assert_equal_dispatch(
-            expected=df,
-            actual=df_returned,
-            msg="unexepcted object returned from check_numeric_columns",
-        )
-
-
-class TestFit:
-    """Tests for PCATransformer.fit()."""
-
-    def test_super_fit_call(self, mocker):
-        """Test the call to BaseTransformer.fit."""
-        df = d.create_numeric_df_1()
-
-        x = PCATransformer(columns=["a", "b"], n_components=1)
-
-        expected_call_args = {
-            0: {"args": (d.create_numeric_df_1(), None), "kwargs": {}},
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "fit",
-            expected_call_args,
-        ):
-            x.fit(df)
-
-    def test_check_numeric_columns_call(self, mocker):
-        """Test the call to PCATransformer.check_numeric_columns."""
-        df = d.create_numeric_df_1()
-
-        x = PCATransformer(columns=["a", "b"], n_components=1)
-
-        expected_call_args = {0: {"args": (d.create_numeric_df_1(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.numeric.PCATransformer,
-            "check_numeric_columns",
-            expected_call_args,
-            return_value=d.create_numeric_df_1(),
-        ):
-            x.fit(df)
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "PCATransformer"
 
     def test_to_arpack_n_compontes_value_error(self):
         """Test that an exception is raised if svd solver is arpack and n_components greater than nb samples or features."""
@@ -181,165 +114,184 @@ class TestFit:
 
             x.fit(df)
 
-    def test_return_self(self):
-        """Test that fit returns self."""
-        df = d.create_numeric_df_1()
 
-        x = PCATransformer(columns=["a", "b"])
+class TestTransform(GenericTransformTests):
+    """Tests for transformer.transform."""
 
-        x_fitted = x.fit(df)
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "PCATransformer"
 
-        assert (
-            x_fitted is x
-        ), "return value from PCATransformer.fit not as expected (self)."
+    def create_svd_sovler_output(self):
+        svd_sovler_output = {}
+        svd_sovler_output["full"] = pd.DataFrame(
+            {
+                "a": [34.48, 21.71, 32.83, 1.08, 32.93, 4.74, 2.76, 75.7, 14.08, 61.31],
+                "b": [12.03, 20.32, 24.12, 24.18, 68.99, 0.0, 0.0, 59.46, 11.02, 60.68],
+                "c": [
+                    17.06,
+                    12.25,
+                    19.15,
+                    29.73,
+                    1.98,
+                    8.23,
+                    15.22,
+                    20.59,
+                    3.82,
+                    39.73,
+                ],
+                "d": [
+                    25.94,
+                    70.22,
+                    72.94,
+                    64.55,
+                    0.41,
+                    13.62,
+                    30.22,
+                    4.6,
+                    67.13,
+                    10.38,
+                ],
+                "e": [94.3, 4.18, 51.7, 16.63, 2.6, 16.57, 3.51, 30.79, 66.19, 25.44],
+                "pca_0": [
+                    -7.0285210087721985,
+                    -10.570772171093276,
+                    0.7141476951788178,
+                    -19.755517377029697,
+                    30.46293987797488,
+                    -37.27200224865943,
+                    -37.718068808834694,
+                    55.636246999483866,
+                    -23.564287941836838,
+                    49.095834983588574,
+                ],
+                "pca_1": [
+                    -14.719057085223534,
+                    0.6588448890236053,
+                    -6.504809368610448,
+                    8.411936495027216,
+                    30.75596190514493,
+                    -0.8912674725933973,
+                    -2.647964525208776,
+                    -9.600190936709105,
+                    2.6606364975891146,
+                    -8.124090398439629,
+                ],
+            },
+        )
 
+        svd_sovler_output["randomized"] = pd.DataFrame(
+            {
+                "a": [34.48, 21.71, 32.83, 1.08, 32.93, 4.74, 2.76, 75.7, 14.08, 61.31],
+                "b": [12.03, 20.32, 24.12, 24.18, 68.99, 0.0, 0.0, 59.46, 11.02, 60.68],
+                "c": [
+                    17.06,
+                    12.25,
+                    19.15,
+                    29.73,
+                    1.98,
+                    8.23,
+                    15.22,
+                    20.59,
+                    3.82,
+                    39.73,
+                ],
+                "d": [
+                    25.94,
+                    70.22,
+                    72.94,
+                    64.55,
+                    0.41,
+                    13.62,
+                    30.22,
+                    4.6,
+                    67.13,
+                    10.38,
+                ],
+                "e": [94.3, 4.18, 51.7, 16.63, 2.6, 16.57, 3.51, 30.79, 66.19, 25.44],
+                "pca_0": [
+                    -7.028521008772197,
+                    -10.570772171093276,
+                    0.7141476951788183,
+                    -19.755517377029697,
+                    30.46293987797488,
+                    -37.27200224865943,
+                    -37.718068808834694,
+                    55.636246999483866,
+                    -23.564287941836838,
+                    49.09583498358857,
+                ],
+                "pca_1": [
+                    -14.71905708522353,
+                    0.6588448890236093,
+                    -6.504809368610448,
+                    8.411936495027184,
+                    30.755961905144947,
+                    -0.8912674725933926,
+                    -2.647964525208781,
+                    -9.600190936709092,
+                    2.660636497589127,
+                    -8.12409039843965,
+                ],
+            },
+        )
 
-def create_svd_sovler_output():
-    svd_sovler_output = {}
-    svd_sovler_output["full"] = pd.DataFrame(
-        {
-            "a": [34.48, 21.71, 32.83, 1.08, 32.93, 4.74, 2.76, 75.7, 14.08, 61.31],
-            "b": [12.03, 20.32, 24.12, 24.18, 68.99, 0.0, 0.0, 59.46, 11.02, 60.68],
-            "c": [17.06, 12.25, 19.15, 29.73, 1.98, 8.23, 15.22, 20.59, 3.82, 39.73],
-            "d": [25.94, 70.22, 72.94, 64.55, 0.41, 13.62, 30.22, 4.6, 67.13, 10.38],
-            "e": [94.3, 4.18, 51.7, 16.63, 2.6, 16.57, 3.51, 30.79, 66.19, 25.44],
-            "pca_0": [
-                -7.0285210087721985,
-                -10.570772171093276,
-                0.7141476951788178,
-                -19.755517377029697,
-                30.46293987797488,
-                -37.27200224865943,
-                -37.718068808834694,
-                55.636246999483866,
-                -23.564287941836838,
-                49.095834983588574,
-            ],
-            "pca_1": [
-                -14.719057085223534,
-                0.6588448890236053,
-                -6.504809368610448,
-                8.411936495027216,
-                30.75596190514493,
-                -0.8912674725933973,
-                -2.647964525208776,
-                -9.600190936709105,
-                2.6606364975891146,
-                -8.124090398439629,
-            ],
-        },
-    )
-
-    svd_sovler_output["randomized"] = pd.DataFrame(
-        {
-            "a": [34.48, 21.71, 32.83, 1.08, 32.93, 4.74, 2.76, 75.7, 14.08, 61.31],
-            "b": [12.03, 20.32, 24.12, 24.18, 68.99, 0.0, 0.0, 59.46, 11.02, 60.68],
-            "c": [17.06, 12.25, 19.15, 29.73, 1.98, 8.23, 15.22, 20.59, 3.82, 39.73],
-            "d": [25.94, 70.22, 72.94, 64.55, 0.41, 13.62, 30.22, 4.6, 67.13, 10.38],
-            "e": [94.3, 4.18, 51.7, 16.63, 2.6, 16.57, 3.51, 30.79, 66.19, 25.44],
-            "pca_0": [
-                -7.028521008772197,
-                -10.570772171093276,
-                0.7141476951788183,
-                -19.755517377029697,
-                30.46293987797488,
-                -37.27200224865943,
-                -37.718068808834694,
-                55.636246999483866,
-                -23.564287941836838,
-                49.09583498358857,
-            ],
-            "pca_1": [
-                -14.71905708522353,
-                0.6588448890236093,
-                -6.504809368610448,
-                8.411936495027184,
-                30.755961905144947,
-                -0.8912674725933926,
-                -2.647964525208781,
-                -9.600190936709092,
-                2.660636497589127,
-                -8.12409039843965,
-            ],
-        },
-    )
-
-    svd_sovler_output["arpack"] = pd.DataFrame(
-        {
-            "a": [34.48, 21.71, 32.83, 1.08, 32.93, 4.74, 2.76, 75.7, 14.08, 61.31],
-            "b": [12.03, 20.32, 24.12, 24.18, 68.99, 0.0, 0.0, 59.46, 11.02, 60.68],
-            "c": [17.06, 12.25, 19.15, 29.73, 1.98, 8.23, 15.22, 20.59, 3.82, 39.73],
-            "d": [25.94, 70.22, 72.94, 64.55, 0.41, 13.62, 30.22, 4.6, 67.13, 10.38],
-            "e": [94.3, 4.18, 51.7, 16.63, 2.6, 16.57, 3.51, 30.79, 66.19, 25.44],
-            "pca_0": [
-                -7.0285210087722,
-                -10.570772171093276,
-                0.7141476951788169,
-                -19.75551737702969,
-                30.46293987797488,
-                -37.272002248659426,
-                -37.718068808834694,
-                55.63624699948385,
-                -23.564287941836838,
-                49.09583498358856,
-            ],
-            "pca_1": [
-                -14.71905708522354,
-                0.6588448890236054,
-                -6.5048093686104504,
-                8.411936495027229,
-                30.755961905144936,
-                -0.8912674725933969,
-                -2.647964525208771,
-                -9.600190936709119,
-                2.660636497589114,
-                -8.124090398439632,
-            ],
-        },
-    )
-    return svd_sovler_output
-
-
-class TestTransform:
-    """Tests for PCATransformer.transform()."""
-
-    def test_super_transform_called(self, mocker):
-        """Test that BaseTransformer.transform called."""
-        df = d.create_numeric_df_1()
-
-        x = PCATransformer(columns=["a", "b"])
-
-        x.fit(df)
-
-        expected_call_args = {0: {"args": (d.create_numeric_df_1(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-            return_value=d.create_numeric_df_1(),
-        ):
-            x.transform(df)
-
-    def test_check_numeric_columns_call(self, mocker):
-        """Test the call to PCATransformer.check_numeric_columns."""
-        df = d.create_numeric_df_1()
-
-        x = PCATransformer(columns=["a", "b"])
-
-        x.fit(df)
-
-        expected_call_args = {0: {"args": (d.create_numeric_df_1(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-            return_value=d.create_numeric_df_1(),
-        ):
-            x.transform(df)
+        svd_sovler_output["arpack"] = pd.DataFrame(
+            {
+                "a": [34.48, 21.71, 32.83, 1.08, 32.93, 4.74, 2.76, 75.7, 14.08, 61.31],
+                "b": [12.03, 20.32, 24.12, 24.18, 68.99, 0.0, 0.0, 59.46, 11.02, 60.68],
+                "c": [
+                    17.06,
+                    12.25,
+                    19.15,
+                    29.73,
+                    1.98,
+                    8.23,
+                    15.22,
+                    20.59,
+                    3.82,
+                    39.73,
+                ],
+                "d": [
+                    25.94,
+                    70.22,
+                    72.94,
+                    64.55,
+                    0.41,
+                    13.62,
+                    30.22,
+                    4.6,
+                    67.13,
+                    10.38,
+                ],
+                "e": [94.3, 4.18, 51.7, 16.63, 2.6, 16.57, 3.51, 30.79, 66.19, 25.44],
+                "pca_0": [
+                    -7.0285210087722,
+                    -10.570772171093276,
+                    0.7141476951788169,
+                    -19.75551737702969,
+                    30.46293987797488,
+                    -37.272002248659426,
+                    -37.718068808834694,
+                    55.63624699948385,
+                    -23.564287941836838,
+                    49.09583498358856,
+                ],
+                "pca_1": [
+                    -14.71905708522354,
+                    0.6588448890236054,
+                    -6.5048093686104504,
+                    8.411936495027229,
+                    30.755961905144936,
+                    -0.8912674725933969,
+                    -2.647964525208771,
+                    -9.600190936709119,
+                    2.660636497589114,
+                    -8.124090398439632,
+                ],
+            },
+        )
+        return svd_sovler_output
 
     @pytest.mark.parametrize(
         ("svd_solver", "svd_solver_output_str"),
@@ -363,7 +315,7 @@ class TestTransform:
         x.fit(df)
         df_transformed = x.transform(df)
 
-        pca_transform_output = create_svd_sovler_output()
+        pca_transform_output = self.create_svd_sovler_output()
 
         mocker.patch(
             "sklearn.decomposition.PCA.transform",

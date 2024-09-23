@@ -10,14 +10,6 @@ from tests.base_tests import (
 )
 from tubular.numeric import TwoColumnOperatorTransformer
 
-# @pytest.fixture(scope="module", autouse=True)
-# def example_transformer():
-#     return TwoColumnOperatorTransformer(
-#         "mul",
-#         ["a", "b"],
-#         "c",
-#     )
-
 
 class TestInit(
     NewColumnNameInitMixintests,

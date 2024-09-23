@@ -29,10 +29,14 @@ Changed
 - Refactored MeanResponseTransformer tests in new format `#262 <https://github.com/lvgig/tubular/pull/262>`_
 - refactored build tools and package config into pyproject.toml `#271 <https://github.com/lvgig/tubular/pull/271>`_
 - set up automatic versioning using setuptools-scm `#271 <https://github.com/lvgig/tubular/pull/271>`_
-- Refactored TwoColumnOperatorTransformer tests in new format `#283 <https://github.com/lvgig/tubular/issues/274>`_
-- Refactored BetweenDatesTransformer tests in new format `#294 <https://github.com/lvgig/tubular/issues/294>`
+- Refactored TwoColumnOperatorTransformer tests in new format `#274 <https://github.com/lvgig/tubular/issues/274>`_
+- Refactored PCATransformer tests in new format `#277 <https://github.com/lvgig/tubular/issues/277>`_
+- Refactored tests for NullIndicator `#301 <https://github.com/lvgig/tubular/issues/301>`_
+- Refactored BetweenDatesTransformer tests in new format `#294 <https://github.com/lvgig/tubular/issues/294>`_
 - As part of above, edited dates file transformers to use BaseDropOriginalMixin in transform
 - Refactored DateDiffLeapYearTransformer tests in new format. As part of this had to remove the autodefined new_column_name, as this conflicts with the generic testing. Suggest we look to turn back on in future. `#295 https://github.com/lvgig/tubular/issues/295`
+- Edited base testing setup for dates file, created new BaseDatetimeTransformer class
+
 
 1.3.1 (2024-07-18)
 ------------------
@@ -44,6 +48,7 @@ Changed
 - DatetimeInfoExtractor.mappings_provided changed from a dict.keys() object to list so transformer is serialisable. `#258 <https://github.com/lvgig/tubular/pull/258>`_
 - Created BaseNumericTransformer class to support test refactor of numeric file `#266 <https://github.com/lvgig/tubular/pull/266>`_
 - Updated testing approach for LogTransformer `#268 <https://github.com/lvgig/tubular/pull/268>`_
+- Refactored ScalingTransformer tests in new format `#284 <https://github.com/lvgig/tubular/pull/284>`_
 
 
 1.3.0 (2024-06-13)
