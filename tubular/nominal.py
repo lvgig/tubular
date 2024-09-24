@@ -1041,7 +1041,7 @@ class OneHotEncodingTransformer(
     SeparatorColumnMixin,
     BaseTransformer,
 ):
-    """Transformer to convert cetegorical variables into dummy columns.
+    """Transformer to convert categorical variables into dummy columns.
 
     Extends the sklearn OneHotEncoder class to provide easy renaming of dummy columns.
 
@@ -1096,6 +1096,9 @@ class OneHotEncodingTransformer(
             copy=copy,
         )
 
+        # Set the dtype attribute
+        self.dtype = dtype
+
         # Create an instance of OneHotEncoder and assign it to _encoder
         self._encoder = OneHotEncoder(
             sparse_output=False,
@@ -1142,6 +1145,9 @@ class OneHotEncodingTransformer(
 
         self._encoder.fit(X[self.columns], y=y)
 
+        # Set the categories_ attribute to ensure check_is_fitted works
+        self.categories_ = self._encoder.categories_
+
         return self
 
     def _get_feature_names(
@@ -1156,11 +1162,11 @@ class OneHotEncodingTransformer(
 
         Parameters
         ----------
-        input_features : list(str)
+        input_features : list[str]
             Input columns being transformed by the OHE transformer.
 
         kwargs : dict
-            Keyword arguments to be passed on to the scikit learn attriute.
+            Keyword arguments to be passed on to the scikit learn attribute.
         """
         if hasattr(self._encoder, "get_feature_names"):
             input_columns = self._encoder.get_feature_names(
@@ -1210,6 +1216,16 @@ class OneHotEncodingTransformer(
                     % c,
                 )
 
+        # Print warning for unseen levels
+        for i, c in enumerate(self.columns):
+            unseen_levels = set(X[c].unique().tolist()) - set(self.categories_[i])
+            if len(unseen_levels) > 0:
+                warnings.warn(
+                    f"{self.classname()}: column {c} has unseen categories: {unseen_levels}",
+                    UserWarning,
+                    stacklevel=2,
+                )
+
         # Apply OHE transform
         X_transformed = self._encoder.transform(X[self.columns])
 
@@ -1237,20 +1253,6 @@ class OneHotEncodingTransformer(
             X_transformed = X_transformed.rename(
                 columns=dict(zip(old_names, new_names)),
             )
-
-        # Print warning for unseen levels
-        if self.verbose:
-            for i, c in enumerate(self.columns):
-                unseen_levels = set(X[c].unique().tolist()) - set(
-                    self._encoder.categories_[i],
-                )
-
-                if len(unseen_levels) > 0:
-                    warnings.warn(
-                        f"{self.classname()}: column %s has unseen categories: %s"
-                        % (c, unseen_levels),
-                        stacklevel=2,
-                    )
 
         # Drop original columns if self.drop_original is True
         DropOriginalMixin.drop_original_column(
