@@ -1040,7 +1040,6 @@ class OneHotEncodingTransformer(
     DropOriginalMixin,
     SeparatorColumnMixin,
     BaseTransformer,
-    OneHotEncoder,
 ):
     """Transformer to convert cetegorical variables into dummy columns.
 
@@ -1097,9 +1096,8 @@ class OneHotEncodingTransformer(
             copy=copy,
         )
 
-        # Set attributes for scikit-learn's OneHotEncoder
-        OneHotEncoder.__init__(
-            self,
+        # Create an instance of OneHotEncoder and assign it to _encoder
+        self._encoder = OneHotEncoder(
             sparse_output=False,
             handle_unknown="ignore",
             dtype=dtype,
@@ -1142,7 +1140,7 @@ class OneHotEncodingTransformer(
                     % c,
                 )
 
-        OneHotEncoder.fit(self, X=X[self.columns], y=y)
+        self._encoder.fit(X[self.columns], y=y)
 
         return self
 
@@ -1164,14 +1162,14 @@ class OneHotEncodingTransformer(
         kwargs : dict
             Keyword arguments to be passed on to the scikit learn attriute.
         """
-        if hasattr(self, "get_feature_names"):
-            input_columns = self.get_feature_names(
+        if hasattr(self._encoder, "get_feature_names"):
+            input_columns = self._encoder.get_feature_names(
                 input_features=input_features,
                 **kwargs,
             )
 
-        elif hasattr(self, "get_feature_names_out"):
-            input_columns = self.get_feature_names_out(
+        elif hasattr(self._encoder, "get_feature_names_out"):
+            input_columns = self._encoder.get_feature_names_out(
                 input_features=input_features,
                 **kwargs,
             )
@@ -1213,7 +1211,7 @@ class OneHotEncodingTransformer(
                 )
 
         # Apply OHE transform
-        X_transformed = OneHotEncoder.transform(self, X[self.columns])
+        X_transformed = self._encoder.transform(X[self.columns])
 
         input_columns = self._get_feature_names(input_features=self.columns)
 
@@ -1228,12 +1226,12 @@ class OneHotEncodingTransformer(
             old_names = [
                 c + "_" + str(lvl)
                 for i, c in enumerate(self.columns)
-                for lvl in self.categories_[i]
+                for lvl in self._encoder.categories_[i]
             ]
             new_names = [
                 c + self.separator + str(lvl)
                 for i, c in enumerate(self.columns)
-                for lvl in self.categories_[i]
+                for lvl in self._encoder.categories_[i]
             ]
 
             X_transformed = X_transformed.rename(
@@ -1243,7 +1241,9 @@ class OneHotEncodingTransformer(
         # Print warning for unseen levels
         if self.verbose:
             for i, c in enumerate(self.columns):
-                unseen_levels = set(X[c].unique().tolist()) - set(self.categories_[i])
+                unseen_levels = set(X[c].unique().tolist()) - set(
+                    self._encoder.categories_[i],
+                )
 
                 if len(unseen_levels) > 0:
                     warnings.warn(
