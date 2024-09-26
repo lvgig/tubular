@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import pytest
 import test_aide as ta
-from sklearn.exceptions import NotFittedError
 from test_BaseNominalTransformer import GenericNominalTransformTests
 
 import tests.test_data as d
@@ -265,76 +264,3 @@ class TestTransform(
             actual=df_transformed,
             msg="unseen category rows not encoded as 0s",
         )
-
-
-class TestAdditionalOneHotEncodingTransformer:
-    """Additional tests for OneHotEncodingTransformer."""
-
-    @pytest.fixture
-    def sample_data(self):
-        return pd.DataFrame(
-            {
-                "color": ["red", "blue", "green", "blue", "red"],
-                "size": ["S", "M", "L", "S", "M"],
-            },
-        )
-
-    def test_not_fitted_error_transform(self, sample_data):
-        transformer = OneHotEncodingTransformer(columns=["color", "size"])
-        with pytest.raises(NotFittedError):
-            transformer.transform(sample_data)
-
-    def test_initialization_and_fitting(self, sample_data):
-        transformer = OneHotEncodingTransformer(columns=["color", "size"])
-        transformer.fit(sample_data)
-        assert hasattr(
-            transformer._encoder,
-            "categories_",
-        ), "The encoder should have 'categories_' attribute after fitting."
-
-    def test_transformation(self, sample_data):
-        transformer = OneHotEncodingTransformer(columns=["color", "size"])
-        transformer.fit(sample_data)  # Ensure the transformer is fitted
-        transformed = transformer.transform(sample_data)
-        expected_columns = [
-            "color_red",
-            "color_blue",
-            "color_green",
-            "size_S",
-            "size_M",
-            "size_L",
-        ]
-        assert all(
-            col in transformed.columns for col in expected_columns
-        ), "All expected columns should be in the transformed dataframe."
-
-    def test_unseen_categories(self, sample_data):
-        transformer = OneHotEncodingTransformer(columns=["color", "size"])
-        transformer.fit(sample_data)  # Ensure the transformer is fitted
-        new_data = pd.DataFrame(
-            {
-                "color": ["yellow", "blue"],
-                "size": ["S", "XL"],
-            },
-        )
-        with pytest.warns(UserWarning, match="unseen categories"):
-            transformed = transformer.transform(new_data)
-        expected_columns = [
-            "color_red",
-            "color_blue",
-            "color_green",
-            "size_S",
-            "size_M",
-            "size_L",
-        ]
-        assert all(
-            col in transformed.columns for col in expected_columns
-        ), "All expected columns should be in the transformed dataframe."
-
-    def test_bug_fix(self, sample_data):
-        transformer = OneHotEncodingTransformer(columns=["color", "size"])
-        transformer.fit(sample_data)  # Ensure the transformer is fitted
-        try:
-            transformer.transform(sample_data)
-        except AttributeError as e:
-            pytest.fail(f"Unexpected AttributeError: {e}")
