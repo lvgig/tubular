@@ -22,6 +22,7 @@ Each individual change should have a link to the pull request after the descript
 Changed
 ^^^^^^^
 
+- Modified OneHotEncodingTransformer, made an instance of OneHotEncoder and assign it to attribut _encoder `#308 <https://github.com/lvgig/tubular/pull/309>`
 - Refactored BaseDateTransformer, BaseDateTwoColumnTransformer and associated testing  `#273 <https://github.com/lvgig/tubular/pull/273>`_
 - BaseTwoColumnTransformer removed in favour of mixin classes TwoColumnMixin and NewColumnNameMixin to handle validation of two columns and new_column_name arguments `#273 <https://github.com/lvgig/tubular/pull/273>`_
 - Refactored tests for InteractionTransformer  `#283 <https://github.com/lvgig/tubular/pull/283>`_
