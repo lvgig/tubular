@@ -6,6 +6,16 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
+from tests.base_tests import (
+    DropOriginalInitMixinTests,
+    DropOriginalTransformMixinTests,
+    GenericTransformTests,
+    NewColumnNameInitMixintests,
+    TwoColumnListInitTests,
+)
+from tests.dates.test_BaseGenericDateTransformer import (
+    GenericDatesMixinTransformTests,
+)
 from tubular.dates import DateDiffLeapYearTransformer
 
 
@@ -42,49 +52,16 @@ class TestCalculateAge:
         assert val == "missing_replacement"
 
 
-class TestInit:
+class TestInit(
+    NewColumnNameInitMixintests,
+    DropOriginalInitMixinTests,
+    TwoColumnListInitTests,
+):
     """Tests for DateDiffLeapYearTransformer.init()."""
 
-    @pytest.mark.parametrize("column_index", [0, 1])
-    def test_columns_type_error(self, column_index):
-        """Test that an exception is raised if columns element is not a str."""
-
-        columns = ["dummy_1", "dummy_2"]
-        columns[column_index] = 123
-
-        with pytest.raises(
-            TypeError,
-            match=r"DateDiffLeapYearTransformer: each element of columns should be a single \(string\) column name",
-        ):
-            DateDiffLeapYearTransformer(
-                columns=columns,
-                new_column_name="dummy_3",
-                drop_original=True,
-            )
-
-    def test_new_column_name_type_error(self):
-        """Test that an exception is raised if new_column_name is not a str."""
-        with pytest.raises(
-            TypeError,
-            match="DateDiffLeapYearTransformer: new_column_name should be str",
-        ):
-            DateDiffLeapYearTransformer(
-                columns=["dummy_1", "dummy_2"],
-                new_column_name=123,
-                drop_original=True,
-            )
-
-    def test_drop_original_type_error(self):
-        """Test that an exception is raised if drop_original is not a bool."""
-        with pytest.raises(
-            TypeError,
-            match="DateDiffLeapYearTransformer: drop_original should be bool",
-        ):
-            DateDiffLeapYearTransformer(
-                columns=["dummy_1", "dummy_2"],
-                new_column_name="dummy_3",
-                drop_original=123,
-            )
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DateDiffLeapYearTransformer"
 
     def test_missing_replacement_type_error(self):
         """Test that an exception is raised if missing_replacement is not the correct type."""
@@ -99,51 +76,17 @@ class TestInit:
                 missing_replacement=[1, 2, 3],
             )
 
-    def test_inputs_set_to_attribute(self):
-        """Test that the value passed for new_column_name and drop_original are saved in attributes of the same name."""
-        value_1 = "test_name"
-        value_2 = True
 
-        x = DateDiffLeapYearTransformer(
-            columns=["dummy_1", "dummy_2"],
-            new_column_name=value_1,
-            drop_original=value_2,
-            missing_replacement="dummy_3",
-        )
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "column_lower": "dummy_1",
-                "column_upper": "dummy_2",
-                "new_column_name": value_1,
-                "drop_original": value_2,
-                "missing_replacement": "dummy_3",
-            },
-            msg="Attributes for DateDiffLeapYearTransformer set in init",
-        )
-
-    def test_inputs_set_to_attribute_name_not_set(self):
-        """Test that the value passed for new_column_new_column_name and units are saved in attributes of the same new_column_name."""
-        x = DateDiffLeapYearTransformer(
-            columns=["dummy_1", "dummy_2"],
-            drop_original=True,
-        )
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "column_lower": "dummy_1",
-                "column_upper": "dummy_2",
-                "columns": ["dummy_1", "dummy_2"],
-                "new_column_name": "dummy_2_dummy_1_datediff",
-            },
-            msg="Attributes for DateDifferenceTransformer set in init",
-        )
-
-
-class TestTransform:
+class TestTransform(
+    DropOriginalTransformMixinTests,
+    GenericTransformTests,
+    GenericDatesMixinTransformTests,
+):
     """Tests for DateDiffLeapYearTransformer.transform()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DateDiffLeapYearTransformer"
 
     def expected_df_1():
         """Expected output for test_expected_output_drop_original_true."""
@@ -216,33 +159,6 @@ class TestTransform:
                 "c": [None],
             },
         )
-
-    @pytest.mark.parametrize(
-        ("columns, bad_col"),
-        [
-            (["date_col", "numeric_col"], 1),
-            (["date_col", "string_col"], 1),
-            (["date_col", "bool_col"], 1),
-            (["date_col", "empty_col"], 1),
-            (["numeric_col", "date_col"], 0),
-            (["string_col", "date_col"], 0),
-            (["bool_col", "date_col"], 0),
-            (["empty_col", "date_col"], 0),
-        ],
-    )
-    def test_input_data_check_column_errors(self, columns, bad_col):
-        """Check that errors are raised on a variety of different non datatypes"""
-        x = DateDiffLeapYearTransformer(
-            columns=columns,
-            new_column_name="c",
-            drop_original=True,
-        )
-        df = d.create_date_diff_incorrect_dtypes()
-
-        msg = rf"{x.classname()}: {columns[bad_col]} type should be in \['datetime64', 'date'\] but got {df[columns[bad_col]].dtype}"
-
-        with pytest.raises(TypeError, match=msg):
-            x.transform(df)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
