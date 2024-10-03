@@ -103,8 +103,7 @@ class GenericDatesMixinTransformTests:
             df[col] = bad_value
 
             x = uninitialized_transformers[self.transformer_name](
-                columns=columns,
-                new_column_name="c",
+                **args,
             )
 
             msg = (
@@ -129,12 +128,14 @@ class GenericDatesMixinTransformTests:
         columns,
         datetime_col,
         uninitialized_transformers,
+        minimal_attribute_dict,
     ):
         "Test that transform raises an error if one column is a date and one is datetime"
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["columns"] = columns
 
         x = uninitialized_transformers[self.transformer_name](
-            columns=columns,
-            new_column_name="c",
+            **args,
         )
 
         df = create_date_diff_different_dtypes()
