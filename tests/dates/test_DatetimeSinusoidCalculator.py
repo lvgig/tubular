@@ -5,6 +5,10 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
+from tests.base_tests import (
+    ColumnStrListInitTests,
+    DropOriginalInitMixinTests,
+)
 from tubular.dates import DatetimeSinusoidCalculator
 
 
@@ -13,8 +17,15 @@ def example_transformer():
     return DatetimeSinusoidCalculator("a", "cos", "hour", 24)
 
 
-class TestDatetimeSinusoidCalculatorInit:
-    """Tests for DateDifferenceTransformer.init()."""
+class TestInit(
+    ColumnStrListInitTests,
+    DropOriginalInitMixinTests,
+):
+    """Tests for DatetimeSinusoidCalculator.init()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DatetimeSinusoidCalculator"
 
     @pytest.mark.parametrize("incorrect_type_method", [2, 2.0, True, {"a": 4}])
     def test_method_type_error(self, incorrect_type_method):
@@ -203,18 +214,6 @@ class TestDatetimeSinusoidCalculatorInit:
                 units,
                 24,
             )
-
-    def test_attributes(self, example_transformer):
-        """Test that the value passed for new_column_name and units are saved in attributes of the same name."""
-        ta.classes.test_object_attributes(
-            obj=example_transformer,
-            expected_attributes={
-                "columns": ["a"],
-                "units": "hour",
-                "period": 24,
-            },
-            msg="Attributes for DateDifferenceTransformer set in init",
-        )
 
 
 class TestDatetimeSinusoidCalculatorTransform:
