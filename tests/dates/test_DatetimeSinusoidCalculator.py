@@ -8,6 +8,7 @@ import tests.test_data as d
 from tests.base_tests import (
     ColumnStrListInitTests,
     DropOriginalInitMixinTests,
+    GenericFitTests,
 )
 from tubular.dates import DatetimeSinusoidCalculator
 
@@ -214,6 +215,14 @@ class TestInit(
                 units,
                 24,
             )
+
+
+class TestFit(GenericFitTests):
+    """Generic tests for transformer.fit()"""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DatetimeSinusoidCalculator"
 
 
 class TestDatetimeSinusoidCalculatorTransform:
