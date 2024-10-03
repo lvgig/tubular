@@ -9,7 +9,10 @@ from tests.base_tests import (
     ColumnStrListInitTests,
     DropOriginalInitMixinTests,
     GenericFitTests,
+    GenericTransformTests,
+    OtherBaseBehaviourTests,
 )
+from tests.dates.test_BaseDatetimeTransformer import DatetimeMixinTransformTests
 from tubular.dates import DatetimeSinusoidCalculator
 
 
@@ -225,7 +228,13 @@ class TestFit(GenericFitTests):
         cls.transformer_name = "DatetimeSinusoidCalculator"
 
 
-class TestDatetimeSinusoidCalculatorTransform:
+class TestTransform(GenericTransformTests, DatetimeMixinTransformTests):
+    """Tests for BaseTwoColumnDateTransformer.transform."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DatetimeSinusoidCalculator"
+
     @pytest.mark.parametrize(
         ("bad_column", "bad_type"),
         [
@@ -395,3 +404,15 @@ class TestDatetimeSinusoidCalculatorTransform:
             expected=expected,
             msg_tag="DatetimeSinusoidCalculator transformer does not produce the expected output",
         )
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DatetimeSinusoidCalculator"
