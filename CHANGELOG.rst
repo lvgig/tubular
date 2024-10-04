@@ -15,15 +15,8 @@ Subsections for each version can be one of the following;
 - ``Security`` in case of vulnerabilities.
 
 Each individual change should have a link to the pull request after the description of the change.
-1.4.1 (unreleased)
-------------------
 
-Changed
-^^^^^^^
-
-- (document PR changes here)
-
-1.4.0 (2024-10-04)
+1.4.0 (unreleased)
 ------------------
 
 Changed
