@@ -15,13 +15,21 @@ Subsections for each version can be one of the following;
 - ``Security`` in case of vulnerabilities.
 
 Each individual change should have a link to the pull request after the description of the change.
-
-1.3.2 (unreleased)
+1.4.1 (unreleased)
 ------------------
 
 Changed
 ^^^^^^^
 
+- (document PR changes here)
+
+1.4.0 (2024-10-04)
+------------------
+
+Changed
+^^^^^^^
+
+- Modified OneHotEncodingTransformer, made an instance of OneHotEncoder and assign it to attribut _encoder `#308 <https://github.com/lvgig/tubular/pull/309>`
 - Refactored BaseDateTransformer, BaseDateTwoColumnTransformer and associated testing  `#273 <https://github.com/lvgig/tubular/pull/273>`_
 - BaseTwoColumnTransformer removed in favour of mixin classes TwoColumnMixin and NewColumnNameMixin to handle validation of two columns and new_column_name arguments `#273 <https://github.com/lvgig/tubular/pull/273>`_
 - Refactored tests for InteractionTransformer  `#283 <https://github.com/lvgig/tubular/pull/283>`_
@@ -35,6 +43,7 @@ Changed
 - Refactored BetweenDatesTransformer tests in new format `#294 <https://github.com/lvgig/tubular/issues/294>`_
 - As part of above, edited dates file transformers to use BaseDropOriginalMixin in transform
 - Refactored DateDifferenceTransformer tests in new format. Had to turn off autodefine new_column_name functionality to match generic test expectations. Suggest we look to turn back on in the future. `#296 https://github.com/lvgig/tubular/issues/296`
+- Refactored DateDiffLeapYearTransformer tests in new format. As part of this had to remove the autodefined new_column_name, as this conflicts with the generic testing. Suggest we look to turn back on in future. `#295 https://github.com/lvgig/tubular/issues/295`
 - Edited base testing setup for dates file, created new BaseDatetimeTransformer class
 
 

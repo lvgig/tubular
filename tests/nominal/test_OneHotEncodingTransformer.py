@@ -232,7 +232,7 @@ class TestTransform(
 
         x.fit(df_train)
 
-        with pytest.warns(Warning):
+        with pytest.warns(UserWarning, match="unseen categories"):
             x.transform(df_test)
 
     @pytest.mark.parametrize(
