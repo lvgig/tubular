@@ -5,6 +5,16 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
+from tests.base_tests import (
+    ColumnStrListInitTests,
+    DropOriginalInitMixinTests,
+    DropOriginalTransformMixinTests,
+    GenericTransformTests,
+    OtherBaseBehaviourTests,
+)
+from tests.dates.test_BaseDatetimeTransformer import (
+    DatetimeMixinTransformTests,
+)
 from tubular.dates import DatetimeInfoExtractor
 
 
@@ -28,26 +38,13 @@ def dayofweek_extractor():
     return DatetimeInfoExtractor(columns=["a"], include=["dayofweek"])
 
 
-class TestExtractDatetimeInfoInit:
-    def test_values_passed_in_init_set_to_attribute(self):
-        """Test that the values passed in init are saved in an attribute of the same name."""
-        x = DatetimeInfoExtractor(
-            columns=["a"],
-            include=["timeofmonth", "timeofday"],
-            datetime_mappings={"timeofday": {"am": range(12), "pm": range(12, 24)}},
-        )
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "columns": ["a"],
-                "include": ["timeofmonth", "timeofday"],
-                "datetime_mappings": {
-                    "timeofday": {"am": range(12), "pm": range(12, 24)},
-                },
-            },
-            msg="Attributes for ExtractDatetimeInfo set in init",
-        )
+class TestExtractDatetimeInfoInit(
+    ColumnStrListInitTests,
+    DropOriginalInitMixinTests,
+):
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DatetimeInfoExtractor"
 
     @pytest.mark.parametrize("incorrect_type_include", [2, 3.0, "invalid", "dayofweek"])
     def test_error_when_include_not_list(self, incorrect_type_include):
@@ -289,27 +286,14 @@ class TestMapValues:
         ), f"passing np.nan should result in np.nan, instead received {output}"
 
 
-class TestTransform:
-    @pytest.mark.parametrize(
-        ("bad_column", "bad_type"),
-        [
-            ["numeric_col", "int64"],
-            ["string_col", "object"],
-            ["bool_col", "bool"],
-            ["empty_col", "object"],
-            ["date_col", "date"],
-        ],
-    )
-    def test_input_data_check_column_errors(self, bad_column, bad_type):
-        """Check that errors are raised on a variety of different non datatypes"""
-        x = DatetimeInfoExtractor(columns=bad_column)
-
-        df = d.create_date_diff_incorrect_dtypes()
-
-        msg = rf"{x.classname()}: {bad_column} type should be in \['datetime64'\] but got {bad_type}"
-
-        with pytest.raises(TypeError, match=msg):
-            x.transform(df)
+class TestTransform(
+    GenericTransformTests,
+    DatetimeMixinTransformTests,
+    DropOriginalTransformMixinTests,
+):
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DatetimeInfoExtractor"
 
     def test_correct_col_returned(self):
         """Test that the added column is correct."""
@@ -401,3 +385,15 @@ class TestTransform:
 
         # serialise without raising error
         joblib.dump(transformer, path)
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DatetimeInfoExtractor"
