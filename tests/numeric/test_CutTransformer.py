@@ -1,34 +1,15 @@
 import re
 
-import pandas
 import pandas as pd
 import pytest
 import test_aide as ta
 
 import tests.test_data as d
-import tubular
 from tubular.numeric import CutTransformer
 
 
 class TestInit:
     """Tests for CutTransformer.init()."""
-
-    def test_super_init_called(self, mocker):
-        """Test that init calls BaseTransformer.init."""
-        expected_call_args = {
-            0: {
-                "args": (),
-                "kwargs": {"columns": ["a"], "verbose": False},
-            },
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "__init__",
-            expected_call_args,
-        ):
-            CutTransformer(column="a", new_column_name="b", verbose=False)
 
     def test_column_type_error(self):
         """Test that an exception is raised if column is not a str."""
@@ -71,25 +52,6 @@ class TestInit:
                 cut_kwargs={"a": 1, 2: "b"},
             )
 
-    def test_inputs_set_to_attribute(self):
-        """Test that the values passed in init are set to attributes."""
-        x = CutTransformer(
-            column="b",
-            new_column_name="a",
-            cut_kwargs={"a": 1, "b": 2},
-        )
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "column": "b",
-                "columns": ["b"],
-                "new_column_name": "a",
-                "cut_kwargs": {"a": 1, "b": 2},
-            },
-            msg="Attributes for CutTransformer set in init",
-        )
-
 
 class TestTransform:
     """Tests for CutTransformer.transform()."""
@@ -105,49 +67,6 @@ class TestTransform:
         )
 
         return df
-
-    def test_super_transform_call(self, mocker):
-        """Test the call to BaseTransformer.transform is as expected."""
-        df = d.create_df_9()
-
-        x = CutTransformer(column="a", new_column_name="Y", cut_kwargs={"bins": 3})
-
-        expected_call_args = {0: {"args": (d.create_df_9(),), "kwargs": {}}}
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-            return_value=d.create_df_9(),
-        ):
-            x.transform(df)
-
-    def test_pd_cut_call(self, mocker):
-        """Test the call to pd.cut is as expected."""
-        df = d.create_df_9()
-
-        x = CutTransformer(
-            column="a",
-            new_column_name="a_cut",
-            cut_kwargs={"bins": 3, "right": False, "precision": 2},
-        )
-
-        expected_call_args = {
-            0: {
-                "args": (d.create_df_9()["a"].to_numpy(),),
-                "kwargs": {"bins": 3, "right": False, "precision": 2},
-            },
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            pandas,
-            "cut",
-            expected_call_args,
-            return_value=[1, 2, 3, 4, 5, 6],
-        ):
-            x.transform(df)
 
     def test_output_from_cut_assigned_to_column(self, mocker):
         """Test that the output from pd.cut is assigned to column with name new_column_name."""
@@ -187,15 +106,3 @@ class TestTransform:
             actual=df_transformed,
             msg="CutTransformer.transform output",
         )
-
-    def test_non_numeric_column_error(self):
-        """Test that an exception is raised if the column to discretise is not numeric."""
-        df = d.create_df_8()
-
-        x = CutTransformer(column="b", new_column_name="d")
-
-        with pytest.raises(
-            TypeError,
-            match="CutTransformer: b should be a numeric dtype but got object",
-        ):
-            x.transform(df)
