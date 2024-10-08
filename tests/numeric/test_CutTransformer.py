@@ -5,11 +5,19 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
+from tests.numeric.test_BaseNumericTransformer import (
+    BaseNumericTransformerInitTests,
+    BaseNumericTransformerTransformTests,
+)
 from tubular.numeric import CutTransformer
 
 
-class TestInit:
+class TestInit(BaseNumericTransformerInitTests):
     """Tests for CutTransformer.init()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "CutTransformer"
 
     def test_column_type_error(self):
         """Test that an exception is raised if column is not a str."""
@@ -53,8 +61,12 @@ class TestInit:
             )
 
 
-class TestTransform:
+class TestTransform(BaseNumericTransformerTransformTests):
     """Tests for CutTransformer.transform()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "CutTransformer"
 
     def expected_df_1():
         """Expected output for test_expected_output."""
