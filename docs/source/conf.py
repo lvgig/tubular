@@ -12,6 +12,8 @@
 
 import os
 import sys
+from contextlib import suppress
+from importlib.metadata import version
 
 sys.path.insert(0, os.path.abspath("../../"))
 
@@ -23,9 +25,10 @@ project_copyright = "2021, LV GI Data Science Team"
 author = "LV GI Data Science Team"
 
 # The full version, including alpha/beta/rc tags
-import tubular  # noqa: E402
 
-release = tubular.__version__
+
+with suppress(ModuleNotFoundError):
+    release = version("tubular")
 
 
 # -- General configuration ---------------------------------------------------
