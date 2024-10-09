@@ -10,6 +10,7 @@ from tests.base_tests import (
     DropOriginalInitMixinTests,
     GenericTransformTests,
     NewColumnNameInitMixintests,
+    OtherBaseBehaviourTests,
 )
 from tubular.dates import ToDatetimeTransformer
 
@@ -116,3 +117,15 @@ class TestTransform(GenericTransformTests):
             actual=df_transformed,
             msg="ToDatetimeTransformer.transform output",
         )
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseDatetimeTransformer"
