@@ -17,6 +17,34 @@ class TestInit(BaseNumericTransformerInitTests):
     def setup_class(cls):
         cls.transformer_name = "CutTransformer"
 
+    def test_new_column_name_type_error(self):
+        """Test that an exception is raised if new_column_name is not a str."""
+        with pytest.raises(
+            TypeError,
+            match="CutTransformer: new_column_name must be a str",
+        ):
+            CutTransformer(column="b", new_column_name=1)
+
+    def test_cut_kwargs_type_error(self):
+        """Test that an exception is raised if cut_kwargs is not a dict."""
+        with pytest.raises(
+            TypeError,
+            match=r"""cut_kwargs should be a dict but got type \<class 'int'\>""",
+        ):
+            CutTransformer(column="b", new_column_name="a", cut_kwargs=1)
+
+    def test_cut_kwargs_key_type_error(self):
+        """Test that an exception is raised if cut_kwargs has keys which are not str."""
+        with pytest.raises(
+            TypeError,
+            match=r"""CutTransformer: unexpected type \(\<class 'int'\>\) for cut_kwargs key in position 1, must be str""",
+        ):
+            CutTransformer(
+                new_column_name="a",
+                column="b",
+                cut_kwargs={"a": 1, 2: "b"},
+            )
+
 
 class TestTransform(BaseNumericTransformerTransformTests):
     """Tests for CutTransformer.transform()."""
