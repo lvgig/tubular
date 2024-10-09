@@ -238,7 +238,7 @@ class LogTransformer(BaseNumericTransformer, DropOriginalMixin):
         return X
 
 
-class CutTransformer(BaseTransformer):
+class CutTransformer(BaseNumericTransformer):
     """Class to bin a column into discrete intervals.
 
     Class simply uses the [pd.cut](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.cut.html)
@@ -306,10 +306,6 @@ class CutTransformer(BaseTransformer):
 
         """
         X = super().transform(X)
-
-        if not pd.api.types.is_numeric_dtype(X[self.columns[0]]):
-            msg = f"{self.classname()}: {self.columns[0]} should be a numeric dtype but got {X[self.columns[0]].dtype}"
-            raise TypeError(msg)
 
         X[self.new_column_name] = pd.cut(
             X[self.columns[0]].to_numpy(),
