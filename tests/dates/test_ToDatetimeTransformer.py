@@ -5,30 +5,24 @@ import pandas as pd
 import pytest
 import test_aide as ta
 
+from tests.base_tests import (
+    ColumnStrListInitTests,
+    DropOriginalInitMixinTests,
+    NewColumnNameInitMixintests,
+)
 from tubular.dates import ToDatetimeTransformer
 
 
-class TestInit:
-    """Tests for ToDatetimeTransformer.init()."""
+class TestInit(
+    NewColumnNameInitMixintests,
+    DropOriginalInitMixinTests,
+    ColumnStrListInitTests,
+):
+    """Generic tests for transformer.init()."""
 
-    def test_column_type_error(self):
-        """Test that an exception is raised if column is not a str."""
-        with pytest.raises(
-            TypeError,
-            match=r"ToDatetimeTransformer: each element of columns should be a single \(string\) column name",
-        ):
-            ToDatetimeTransformer(
-                column=["a"],
-                new_column_name="a",
-            )
-
-    def test_new_column_name_type_error(self):
-        """Test that an exception is raised if new_column_name is not a str."""
-        with pytest.raises(
-            TypeError,
-            match="ToDatetimeTransformer: new_column_name should be str",
-        ):
-            ToDatetimeTransformer(column="b", new_column_name=1)
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseDatetimeTransformer"
 
     def test_to_datetime_kwargs_type_error(self):
         """Test that an exception is raised if to_datetime_kwargs is not a dict."""
@@ -49,25 +43,6 @@ class TestInit:
                 column="b",
                 to_datetime_kwargs={"a": 1, 2: "b"},
             )
-
-    def test_inputs_set_to_attribute(self):
-        """Test that the values passed in init are set to attributes."""
-        to_dt = ToDatetimeTransformer(
-            column="b",
-            new_column_name="a",
-            to_datetime_kwargs={"a": 1, "b": 2},
-        )
-
-        ta.classes.test_object_attributes(
-            obj=to_dt,
-            expected_attributes={
-                "column": "b",
-                "columns": ["b"],
-                "new_column_name": "a",
-                "to_datetime_kwargs": {"a": 1, "b": 2},
-            },
-            msg="Attributes for ToDatetimeTransformer set in init",
-        )
 
 
 class TestTransform:
