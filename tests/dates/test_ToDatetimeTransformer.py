@@ -8,6 +8,7 @@ import test_aide as ta
 from tests.base_tests import (
     ColumnStrListInitTests,
     DropOriginalInitMixinTests,
+    GenericTransformTests,
     NewColumnNameInitMixintests,
 )
 from tubular.dates import ToDatetimeTransformer
@@ -45,8 +46,12 @@ class TestInit(
             )
 
 
-class TestTransform:
-    """Tests for ToDatetimeTransformer.transform()."""
+class TestTransform(GenericTransformTests):
+    """Tests for BaseDatetimeTransformer.transform."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseDatetimeTransformer"
 
     def expected_df_1():
         """Expected output for test_expected_output."""
