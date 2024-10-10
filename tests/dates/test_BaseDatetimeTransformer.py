@@ -37,11 +37,12 @@ class DatetimeMixinTransformTests:
         "Test that transform raises an error if columns contains non date types"
 
         args = minimal_attribute_dict[self.transformer_name].copy()
+
+        # pull out columns arg to use below, and remove from dict
         columns = args["columns"]
 
         for i in range(len(columns)):
             df = deepcopy(minimal_dataframe_lookup[self.transformer_name])
-            print(df)
             col = columns[i]
             df[col] = bad_value
 
