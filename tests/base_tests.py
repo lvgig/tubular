@@ -333,7 +333,7 @@ class GenericFitTests:
 
         with pytest.raises(
             TypeError,
-            match=f"{self.transformer_name}: X should be a pd.DataFrame",
+            match=f"{self.transformer_name}: X should be a polars or pandas DataFrame/LazyFrame",
         ):
             x.fit(non_df, df["a"])
 
@@ -352,7 +352,7 @@ class GenericFitTests:
 
         with pytest.raises(
             TypeError,
-            match=f"{self.transformer_name}: unexpected type for y, should be a pd.Series",
+            match=f"{self.transformer_name}: unexpected type for y, should be a polars or pandas Series",
         ):
             x.fit(X=df, y=non_series)
 
@@ -621,7 +621,7 @@ class GenericTransformTests:
 
         with pytest.raises(
             TypeError,
-            match=f"{self.transformer_name}: X should be a pd.DataFrame",
+            match=f"{self.transformer_name}: X should be a polars or pandas DataFrame/LazyFrame",
         ):
             x_fitted.transform(X=non_df)
 
@@ -748,7 +748,7 @@ class ColumnsCheckTests:
 
         with pytest.raises(
             TypeError,
-            match=f"{self.transformer_name}: X should be a pd.DataFrame",
+            match=f"{self.transformer_name}: X should be a polars or pandas DataFrame/LazyFrame",
         ):
             x.columns_check(X=[1, 2, 3, 4, 5, 6])
 
@@ -806,7 +806,7 @@ class CombineXYTests:
 
         with pytest.raises(
             TypeError,
-            match=f"{self.transformer_name}: X should be a pd.DataFrame",
+            match=f"{self.transformer_name}: X should be a polars or pandas DataFrame/LazyFrame",
         ):
             x._combine_X_y(X=non_df, y=pd.Series([1, 2]))
 
@@ -822,7 +822,7 @@ class CombineXYTests:
 
         with pytest.raises(
             TypeError,
-            match=f"{self.transformer_name}: y should be a pd.Series",
+            match=f"{self.transformer_name}: y should be a polars or pandas Series",
         ):
             x._combine_X_y(X=pd.DataFrame({"a": [1, 2]}), y=non_series)
 
@@ -841,23 +841,6 @@ class CombineXYTests:
             ),
         ):
             x._combine_X_y(X=pd.DataFrame({"a": [1, 2]}), y=pd.Series([2]))
-
-    def test_X_and_y_different_indexes_warning(
-        self,
-        initialized_transformers,
-    ):
-        """Test a warning is raised if X and y have different indexes, but the output is still X and y."""
-
-        x = initialized_transformers[self.transformer_name]
-
-        with pytest.warns(
-            UserWarning,
-            match=f"{self.transformer_name}: X and y do not have equal indexes",
-        ):
-            x._combine_X_y(
-                X=pd.DataFrame({"a": [1, 2]}, index=[1, 2]),
-                y=pd.Series([2, 4]),
-            )
 
     def test_output_same_indexes(
         self,

@@ -221,7 +221,7 @@ class TestTransform:
 
         with pytest.raises(
             TypeError,
-            match=f"{x.classname()}: X should be a pd.DataFrame",
+            match=f"{x.classname()}: X should be a polars or pandas DataFrame/LazyFrame",
         ):
             x.transform(X=[1, 2, 3, 4, 5, 6])
 
