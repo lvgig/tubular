@@ -591,21 +591,23 @@ class SeriesDtMethodTransformer(BaseDatetimeTransformer):
         self,
         new_column_name: str,
         pd_method_name: str,
-        column: str,
+        columns: str,
         pd_method_kwargs: dict[str, object] | None = None,
         drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
-        if type(column) is not str:
-            msg = f"{self.classname()}: column should be a str but got {type(column)}"
-            raise TypeError(msg)
-
         super().__init__(
-            columns=[column],
+            columns=columns,
             new_column_name=new_column_name,
             drop_original=drop_original,
             **kwargs,
         )
+
+        if len(self.columns) > 1:
+            msg = rf"{self.classname()}: column should be a str or list of len 1, got {self.columns}"
+            raise ValueError(
+                msg,
+            )
 
         if type(pd_method_name) is not str:
             msg = f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
@@ -644,7 +646,7 @@ class SeriesDtMethodTransformer(BaseDatetimeTransformer):
 
         # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.
-        self.column = column
+        self.column = self.columns[0]
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform specific column on input pandas.DataFrame (X) using the given pandas.Series.dt method and
