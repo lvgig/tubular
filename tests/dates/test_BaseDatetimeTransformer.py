@@ -46,8 +46,7 @@ class DatetimeMixinTransformTests:
             df[col] = bad_value
 
             x = uninitialized_transformers[self.transformer_name](
-                columns=columns,
-                new_column_name="c",
+                **args,
             )
 
             msg = rf"{col} type should be in \['datetime64'\] but got {bad_type}"
