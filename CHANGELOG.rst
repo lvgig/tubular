@@ -42,6 +42,7 @@ Changed
 - Refactored DatetimeSinusoidCalculator tests in new format. `#310 <https://github.com/lvgig/tubular/issues/310>`_
 - fixed a bug in CappingTransformer which was preventing use of .get_params method `#311 <https://github.com/lvgig/tubular/issues/311>`_
 - Refactored ToDatetimeTransformer tests in new format `#300 <https://github.com/lvgig/tubular/issues/300>`_
+- Refactors tests for SeriesDtMethodTransformer in new format. Changed column arg to columns to fit generic format. `#299 <https://github.com/lvgig/tubular/issues/299>_`
 
 
 1.3.1 (2024-07-18)
