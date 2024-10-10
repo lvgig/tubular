@@ -6,40 +6,30 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
+from tests.base_tests import (
+    DropOriginalInitMixinTests,
+    DropOriginalTransformMixinTests,
+    GenericTransformTests,
+    NewColumnNameInitMixintests,
+    OtherBaseBehaviourTests,
+    TwoColumnListInitTests,
+)
+from tests.dates.test_BaseGenericDateTransformer import (
+    GenericDatesMixinTransformTests,
+)
 from tubular.dates import DateDifferenceTransformer
 
 
-class TestInit:
+class TestInit(
+    TwoColumnListInitTests,
+    DropOriginalInitMixinTests,
+    NewColumnNameInitMixintests,
+):
     """Tests for DateDifferenceTransformer.init()."""
 
-    @pytest.mark.parametrize("column_index", [0, 1])
-    def test_columns_type_error(self, column_index):
-        """Test that an exception is raised if columns element is not a str."""
-        with pytest.raises(
-            TypeError,
-            match=r"DateDifferenceTransformer: each element of columns should be a single \(string\) column name",
-        ):
-            columns = ["dummy_1", "dummy_2"]
-            columns[column_index] = 123
-            DateDifferenceTransformer(
-                columns=columns,
-                new_column_name="dummy_3",
-                units="D",
-                verbose=False,
-            )
-
-    def test_new_column_name_type_error(self):
-        """Test that an exception is raised if new_column_name is not a str."""
-        with pytest.raises(
-            TypeError,
-            match="DateDifferenceTransformer: new_column_name should be str",
-        ):
-            DateDifferenceTransformer(
-                columns=["dummy_1", "dummy_2"],
-                new_column_name=123,
-                units="D",
-                verbose=False,
-            )
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DateDifferenceTransformer"
 
     def test_units_values_error(self):
         """Test that an exception is raised if the value of inits is not one of accepted_values_units."""
@@ -54,30 +44,17 @@ class TestInit:
                 verbose=False,
             )
 
-    def test_inputs_set_to_attribute_name_not_set(self):
-        """Test that the value passed for new_column_new_column_name and units are saved in attributes of the same new_column_name."""
-        x = DateDifferenceTransformer(
-            columns=["dummy_1", "dummy_2"],
-            units="D",
-            verbose=False,
-        )
 
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "column_lower": "dummy_1",
-                "column_upper": "dummy_2",
-                "columns": ["dummy_1", "dummy_2"],
-                "new_column_name": "dummy_2_dummy_1_datediff_D",
-                "units": "D",
-                "verbose": False,
-            },
-            msg="Attributes for DateDifferenceTransformer set in init",
-        )
-
-
-class TestTransform:
+class TestTransform(
+    GenericTransformTests,
+    GenericDatesMixinTransformTests,
+    DropOriginalTransformMixinTests,
+):
     """Tests for DateDifferenceTransformer.transform()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DateDifferenceTransformer"
 
     def expected_df_3():
         """Expected output for test_expected_output_units_D."""
@@ -808,65 +785,6 @@ class TestTransform:
         )
 
     @pytest.mark.parametrize(
-        ("columns, bad_col"),
-        [
-            (["date_col", "numeric_col"], 1),
-            (["date_col", "string_col"], 1),
-            (["date_col", "bool_col"], 1),
-            (["date_col", "empty_col"], 1),
-            (["numeric_col", "date_col"], 0),
-            (["string_col", "date_col"], 0),
-            (["bool_col", "date_col"], 0),
-            (["empty_col", "date_col"], 0),
-        ],
-    )
-    def test_input_data_check_column_errors(self, columns, bad_col):
-        """Check that errors are raised on a variety of different non date datatypes"""
-        x = DateDifferenceTransformer(
-            columns=columns,
-            new_column_name="c",
-        )
-        df = d.create_date_diff_incorrect_dtypes()
-
-        msg = rf"{x.classname()}: {columns[bad_col]} type should be in \['datetime64', 'date'\] but got {df[columns[bad_col]].dtype}"
-
-        with pytest.raises(TypeError, match=msg):
-            x.transform(df)
-
-    @pytest.mark.parametrize(
-        ("columns, datetime_col, date_col"),
-        [
-            (["date_col_1", "datetime_col_2"], 1, 0),
-            (["datetime_col_1", "date_col_2"], 0, 1),
-        ],
-    )
-    def test_mismatched_datetypes_error(self, columns, datetime_col, date_col):
-        "Test that transform raises an error if one column is a date and one is datetime"
-
-        x = DateDifferenceTransformer(
-            columns=columns,
-            new_column_name="c",
-        )
-
-        df = d.create_date_diff_different_dtypes()
-        # types don't seem to come out of the above function as expected, hard enforce
-        for col in ["date_col_1", "date_col_2"]:
-            df[col] = pd.to_datetime(df[col]).dt.date
-
-        for col in ["datetime_col_1", "datetime_col_2"]:
-            df[col] = pd.to_datetime(df[col])
-
-        present_types = (
-            {"datetime64", "date"} if datetime_col == 0 else {"date", "datetime64"}
-        )
-        msg = rf"Columns fed to datetime transformers should be \['datetime64', 'date'\] and have consistent types, but found {present_types}. Please use ToDatetimeTransformer to standardise"
-        with pytest.raises(
-            TypeError,
-            match=msg,
-        ):
-            x.transform(df)
-
-    @pytest.mark.parametrize(
         ("df", "expected"),
         ta.pandas.adjusted_dataframe_params(
             d.create_datediff_test_df(),
@@ -1001,3 +919,15 @@ class TestTransform:
             expected=expected,
             msg_tag="Unexpected values in DateDifferenceTransformer.transform (nulls)",
         )
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DateDifferenceTransformer"
