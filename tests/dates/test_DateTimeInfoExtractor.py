@@ -38,10 +38,12 @@ def dayofweek_extractor():
     return DatetimeInfoExtractor(columns=["a"], include=["dayofweek"])
 
 
-class TestExtractDatetimeInfoInit(
+class TestInit(
     ColumnStrListInitTests,
     DropOriginalInitMixinTests,
 ):
+    "tests for DatetimeInfoExtractor.__init__"
+
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "DatetimeInfoExtractor"
@@ -161,6 +163,8 @@ class TestExtractDatetimeInfoInit(
 
 
 class TestMapValues:
+    "tests for DatetimeInfoExtractor.map_values"
+
     @pytest.mark.parametrize("incorrect_type_input", ["2", [1, 2]])
     def test_incorrect_type_input(self, incorrect_type_input, timeofday_extractor):
         """Test that an error is raised if input is the wrong type."""
@@ -291,6 +295,8 @@ class TestTransform(
     DatetimeMixinTransformTests,
     DropOriginalTransformMixinTests,
 ):
+    "tests for DatetimeInfoExtractor.transform"
+
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "DatetimeInfoExtractor"
