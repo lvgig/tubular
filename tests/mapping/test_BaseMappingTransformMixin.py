@@ -103,7 +103,7 @@ class TestTransform(GenericTransformTests):
 
         with pytest.raises(
             TypeError,
-            match="BaseMappingTransformMixin: X should be a pd.DataFrame",
+            match="BaseMappingTransformMixin: X should be a polars or pandas DataFrame/LazyFrame",
         ):
             x_fitted.transform(X=non_df)
 

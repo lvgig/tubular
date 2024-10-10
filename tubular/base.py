@@ -5,12 +5,17 @@ from. These transformers contain key checks to be applied in all cases.
 from __future__ import annotations
 
 import warnings
+from typing import TYPE_CHECKING
 
+import narwhals as nw
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from tubular.mixins import DropOriginalMixin
+
+if TYPE_CHECKING:
+    from narwhals.typing import FrameT
 
 pd.options.mode.copy_on_write = True
 
@@ -95,7 +100,8 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         self.copy = copy
 
-    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> BaseTransformer:
+    @nw.narwhalify
+    def fit(self, X: FrameT, y: nw.Series | None = None) -> BaseTransformer:
         """Base transformer fit method, checks X and y types. Currently only pandas DataFrames are allowed for X
         and DataFrames or Series for y.
 
@@ -120,10 +126,8 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             raise ValueError(msg)
 
         if y is not None:
-            if not isinstance(y, pd.Series):
-                msg = (
-                    f"{self.classname()}: unexpected type for y, should be a pd.Series"
-                )
+            if not isinstance(y, nw.Series):
+                msg = f"{self.classname()}: unexpected type for y, should be a polars or pandas Series"
                 raise TypeError(msg)
 
             if not y.shape[0] > 0:
@@ -132,7 +136,8 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         return self
 
-    def _combine_X_y(self, X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
+    @nw.narwhalify
+    def _combine_X_y(self, X: FrameT, y: nw.Series) -> FrameT:
         """Combine X and y by adding a new column with the values of y to a copy of X.
 
         The new column response column will be called `_temporary_response`.
@@ -149,27 +154,22 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             Response variable.
 
         """
-        if not isinstance(X, pd.DataFrame):
-            msg = f"{self.classname()}: X should be a pd.DataFrame"
+        if not isinstance(X, (nw.DataFrame, nw.LazyFrame)):
+            msg = f"{self.classname()}: X should be a polars or pandas DataFrame/LazyFrame"
             raise TypeError(msg)
 
-        if not isinstance(y, pd.Series):
-            msg = f"{self.classname()}: y should be a pd.Series"
+        if not isinstance(y, nw.Series):
+            msg = f"{self.classname()}: y should be a polars or pandas Series"
             raise TypeError(msg)
 
         if X.shape[0] != y.shape[0]:
             msg = f"{self.classname()}: X and y have different numbers of rows ({X.shape[0]} vs {y.shape[0]})"
             raise ValueError(msg)
 
-        if not (X.index == y.index).all():
-            warnings.warn(
-                f"{self.classname()}: X and y do not have equal indexes",
-                stacklevel=2,
-            )
+        return X.with_columns(_temporary_response=y)
 
-        return X.assign(_temporary_response=y)
-
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+    @nw.narwhalify
+    def transform(self, X: FrameT) -> FrameT:
         """Base transformer transform method; checks X type (pandas DataFrame only) and copies data if requested.
 
         Transform calls the columns_check method which will check columns in columns attribute are in X.
@@ -191,7 +191,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             print("BaseTransformer.transform() called")
 
         # to prevent overwriting original dataframe
-        X_view = X.iloc[:]
+        X_view = X.clone()
 
         if not X.shape[0] > 0:
             msg = f"{self.classname()}: X has no rows; {X.shape}"
@@ -213,7 +213,8 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
         """
         check_is_fitted(self, attribute)
 
-    def columns_check(self, X: pd.DataFrame) -> None:
+    @nw.narwhalify
+    def columns_check(self, X: FrameT) -> None:
         """Method to check that the columns attribute is set and all values are present in X.
 
         Parameters
@@ -222,8 +223,8 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             Data to check columns are in.
 
         """
-        if not isinstance(X, pd.DataFrame):
-            msg = f"{self.classname()}: X should be a pd.DataFrame"
+        if not isinstance(X, (nw.DataFrame, nw.LazyFrame)):
+            msg = f"{self.classname()}: X should be a polars or pandas DataFrame/LazyFrame"
             raise TypeError(msg)
 
         if not isinstance(self.columns, list):
@@ -231,7 +232,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
             raise TypeError(msg)
 
         for c in self.columns:
-            if c not in X.columns.to_numpy():
+            if c not in X.columns:
                 raise ValueError(f"{self.classname()}: variable " + c + " is not in X")
 
 

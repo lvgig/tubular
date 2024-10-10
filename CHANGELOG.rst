@@ -41,6 +41,7 @@ Changed
 - Refactored DatetimeInfoExtractor tests in new format `#297 <https://github.com/lvgig/tubular/issues/297>`_
 - Refactored DatetimeSinusoidCalculator tests in new format. `#310 <https://github.com/lvgig/tubular/issues/310>`_
 - fixed a bug in CappingTransformer which was preventing use of .get_params method `#311 <https://github.com/lvgig/tubular/issues/311>`_
+- Narwhal-ified BaseTransformer
 
 
 1.3.1 (2024-07-18)
