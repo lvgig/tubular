@@ -40,7 +40,6 @@ class DatetimeMixinTransformTests:
 
         # pull out columns arg to use below, and remove from dict
         columns = args["columns"]
-        del args["columns"]
 
         for i in range(len(columns)):
             df = deepcopy(minimal_dataframe_lookup[self.transformer_name])
