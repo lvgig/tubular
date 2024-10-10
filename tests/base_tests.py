@@ -281,6 +281,11 @@ class GenericFitTests:
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     def test_fit_returns_self(
         self,
         initialized_transformers,
@@ -298,10 +303,16 @@ class GenericFitTests:
             x_fitted is x
         ), f"Returned value from {self.transformer_name}.fit not as expected."
 
+    @pytest.mark.parametrize(
+        ("minimal_dataframe_lookup", "get_assert_frame_equal"),
+        [("pandas",) * 2, ("polars",) * 2],
+        indirect=True,
+    )
     def test_fit_not_changing_data(
         self,
         initialized_transformers,
         minimal_dataframe_lookup,
+        get_assert_frame_equal,
     ):
         """Test fit does not change X."""
 
@@ -312,12 +323,16 @@ class GenericFitTests:
 
         x.fit(df, df["a"])
 
-        ta.equality.assert_equal_dispatch(
-            expected=original_df,
-            actual=df,
-            msg="Check X not changing during fit",
+        get_assert_frame_equal(
+            original_df,
+            df,
         )
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     @pytest.mark.parametrize("non_df", [1, True, "a", [1, 2], {"a": 1}, None])
     def test_X_non_df_error(
         self,
@@ -337,8 +352,13 @@ class GenericFitTests:
         ):
             x.fit(non_df, df["a"])
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     @pytest.mark.parametrize("non_series", [1, True, "a", [1, 2], {"a": 1}])
-    def test_non_pd_type_error(
+    def test_bad_type_error(
         self,
         non_series,
         initialized_transformers,
@@ -372,10 +392,16 @@ class GenericFitTests:
         ):
             x.fit(df, df["a"])
 
+    @pytest.mark.parametrize(
+        ("minimal_dataframe_lookup", "get_series_init"),
+        [("pandas",) * 2, ("polars",) * 2],
+        indirect=True,
+    )
     def test_Y_no_rows_error(
         self,
         initialized_transformers,
         minimal_dataframe_lookup,
+        get_series_init,
     ):
         """Test an error is raised if Y has no rows."""
 
@@ -387,7 +413,7 @@ class GenericFitTests:
             ValueError,
             match=re.escape(f"{self.transformer_name}: y is empty; (0,)"),
         ):
-            x.fit(X=df, y=pd.Series(name="d", dtype=object))
+            x.fit(X=df, y=get_series_init(name="d", dtype=object))
 
     def test_unexpected_kwarg_error(
         self,
@@ -604,6 +630,11 @@ class GenericTransformTests:
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     @pytest.mark.parametrize("non_df", [1, True, "a", [1, 2], {"a": 1}, None])
     def test_non_pd_type_error(
         self,
@@ -625,6 +656,11 @@ class GenericTransformTests:
         ):
             x_fitted.transform(X=non_df)
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     def test_no_rows_error(self, initialized_transformers, minimal_dataframe_lookup):
         """Test an error is raised if X has no rows."""
 
@@ -642,10 +678,16 @@ class GenericTransformTests:
         ):
             x.transform(df)
 
+    @pytest.mark.parametrize(
+        ("minimal_dataframe_lookup", "get_assert_frame_equal"),
+        [("pandas",) * 2, ("polars",) * 2],
+        indirect=True,
+    )
     def test_original_df_not_updated(
         self,
         initialized_transformers,
         minimal_dataframe_lookup,
+        get_assert_frame_equal,
     ):
         """Test that the original dataframe is not transformed when transform method used."""
 
@@ -658,7 +700,7 @@ class GenericTransformTests:
 
         _ = x.transform(df)
 
-        pd.testing.assert_frame_equal(df, original_df)
+        get_assert_frame_equal(df, original_df)
 
 
 class DropOriginalTransformMixinTests:
