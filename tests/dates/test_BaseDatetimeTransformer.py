@@ -48,7 +48,6 @@ class DatetimeMixinTransformTests:
             df[col] = bad_value
 
             x = uninitialized_transformers[self.transformer_name](
-                columns=columns,
                 **args,
             )
 
