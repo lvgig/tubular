@@ -176,7 +176,7 @@ class LogTransformer(BaseNumericTransformer, DropOriginalMixin):
             raise TypeError(suffix_error_msg)
 
         if base is not None:
-            if not isinstance(base, (int, float)):
+            if not isinstance(base, int | float):
                 msg = f"{self.classname()}: base should be numeric or None"
                 raise ValueError(msg)
             if not base > 0:
