@@ -596,7 +596,7 @@ class MeanResponseTransformer(BaseNominalTransformer, WeightColumnMixin):
         if (
             unseen_level_handling
             and (unseen_level_handling not in ["Mean", "Median", "Lowest", "Highest"])
-            and not (isinstance(unseen_level_handling, int | float))
+            and not (isinstance(unseen_level_handling, (int, float)))
         ):
             msg = f"{self.classname()}: unseen_level_handling should be the option: Mean, Median, Lowest, Highest or an arbitrary int/float value"
             raise ValueError(msg)
@@ -791,7 +791,7 @@ class MeanResponseTransformer(BaseNominalTransformer, WeightColumnMixin):
             self._fit_binary_response(X, y, self.columns)
             self.encoded_feature_columns = self.columns
 
-        if isinstance(self.unseen_level_handling, int | float):
+        if isinstance(self.unseen_level_handling, (int, float)):
             for c in self.encoded_feature_columns:
                 self.unseen_levels_encoding_dict[c] = self.cast_method(
                     self.unseen_level_handling,
