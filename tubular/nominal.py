@@ -1251,7 +1251,7 @@ class OneHotEncodingTransformer(
             ]
 
             X_transformed = X_transformed.rename(
-                columns=dict(zip(old_names, new_names, strict=False)),
+                columns=dict(zip(old_names, new_names)),
             )
 
         # Drop original columns if self.drop_original is True
