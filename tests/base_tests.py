@@ -5,6 +5,7 @@ import re
 import joblib
 import numpy as np
 import pandas as pd
+import polars as pl
 import pytest
 import sklearn.base as b
 import test_aide as ta
@@ -290,10 +291,17 @@ class GenericFitTests:
         self,
         initialized_transformers,
         minimal_dataframe_lookup,
+        narwhalified_transformers_dict,
     ):
         """Test fit returns self?."""
 
+        narwhalified = narwhalified_transformers_dict[self.transformer_name]
+
         df = minimal_dataframe_lookup[self.transformer_name]
+
+        # skip polars test if not narwhalified
+        if not narwhalified and isinstance(df, pl.DataFrame):
+            return
 
         x = initialized_transformers[self.transformer_name]
 
@@ -313,10 +321,18 @@ class GenericFitTests:
         initialized_transformers,
         minimal_dataframe_lookup,
         get_assert_frame_equal,
+        narwhalified_transformers_dict,
     ):
         """Test fit does not change X."""
 
+        narwhalified = narwhalified_transformers_dict[self.transformer_name]
+
         df = minimal_dataframe_lookup[self.transformer_name]
+
+        # skip polars test if not narwhalified
+        if not narwhalified and isinstance(df, pl.DataFrame):
+            return
+
         original_df = copy.deepcopy(df)
 
         x = initialized_transformers[self.transformer_name]
@@ -339,10 +355,17 @@ class GenericFitTests:
         initialized_transformers,
         non_df,
         minimal_dataframe_lookup,
+        narwhalified_transformers_dict,
     ):
-        """Test an error is raised if X is not passed as a pd.DataFrame."""
+        """Test an error is raised if X is not passed as a pd/pl.DataFrame."""
+
+        narwhalified = narwhalified_transformers_dict[self.transformer_name]
 
         df = minimal_dataframe_lookup[self.transformer_name]
+
+        # skip polars test if not narwhalified
+        if not narwhalified and isinstance(df, pl.DataFrame):
+            return
 
         x = initialized_transformers[self.transformer_name]
 
@@ -363,10 +386,17 @@ class GenericFitTests:
         non_series,
         initialized_transformers,
         minimal_dataframe_lookup,
+        narwhalified_transformers_dict,
     ):
-        """Test an error is raised if y is not passed as a pd.Series."""
+        """Test an error is raised if y is not passed as a pd/pl.Series."""
+
+        narwhalified = narwhalified_transformers_dict[self.transformer_name]
 
         df = minimal_dataframe_lookup[self.transformer_name]
+
+        # skip polars test if not narwhalified
+        if not narwhalified and isinstance(df, pl.DataFrame):
+            return
 
         x = initialized_transformers[self.transformer_name]
 
@@ -393,27 +423,40 @@ class GenericFitTests:
             x.fit(df, df["a"])
 
     @pytest.mark.parametrize(
-        ("minimal_dataframe_lookup", "get_series_init"),
-        [("pandas",) * 2, ("polars",) * 2],
+        ("minimal_dataframe_lookup"),
+        ["pandas", "polars"],
         indirect=True,
     )
     def test_Y_no_rows_error(
         self,
         initialized_transformers,
         minimal_dataframe_lookup,
-        get_series_init,
+        narwhalified_transformers_dict,
     ):
         """Test an error is raised if Y has no rows."""
+
+        narwhalified = narwhalified_transformers_dict[self.transformer_name]
 
         x = initialized_transformers[self.transformer_name]
 
         df = minimal_dataframe_lookup[self.transformer_name]
 
+        # skip polars test if not narwhalified
+        if not narwhalified and isinstance(df, pl.DataFrame):
+            return
+
+        if isinstance(df, pd.DataFrame):
+            series_init = pd.Series
+        elif isinstance(df, pl.DataFrame):
+            series_init = pl.Series
+        else:
+            series_init = None
+
         with pytest.raises(
             ValueError,
             match=re.escape(f"{self.transformer_name}: y is empty; (0,)"),
         ):
-            x.fit(X=df, y=get_series_init(name="d", dtype=object))
+            x.fit(X=df, y=series_init(name="d", dtype=object))
 
     def test_unexpected_kwarg_error(
         self,
@@ -641,10 +684,17 @@ class GenericTransformTests:
         non_df,
         initialized_transformers,
         minimal_dataframe_lookup,
+        narwhalified_transformers_dict,
     ):
-        """Test that an error is raised in transform is X is not a pd.DataFrame."""
+        """Test that an error is raised in transform is X is not a pd/pl.DataFrame."""
+
+        narwhalified = narwhalified_transformers_dict[self.transformer_name]
 
         df = minimal_dataframe_lookup[self.transformer_name]
+
+        # skip polars test if not narwhalified
+        if not narwhalified and isinstance(df, pl.DataFrame):
+            return
 
         x = initialized_transformers[self.transformer_name]
 
@@ -661,10 +711,21 @@ class GenericTransformTests:
         ["pandas", "polars"],
         indirect=True,
     )
-    def test_no_rows_error(self, initialized_transformers, minimal_dataframe_lookup):
+    def test_no_rows_error(
+        self,
+        initialized_transformers,
+        minimal_dataframe_lookup,
+        narwhalified_transformers_dict,
+    ):
         """Test an error is raised if X has no rows."""
 
+        narwhalified = narwhalified_transformers_dict[self.transformer_name]
+
         df = minimal_dataframe_lookup[self.transformer_name]
+
+        # skip polars test if not narwhalified
+        if not narwhalified and isinstance(df, pl.DataFrame):
+            return
 
         x = initialized_transformers[self.transformer_name]
 
@@ -688,10 +749,18 @@ class GenericTransformTests:
         initialized_transformers,
         minimal_dataframe_lookup,
         get_assert_frame_equal,
+        narwhalified_transformers_dict,
     ):
         """Test that the original dataframe is not transformed when transform method used."""
 
+        narwhalified = narwhalified_transformers_dict[self.transformer_name]
+
         df = minimal_dataframe_lookup[self.transformer_name]
+
+        # skip polars test if not narwhalified
+        if not narwhalified and isinstance(df, pl.DataFrame):
+            return
+
         original_df = copy.deepcopy(df)
 
         x = initialized_transformers[self.transformer_name]

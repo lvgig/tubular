@@ -4,8 +4,8 @@ import inspect
 import pkgutil
 from importlib import import_module
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-import pandas as pd
 import polars as pl
 import pytest
 from pandas.testing import assert_frame_equal as assert_pandas_frame_equal
@@ -18,6 +18,9 @@ from tests.test_data import (
     create_numeric_df_2,
     create_object_df,
 )
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 """
 How To Use This Testing Framework
@@ -88,6 +91,61 @@ def get_all_classes(
         all_classes.extend(classes)
 
     return set(all_classes)
+
+
+@pytest.fixture()
+def narwhalified_transformers_dict():
+    """tells us which transformers are polars friendly"""
+    return {
+        "ArbitraryImputer": False,
+        "BaseCappingTransformer": False,
+        "BaseCrossColumnMappingTransformer": False,
+        "BaseCrossColumnNumericTransformer": False,
+        "BaseGenericDateTransformer": False,
+        "BaseDatetimeTransformer": False,
+        "BaseDateTwoColumnTransformer": False,
+        "BaseImputer": False,
+        "BaseMappingTransformer": False,
+        "BaseMappingTransformMixin": False,
+        "BaseNominalTransformer": False,
+        "BaseNumericTransformer": False,
+        "BaseTransformer": True,
+        "BetweenDatesTransformer": False,
+        "CappingTransformer": False,
+        "ColumnDtypeSetter": False,
+        "CrossColumnAddTransformer": False,
+        "CrossColumnMappingTransformer": False,
+        "CrossColumnMultiplyTransformer": False,
+        "CutTransformer": False,
+        "DataFrameMethodTransformer": False,
+        "DateDifferenceTransformer": False,
+        "DateDiffLeapYearTransformer": False,
+        "DatetimeInfoExtractor": False,
+        "DatetimeSinusoidCalculator": False,
+        "EqualityChecker": False,
+        "GroupRareLevelsTransformer": False,
+        "InteractionTransformer": False,
+        "LogTransformer": False,
+        "MappingTransformer": False,
+        "MeanImputer": False,
+        "MeanResponseTransformer": False,
+        "MedianImputer": False,
+        "ModeImputer": False,
+        "NearestMeanResponseImputer": False,
+        "NominalToIntegerTransformer": False,
+        "NullIndicator": False,
+        "OneHotEncodingTransformer": False,
+        "OrdinalEncoderTransformer": False,
+        "OutOfRangeNullTransformer": False,
+        "PCATransformer": False,
+        "ScalingTransformer": False,
+        "SeriesDtMethodTransformer": False,
+        "SeriesStrMethodTransformer": False,
+        "SetValueTransformer": False,
+        "StringConcatenator": False,
+        "ToDatetimeTransformer": False,
+        "TwoColumnOperatorTransformer": False,
+    }
 
 
 @pytest.fixture()
@@ -345,6 +403,7 @@ def minimal_dataframe_lookup(request) -> dict[str, pd.DataFrame]:
 
 @pytest.fixture
 def get_assert_frame_equal(request):
+    """fixture to return correct pandas/polars assert_frame_equal method"""
     # setup to default to pandas if not provided
     library = getattr(request, "param", "pandas")
 
@@ -353,21 +412,6 @@ def get_assert_frame_equal(request):
 
     if library == "polars":
         return assert_polars_frame_equal
-
-    invalid_request_error = "fixture setup to handle only pandas or polars requests"
-    raise ValueError(invalid_request_error)
-
-
-@pytest.fixture
-def get_series_init(request):
-    # setup to default to pandas if not provided
-    library = getattr(request, "param", "pandas")
-
-    if library == "pandas":
-        return pd.Series
-
-    if library == "polars":
-        return pl.Series
 
     invalid_request_error = "fixture setup to handle only pandas or polars requests"
     raise ValueError(invalid_request_error)
