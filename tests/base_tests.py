@@ -10,6 +10,8 @@ import pytest
 import sklearn.base as b
 import test_aide as ta
 
+from tests.utils import get_assert_frame_equal
+
 
 class GenericInitTests:
     """
@@ -312,15 +314,14 @@ class GenericFitTests:
         ), f"Returned value from {self.transformer_name}.fit not as expected."
 
     @pytest.mark.parametrize(
-        ("minimal_dataframe_lookup", "get_assert_frame_equal"),
-        [("pandas",) * 2, ("polars",) * 2],
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
         indirect=True,
     )
     def test_fit_not_changing_data(
         self,
         initialized_transformers,
         minimal_dataframe_lookup,
-        get_assert_frame_equal,
         narwhalified_transformers_dict,
     ):
         """Test fit does not change X."""
@@ -339,7 +340,7 @@ class GenericFitTests:
 
         x.fit(df, df["a"])
 
-        get_assert_frame_equal(
+        get_assert_frame_equal(df)(
             original_df,
             df,
         )
@@ -423,7 +424,7 @@ class GenericFitTests:
             x.fit(df, df["a"])
 
     @pytest.mark.parametrize(
-        ("minimal_dataframe_lookup"),
+        "minimal_dataframe_lookup",
         ["pandas", "polars"],
         indirect=True,
     )
@@ -740,15 +741,14 @@ class GenericTransformTests:
             x.transform(df)
 
     @pytest.mark.parametrize(
-        ("minimal_dataframe_lookup", "get_assert_frame_equal"),
-        [("pandas",) * 2, ("polars",) * 2],
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
         indirect=True,
     )
     def test_original_df_not_updated(
         self,
         initialized_transformers,
         minimal_dataframe_lookup,
-        get_assert_frame_equal,
         narwhalified_transformers_dict,
     ):
         """Test that the original dataframe is not transformed when transform method used."""
@@ -769,7 +769,7 @@ class GenericTransformTests:
 
         _ = x.transform(df)
 
-        get_assert_frame_equal(df, original_df)
+        get_assert_frame_equal(df)(df, original_df)
 
 
 class DropOriginalTransformMixinTests:

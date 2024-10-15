@@ -8,8 +8,6 @@ from typing import TYPE_CHECKING
 
 import polars as pl
 import pytest
-from pandas.testing import assert_frame_equal as assert_pandas_frame_equal
-from polars.testing import assert_frame_equal as assert_polars_frame_equal
 
 import tubular.base as base
 from tests.test_data import (
@@ -399,22 +397,6 @@ def minimal_dataframe_lookup(request) -> dict[str, pd.DataFrame]:
             min_df_dict[key] = pl.from_pandas(min_df_dict[key])
 
     return min_df_dict
-
-
-@pytest.fixture
-def get_assert_frame_equal(request):
-    """fixture to return correct pandas/polars assert_frame_equal method"""
-    # setup to default to pandas if not provided
-    library = getattr(request, "param", "pandas")
-
-    if library == "pandas":
-        return assert_pandas_frame_equal
-
-    if library == "polars":
-        return assert_polars_frame_equal
-
-    invalid_request_error = "fixture setup to handle only pandas or polars requests"
-    raise ValueError(invalid_request_error)
 
 
 @pytest.fixture()
