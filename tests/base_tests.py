@@ -3,6 +3,7 @@ import copy
 import re
 
 import joblib
+import narwhals as nw
 import numpy as np
 import pandas as pd
 import polars as pl
@@ -499,19 +500,42 @@ class CheckNumericFitMixinTests:
 
 
 class WeightColumnFitMixinTests:
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     def test_fit_returns_self_weighted(
         self,
         minimal_attribute_dict,
         uninitialized_transformers,
         minimal_dataframe_lookup,
+        narwhalified_transformers_dict,
     ):
         """Test fit returns self?."""
         df = minimal_dataframe_lookup[self.transformer_name]
+
+        # skip polars test if not narwhalified
+        narwhalified = narwhalified_transformers_dict[self.transformer_name]
+        if not narwhalified and isinstance(df, pl.DataFrame):
+            return
+
+        df = nw.from_native(df)
+        native_namespace = nw.get_native_namespace(df)
+
         args = minimal_attribute_dict[self.transformer_name].copy()
         # insert weight column
         weight_column = "weight_column"
         args["weights_column"] = weight_column
-        df[weight_column] = np.arange(1, len(df) + 1)
+        df = df.with_columns(
+            nw.new_series(
+                weight_column,
+                np.arange(1, len(df) + 1),
+                native_namespace=native_namespace,
+            ),
+        )
+
+        df = nw.to_native(df)
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
@@ -521,32 +545,57 @@ class WeightColumnFitMixinTests:
             x_fitted is transformer
         ), f"Returned value from {self.transformer_name}.fit not as expected."
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     def test_fit_not_changing_data_weighted(
         self,
         minimal_attribute_dict,
         uninitialized_transformers,
         minimal_dataframe_lookup,
+        narwhalified_transformers_dict,
     ):
         """Test fit does not change X - when weights are used."""
         df = minimal_dataframe_lookup[self.transformer_name]
+
+        # skip polars test if not narwhalified
+        narwhalified = narwhalified_transformers_dict[self.transformer_name]
+        if not narwhalified and isinstance(df, pl.DataFrame):
+            return
+
+        df = nw.from_native(df)
+        native_namespace = nw.get_native_namespace(df)
         # insert weight column
         weight_column = "weight_column"
-        df[weight_column] = np.arange(1, len(df) + 1)
+        df = df.with_columns(
+            nw.new_series(
+                weight_column,
+                np.arange(1, len(df) + 1),
+                native_namespace=native_namespace,
+            ),
+        )
 
-        original_df = copy.deepcopy(df)
+        original_df = df.clone()
 
         args = minimal_attribute_dict[self.transformer_name].copy()
         args["weights_column"] = weight_column
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
-        transformer.fit(df, df["a"])
-        ta.equality.assert_equal_dispatch(
-            expected=original_df,
-            actual=df,
-            msg=f"X changed during fit for {self.transformer_name}",
-        )
+        df = nw.to_native(df)
+        original_df = nw.to_native(original_df)
 
+        transformer.fit(df, df["a"])
+
+        get_assert_frame_equal(original_df)(df, original_df)
+
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     @pytest.mark.parametrize(
         "bad_weight_value, expected_message",
         [
@@ -563,17 +612,33 @@ class WeightColumnFitMixinTests:
         minimal_attribute_dict,
         uninitialized_transformers,
         minimal_dataframe_lookup,
+        narwhalified_transformers_dict,
     ):
         """Test that an exception is raised if there are negative/nan/inf values in sample_weight."""
 
         df = minimal_dataframe_lookup[self.transformer_name]
 
+        # skip polars test if not narwhalified
+        narwhalified = narwhalified_transformers_dict[self.transformer_name]
+        if not narwhalified and isinstance(df, pl.DataFrame):
+            return
+
+        df = nw.from_native(df)
+        native_namespace = nw.get_native_namespace(df)
+
         args = minimal_attribute_dict[self.transformer_name].copy()
         weight_column = "weight_column"
         args["weights_column"] = weight_column
 
-        df[weight_column] = np.arange(1, len(df) + 1)
-        df.iloc[0, df.columns.get_loc(weight_column)] = bad_weight_value
+        df = df.with_columns(
+            nw.new_series(
+                weight_column,
+                [*[bad_weight_value], *np.arange(2, len(df) + 1)],
+                native_namespace=native_namespace,
+            ),
+        )
+
+        df = nw.to_native(df)
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
@@ -594,19 +659,33 @@ class WeightColumnFitMixinTests:
             ),
         ]
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     def test_weight_col_non_numeric(
         self,
         uninitialized_transformers,
         minimal_attribute_dict,
         minimal_dataframe_lookup,
+        narwhalified_transformers_dict,
     ):
         """Test an error is raised if weight is not numeric."""
 
         df = minimal_dataframe_lookup[self.transformer_name]
 
+        # skip polars test if not narwhalified
+        narwhalified = narwhalified_transformers_dict[self.transformer_name]
+        if not narwhalified and isinstance(df, pl.DataFrame):
+            return
+
+        df = nw.from_native(df)
+
         weight_column = "weight_column"
         error = r"weight column must be numeric."
-        df[weight_column] = ["a"] * len(df)
+        df = df.with_columns(nw.lit("a").alias(weight_column))
+        df = nw.to_native(df)
 
         with pytest.raises(
             ValueError,
@@ -620,15 +699,26 @@ class WeightColumnFitMixinTests:
             transformer = uninitialized_transformers[self.transformer_name](**args)
             transformer.fit(df, df["a"])
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     def test_weight_not_in_X_error(
         self,
         uninitialized_transformers,
         minimal_attribute_dict,
         minimal_dataframe_lookup,
+        narwhalified_transformers_dict,
     ):
         """Test an error is raised if weight is not in X"""
 
         df = minimal_dataframe_lookup[self.transformer_name]
+
+        # skip polars test if not narwhalified
+        narwhalified = narwhalified_transformers_dict[self.transformer_name]
+        if not narwhalified and isinstance(df, pl.DataFrame):
+            return
 
         weight_column = "weight_column"
         error = rf"weight col \({weight_column}\) is not present in columns of data"
@@ -645,11 +735,17 @@ class WeightColumnFitMixinTests:
             transformer = uninitialized_transformers[self.transformer_name](**args)
             transformer.fit(df, df["a"])
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     def test_zero_total_weight_error(
         self,
         minimal_attribute_dict,
         uninitialized_transformers,
         minimal_dataframe_lookup,
+        narwhalified_transformers_dict,
     ):
         """Test that an exception is raised if the total sample weights are 0."""
 
@@ -658,7 +754,15 @@ class WeightColumnFitMixinTests:
         args["weights_column"] = weight_column
 
         df = minimal_dataframe_lookup[self.transformer_name]
-        df[weight_column] = [0] * len(df)
+
+        # skip polars test if not narwhalified
+        narwhalified = narwhalified_transformers_dict[self.transformer_name]
+        if not narwhalified and isinstance(df, pl.DataFrame):
+            return
+
+        df = nw.from_native(df)
+        df = df.with_columns(nw.lit(0).alias("weight_column"))
+        df = nw.to_native(df)
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
         with pytest.raises(

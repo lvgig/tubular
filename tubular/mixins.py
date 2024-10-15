@@ -1,7 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+import narwhals as nw
+import narwhals.selectors as ncs
 import numpy as np
 import pandas as pd
+
+if TYPE_CHECKING:
+    from narwhals.typing import FrameT
 
 
 class CheckNumericMixin:
@@ -121,13 +128,14 @@ class TwoColumnMixin:
 
 
 class WeightColumnMixin:
-    def check_weights_column(self, X: pd.DataFrame, weights_column: str) -> None:
+    @nw.narwhalify
+    def check_weights_column(self, X: FrameT, weights_column: str) -> None:
         """Helper method for validating weights column in dataframe.
 
         Args:
         ----
-            X (pd.DataFrame): df containing weight column
-            weights_column (str): name of weight column
+            dfs: df containing weight column
+            weights_column: name of weight column
 
         """
         # check if given weight is in columns
@@ -136,28 +144,27 @@ class WeightColumnMixin:
             raise ValueError(msg)
 
         # check weight is numeric
-
-        if not pd.api.types.is_numeric_dtype(X[weights_column]):
+        if weights_column not in X.select(ncs.numeric()).columns:
             msg = f"{self.classname()}: weight column must be numeric."
             raise ValueError(msg)
 
         # check weight is positive
-
-        if (X[weights_column] < 0).sum() != 0:
+        if X[weights_column].min() < 0:
             msg = f"{self.classname()}: weight column must be positive"
             raise ValueError(msg)
 
         # check weight non-null
-        if X[weights_column].isna().sum() != 0:
+        if X[weights_column].is_null().sum() != 0:
             msg = f"{self.classname()}: weight column must be non-null"
             raise ValueError(msg)
 
         # check weight not inf
-        if np.isinf(X[weights_column]).any():
+        if np.isinf(X[weights_column].to_numpy()).any():
             msg = f"{self.classname()}: weight column must not contain infinite values."
             raise ValueError(msg)
 
-        if X[weights_column].sum() <= 0:
+        # check weight not all 0
+        if X[weights_column].sum() == 0:
             msg = f"{self.classname()}: total sample weights are not greater than 0"
             raise ValueError(msg)
 
