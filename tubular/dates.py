@@ -1161,12 +1161,14 @@ class DatetimeSinusoidCalculator(BaseDatetimeTransformer):
         method: str | list[str],
         units: str | dict,
         period: float | dict = 2 * np.pi,
+        verbose: bool = False,
         drop_original: bool = False,
     ) -> None:
         super().__init__(
             columns=columns,
             drop_original=drop_original,
             new_column_name="dummy",
+            verbose=verbose,
         )
 
         if not isinstance(method, str) and not isinstance(method, list):
