@@ -92,61 +92,6 @@ def get_all_classes(
 
 
 @pytest.fixture()
-def narwhalified_transformers_dict():
-    """tells us which transformers are polars friendly"""
-    return {
-        "ArbitraryImputer": False,
-        "BaseCappingTransformer": False,
-        "BaseCrossColumnMappingTransformer": False,
-        "BaseCrossColumnNumericTransformer": False,
-        "BaseGenericDateTransformer": False,
-        "BaseDatetimeTransformer": False,
-        "BaseDateTwoColumnTransformer": False,
-        "BaseImputer": False,
-        "BaseMappingTransformer": False,
-        "BaseMappingTransformMixin": False,
-        "BaseNominalTransformer": False,
-        "BaseNumericTransformer": False,
-        "BaseTransformer": True,
-        "BetweenDatesTransformer": False,
-        "CappingTransformer": False,
-        "ColumnDtypeSetter": False,
-        "CrossColumnAddTransformer": False,
-        "CrossColumnMappingTransformer": False,
-        "CrossColumnMultiplyTransformer": False,
-        "CutTransformer": False,
-        "DataFrameMethodTransformer": False,
-        "DateDifferenceTransformer": False,
-        "DateDiffLeapYearTransformer": False,
-        "DatetimeInfoExtractor": False,
-        "DatetimeSinusoidCalculator": False,
-        "EqualityChecker": False,
-        "GroupRareLevelsTransformer": False,
-        "InteractionTransformer": False,
-        "LogTransformer": False,
-        "MappingTransformer": False,
-        "MeanImputer": False,
-        "MeanResponseTransformer": False,
-        "MedianImputer": False,
-        "ModeImputer": False,
-        "NearestMeanResponseImputer": False,
-        "NominalToIntegerTransformer": False,
-        "NullIndicator": False,
-        "OneHotEncodingTransformer": False,
-        "OrdinalEncoderTransformer": False,
-        "OutOfRangeNullTransformer": False,
-        "PCATransformer": False,
-        "ScalingTransformer": False,
-        "SeriesDtMethodTransformer": False,
-        "SeriesStrMethodTransformer": False,
-        "SetValueTransformer": False,
-        "StringConcatenator": False,
-        "ToDatetimeTransformer": False,
-        "TwoColumnOperatorTransformer": False,
-    }
-
-
-@pytest.fixture()
 def minimal_attribute_dict():
     """defines minmal attributes (values) needed to initiate each transformer named (key).
     New transformers need to be added here"""

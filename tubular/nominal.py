@@ -14,7 +14,18 @@ from tubular.mixins import DropOriginalMixin, SeparatorColumnMixin, WeightColumn
 
 
 class BaseNominalTransformer(BaseTransformer):
-    """Base Transformer extension for nominal transformers."""
+    """
+    Base Transformer extension for nominal transformers.
+
+    Attributes
+    ----------
+
+    NARWHALIFIED : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
+    """
+
+    NARWHALIFIED = False
 
     FITS = False
 
@@ -94,7 +105,12 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         Created in inverse_transform. Inverse mapping of mappings. Maps integer value back to categorical
         levels.
 
+    NARWHALIFIED : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    NARWHALIFIED = False
 
     FITS = True
 
@@ -273,7 +289,12 @@ class GroupRareLevelsTransformer(BaseTransformer, WeightColumnMixin):
         Dictionary containing the set of values present in the training data for each column in self.columns. It
         will only exist in if unseen_levels_to_rare is set to False.
 
+    NARWHALIFIED : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    NARWHALIFIED = False
 
     FITS = True
 
@@ -568,7 +589,12 @@ class MeanResponseTransformer(BaseNominalTransformer, WeightColumnMixin):
     cast_method: Literal[np.float32, np,float64]
         Store the casting method associated to return_type
 
+    NARWHALIFIED : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    NARWHALIFIED = False
 
     FITS = True
 
@@ -924,7 +950,12 @@ class OrdinalEncoderTransformer(
         Created in fit. Dict of key (column names) value (mapping of categorical levels to numeric,
         ordinal encoded response values) pairs.
 
+    NARWHALIFIED : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    NARWHALIFIED = False
 
     FITS = True
 
@@ -1075,7 +1106,12 @@ class OneHotEncodingTransformer(
     drop_original : bool
         Should original columns be dropped after creating dummy fields?
 
+    NARWHALIFIED : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    NARWHALIFIED = False
 
     FITS = True
 

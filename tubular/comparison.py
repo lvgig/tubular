@@ -28,7 +28,15 @@ class EqualityChecker(
     **kwargs:
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
 
+    Attributes
+    ----------
+
+    NARWHALIFIED : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    NARWHALIFIED = False
 
     def __init__(
         self,
