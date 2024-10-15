@@ -38,8 +38,11 @@ Changed
 - Refactored DateDifferenceTransformer tests in new format. Had to turn off autodefine new_column_name functionality to match generic test expectations. Suggest we look to turn back on in the future. `#296 https://github.com/lvgig/tubular/issues/296`
 - Refactored DateDiffLeapYearTransformer tests in new format. As part of this had to remove the autodefined new_column_name, as this conflicts with the generic testing. Suggest we look to turn back on in future. `#295 https://github.com/lvgig/tubular/issues/295`
 - Edited base testing setup for dates file, created new BaseDatetimeTransformer class
+- Refactored DatetimeInfoExtractor tests in new format `#297 <https://github.com/lvgig/tubular/issues/297>`_
+- Refactored DatetimeSinusoidCalculator tests in new format. `#310 <https://github.com/lvgig/tubular/issues/310>`_
 - fixed a bug in CappingTransformer which was preventing use of .get_params method `#311 <https://github.com/lvgig/tubular/issues/311>`_
 - Setup requirements for narwhals, remove python3.8 from our build pipelines as incompatible with polars
+- Refactored ToDatetimeTransformer tests in new format `#300 <https://github.com/lvgig/tubular/issues/300>`_
 
 
 1.3.1 (2024-07-18)

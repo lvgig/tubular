@@ -11,6 +11,7 @@ from tests.base_tests import (
     DropOriginalTransformMixinTests,
     GenericTransformTests,
     NewColumnNameInitMixintests,
+    OtherBaseBehaviourTests,
     TwoColumnListInitTests,
 )
 from tests.dates.test_BaseGenericDateTransformer import (
@@ -234,3 +235,15 @@ class TestTransform(
             expected=expected,
             msg_tag=f"Unexpected values in DateDiffLeapYearTransformer.transform between {columns[0]} and {columns[1]}",
         )
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DateDiffLeapYearTransformer"
