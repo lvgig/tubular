@@ -591,7 +591,7 @@ class SeriesDtMethodTransformer(BaseDatetimeTransformer):
         self,
         new_column_name: str,
         pd_method_name: str,
-        columns: str,
+        columns: list[str],
         pd_method_kwargs: dict[str, object] | None = None,
         drop_original: bool = False,
         **kwargs: dict[str, bool],

@@ -10,6 +10,7 @@ from tests.base_tests import (
     DropOriginalInitMixinTests,
     DropOriginalTransformMixinTests,
     GenericTransformTests,
+    NewColumnNameInitMixintests,
     OtherBaseBehaviourTests,
 )
 from tests.dates.test_BaseDatetimeTransformer import (
@@ -21,6 +22,7 @@ from tubular.dates import SeriesDtMethodTransformer
 class TestInit(
     ColumnStrListInitTests,
     DropOriginalInitMixinTests,
+    NewColumnNameInitMixintests,
 ):
     """Tests for SeriesDtMethodTransformer.init()."""
 
