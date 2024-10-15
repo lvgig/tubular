@@ -17,9 +17,11 @@ name = "tubular"
 dynamic = ["version"]
 dependencies = [
     "pandas>=1.5.0",
-    "scikit-learn>=1.2.0"
+    "scikit-learn>=1.2.0",
+    "narwhals >= 1.9.2",
+    "polars >= 1.9.0",
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 authors = [{ name = "LV GI Data Science Team", email="#DataSciencePackages@lv.co.uk"}]
 description = "Package to perform pre processing steps for machine learning models"
 readme = {file = "README.md", content-type = "text/markdown"}
@@ -27,7 +29,6 @@ license = {file = "LICENSE"}
 keywords = ["data science", "feature engineering", "data transforms", "pipeline", "sklearn", "machine learning", "ML", "DS"]
 classifiers=[
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -56,8 +57,8 @@ Changelog = "https://github.com/lvgig/tubular/CHANGELOG.md"
 # Same as Black.
 line-length = 88
 
-# Assume Python 3.8.
-target-version = "py38"
+# Assume Python 3.10.
+target-version = "py310"
 
 [tool.ruff.lint]
 # Enable the pycodestyle (`E`) and Pyflakes (`F`) rules by default.
@@ -105,9 +106,13 @@ select = [
 # Enabled to allow direct type comparisons using is and is not under E721 (see https://docs.astral.sh/ruff/rules/type-comparison/)
 preview = true
 
-# ignore E501 - linelength limit (covered by black except in docstrings) 
-# and PD901 - use of df variable name
-ignore = ["E501", "PD901", "ANN101"]
+ignore = [
+    "E501", # ignore E501 - linelength limit (covered by black except in docstrings) 
+    "PD901", # and PD901 - use of df variable name
+    "ANN101",
+    "B905", # the below two rules seem to make changes that error for python3.9
+    "UP038", 
+    ]
 
 # Allow autofix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
