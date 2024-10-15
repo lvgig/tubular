@@ -250,9 +250,9 @@ def minimal_attribute_dict():
             "columns": ["a", "b"],
         },
         "SeriesDtMethodTransformer": {
-            "new_column_name": "a",
+            "new_column_name": "new_column",
             "pd_method_name": "month",
-            "column": "b",
+            "columns": "b",
         },
         "SeriesStrMethodTransformer": {
             "columns": ["b"],
