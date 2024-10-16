@@ -5,9 +5,12 @@ import re
 import joblib
 import numpy as np
 import pandas as pd
+import polars as pl
 import pytest
 import sklearn.base as b
 import test_aide as ta
+
+from tests.utils import assert_frame_equal_dispatch
 
 
 class GenericInitTests:
@@ -281,6 +284,11 @@ class GenericFitTests:
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     def test_fit_returns_self(
         self,
         initialized_transformers,
@@ -292,12 +300,21 @@ class GenericFitTests:
 
         x = initialized_transformers[self.transformer_name]
 
+        # skip polars test if not narwhalified
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
+            return
+
         x_fitted = x.fit(df, df["a"])
 
         assert (
             x_fitted is x
         ), f"Returned value from {self.transformer_name}.fit not as expected."
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     def test_fit_not_changing_data(
         self,
         initialized_transformers,
@@ -306,18 +323,26 @@ class GenericFitTests:
         """Test fit does not change X."""
 
         df = minimal_dataframe_lookup[self.transformer_name]
-        original_df = copy.deepcopy(df)
-
         x = initialized_transformers[self.transformer_name]
+
+        # skip polars test if not narwhalified
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
+            return
+
+        original_df = copy.deepcopy(df)
 
         x.fit(df, df["a"])
 
-        ta.equality.assert_equal_dispatch(
-            expected=original_df,
-            actual=df,
-            msg="Check X not changing during fit",
+        assert_frame_equal_dispatch(
+            original_df,
+            df,
         )
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     @pytest.mark.parametrize("non_df", [1, True, "a", [1, 2], {"a": 1}, None])
     def test_X_non_df_error(
         self,
@@ -325,34 +350,45 @@ class GenericFitTests:
         non_df,
         minimal_dataframe_lookup,
     ):
-        """Test an error is raised if X is not passed as a pd.DataFrame."""
+        """Test an error is raised if X is not passed as a pd/pl.DataFrame."""
 
         df = minimal_dataframe_lookup[self.transformer_name]
-
         x = initialized_transformers[self.transformer_name]
+
+        # skip polars test if not narwhalified
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
         with pytest.raises(
             TypeError,
-            match=f"{self.transformer_name}: X should be a pd.DataFrame",
+            match=f"{self.transformer_name}: X should be a polars or pandas DataFrame/LazyFrame",
         ):
             x.fit(non_df, df["a"])
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     @pytest.mark.parametrize("non_series", [1, True, "a", [1, 2], {"a": 1}])
-    def test_non_pd_type_error(
+    def test_bad_type_error(
         self,
         non_series,
         initialized_transformers,
         minimal_dataframe_lookup,
     ):
-        """Test an error is raised if y is not passed as a pd.Series."""
+        """Test an error is raised if y is not passed as a pd/pl.Series."""
 
         df = minimal_dataframe_lookup[self.transformer_name]
-
         x = initialized_transformers[self.transformer_name]
+
+        # skip polars test if not narwhalified
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
         with pytest.raises(
             TypeError,
-            match=f"{self.transformer_name}: unexpected type for y, should be a pd.Series",
+            match=f"{self.transformer_name}: unexpected type for y, should be a polars or pandas Series",
         ):
             x.fit(X=df, y=non_series)
 
@@ -372,6 +408,11 @@ class GenericFitTests:
         ):
             x.fit(df, df["a"])
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     def test_Y_no_rows_error(
         self,
         initialized_transformers,
@@ -383,11 +424,22 @@ class GenericFitTests:
 
         df = minimal_dataframe_lookup[self.transformer_name]
 
+        # skip polars test if not narwhalified
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
+            return
+
+        if isinstance(df, pd.DataFrame):
+            series_init = pd.Series
+        elif isinstance(df, pl.DataFrame):
+            series_init = pl.Series
+        else:
+            series_init = None
+
         with pytest.raises(
             ValueError,
             match=re.escape(f"{self.transformer_name}: y is empty; (0,)"),
         ):
-            x.fit(X=df, y=pd.Series(name="d", dtype=object))
+            x.fit(X=df, y=series_init(name="d", dtype=object))
 
     def test_unexpected_kwarg_error(
         self,
@@ -604,6 +656,11 @@ class GenericTransformTests:
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     @pytest.mark.parametrize("non_df", [1, True, "a", [1, 2], {"a": 1}, None])
     def test_non_pd_type_error(
         self,
@@ -611,26 +668,41 @@ class GenericTransformTests:
         initialized_transformers,
         minimal_dataframe_lookup,
     ):
-        """Test that an error is raised in transform is X is not a pd.DataFrame."""
+        """Test that an error is raised in transform is X is not a pd/pl.DataFrame."""
 
         df = minimal_dataframe_lookup[self.transformer_name]
-
         x = initialized_transformers[self.transformer_name]
+
+        # skip polars test if not narwhalified
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
         x_fitted = x.fit(df, df["a"])
 
         with pytest.raises(
             TypeError,
-            match=f"{self.transformer_name}: X should be a pd.DataFrame",
+            match=f"{self.transformer_name}: X should be a polars or pandas DataFrame/LazyFrame",
         ):
             x_fitted.transform(X=non_df)
 
-    def test_no_rows_error(self, initialized_transformers, minimal_dataframe_lookup):
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
+    def test_no_rows_error(
+        self,
+        initialized_transformers,
+        minimal_dataframe_lookup,
+    ):
         """Test an error is raised if X has no rows."""
 
         df = minimal_dataframe_lookup[self.transformer_name]
-
         x = initialized_transformers[self.transformer_name]
+
+        # skip polars test if not narwhalified
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
         x = x.fit(df, df["a"])
 
@@ -642,6 +714,11 @@ class GenericTransformTests:
         ):
             x.transform(df)
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
+    )
     def test_original_df_not_updated(
         self,
         initialized_transformers,
@@ -650,15 +727,19 @@ class GenericTransformTests:
         """Test that the original dataframe is not transformed when transform method used."""
 
         df = minimal_dataframe_lookup[self.transformer_name]
-        original_df = copy.deepcopy(df)
-
         x = initialized_transformers[self.transformer_name]
+
+        # skip polars test if not narwhalified
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
+            return
+
+        original_df = copy.deepcopy(df)
 
         x = x.fit(df, df["a"])
 
         _ = x.transform(df)
 
-        pd.testing.assert_frame_equal(df, original_df)
+        assert_frame_equal_dispatch(df, original_df)
 
 
 class DropOriginalTransformMixinTests:
@@ -748,7 +829,7 @@ class ColumnsCheckTests:
 
         with pytest.raises(
             TypeError,
-            match=f"{self.transformer_name}: X should be a pd.DataFrame",
+            match=f"{self.transformer_name}: X should be a polars or pandas DataFrame/LazyFrame",
         ):
             x.columns_check(X=[1, 2, 3, 4, 5, 6])
 
@@ -806,7 +887,7 @@ class CombineXYTests:
 
         with pytest.raises(
             TypeError,
-            match=f"{self.transformer_name}: X should be a pd.DataFrame",
+            match=f"{self.transformer_name}: X should be a polars or pandas DataFrame/LazyFrame",
         ):
             x._combine_X_y(X=non_df, y=pd.Series([1, 2]))
 
@@ -822,7 +903,7 @@ class CombineXYTests:
 
         with pytest.raises(
             TypeError,
-            match=f"{self.transformer_name}: y should be a pd.Series",
+            match=f"{self.transformer_name}: y should be a polars or pandas Series",
         ):
             x._combine_X_y(X=pd.DataFrame({"a": [1, 2]}), y=non_series)
 
@@ -841,23 +922,6 @@ class CombineXYTests:
             ),
         ):
             x._combine_X_y(X=pd.DataFrame({"a": [1, 2]}), y=pd.Series([2]))
-
-    def test_X_and_y_different_indexes_warning(
-        self,
-        initialized_transformers,
-    ):
-        """Test a warning is raised if X and y have different indexes, but the output is still X and y."""
-
-        x = initialized_transformers[self.transformer_name]
-
-        with pytest.warns(
-            UserWarning,
-            match=f"{self.transformer_name}: X and y do not have equal indexes",
-        ):
-            x._combine_X_y(
-                X=pd.DataFrame({"a": [1, 2]}, index=[1, 2]),
-                y=pd.Series([2, 4]),
-            )
 
     def test_output_same_indexes(
         self,

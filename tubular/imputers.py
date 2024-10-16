@@ -16,7 +16,16 @@ class BaseImputer(BaseTransformer):
     values in the impute_values_ attribute.
 
     Other imputers in this module should inherit from this class.
+
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     FITS = False
 
@@ -61,7 +70,12 @@ class ArbitraryImputer(BaseImputer):
     ----------
     impute_value : int or float or str
         Value to impute nulls with.
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
+
+    polars_compatible = False
 
     FITS = False
 
@@ -150,7 +164,12 @@ class MedianImputer(BaseImputer, WeightColumnMixin):
         Created during fit method. Dictionary of float / int (median) values of columns
         in the columns attribute. Keys of impute_values_ give the column names.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     FITS = True
 
@@ -234,7 +253,12 @@ class MeanImputer(WeightColumnMixin, BaseImputer):
         Created during fit method. Dictionary of float / int (mean) values of columns
         in the columns attribute. Keys of impute_values_ give the column names.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     FITS = True
 
@@ -313,7 +337,12 @@ class ModeImputer(BaseImputer, WeightColumnMixin):
         Created during fit method. Dictionary of float / int (mode) values of columns
         in the columns attribute. Keys of impute_values_ give the column names.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     FITS = True
 
@@ -388,7 +417,15 @@ class NearestMeanResponseImputer(BaseImputer):
         Columns to impute, if the default of None is supplied all columns in X are used
         when the transform method is called.
 
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     FITS = True
 
@@ -463,7 +500,15 @@ class NullIndicator(BaseTransformer):
         Columns to produce indicator columns for, if the default of None is supplied all columns in X are used
         when the transform method is called.
 
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,

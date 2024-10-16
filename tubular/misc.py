@@ -21,7 +21,15 @@ class SetValueTransformer(BaseTransformer):
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
 
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -66,7 +74,15 @@ class ColumnDtypeSetter(BaseTransformer):
     dtype : type or string
         dtype object to set columns to or a string interpretable as one by pd.api.types.pandas_dtype
         e.g. float or 'float'
+
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
+
+    polars_compatible = False
 
     def __init__(
         self,

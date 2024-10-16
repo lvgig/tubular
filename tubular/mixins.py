@@ -5,6 +5,19 @@ import pandas as pd
 
 
 class CheckNumericMixin:
+    """
+    Mixin class with methods for numeric transformers
+
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
+    """
+
+    polars_compatible = False
+
     def check_numeric_columns(self, X: pd.DataFrame) -> pd.DataFrame:
         """Helper function for checking column args are numeric for numeric transformers.
 
@@ -34,7 +47,15 @@ class DropOriginalMixin:
 
     Transformer deletes transformer input columns depending on boolean argument.
 
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def set_drop_original_column(self, drop_original: bool) -> None:
         """Helper method for validating 'drop_original' argument.
@@ -86,7 +107,18 @@ class DropOriginalMixin:
 
 
 class NewColumnNameMixin:
-    """Helper to validate and set new_column_name attribute"""
+    """
+    Helper to validate and set new_column_name attribute
+
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
+    """
+
+    polars_compatible = False
 
     def check_and_set_new_column_name(self, new_column_name: str) -> None:
         if not (isinstance(new_column_name, str)):
@@ -97,7 +129,18 @@ class NewColumnNameMixin:
 
 
 class SeparatorColumnMixin:
-    """Hel per to validate and set separator attribute"""
+    """
+    Helper to validate and set separator attribute
+
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
+    """
+
+    polars_compatible = False
 
     def check_and_set_separator_column(self, separator: str) -> None:
         if not (isinstance(separator, str)):
@@ -108,7 +151,18 @@ class SeparatorColumnMixin:
 
 
 class TwoColumnMixin:
-    """helper to validate columns when exactly two columns are required"""
+    """
+    helper to validate columns when exactly two columns are required
+
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
+    """
+
+    polars_compatible = False
 
     def check_two_columns(self, columns: list[str]) -> None:
         if not (isinstance(columns, list)):
@@ -121,6 +175,18 @@ class TwoColumnMixin:
 
 
 class WeightColumnMixin:
+    """
+    Mixin class with weights functionality
+
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+    """
+
+    polars_compatible = False
+
     def check_weights_column(self, X: pd.DataFrame, weights_column: str) -> None:
         """Helper method for validating weights column in dataframe.
 

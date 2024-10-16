@@ -6,7 +6,7 @@ from importlib import import_module
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import pandas as pd
+import polars as pl
 import pytest
 
 import tubular.base as base
@@ -281,7 +281,7 @@ def minimal_attribute_dict():
 
 
 @pytest.fixture()
-def minimal_dataframe_lookup() -> dict[str, pd.DataFrame]:
+def minimal_dataframe_lookup(request) -> dict[str, pd.DataFrame]:
     """links transformers to minimal dataframes needed to successfully run transformer. There is logic to do this automatically by module, so function will only need to be edited where either:
     - a new module that operates primarily on non-numeric columns is added
     - a new transformer is added to an existing module that breaks the pattern of that module, e.g. a transformer in dates.py that operates on numeric columns
@@ -293,6 +293,9 @@ def minimal_dataframe_lookup() -> dict[str, pd.DataFrame]:
         dictionary mapping transformers to minimal dataframes that they can successfully run on
 
     """
+
+    # setup to default to pandas if not provided
+    library = getattr(request, "param", "pandas")
 
     num_df = create_numeric_df_1()
     nan_df = create_numeric_df_2()
@@ -333,6 +336,10 @@ def minimal_dataframe_lookup() -> dict[str, pd.DataFrame]:
     ]
     for transformer in other_nan_transformers:
         min_df_dict[transformer] = nan_df
+
+    if library == "polars":
+        for key in min_df_dict:
+            min_df_dict[key] = pl.from_pandas(min_df_dict[key])
 
     return min_df_dict
 
