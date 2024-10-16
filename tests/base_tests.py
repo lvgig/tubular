@@ -10,7 +10,7 @@ import pytest
 import sklearn.base as b
 import test_aide as ta
 
-from tests.utils import get_assert_frame_equal
+from tests.utils import assert_frame_equal_dispatch
 
 
 class GenericInitTests:
@@ -333,7 +333,7 @@ class GenericFitTests:
 
         x.fit(df, df["a"])
 
-        get_assert_frame_equal(df)(
+        assert_frame_equal_dispatch(
             original_df,
             df,
         )
@@ -739,7 +739,7 @@ class GenericTransformTests:
 
         _ = x.transform(df)
 
-        get_assert_frame_equal(df)(df, original_df)
+        assert_frame_equal_dispatch(df, original_df)
 
 
 class DropOriginalTransformMixinTests:
