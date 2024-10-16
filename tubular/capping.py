@@ -13,7 +13,7 @@ from tubular.mixins import WeightColumnMixin
 
 
 class BaseCappingTransformer(BaseTransformer, WeightColumnMixin):
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def __init__(
         self,
@@ -70,7 +70,7 @@ class BaseCappingTransformer(BaseTransformer, WeightColumnMixin):
         _replacement_values : dict
             Replacement values when capping is applied. Will be a copy of capping_values.
 
-        NARWHALIFIED : bool
+        polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
         """
@@ -482,12 +482,12 @@ class CappingTransformer(BaseCappingTransformer):
     _replacement_values : dict
         Replacement values when capping is applied. Will be a copy of capping_values.
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def __init__(
         self,
@@ -577,12 +577,12 @@ class OutOfRangeNullTransformer(BaseCappingTransformer):
     _replacement_values : dict
         Replacement values when capping is applied. This will contain nulls for each column.
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def __init__(
         self,

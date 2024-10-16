@@ -25,12 +25,12 @@ class BaseImputer(BaseTransformer):
     Attributes
     ----------
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     FITS = False
 
@@ -77,11 +77,11 @@ class ArbitraryImputer(BaseImputer):
     impute_value : int or float or str
         Value to impute nulls with.
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     FITS = False
 
@@ -170,12 +170,12 @@ class MedianImputer(BaseImputer, WeightColumnMixin):
         Created during fit method. Dictionary of float / int (median) values of columns
         in the columns attribute. Keys of impute_values_ give the column names.
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     FITS = True
 
@@ -259,12 +259,12 @@ class MeanImputer(WeightColumnMixin, BaseImputer):
         Created during fit method. Dictionary of float / int (mean) values of columns
         in the columns attribute. Keys of impute_values_ give the column names.
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     FITS = True
 
@@ -343,12 +343,12 @@ class ModeImputer(BaseImputer, WeightColumnMixin):
         Created during fit method. Dictionary of float / int (mode) values of columns
         in the columns attribute. Keys of impute_values_ give the column names.
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     FITS = True
 
@@ -426,12 +426,12 @@ class NearestMeanResponseImputer(BaseImputer):
     Attributes
     ----------
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     FITS = True
 
@@ -509,12 +509,12 @@ class NullIndicator(BaseTransformer):
     Attributes
     ----------
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def __init__(
         self,

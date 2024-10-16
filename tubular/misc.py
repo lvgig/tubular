@@ -24,12 +24,12 @@ class SetValueTransformer(BaseTransformer):
     Attributes
     ----------
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def __init__(
         self,
@@ -78,11 +78,11 @@ class ColumnDtypeSetter(BaseTransformer):
     Attributes
     ----------
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def __init__(
         self,

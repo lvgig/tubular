@@ -16,7 +16,7 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
-1.4.0 (unreleased)
+1.4.0 (2024-10-15)
 ------------------
 
 Changed
@@ -44,6 +44,7 @@ Changed
 - Setup requirements for narwhals, remove python3.8 from our build pipelines as incompatible with polars
 - Narwhal-ified BaseTransformer `#313 <https://github.com/lvgig/tubular/issues/313>_`
 - Refactored ToDatetimeTransformer tests in new format `#300 <https://github.com/lvgig/tubular/issues/300>`_
+- Refactors tests for SeriesDtMethodTransformer in new format. Changed column arg to columns to fit generic format. `#299 <https://github.com/lvgig/tubular/issues/299>_`
 - Refactored OrdinalEncoderTransformer tests in new format `#330 <https://github.com/lvgig/tubular/issues/330>`_
 
 

@@ -50,12 +50,12 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
     verbose : bool
         Print statements to show which methods are being run or not.
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = True
+    polars_compatible = True
 
     def classname(self) -> str:
         """Method that returns the name of the current class when called."""
@@ -288,12 +288,12 @@ class DataFrameMethodTransformer(DropOriginalMixin, BaseTransformer):
     pd_method_name : str
         The name of the pandas.DataFrame method to call.
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def __init__(
         self,

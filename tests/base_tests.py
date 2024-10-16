@@ -301,7 +301,7 @@ class GenericFitTests:
         x = initialized_transformers[self.transformer_name]
 
         # skip polars test if not narwhalified
-        if not x.NARWHALIFIED and isinstance(df, pl.DataFrame):
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
             return
 
         x_fitted = x.fit(df, df["a"])
@@ -326,7 +326,7 @@ class GenericFitTests:
         x = initialized_transformers[self.transformer_name]
 
         # skip polars test if not narwhalified
-        if not x.NARWHALIFIED and isinstance(df, pl.DataFrame):
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
             return
 
         original_df = copy.deepcopy(df)
@@ -356,7 +356,7 @@ class GenericFitTests:
         x = initialized_transformers[self.transformer_name]
 
         # skip polars test if not narwhalified
-        if not x.NARWHALIFIED and isinstance(df, pl.DataFrame):
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
             return
 
         with pytest.raises(
@@ -383,7 +383,7 @@ class GenericFitTests:
         x = initialized_transformers[self.transformer_name]
 
         # skip polars test if not narwhalified
-        if not x.NARWHALIFIED and isinstance(df, pl.DataFrame):
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
             return
 
         with pytest.raises(
@@ -425,7 +425,7 @@ class GenericFitTests:
         df = minimal_dataframe_lookup[self.transformer_name]
 
         # skip polars test if not narwhalified
-        if not x.NARWHALIFIED and isinstance(df, pl.DataFrame):
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
             return
 
         if isinstance(df, pd.DataFrame):
@@ -674,7 +674,7 @@ class GenericTransformTests:
         x = initialized_transformers[self.transformer_name]
 
         # skip polars test if not narwhalified
-        if not x.NARWHALIFIED and isinstance(df, pl.DataFrame):
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
             return
 
         x_fitted = x.fit(df, df["a"])
@@ -701,7 +701,7 @@ class GenericTransformTests:
         x = initialized_transformers[self.transformer_name]
 
         # skip polars test if not narwhalified
-        if not x.NARWHALIFIED and isinstance(df, pl.DataFrame):
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
             return
 
         x = x.fit(df, df["a"])
@@ -730,7 +730,7 @@ class GenericTransformTests:
         x = initialized_transformers[self.transformer_name]
 
         # skip polars test if not narwhalified
-        if not x.NARWHALIFIED and isinstance(df, pl.DataFrame):
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
             return
 
         original_df = copy.deepcopy(df)
