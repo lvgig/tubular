@@ -49,12 +49,12 @@ class SeriesStrMethodTransformer(NewColumnNameMixin, BaseTransformer):
     pd_method_name : str
         The name of the pd.Series.str method to call.
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def __init__(
         self,
@@ -142,11 +142,11 @@ class StringConcatenator(NewColumnNameMixin, SeparatorColumnMixin, BaseTransform
 
     Attributes
     ----------
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def __init__(
         self,

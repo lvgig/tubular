@@ -11,12 +11,12 @@ class CheckNumericMixin:
     Attributes
     ----------
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def check_numeric_columns(self, X: pd.DataFrame) -> pd.DataFrame:
         """Helper function for checking column args are numeric for numeric transformers.
@@ -50,12 +50,12 @@ class DropOriginalMixin:
     Attributes
     ----------
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def set_drop_original_column(self, drop_original: bool) -> None:
         """Helper method for validating 'drop_original' argument.
@@ -113,12 +113,12 @@ class NewColumnNameMixin:
     Attributes
     ----------
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def check_and_set_new_column_name(self, new_column_name: str) -> None:
         if not (isinstance(new_column_name, str)):
@@ -135,12 +135,12 @@ class SeparatorColumnMixin:
     Attributes
     ----------
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def check_and_set_separator_column(self, separator: str) -> None:
         if not (isinstance(separator, str)):
@@ -157,12 +157,12 @@ class TwoColumnMixin:
     Attributes
     ----------
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def check_two_columns(self, columns: list[str]) -> None:
         if not (isinstance(columns, list)):
@@ -181,11 +181,11 @@ class WeightColumnMixin:
     Attributes
     ----------
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def check_weights_column(self, X: pd.DataFrame, weights_column: str) -> None:
         """Helper method for validating weights column in dataframe.

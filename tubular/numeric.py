@@ -38,12 +38,12 @@ class BaseNumericTransformer(BaseTransformer):
     columns : List[str]
         List of columns to be operated on
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def __init__(self, columns: list[str], **kwargs: dict[str, bool]) -> None:
         super().__init__(columns=columns, **kwargs)
@@ -159,12 +159,12 @@ class LogTransformer(BaseNumericTransformer, DropOriginalMixin):
     suffix : str
         The suffix to add onto the end of column names for new columns.
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def __init__(
         self,
@@ -271,12 +271,12 @@ class CutTransformer(BaseNumericTransformer):
     Attributes
     ----------
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def __init__(
         self,
@@ -382,12 +382,12 @@ class TwoColumnOperatorTransformer(
     pd_method_kwargs : dict
         Dictionary of method kwargs to be passed to pandas.DataFrame method.
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def __init__(
         self,
@@ -478,12 +478,12 @@ class ScalingTransformer(BaseNumericTransformer):
     Attributes
     ----------
 
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     # Dictionary mapping scaler types to their corresponding sklearn classes
     scaler_options = {
@@ -606,12 +606,12 @@ class InteractionTransformer(BaseNumericTransformer):
             column names joined with a whitespace. Interaction feature of ["col1","col2","col3] would be "col1 col2 col3".
         nb_feature_out : int
             number of total columns of transformed dataset, including new interaction features
-        NARWHALIFIED : bool
+        polars_compatible : bool
             class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def __init__(
         self,
@@ -781,13 +781,13 @@ class PCATransformer(CheckNumericMixin, BaseTransformer):
         if n_components is None.
     feature_names_out: list or None
         list of feature name representing the new dimensions.
-    NARWHALIFIED : bool
+    polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
 
     """
 
-    NARWHALIFIED = False
+    polars_compatible = False
 
     def __init__(
         self,
