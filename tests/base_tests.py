@@ -497,6 +497,7 @@ class WeightColumnFitMixinTests:
         df = minimal_dataframe_lookup[self.transformer_name]
 
         uninitialized_transformer = uninitialized_transformers[self.transformer_name]
+        # skip polars test if not narwhalified
         if not uninitialized_transformer.polars_compatible and isinstance(
             df,
             pl.DataFrame,
