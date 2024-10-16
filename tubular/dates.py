@@ -33,7 +33,16 @@ class BaseGenericDateTransformer(
 
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
+
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -143,7 +152,15 @@ class BaseDatetimeTransformer(BaseGenericDateTransformer):
 
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
+
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -202,7 +219,15 @@ class BaseDateTwoColumnTransformer(
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
 
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -254,7 +279,12 @@ class DateDiffLeapYearTransformer(BaseDateTwoColumnTransformer):
     drop_original : bool
         Indicator whether to drop old columns during transform method.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -375,7 +405,15 @@ class DateDifferenceTransformer(BaseDateTwoColumnTransformer):
         Control level of detail in printouts
     drop_original:
         Boolean flag indicating whether to drop original columns.
+
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -463,7 +501,15 @@ class ToDatetimeTransformer(BaseGenericDateTransformer):
     **kwargs
         Arbitrary keyword arguments passed onto pd.to_datetime().
 
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -585,27 +631,34 @@ class SeriesDtMethodTransformer(BaseDatetimeTransformer):
     drop_original: bool
         Indicates whether to drop self.column post transform
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
         new_column_name: str,
         pd_method_name: str,
-        column: str,
+        columns: list[str],
         pd_method_kwargs: dict[str, object] | None = None,
         drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
-        if type(column) is not str:
-            msg = f"{self.classname()}: column should be a str but got {type(column)}"
-            raise TypeError(msg)
-
         super().__init__(
-            columns=[column],
+            columns=columns,
             new_column_name=new_column_name,
             drop_original=drop_original,
             **kwargs,
         )
+
+        if len(self.columns) > 1:
+            msg = rf"{self.classname()}: column should be a str or list of len 1, got {self.columns}"
+            raise ValueError(
+                msg,
+            )
 
         if type(pd_method_name) is not str:
             msg = f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
@@ -644,7 +697,7 @@ class SeriesDtMethodTransformer(BaseDatetimeTransformer):
 
         # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.
-        self.column = column
+        self.column = self.columns[0]
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform specific column on input pandas.DataFrame (X) using the given pandas.Series.dt method and
@@ -748,7 +801,12 @@ class BetweenDatesTransformer(BaseGenericDateTransformer):
     drop_original: bool
         indicates whether to drop original columns.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -913,7 +971,12 @@ class DatetimeInfoExtractor(BaseDatetimeTransformer):
     drop_original: str
         indicates whether to drop provided columns post transform
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     TIME_OF_DAY = "timeofday"
     TIME_OF_MONTH = "timeofmonth"
@@ -1153,7 +1216,12 @@ class DatetimeSinusoidCalculator(BaseDatetimeTransformer):
     period : str, float or dict, default = 2*np.pi
         The period of the output in the units specified above. Can be a string or a dict containing key-value pairs of column
         name and units to be used for that column.
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
+
+    polars_compatible = False
 
     def __init__(
         self,

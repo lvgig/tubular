@@ -11,7 +11,7 @@ import pytest
 import sklearn.base as b
 import test_aide as ta
 
-from tests.utils import get_assert_frame_equal
+from tests.utils import assert_frame_equal_dispatch
 
 
 class GenericInitTests:
@@ -294,19 +294,16 @@ class GenericFitTests:
         self,
         initialized_transformers,
         minimal_dataframe_lookup,
-        narwhalified_transformers_dict,
     ):
         """Test fit returns self?."""
 
-        narwhalified = narwhalified_transformers_dict[self.transformer_name]
-
         df = minimal_dataframe_lookup[self.transformer_name]
 
-        # skip polars test if not narwhalified
-        if not narwhalified and isinstance(df, pl.DataFrame):
-            return
-
         x = initialized_transformers[self.transformer_name]
+
+        # skip polars test if not narwhalified
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
         x_fitted = x.fit(df, df["a"])
 
@@ -323,25 +320,21 @@ class GenericFitTests:
         self,
         initialized_transformers,
         minimal_dataframe_lookup,
-        narwhalified_transformers_dict,
     ):
         """Test fit does not change X."""
 
-        narwhalified = narwhalified_transformers_dict[self.transformer_name]
-
         df = minimal_dataframe_lookup[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         # skip polars test if not narwhalified
-        if not narwhalified and isinstance(df, pl.DataFrame):
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
             return
 
         original_df = copy.deepcopy(df)
 
-        x = initialized_transformers[self.transformer_name]
-
         x.fit(df, df["a"])
 
-        get_assert_frame_equal(df)(
+        assert_frame_equal_dispatch(
             original_df,
             df,
         )
@@ -357,19 +350,15 @@ class GenericFitTests:
         initialized_transformers,
         non_df,
         minimal_dataframe_lookup,
-        narwhalified_transformers_dict,
     ):
         """Test an error is raised if X is not passed as a pd/pl.DataFrame."""
 
-        narwhalified = narwhalified_transformers_dict[self.transformer_name]
-
         df = minimal_dataframe_lookup[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         # skip polars test if not narwhalified
-        if not narwhalified and isinstance(df, pl.DataFrame):
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
             return
-
-        x = initialized_transformers[self.transformer_name]
 
         with pytest.raises(
             TypeError,
@@ -388,19 +377,15 @@ class GenericFitTests:
         non_series,
         initialized_transformers,
         minimal_dataframe_lookup,
-        narwhalified_transformers_dict,
     ):
         """Test an error is raised if y is not passed as a pd/pl.Series."""
 
-        narwhalified = narwhalified_transformers_dict[self.transformer_name]
-
         df = minimal_dataframe_lookup[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         # skip polars test if not narwhalified
-        if not narwhalified and isinstance(df, pl.DataFrame):
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
             return
-
-        x = initialized_transformers[self.transformer_name]
 
         with pytest.raises(
             TypeError,
@@ -433,18 +418,15 @@ class GenericFitTests:
         self,
         initialized_transformers,
         minimal_dataframe_lookup,
-        narwhalified_transformers_dict,
     ):
         """Test an error is raised if Y has no rows."""
-
-        narwhalified = narwhalified_transformers_dict[self.transformer_name]
 
         x = initialized_transformers[self.transformer_name]
 
         df = minimal_dataframe_lookup[self.transformer_name]
 
         # skip polars test if not narwhalified
-        if not narwhalified and isinstance(df, pl.DataFrame):
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
             return
 
         if isinstance(df, pd.DataFrame):
@@ -589,7 +571,7 @@ class WeightColumnFitMixinTests:
 
         transformer.fit(df, df["a"])
 
-        get_assert_frame_equal(original_df)(df, original_df)
+        assert_frame_equal_dispatch(df, original_df)
 
     @pytest.mark.parametrize(
         "minimal_dataframe_lookup",
@@ -789,19 +771,15 @@ class GenericTransformTests:
         non_df,
         initialized_transformers,
         minimal_dataframe_lookup,
-        narwhalified_transformers_dict,
     ):
         """Test that an error is raised in transform is X is not a pd/pl.DataFrame."""
 
-        narwhalified = narwhalified_transformers_dict[self.transformer_name]
-
         df = minimal_dataframe_lookup[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         # skip polars test if not narwhalified
-        if not narwhalified and isinstance(df, pl.DataFrame):
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
             return
-
-        x = initialized_transformers[self.transformer_name]
 
         x_fitted = x.fit(df, df["a"])
 
@@ -820,19 +798,15 @@ class GenericTransformTests:
         self,
         initialized_transformers,
         minimal_dataframe_lookup,
-        narwhalified_transformers_dict,
     ):
         """Test an error is raised if X has no rows."""
 
-        narwhalified = narwhalified_transformers_dict[self.transformer_name]
-
         df = minimal_dataframe_lookup[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         # skip polars test if not narwhalified
-        if not narwhalified and isinstance(df, pl.DataFrame):
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
             return
-
-        x = initialized_transformers[self.transformer_name]
 
         x = x.fit(df, df["a"])
 
@@ -853,27 +827,23 @@ class GenericTransformTests:
         self,
         initialized_transformers,
         minimal_dataframe_lookup,
-        narwhalified_transformers_dict,
     ):
         """Test that the original dataframe is not transformed when transform method used."""
 
-        narwhalified = narwhalified_transformers_dict[self.transformer_name]
-
         df = minimal_dataframe_lookup[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
 
         # skip polars test if not narwhalified
-        if not narwhalified and isinstance(df, pl.DataFrame):
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
             return
 
         original_df = copy.deepcopy(df)
-
-        x = initialized_transformers[self.transformer_name]
 
         x = x.fit(df, df["a"])
 
         _ = x.transform(df)
 
-        get_assert_frame_equal(df)(df, original_df)
+        assert_frame_equal_dispatch(df, original_df)
 
 
 class DropOriginalTransformMixinTests:

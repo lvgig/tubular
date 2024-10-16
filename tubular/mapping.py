@@ -32,7 +32,12 @@ class BaseMappingTransformer(BaseTransformer):
         Dictionary of mappings for each column individually. The dict passed to mappings in
         init is set to the mappings attribute.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(self, mappings: dict[str, dict], **kwargs: dict[str, bool]) -> None:
         if isinstance(mappings, dict):
@@ -81,7 +86,15 @@ class BaseMappingTransformMixin(BaseTransformer):
     Transformer uses the mappings attribute which should be a dict of dicts/mappings
     for each required column.
 
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Applies the mapping defined in the mappings dict to each column in the columns
@@ -133,7 +146,12 @@ class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
         Dictionary of mappings for each column individually. The dict passed to mappings in
         init is set to the mappings attribute.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def transform(
         self,
@@ -240,7 +258,12 @@ class BaseCrossColumnMappingTransformer(BaseMappingTransformer):
         Dictionary of mappings for each column individually to be applied to the adjust_column.
         The dict passed to mappings in init is set to the mappings attribute.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -309,8 +332,12 @@ class CrossColumnMappingTransformer(BaseCrossColumnMappingTransformer):
         Dictionary of mappings for each column individually to be applied to the adjust_column.
         The dict passed to mappings in init is set to the mappings attribute.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -375,7 +402,12 @@ class BaseCrossColumnNumericTransformer(BaseCrossColumnMappingTransformer):
         Dictionary of mappings for each column individually to be applied to the adjust_column.
         The dict passed to mappings in init is set to the mappings attribute.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -444,8 +476,13 @@ class CrossColumnMultiplyTransformer(BaseCrossColumnNumericTransformer):
         Dictionary of multiplicative adjustments for each column individually to be applied to the adjust_column.
         The dict passed to mappings in init is set to the mappings attribute.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
 
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -512,8 +549,13 @@ class CrossColumnAddTransformer(BaseCrossColumnNumericTransformer):
         Dictionary of additive adjustments for each column individually to be applied to the adjust_column.
         The dict passed to mappings in init is set to the mappings attribute.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
 
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
