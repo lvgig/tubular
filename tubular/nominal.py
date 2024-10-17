@@ -2,8 +2,9 @@
 from __future__ import annotations
 
 import warnings
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
+import narwhals as nw
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
@@ -11,6 +12,9 @@ from sklearn.preprocessing import OneHotEncoder
 from tubular.base import BaseTransformer
 from tubular.mapping import BaseMappingTransformMixin
 from tubular.mixins import DropOriginalMixin, SeparatorColumnMixin, WeightColumnMixin
+
+if TYPE_CHECKING:
+    from narwhals.typing import FrameT
 
 
 class BaseNominalTransformer(BaseTransformer):
@@ -25,11 +29,12 @@ class BaseNominalTransformer(BaseTransformer):
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     FITS = False
 
-    def check_mappable_rows(self, X: pd.DataFrame) -> None:
+    @nw.narwhalify
+    def check_mappable_rows(self, X: FrameT) -> None:
         """Method to check that all the rows to apply the transformer to are able to be
         mapped according to the values in the mappings dict.
 
@@ -43,24 +48,25 @@ class BaseNominalTransformer(BaseTransformer):
         self.check_is_fitted(["mappings"])
 
         for c in self.columns:
-            mappable_rows = X[c].isin(list(self.mappings[c])).sum()
+            mappable_rows = X[c].is_in(list(self.mappings[c])).sum()
 
             if mappable_rows < X.shape[0]:
                 msg = f"{self.classname()}: nulls would be introduced into column {c} from levels not present in mapping"
                 raise ValueError(msg)
 
-    def transform(self, X: pd.DataFrame) -> None:
+    @nw.narwhalify
+    def transform(self, X: FrameT) -> None:
         """Base nominal transformer transform method.  Checks that all the rows are able to be
         mapped according to the values in the mappings dict and calls the BaseTransformer transform method.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : FrameT
             Data to apply nominal transformations to.
 
         Returns
         -------
-        X : pd.DataFrame
+        X : FrameT
             Input X.
 
         """
