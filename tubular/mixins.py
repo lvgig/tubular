@@ -146,7 +146,7 @@ class WeightColumnMixin:
 
         Args:
         ----
-            dfs: df containing weight column
+            X: pandas or polars df containing weight column
             weights_column: name of weight column
 
         """
