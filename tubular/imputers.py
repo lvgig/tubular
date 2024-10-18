@@ -51,10 +51,10 @@ class BaseImputer(BaseTransformer):
         """
         self.check_is_fitted(["impute_values_"])
 
-        X = super().transform(X)
+        X = nw.from_native(super().transform(X))
 
         for c in self.columns:
-            X[c] = X.with_columns(X[c].fill_null(self.impute_values_[c]).alias(c))
+            X = X.with_columns(X[c].fill_null(self.impute_values_[c]).alias(c))
 
         return X
 
