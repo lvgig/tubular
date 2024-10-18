@@ -20,13 +20,14 @@ iniconfig==2.0.0
     # via pytest
 joblib==1.4.2
     # via scikit-learn
-narwhals==1.9.2
+narwhals==1.9.4
     # via tubular (pyproject.toml)
 nodeenv==1.9.1
     # via pre-commit
 numpy==1.24.4
     # via
     #   pandas
+    #   pyarrow
     #   scikit-learn
     #   scipy
 packaging==24.1
@@ -40,6 +41,8 @@ pluggy==1.5.0
 polars==1.9.0
     # via tubular (pyproject.toml)
 pre-commit==2.15.0
+    # via tubular (pyproject.toml)
+pyarrow==17.0.0
     # via tubular (pyproject.toml)
 pytest==8.2.2
     # via
