@@ -3,12 +3,17 @@
 from __future__ import annotations
 
 import warnings
+from typing import TYPE_CHECKING
 
+import narwhals as nw
 import numpy as np
 import pandas as pd
 
 from tubular.base import BaseTransformer
 from tubular.mixins import WeightColumnMixin
+
+if TYPE_CHECKING:
+    from narwhals.typing import FrameT
 
 
 class BaseImputer(BaseTransformer):
@@ -517,12 +522,13 @@ class NullIndicator(BaseTransformer):
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+    @nw.narwhalify
+    def transform(self, X: FrameT) -> FrameT:
         """Create new columns indicating the position of null values for each variable in self.columns.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : FrameT
             Data to add indicators to.
 
         """
