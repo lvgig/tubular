@@ -4,6 +4,7 @@ import datetime
 
 import numpy as np
 import pandas as pd
+import polars as pl
 
 
 def create_series_1(n=6):
@@ -170,15 +171,21 @@ def create_df_8():
     return df
 
 
-def create_df_9():
+def create_df_9(library="pandas"):
     """Create simple DataFrame to use in other tests."""
-    return pd.DataFrame(
+
+    df = pd.DataFrame(
         {
             "a": [1, 2, np.nan, 4, np.nan, 6],
             "b": [np.nan, 5, 4, 3, 2, 1],
             "c": [3, 2, 1, 4, 5, 6],
         },
     )
+
+    if library == "polars":
+        df = pl.from_pandas(df)
+
+    return df
 
 
 def create_df_10():

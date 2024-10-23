@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
+import polars as pl
 import pytest
-import test_aide as ta
 
 import tests.test_data as d
 from tests.base_tests import (
@@ -9,6 +9,7 @@ from tests.base_tests import (
     GenericTransformTests,
     OtherBaseBehaviourTests,
 )
+from tests.utils import assert_frame_equal_dispatch
 from tubular.imputers import NullIndicator
 
 
@@ -27,9 +28,10 @@ class TestTransform(GenericTransformTests):
     def setup_class(cls):
         cls.transformer_name = "NullIndicator"
 
-    def expected_df_1():
+    def expected_df_1(self, library="pandas"):
         """Expected output for test_null_indicator_columns_correct."""
-        return pd.DataFrame(
+
+        df = pd.DataFrame(
             {
                 "a": [1, 2, np.nan, 4, np.nan, 6],
                 "b": [np.nan, 5, 4, 3, 2, 1],
@@ -39,25 +41,29 @@ class TestTransform(GenericTransformTests):
             },
         )
 
-    @pytest.mark.parametrize(
-        ("df", "expected"),
-        ta.pandas.adjusted_dataframe_params(d.create_df_9(), expected_df_1()),
-    )
-    def test_null_indicator_columns_correct(self, df, expected):
+        if library == "polars":
+            df = pl.from_pandas(df)
+
+        return df
+
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
+    def test_null_indicator_columns_correct(self, library):
         """Test that the created indicator column is correct - and unrelated columns are unchanged."""
         columns = ["b", "c"]
-        x = NullIndicator(columns=columns)
+        transformer = NullIndicator(columns=columns)
 
-        df_transformed = x.transform(df)
+        df = d.create_df_9(library=library)
+        expected = self.expected_df_1(library=library)
+
+        df_transformed = transformer.transform(df)
 
         for col in [column + "_nulls" for column in columns]:
-            expected[col] = expected[col].astype(np.int8)
+            if library == "pandas":
+                expected[col] = expected[col].astype(np.int8)
+            else:
+                expected = expected.with_columns(expected[col].cast(pl.Int8))
 
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="Check null indicator columns created correctly in transform.",
-        )
+        assert_frame_equal_dispatch(df_transformed, expected)
 
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
