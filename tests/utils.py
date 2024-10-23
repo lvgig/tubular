@@ -1,9 +1,51 @@
-import numpy as np
 import pandas as pd
 import polars as pl
 from narwhals.typing import FrameT
 from pandas.testing import assert_frame_equal as assert_pandas_frame_equal
 from polars.testing import assert_frame_equal as assert_polars_frame_equal
+
+
+def align_pandas_and_polars_dtypes(
+    pandas_df: pd.DataFrame,
+    polars_df: pl.DataFrame,
+) -> pl.DataFrame:
+    """helper to ensure that dtypes are aligned between polars/pandas dfs used in tests. Avoids e.g.
+    [0, None] being inferred as float in pandas and int in polars and complicating tests
+
+    Parameters
+    ----------
+    pandas_df : pd.DataFrame
+        pandas df to extract types from
+
+    polars_df : pl.DataFrame
+        polars df to apply types to
+
+    Returns
+    ----------
+
+    pl.DataFrame: polars df with types converted to align with pandas_df
+
+    """
+
+    PANDAS_TO_POLARS_TYPES = {
+        "int64": pl.Int64,
+        "int32": pl.Int32,
+        "int16": pl.Int16,
+        "int8": pl.Int8,
+        "float64": pl.Float64,
+        "float32": pl.Float32,
+        "object": pl.Utf8,
+        "str": pl.String,
+        "bool": pl.Boolean,
+        "datetime64[ns]": pl.Datetime,
+    }
+
+    for col in pandas_df:
+        pandas_col_type = str(pandas_df[col].dtype)
+        polars_col_type = PANDAS_TO_POLARS_TYPES[pandas_col_type]
+        polars_df = polars_df.with_columns(polars_df[col].cast(polars_col_type))
+
+    return polars_df
 
 
 def assert_frame_equal_dispatch(df1: FrameT, df2: FrameT) -> None:
@@ -29,16 +71,10 @@ def assert_frame_equal_dispatch(df1: FrameT, df2: FrameT) -> None:
     raise ValueError(invalid_request_error)
 
 
-def convert_values(values, library):
-    if library == "pandas":
-        return [np.nan if v is None else v for v in values]
-    return values
-
-
 def dataframe_init_dispatch(
     dataframe_dict: dict,
     library: str,
-) -> pl.DataFrame | pd.DataFrame:
+) -> FrameT:
     """
     Initialize a DataFrame using either Pandas or Polars library based on the specified library name.
 
@@ -52,14 +88,18 @@ def dataframe_init_dispatch(
     Raises:
     ValueError: If the `library` parameter is not "pandas" or "polars".
     """
-    if library not in ["pandas", "polars"]:
-        library_error_message = (
-            "The library parameter should be either 'pandas' or 'polars'."
-        )
-        raise ValueError(library_error_message)
 
-    converted_dict = {k: convert_values(v, library) for k, v in dataframe_dict.items()}
+    pandas_df = pd.DataFrame(dataframe_dict)
 
     if library == "pandas":
-        return pd.DataFrame(converted_dict)
-    return pl.DataFrame(converted_dict, strict=False)
+        return pandas_df
+
+    if library == "polars":
+        polars_df = pl.DataFrame(dataframe_dict, nan_to_null=True)
+
+        return align_pandas_and_polars_dtypes(pandas_df, polars_df)
+
+    library_error_message = (
+        "The library parameter should be either 'pandas' or 'polars'."
+    )
+    raise ValueError(library_error_message)

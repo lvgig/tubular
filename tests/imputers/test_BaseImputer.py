@@ -14,6 +14,11 @@ from tests.base_tests import (
     OtherBaseBehaviourTests,
 )
 
+# Categorical columns created under the same global string cache have the same underlying
+# physical value when string values are equal.
+# there is an efficiency cost, but not an issue for tests
+pl.enable_string_cache()
+
 
 class GenericImputerTransformTests:
     @pytest.fixture()
@@ -80,7 +85,7 @@ class GenericImputerTransformTests:
     def test_not_fitted_error_raised(self, test_fit_df, initialized_transformers):
         transformer = initialized_transformers[self.transformer_name]
         # if transformer is not yet polars compatible, skip this test
-        if transformer.polars_compatible and not isinstance(test_fit_df, pl.DataFrame):
+        if not transformer.polars_compatible and isinstance(test_fit_df, pl.DataFrame):
             return
         if initialized_transformers[self.transformer_name].FITS:
             with pytest.raises(NotFittedError):
@@ -92,7 +97,7 @@ class GenericImputerTransformTests:
         df1 = d.create_df_1(library=library)
         transformer = initialized_transformers[self.transformer_name]
         # if transformer is not yet polars compatible, skip this test
-        if transformer.polars_compatible and not isinstance(df1, pl.DataFrame):
+        if not transformer.polars_compatible and isinstance(df1, pl.DataFrame):
             return
         transformer.impute_values_ = {"b": 1}
         impute_values = deepcopy(transformer.impute_values_)
@@ -116,12 +121,12 @@ class GenericImputerTransformTests:
         # Initialize the transformer
         transformer = initialized_transformers[self.transformer_name]
         # if transformer is not yet polars compatible, skip this test
-        if transformer.polars_compatible and not isinstance(df2, pl.DataFrame):
+        if not transformer.polars_compatible and isinstance(df2, pl.DataFrame):
             return
         transformer.impute_values_ = {"a": 7}
         transformer.columns = ["a"]
 
-        # Transform the DataFrame
+        print(nw.from_native(df2["a"], allow_series=True).fill_null(7).to_native())
         df_transformed = transformer.transform(df2)
 
         # Convert both DataFrames to a common format using Narwhals
@@ -138,8 +143,11 @@ class GenericImputerTransformTests:
                 df_expected_row,
             )
 
-        # Check whol dataframes
-        u.assert_frame_equal_dispatch(df_transformed_common, expected_df_1_common)
+        # Check whole dataframes
+        u.assert_frame_equal_dispatch(
+            df_transformed_common.to_native(),
+            expected_df_1_common.to_native(),
+        )
 
     @pytest.mark.parametrize(
         ("library", "expected_df_2"),
@@ -153,6 +161,11 @@ class GenericImputerTransformTests:
 
         # Initialize the transformer
         transformer = initialized_transformers[self.transformer_name]
+
+        # if transformer is not yet polars compatible, skip this test
+        if not transformer.polars_compatible and isinstance(df2, pl.DataFrame):
+            return
+
         transformer.impute_values_ = {"b": "g"}
         transformer.columns = ["b"]
 
@@ -181,12 +194,17 @@ class GenericImputerTransformTests:
 
         # Initialize the transformer
         transformer = initialized_transformers[self.transformer_name]
+
+        # if transformer is not yet polars compatible, skip this test
+        if not transformer.polars_compatible and isinstance(df2, pl.DataFrame):
+            return
+
         transformer.impute_values_ = {"b": "g", "c": "f"}
         transformer.columns = ["b", "c"]
 
         # Transform the DataFrame
         df_transformed = transformer.transform(df2)
-
+        df_transformed["c"]
         # ArbitraryImputer will add a new categorical level to cat columns,
         # make sure expected takes this into account
         if self.transformer_name == "ArbitraryImputer" and isinstance(
@@ -194,7 +212,7 @@ class GenericImputerTransformTests:
             pd.DataFrame,
         ):
             expected_df_3["c"] = expected_df_3["c"].cat.add_categories(
-                transformer.impute_values_["c"],
+                transformer.impute_value,
             )
 
         # Check if the DataFrame matches the expected DataFrame
@@ -218,12 +236,11 @@ class GenericImputerTransformTestsWeight:
         library = request.param
         df = d.create_df_9(library=library)
 
-        for col in ["b"]:
-            df.loc[df[col].isna(), col] = 4
+        df = nw.from_native(df)
 
-        if library == "polars":
-            return pl.from_pandas(df)
-        return df
+        df = df.with_columns(df["b"].fill_null(4))
+
+        return df.to_native()
 
     @pytest.mark.parametrize(
         ("library", "expected_df_weights"),
@@ -247,6 +264,10 @@ class GenericImputerTransformTestsWeight:
         args["weights_column"] = "c"
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
+
+        # if transformer is not yet polars compatible, skip this test
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
         # Set the impute values dict directly rather than fitting x on df so test works with helpers
         transformer.impute_values_ = {"b": 4}
@@ -281,6 +302,10 @@ class GenericImputerTransformTestsWeight:
         args["weights_column"] = "c"
 
         transformer1 = uninitialized_transformers[self.transformer_name](**args)
+
+        # if transformer is not yet polars compatible, skip this test
+        if not transformer1.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
         transformer1.fit(df)
 

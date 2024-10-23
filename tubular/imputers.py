@@ -30,7 +30,7 @@ class BaseImputer(BaseTransformer):
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     FITS = False
 
@@ -81,7 +81,7 @@ class ArbitraryImputer(BaseImputer):
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
 
-    polars_compatible = True
+    polars_compatible = False
 
     FITS = False
 
@@ -128,7 +128,6 @@ class ArbitraryImputer(BaseImputer):
         """
         self.check_is_fitted(["impute_value"])
         self.columns_check(X)
-
         for c in self.columns:
             if (
                 "category" in X[c].dtype.name

@@ -59,7 +59,7 @@ def create_object_df():
     )
 
 
-def create_df_1(library):
+def create_df_1(library="pandas"):
     """Create simple DataFrame with the following...
 
     6 rows
@@ -74,12 +74,12 @@ def create_df_1(library):
     return u.dataframe_init_dispatch(df_dict, library)
 
 
-def create_df_2(library):
+def create_df_2(library="pandas"):
     """Create simple DataFrame to use in other tests."""
     df_dict = {
-        "a": [1, 2, 3, 4, 5, 6, np.nan],
-        "b": ["a", "b", "c", "d", "e", "f", np.nan],
-        "c": ["a", "b", "c", "d", "e", "f", np.nan],
+        "a": [1, 2, 3, 4, 5, 6, None],
+        "b": ["a", "b", "c", "d", "e", "f", None],
+        "c": ["a", "b", "c", "d", "e", "f", None],
     }
 
     df = u.dataframe_init_dispatch(df_dict, library)
@@ -177,11 +177,11 @@ def create_df_8():
     return df
 
 
-def create_df_9(library):
+def create_df_9(library="pandas"):
     """Create simple DataFrame to use in other tests."""
     df = {
-        "a": [1, 2, np.nan, 4, np.nan, 6],
-        "b": [np.nan, 5, 4, 3, 2, 1],
+        "a": [1, 2, None, 4, None, 6],
+        "b": [None, 5, 4, 3, 2, 1],
         "c": [3, 2, 1, 4, 5, 6],
     }
 
