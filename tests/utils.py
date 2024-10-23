@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import polars as pl
 from narwhals.typing import FrameT
@@ -26,3 +27,39 @@ def assert_frame_equal_dispatch(df1: FrameT, df2: FrameT) -> None:
 
     invalid_request_error = "tubular is setup to handle only pandas or polars inputs, and dfs input to this function should be from same library"
     raise ValueError(invalid_request_error)
+
+
+def convert_values(values, library):
+    if library == "pandas":
+        return [np.nan if v is None else v for v in values]
+    return values
+
+
+def dataframe_init_dispatch(
+    dataframe_dict: dict,
+    library: str,
+) -> pl.DataFrame | pd.DataFrame:
+    """
+    Initialize a DataFrame using either Pandas or Polars library based on the specified library name.
+
+    Parameters:
+    dataframe_dict (dict): A dictionary where keys are column names and values are lists of column data.
+    library (str): The name of the library to use for DataFrame creation. Should be either "pandas" or "polars".
+
+    Returns:
+    pl.DataFrame | pd.DataFrame: A DataFrame object from the specified library.
+
+    Raises:
+    ValueError: If the `library` parameter is not "pandas" or "polars".
+    """
+    if library not in ["pandas", "polars"]:
+        library_error_message = (
+            "The library parameter should be either 'pandas' or 'polars'."
+        )
+        raise ValueError(library_error_message)
+
+    converted_dict = {k: convert_values(v, library) for k, v in dataframe_dict.items()}
+
+    if library == "pandas":
+        return pd.DataFrame(converted_dict)
+    return pl.DataFrame(converted_dict, strict=False)

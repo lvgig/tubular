@@ -81,7 +81,7 @@ class ArbitraryImputer(BaseImputer):
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     FITS = False
 

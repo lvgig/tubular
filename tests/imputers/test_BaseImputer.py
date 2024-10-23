@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-import numpy as np
+import narwhals as nw
 import pandas as pd
 import polars as pl
 import pytest
@@ -15,90 +15,89 @@ from tests.base_tests import (
 )
 
 
-@pytest.fixture
-def library(request):
-    return request.param
-
-
-@pytest.fixture()
-def test_fit_df(request):
-    library = getattr(request, "param", "pandas")
-    df = pd.DataFrame(
-        {
+class GenericImputerTransformTests:
+    @pytest.fixture()
+    def test_fit_df(self, request):
+        library = request.param
+        df_dict = {
             "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
-            "b": ["a", "b", "c", "d", "e", "f", np.nan],
-            "c": ["a", "b", "c", "d", "e", "f", np.nan],
-        },
-    )
-    if library == "polars":
-        return pl.from_pandas(df)
-    return df
+            "b": ["a", "b", "c", "d", "e", "f", None],
+            "c": ["a", "b", "c", "d", "e", "f", None],
+        }
 
+        return u.dataframe_init_dispatch(df_dict, library)
 
-@pytest.fixture()
-def expected_df_3(request):
-    library = getattr(request, "param", "pandas")
-    df3 = pd.DataFrame(
-        {
-            "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.nan],
+    @pytest.fixture()
+    def expected_df_1(self, request):
+        library = request.param
+        df1_dict = {
+            "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
+            "b": ["a", "b", "c", "d", "e", "f", None],
+            "c": ["a", "b", "c", "d", "e", "f", None],
+        }
+
+        df1 = u.dataframe_init_dispatch(df1_dict, library)
+
+        narwhals_df = nw.from_native(df1)
+        narwhals_df = narwhals_df.with_columns(nw.col("c").cast(nw.dtypes.Categorical))
+
+        return narwhals_df.to_native()
+
+    @pytest.fixture()
+    def expected_df_2(self, request):
+        library = request.param
+        df2_dict = {
+            "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, None],
+            "b": ["a", "b", "c", "d", "e", "f", "g"],
+            "c": ["a", "b", "c", "d", "e", "f", None],
+        }
+        df2 = u.dataframe_init_dispatch(df2_dict, library)
+        if library == "pandas":
+            df2["c"] = df2["c"].astype("category")
+        elif library == "polars":
+            df2 = df2.with_columns(df2["c"].cast(pl.Categorical))
+        return df2
+
+    @pytest.fixture()
+    def expected_df_3(self, request):
+        library = request.param
+        df3_dict = {
+            "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, None],
             "b": ["a", "b", "c", "d", "e", "f", "g"],
             "c": ["a", "b", "c", "d", "e", "f", "f"],
-        },
-    )
-    df3["c"] = df3["c"].astype("category")
-    if library == "polars":
-        return pl.from_pandas(df3)
-    return df3
+        }
 
+        df3 = u.dataframe_init_dispatch(dataframe_dict=df3_dict, library=library)
 
-@pytest.fixture()
-def expected_df_2(request):
-    library = getattr(request, "param", "pandas")
-    df2 = pd.DataFrame(
-        {
-            "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, np.nan],
-            "b": ["a", "b", "c", "d", "e", "f", "g"],
-            "c": ["a", "b", "c", "d", "e", "f", np.nan],
-        },
-    )
-    df2["c"] = df2["c"].astype("category")
-    if library == "polars":
-        return pl.from_pandas(df2)
-    return df2
+        if library == "pandas":
+            df3["c"] = df3["c"].astype("category")
+        elif library == "polars":
+            df3 = df3.with_columns(df3["c"].cast(pl.Categorical))
 
+        return df3
 
-@pytest.fixture()
-def expected_df_1(request):
-    library = getattr(request, "param", "pandas")
-    df = pd.DataFrame(
-        {
-            "a": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
-            "b": ["a", "b", "c", "d", "e", "f", np.nan],
-            "c": ["a", "b", "c", "d", "e", "f", np.nan],
-        },
-    )
-    df["c"] = df["c"].astype("category")
-    if library == "polars":
-        return pl.from_pandas(df)
-    return df
-
-
-class GenericImputerTransformTests:
     @pytest.mark.parametrize("test_fit_df", ["pandas", "polars"], indirect=True)
     def test_not_fitted_error_raised(self, test_fit_df, initialized_transformers):
+        transformer = initialized_transformers[self.transformer_name]
+        # if transformer is not yet polars compatible, skip this test
+        if transformer.polars_compatible and not isinstance(test_fit_df, pl.DataFrame):
+            return
         if initialized_transformers[self.transformer_name].FITS:
             with pytest.raises(NotFittedError):
                 initialized_transformers[self.transformer_name].transform(test_fit_df)
 
-    @pytest.mark.parametrize("library", ["pandas", "polars"], indirect=True)
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     def test_impute_value_unchanged(self, library, initialized_transformers):
         """Test that self.impute_value is unchanged after transform."""
-        create_df_1 = d.create_df_1(library=library)
+        df1 = d.create_df_1(library=library)
         transformer = initialized_transformers[self.transformer_name]
+        # if transformer is not yet polars compatible, skip this test
+        if transformer.polars_compatible and not isinstance(df1, pl.DataFrame):
+            return
         transformer.impute_values_ = {"b": 1}
         impute_values = deepcopy(transformer.impute_values_)
 
-        transformer.transform(create_df_1)
+        transformer.transform(df1)
 
         assert (
             transformer.impute_values_ == impute_values
@@ -112,25 +111,35 @@ class GenericImputerTransformTests:
     def test_expected_output_1(self, library, expected_df_1, initialized_transformers):
         """Test that transform is giving the expected output when applied to float column."""
         # Create the DataFrame using the library parameter
-        create_df_2 = d.create_df_2(library=library)
+        df2 = d.create_df_2(library=library)
 
         # Initialize the transformer
         transformer = initialized_transformers[self.transformer_name]
+        # if transformer is not yet polars compatible, skip this test
+        if transformer.polars_compatible and not isinstance(df2, pl.DataFrame):
+            return
         transformer.impute_values_ = {"a": 7}
         transformer.columns = ["a"]
 
         # Transform the DataFrame
-        df_transformed = transformer.transform(create_df_2)
+        df_transformed = transformer.transform(df2)
+
+        # Convert both DataFrames to a common format using Narwhals
+        df_transformed_common = nw.from_native(df_transformed)
+        expected_df_1_common = nw.from_native(expected_df_1)
 
         # Check outcomes for single rows
-        for i in range(len(df_transformed)):
-            if isinstance(df_transformed, pd.DataFrame):
-                u.assert_frame_equal_dispatch(
-                    df_transformed.iloc[[i]],
-                    expected_df_1.iloc[[i]],
-                )
-            else:  # Assuming Polars DataFrame
-                u.assert_frame_equal_dispatch(df_transformed[i], expected_df_1[i])
+        for i in range(len(df_transformed_common)):
+            df_transformed_row = df_transformed_common[[i]].to_native()
+            df_expected_row = expected_df_1_common[[i]].to_native()
+
+            u.assert_frame_equal_dispatch(
+                df_transformed_row,
+                df_expected_row,
+            )
+
+        # Check whol dataframes
+        u.assert_frame_equal_dispatch(df_transformed_common, expected_df_1_common)
 
     @pytest.mark.parametrize(
         ("library", "expected_df_2"),
@@ -140,7 +149,7 @@ class GenericImputerTransformTests:
     def test_expected_output_2(self, library, expected_df_2, initialized_transformers):
         """Test that transform is giving the expected output when applied to object column."""
         # Create the DataFrame using the library parameter
-        create_df_2 = d.create_df_2(library=library)
+        df2 = d.create_df_2(library=library)
 
         # Initialize the transformer
         transformer = initialized_transformers[self.transformer_name]
@@ -148,7 +157,7 @@ class GenericImputerTransformTests:
         transformer.columns = ["b"]
 
         # Transform the DataFrame
-        df_transformed = transformer.transform(create_df_2)
+        df_transformed = transformer.transform(df2)
 
         # Check outcomes for single rows
         for i in range(len(df_transformed)):
@@ -168,7 +177,7 @@ class GenericImputerTransformTests:
     def test_expected_output_3(self, library, expected_df_3, initialized_transformers):
         """Test that transform is giving the expected output when applied to object and categorical columns."""
         # Create the DataFrame using the library parameter
-        create_df_2 = d.create_df_2(library=library)
+        df2 = d.create_df_2(library=library)
 
         # Initialize the transformer
         transformer = initialized_transformers[self.transformer_name]
@@ -176,7 +185,7 @@ class GenericImputerTransformTests:
         transformer.columns = ["b", "c"]
 
         # Transform the DataFrame
-        df_transformed = transformer.transform(create_df_2)
+        df_transformed = transformer.transform(df2)
 
         # ArbitraryImputer will add a new categorical level to cat columns,
         # make sure expected takes this into account
@@ -202,18 +211,20 @@ class GenericImputerTransformTests:
                 u.assert_frame_equal_dispatch(df_transformed[i], expected_df_3[i])
 
 
-@pytest.fixture
-def expected_df_weights():
-    """Expected output for test_nulls_imputed_correctly_weights."""
-    df = d.create_df_9()
-
-    for col in ["b"]:
-        df.loc[df[col].isna(), col] = 4
-
-    return df
-
-
 class GenericImputerTransformTestsWeight:
+    @pytest.fixture()
+    def expected_df_weights(self, request):
+        """Expected output for test_nulls_imputed_correctly_weights."""
+        library = request.param
+        df = d.create_df_9(library=library)
+
+        for col in ["b"]:
+            df.loc[df[col].isna(), col] = 4
+
+        if library == "polars":
+            return pl.from_pandas(df)
+        return df
+
     @pytest.mark.parametrize(
         ("library", "expected_df_weights"),
         [("pandas", "pandas"), ("polars", "polars")],

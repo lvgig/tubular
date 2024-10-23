@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 import polars as pl
 
+import tests.utils as u
+
 
 def create_series_1(n=6):
     """Create simple series of [0:n-1]."""
@@ -57,7 +59,7 @@ def create_object_df():
     )
 
 
-def create_df_1(library="pandas"):
+def create_df_1(library):
     """Create simple DataFrame with the following...
 
     6 rows
@@ -67,26 +69,24 @@ def create_df_1(library="pandas"):
     no nulls
     """
 
-    df = pd.DataFrame({"a": [1, 2, 3, 4, 5, 6], "b": ["a", "b", "c", "d", "e", "f"]})
-    if library == "polars":
-        return pl.from_pandas(df)
-    return df
+    df_dict = {"a": [1, 2, 3, 4, 5, 6], "b": ["a", "b", "c", "d", "e", "f"]}
+
+    return u.dataframe_init_dispatch(df_dict, library)
 
 
-def create_df_2(library="pandas"):
+def create_df_2(library):
     """Create simple DataFrame to use in other tests."""
-    df = pd.DataFrame(
-        {
-            "a": [1, 2, 3, 4, 5, 6, np.nan],
-            "b": ["a", "b", "c", "d", "e", "f", np.nan],
-            "c": ["a", "b", "c", "d", "e", "f", np.nan],
-        },
-    )
+    df_dict = {
+        "a": [1, 2, 3, 4, 5, 6, np.nan],
+        "b": ["a", "b", "c", "d", "e", "f", np.nan],
+        "c": ["a", "b", "c", "d", "e", "f", np.nan],
+    }
 
-    df["c"] = df["c"].astype("category")
-
-    if library == "polars":
-        return pl.from_pandas(df)
+    df = u.dataframe_init_dispatch(df_dict, library)
+    if library == "pandas":
+        df["c"] = df["c"].astype("category")
+    elif library == "polars":
+        df = df.with_columns(df["c"].cast(pl.Categorical))
     return df
 
 
@@ -177,15 +177,15 @@ def create_df_8():
     return df
 
 
-def create_df_9():
+def create_df_9(library):
     """Create simple DataFrame to use in other tests."""
-    return pd.DataFrame(
-        {
-            "a": [1, 2, np.nan, 4, np.nan, 6],
-            "b": [np.nan, 5, 4, 3, 2, 1],
-            "c": [3, 2, 1, 4, 5, 6],
-        },
-    )
+    df = {
+        "a": [1, 2, np.nan, 4, np.nan, 6],
+        "b": [np.nan, 5, 4, 3, 2, 1],
+        "c": [3, 2, 1, 4, 5, 6],
+    }
+
+    return u.dataframe_init_dispatch(df, library)
 
 
 def create_df_10():
