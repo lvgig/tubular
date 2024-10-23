@@ -126,7 +126,6 @@ class GenericImputerTransformTests:
         transformer.impute_values_ = {"a": 7}
         transformer.columns = ["a"]
 
-        print(nw.from_native(df2["a"], allow_series=True).fill_null(7).to_native())
         df_transformed = transformer.transform(df2)
 
         # Convert both DataFrames to a common format using Narwhals
