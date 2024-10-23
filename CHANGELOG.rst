@@ -46,6 +46,7 @@ Changed
 - Refactored ToDatetimeTransformer tests in new format `#300 <https://github.com/lvgig/tubular/issues/300>`_
 - Refactors tests for SeriesDtMethodTransformer in new format. Changed column arg to columns to fit generic format. `#299 <https://github.com/lvgig/tubular/issues/299>_`
 - Refactored OrdinalEncoderTransformer tests in new format `#330 <https://github.com/lvgig/tubular/issues/330>`_
+- Narwhal-ified NullIndicator `#319 <https://github.com/lvgig/tubular/issues/319>_`
 
 
 1.3.1 (2024-07-18)

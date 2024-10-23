@@ -513,7 +513,7 @@ class NullIndicator(BaseTransformer):
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     def __init__(
         self,
@@ -532,9 +532,9 @@ class NullIndicator(BaseTransformer):
             Data to add indicators to.
 
         """
-        X = super().transform(X)
+        X = nw.from_native(super().transform(X))
 
         for c in self.columns:
-            X[f"{c}_nulls"] = X[c].isna().astype(np.int8)
+            X = X.with_columns((X[c].is_null()).cast(nw.Int8).alias(f"{c}_nulls"))
 
         return X
