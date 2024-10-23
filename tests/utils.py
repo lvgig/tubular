@@ -95,7 +95,7 @@ def dataframe_init_dispatch(
         return pandas_df
 
     if library == "polars":
-        polars_df = pl.DataFrame(dataframe_dict, nan_to_null=True)
+        polars_df = pl.DataFrame(dataframe_dict)
 
         return align_pandas_and_polars_dtypes(pandas_df, polars_df)
 
