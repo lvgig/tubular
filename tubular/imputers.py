@@ -54,7 +54,7 @@ class BaseImputer(BaseTransformer):
         X = nw.from_native(super().transform(X))
 
         for c in self.columns:
-            X = X.with_columns(X[c].fill_null(self.impute_values_[c]).alias(c))
+            X = X.with_columns(nw.col(c).fill_null(self.impute_values_[c]).alias(c))
 
         return X
 
