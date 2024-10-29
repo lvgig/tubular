@@ -53,10 +53,13 @@ class BaseImputer(BaseTransformer):
 
         X = nw.from_native(super().transform(X))
 
-        for c in self.columns:
-            X = X.with_columns(nw.col(c).fill_null(self.impute_values_[c]).alias(c))
+        new_col_expressions = [
+            nw.col(c).fill_null(self.impute_values_[c]) for c in self.columns
+        ]
 
-        return X
+        return X.with_columns(
+            new_col_expressions,
+        )
 
 
 class ArbitraryImputer(BaseImputer):
