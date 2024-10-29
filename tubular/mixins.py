@@ -5,9 +5,9 @@ from typing import TYPE_CHECKING
 import narwhals as nw
 import narwhals.selectors as ncs
 import numpy as np
-import pandas as pd
 
 if TYPE_CHECKING:
+    import pandas as pd
     from narhwals.typing import FrameT
 
 
@@ -56,15 +56,7 @@ class DropOriginalMixin:
 
     Transformer deletes transformer input columns depending on boolean argument.
 
-    Attributes
-    ----------
-
-    polars_compatible : bool
-        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
-
     """
-
-    polars_compatible = False
 
     def set_drop_original_column(self, drop_original: bool) -> None:
         """Helper method for validating 'drop_original' argument.
@@ -116,18 +108,7 @@ class DropOriginalMixin:
 
 
 class NewColumnNameMixin:
-    """
-    Helper to validate and set new_column_name attribute
-
-    Attributes
-    ----------
-
-    polars_compatible : bool
-        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
-
-    """
-
-    polars_compatible = False
+    """Helper to validate and set new_column_name attribute"""
 
     def check_and_set_new_column_name(self, new_column_name: str) -> None:
         if not (isinstance(new_column_name, str)):
@@ -138,18 +119,7 @@ class NewColumnNameMixin:
 
 
 class SeparatorColumnMixin:
-    """
-    Helper to validate and set separator attribute
-
-    Attributes
-    ----------
-
-    polars_compatible : bool
-        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
-
-    """
-
-    polars_compatible = False
+    """Hel per to validate and set separator attribute"""
 
     def check_and_set_separator_column(self, separator: str) -> None:
         if not (isinstance(separator, str)):
@@ -160,18 +130,7 @@ class SeparatorColumnMixin:
 
 
 class TwoColumnMixin:
-    """
-    helper to validate columns when exactly two columns are required
-
-    Attributes
-    ----------
-
-    polars_compatible : bool
-        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
-
-    """
-
-    polars_compatible = False
+    """helper to validate columns when exactly two columns are required"""
 
     def check_two_columns(self, columns: list[str]) -> None:
         if not (isinstance(columns, list)):
@@ -196,13 +155,14 @@ class WeightColumnMixin:
 
     polars_compatible = False
 
-    def check_weights_column(self, X: pd.DataFrame, weights_column: str) -> None:
+    @nw.narwhalify
+    def check_weights_column(self, X: FrameT, weights_column: str) -> None:
         """Helper method for validating weights column in dataframe.
 
         Args:
         ----
-            X (pd.DataFrame): df containing weight column
-            weights_column (str): name of weight column
+            X: pandas or polars df containing weight column
+            weights_column: name of weight column
 
         """
         # check if given weight is in columns
@@ -211,28 +171,27 @@ class WeightColumnMixin:
             raise ValueError(msg)
 
         # check weight is numeric
-
-        if not pd.api.types.is_numeric_dtype(X[weights_column]):
+        if weights_column not in X.select(ncs.numeric()).columns:
             msg = f"{self.classname()}: weight column must be numeric."
             raise ValueError(msg)
 
         # check weight is positive
-
-        if (X[weights_column] < 0).sum() != 0:
+        if X[weights_column].min() < 0:
             msg = f"{self.classname()}: weight column must be positive"
             raise ValueError(msg)
 
         # check weight non-null
-        if X[weights_column].isna().sum() != 0:
+        if X[weights_column].is_null().sum() != 0:
             msg = f"{self.classname()}: weight column must be non-null"
             raise ValueError(msg)
 
         # check weight not inf
-        if np.isinf(X[weights_column]).any():
+        if np.isinf(X[weights_column].to_numpy()).any():
             msg = f"{self.classname()}: weight column must not contain infinite values."
             raise ValueError(msg)
 
-        if X[weights_column].sum() <= 0:
+        # check weight not all 0
+        if X[weights_column].sum() == 0:
             msg = f"{self.classname()}: total sample weights are not greater than 0"
             raise ValueError(msg)
 

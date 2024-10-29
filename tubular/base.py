@@ -152,10 +152,10 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Data containing explanatory variables.
 
-        y : pd.Series
+        y : pd/pl.Series
             Response variable.
 
         """
@@ -175,18 +175,18 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
     @nw.narwhalify
     def transform(self, X: FrameT) -> FrameT:
-        """Base transformer transform method; checks X type (pandas DataFrame only) and copies data if requested.
+        """Base transformer transform method; checks X type (pandas/polars DataFrame only) and copies data if requested.
 
         Transform calls the columns_check method which will check columns in columns attribute are in X.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Data to transform with the transformer.
 
         Returns
         -------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Input X, copied if specified by user.
 
         """
@@ -224,7 +224,7 @@ class BaseTransformer(TransformerMixin, BaseEstimator):
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Data to check columns are in.
 
         """
