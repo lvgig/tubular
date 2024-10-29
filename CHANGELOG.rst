@@ -16,6 +16,19 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
+1.4.1 (unreleased)
+------------------
+
+Changed
+^^^^^^^
+
+- narwhalified CheckNumericMixin `#336 <https://github.com/lvgig/tubular/issues/336>_`
+- placeholder
+- placeholder
+- placeholder
+- placeholder
+- placeholder
+
 1.4.0 (2024-10-15)
 ------------------
 
