@@ -633,20 +633,6 @@ class WeightColumnFitMixinTests:
         with pytest.raises(ValueError, match=expected_message):
             transformer.fit(df, df["a"])
 
-    def get_df_error_combos():
-        return [
-            (
-                pd.DataFrame({"a": [1, 2], "b": [3, 4]}),
-                r"weight col \(c\) is not present in columns of data",
-                "c",
-            ),
-            (
-                pd.DataFrame({"a": [1, 2], "b": ["a", "b"]}),
-                r"weight column must be numeric.",
-                "b",
-            ),
-        ]
-
     @pytest.mark.parametrize(
         "minimal_dataframe_lookup",
         ["pandas", "polars"],
