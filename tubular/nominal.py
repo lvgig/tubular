@@ -49,7 +49,7 @@ class BaseNominalTransformer(BaseTransformer):
 
         for c in self.columns:
             mappable_rows = X.select(
-                nw.col(c).unique().is_in(list(self.mappings[c])).sum(),
+                nw.col(c).is_in(list(self.mappings[c])).sum(),
             ).item()
 
             if mappable_rows < X.shape[0]:
