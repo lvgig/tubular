@@ -3,12 +3,17 @@
 from __future__ import annotations
 
 import warnings
+from typing import TYPE_CHECKING
 
+import narwhals as nw
 import numpy as np
 import pandas as pd
 
 from tubular.base import BaseTransformer
 from tubular.mixins import WeightColumnMixin
+
+if TYPE_CHECKING:
+    from narwhals.typing import FrameT
 
 
 class BaseImputer(BaseTransformer):
@@ -25,32 +30,36 @@ class BaseImputer(BaseTransformer):
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     FITS = False
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+    @nw.narwhalify
+    def transform(self, X: FrameT) -> FrameT:
         """Impute missing values with median values calculated from fit method.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : FrameT
             Data to impute.
 
         Returns
         -------
-        X : pd.DataFrame
+        X : FrameT
             Transformed input X with nulls imputed with the median value for the specified columns.
 
         """
         self.check_is_fitted(["impute_values_"])
 
-        X = super().transform(X)
+        X = nw.from_native(super().transform(X))
 
-        for c in self.columns:
-            X[c] = X[c].fillna(self.impute_values_[c])
+        new_col_expressions = [
+            nw.col(c).fill_null(self.impute_values_[c]) for c in self.columns
+        ]
 
-        return X
+        return X.with_columns(
+            new_col_expressions,
+        )
 
 
 class ArbitraryImputer(BaseImputer):
@@ -122,7 +131,6 @@ class ArbitraryImputer(BaseImputer):
         """
         self.check_is_fitted(["impute_value"])
         self.columns_check(X)
-
         for c in self.columns:
             if (
                 "category" in X[c].dtype.name
