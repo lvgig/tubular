@@ -48,7 +48,9 @@ class BaseNominalTransformer(BaseTransformer):
         self.check_is_fitted(["mappings"])
 
         for c in self.columns:
-            mappable_rows = X[c].is_in(list(self.mappings[c])).sum()
+            mappable_rows = X.select(
+                nw.col(c).unique().is_in(list(self.mappings[c])).sum(),
+            ).item()
 
             if mappable_rows < X.shape[0]:
                 msg = f"{self.classname()}: nulls would be introduced into column {c} from levels not present in mapping"
