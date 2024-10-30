@@ -7,10 +7,11 @@ from tubular.mixins import CheckNumericMixin
 class TestCheckNumericMixin:
     "tests for CheckNumericMixin class"
 
-    def test_check_numeric_columns(self):
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
+    def test_check_numeric_columns(self, library):
         "test check_numeric_columns method raises appropriate error"
 
-        df = create_df_2()
+        df = create_df_2(library=library)
 
         obj = CheckNumericMixin()
 

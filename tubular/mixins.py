@@ -153,7 +153,7 @@ class WeightColumnMixin:
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     @nw.narwhalify
     def check_weights_column(self, X: FrameT, weights_column: str) -> None:
@@ -176,22 +176,22 @@ class WeightColumnMixin:
             raise ValueError(msg)
 
         # check weight is positive
-        if X[weights_column].min() < 0:
+        if X.select(nw.col(weights_column).min()).item() < 0:
             msg = f"{self.classname()}: weight column must be positive"
             raise ValueError(msg)
 
         # check weight non-null
-        if X[weights_column].is_null().sum() != 0:
+        if X.select(nw.col(weights_column).is_null().sum()).item() != 0:
             msg = f"{self.classname()}: weight column must be non-null"
             raise ValueError(msg)
 
-        # check weight not inf
+        # check weight not inf, not currently a narwhals efficient way to do this
         if np.isinf(X[weights_column].to_numpy()).any():
             msg = f"{self.classname()}: weight column must not contain infinite values."
             raise ValueError(msg)
 
         # check weight not all 0
-        if X[weights_column].sum() == 0:
+        if X.select(nw.col(weights_column).sum()).item() == 0:
             msg = f"{self.classname()}: total sample weights are not greater than 0"
             raise ValueError(msg)
 
