@@ -32,6 +32,13 @@ Changed
 1.4.0 (2024-10-15)
 ------------------
 
+- Refactored BaseImputer to utilise narwhals `#314 <https://github.com/lvgig/tubular/issues/314>_`
+- placeholder
+- placeholder
+- placeholder
+- placeholder
+- placeholder
+
 Changed
 ^^^^^^^
 
