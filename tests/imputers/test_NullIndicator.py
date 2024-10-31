@@ -1,5 +1,4 @@
 import narwhals as nw
-import polars as pl
 import pytest
 
 import tests.test_data as d
@@ -10,8 +9,6 @@ from tests.base_tests import (
     OtherBaseBehaviourTests,
 )
 from tubular.imputers import NullIndicator
-
-pl.enable_string_cache()
 
 
 class TestInit(ColumnStrListInitTests):
