@@ -516,7 +516,7 @@ class NullIndicator(BaseTransformer):
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     def __init__(
         self,
@@ -525,18 +525,21 @@ class NullIndicator(BaseTransformer):
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+    @nw.narwhalify
+    def transform(self, X: FrameT) -> FrameT:
         """Create new columns indicating the position of null values for each variable in self.columns.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : FrameT
             Data to add indicators to.
 
         """
-        X = super().transform(X)
+        X = nw.from_native(super().transform(X))
 
         for c in self.columns:
-            X[f"{c}_nulls"] = X[c].isna().astype(np.int8)
+            X = X.with_columns(
+                (nw.col(c).is_null()).cast(nw.Boolean).alias(f"{c}_nulls"),
+            )
 
         return X
