@@ -43,9 +43,13 @@ class TestTransform(GenericTransformTests):
 
         narwhals_df = nw.from_native(df1)
 
-        return narwhals_df.to_native()
+        # Convert adjusted expected columns to Boolean
+        for col in ["b_nulls", "c_nulls"]:
+            narwhals_df = narwhals_df.with_columns(
+                narwhals_df[col].cast(nw.Boolean),
+            )
 
-    ""
+        return narwhals_df.to_native()
 
     @pytest.mark.parametrize(
         ("library", "expected_df_1"),
@@ -64,12 +68,6 @@ class TestTransform(GenericTransformTests):
         # Convert both DataFrames to a common format using Narwhals
         df_transformed_common = nw.from_native(df_transformed)
         expected_df_1_common = nw.from_native(expected_df_1)
-
-        # Convert adjusted expected columns to Boolean
-        for col in [column + "_nulls" for column in columns]:
-            expected_df_1_common = expected_df_1_common.with_columns(
-                expected_df_1_common[col].cast(nw.Boolean),
-            )
 
         # Check outcomes for single rows
         for i in range(len(df_transformed_common)):
