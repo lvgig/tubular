@@ -538,6 +538,8 @@ class NullIndicator(BaseTransformer):
         X = nw.from_native(super().transform(X))
 
         for c in self.columns:
-            X = X.with_columns((nw.col(c).is_null()).cast(nw.Int8).alias(f"{c}_nulls"))
+            X = X.with_columns(
+                (nw.col(c).is_null()).cast(nw.Boolean).alias(f"{c}_nulls"),
+            )
 
         return X

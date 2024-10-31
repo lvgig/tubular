@@ -68,10 +68,10 @@ class TestTransform(GenericTransformTests):
         df_transformed_common = nw.from_native(df_transformed)
         expected_df_1_common = nw.from_native(expected_df_1)
 
-        # Convert adjusted expected columns to Int8
+        # Convert adjusted expected columns to Boolean
         for col in [column + "_nulls" for column in columns]:
             expected_df_1_common = expected_df_1_common.with_columns(
-                expected_df_1_common[col].cast(nw.Int8),
+                expected_df_1_common[col].cast(nw.Boolean),
             )
 
         # Check outcomes for single rows
