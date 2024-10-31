@@ -1,16 +1,17 @@
-import numpy as np
-import pandas as pd
+import narwhals as nw
 import polars as pl
 import pytest
 
 import tests.test_data as d
+from tests import utils as u
 from tests.base_tests import (
     ColumnStrListInitTests,
     GenericTransformTests,
     OtherBaseBehaviourTests,
 )
-from tests.utils import assert_frame_equal_dispatch
 from tubular.imputers import NullIndicator
+
+pl.enable_string_cache()
 
 
 class TestInit(ColumnStrListInitTests):
@@ -28,42 +29,66 @@ class TestTransform(GenericTransformTests):
     def setup_class(cls):
         cls.transformer_name = "NullIndicator"
 
-    def expected_df_1(self, library="pandas"):
+    @pytest.fixture()
+    def expected_df_1(self, request):
         """Expected output for test_null_indicator_columns_correct."""
+        library = request.param
 
-        df = pd.DataFrame(
-            {
-                "a": [1, 2, np.nan, 4, np.nan, 6],
-                "b": [np.nan, 5, 4, 3, 2, 1],
-                "c": [3, 2, 1, 4, 5, 6],
-                "b_nulls": [1, 0, 0, 0, 0, 0],
-                "c_nulls": [0, 0, 0, 0, 0, 0],
-            },
-        )
+        df_dict1 = {
+            "a": [1, 2, None, 4, None, 6],
+            "b": [None, 5, 4, 3, 2, 1],
+            "c": [3, 2, 1, 4, 5, 6],
+            "b_nulls": [1, 0, 0, 0, 0, 0],
+            "c_nulls": [0, 0, 0, 0, 0, 0],
+        }
 
-        if library == "polars":
-            df = pl.from_pandas(df)
+        df1 = u.dataframe_init_dispatch(dataframe_dict=df_dict1, library=library)
 
-        return df
+        narwhals_df = nw.from_native(df1)
 
-    @pytest.mark.parametrize("library", ["pandas", "polars"])
-    def test_null_indicator_columns_correct(self, library):
+        return narwhals_df.to_native()
+
+    ""
+
+    @pytest.mark.parametrize(
+        ("library", "expected_df_1"),
+        [("pandas", "pandas"), ("polars", "polars")],
+        indirect=["expected_df_1"],
+    )
+    def test_null_indicator_columns_correct(self, expected_df_1, library):
         """Test that the created indicator column is correct - and unrelated columns are unchanged."""
+        df = d.create_df_9(library=library)
+
         columns = ["b", "c"]
         transformer = NullIndicator(columns=columns)
 
-        df = d.create_df_9(library=library)
-        expected = self.expected_df_1(library=library)
-
         df_transformed = transformer.transform(df)
 
-        for col in [column + "_nulls" for column in columns]:
-            if library == "pandas":
-                expected[col] = expected[col].astype(np.int8)
-            else:
-                expected = expected.with_columns(expected[col].cast(pl.Int8))
+        # Convert both DataFrames to a common format using Narwhals
+        df_transformed_common = nw.from_native(df_transformed)
+        expected_df_1_common = nw.from_native(expected_df_1)
 
-        assert_frame_equal_dispatch(df_transformed, expected)
+        # Convert adjusted expected columns to Int8
+        for col in [column + "_nulls" for column in columns]:
+            expected_df_1_common = expected_df_1_common.with_columns(
+                expected_df_1_common[col].cast(nw.Int8),
+            )
+
+        # Check outcomes for single rows
+        for i in range(len(df_transformed_common)):
+            df_transformed_row = df_transformed_common[[i]].to_native()
+            df_expected_row = expected_df_1_common[[i]].to_native()
+
+            u.assert_frame_equal_dispatch(
+                df_transformed_row,
+                df_expected_row,
+            )
+
+        # Check whole dataframes
+        u.assert_frame_equal_dispatch(
+            df_transformed_common.to_native(),
+            expected_df_1_common.to_native(),
+        )
 
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
