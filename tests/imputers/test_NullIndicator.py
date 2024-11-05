@@ -1,78 +1,98 @@
-import numpy as np
-import pandas as pd
+import narwhals as nw
 import pytest
-import test_aide as ta
 
 import tests.test_data as d
-import tubular
+from tests import utils as u
+from tests.base_tests import (
+    ColumnStrListInitTests,
+    GenericTransformTests,
+    OtherBaseBehaviourTests,
+)
 from tubular.imputers import NullIndicator
 
 
-class TestInit:
+class TestInit(ColumnStrListInitTests):
     """Tests for NullIndicator.init()."""
 
-    def test_super_init_called(self, mocker):
-        """Test that init calls BaseTransformer.init."""
-        expected_call_args = {
-            0: {"args": (), "kwargs": {"columns": None, "verbose": True}},
-        }
-
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "__init__",
-            expected_call_args,
-        ):
-            NullIndicator(columns=None, verbose=True)
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "NullIndicator"
 
 
-class TestTransform:
+class TestTransform(GenericTransformTests):
     """Tests for NullIndicator.transform()."""
 
-    def expected_df_1():
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "NullIndicator"
+
+    @pytest.fixture()
+    def expected_df_1(self, request):
         """Expected output for test_null_indicator_columns_correct."""
-        return pd.DataFrame(
-            {
-                "a": [1, 2, np.nan, 4, np.nan, 6],
-                "b": [np.nan, 5, 4, 3, 2, 1],
-                "c": [3, 2, 1, 4, 5, 6],
-                "b_nulls": [1, 0, 0, 0, 0, 0],
-                "c_nulls": [0, 0, 0, 0, 0, 0],
-            },
-        )
+        library = request.param
 
-    def test_super_transform_called(self, mocker):
-        """Test that BaseTransformer.transform called."""
-        df = d.create_df_1()
+        df_dict1 = {
+            "a": [1, 2, None, 4, None, 6],
+            "b": [None, 5, 4, 3, 2, 1],
+            "c": [3, 2, 1, 4, 5, 6],
+            "b_nulls": [1, 0, 0, 0, 0, 0],
+            "c_nulls": [0, 0, 0, 0, 0, 0],
+        }
 
-        x = NullIndicator(columns="a")
+        df1 = u.dataframe_init_dispatch(dataframe_dict=df_dict1, library=library)
 
-        expected_call_args = {0: {"args": (d.create_df_1(),), "kwargs": {}}}
+        narwhals_df = nw.from_native(df1)
 
-        with ta.functions.assert_function_call(
-            mocker,
-            tubular.base.BaseTransformer,
-            "transform",
-            expected_call_args,
-        ):
-            x.transform(df)
+        # Convert adjusted expected columns to Boolean
+        for col in ["b_nulls", "c_nulls"]:
+            narwhals_df = narwhals_df.with_columns(
+                narwhals_df[col].cast(nw.Boolean),
+            )
+
+        return narwhals_df.to_native()
 
     @pytest.mark.parametrize(
-        ("df", "expected"),
-        ta.pandas.adjusted_dataframe_params(d.create_df_9(), expected_df_1()),
+        ("library", "expected_df_1"),
+        [("pandas", "pandas"), ("polars", "polars")],
+        indirect=["expected_df_1"],
     )
-    def test_null_indicator_columns_correct(self, df, expected):
+    def test_null_indicator_columns_correct(self, expected_df_1, library):
         """Test that the created indicator column is correct - and unrelated columns are unchanged."""
+        df = d.create_df_9(library=library)
+
         columns = ["b", "c"]
-        x = NullIndicator(columns=columns)
+        transformer = NullIndicator(columns=columns)
 
-        df_transformed = x.transform(df)
+        df_transformed = transformer.transform(df)
 
-        for col in [column + "_nulls" for column in columns]:
-            expected[col] = expected[col].astype(np.int8)
+        # Convert both DataFrames to a common format using Narwhals
+        df_transformed_common = nw.from_native(df_transformed)
+        expected_df_1_common = nw.from_native(expected_df_1)
 
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="Check null indicator columns created correctly in transform.",
+        # Check outcomes for single rows
+        for i in range(len(df_transformed_common)):
+            df_transformed_row = df_transformed_common[[i]].to_native()
+            df_expected_row = expected_df_1_common[[i]].to_native()
+
+            u.assert_frame_equal_dispatch(
+                df_transformed_row,
+                df_expected_row,
+            )
+
+        # Check whole dataframes
+        u.assert_frame_equal_dispatch(
+            df_transformed_common.to_native(),
+            expected_df_1_common.to_native(),
         )
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "NullIndicator"

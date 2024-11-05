@@ -16,18 +16,45 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
-1.3.2 (unreleased)
+1.4.0 (2024-10-15)
 ------------------
+
+- Refactored BaseImputer to utilise narwhals `#314 <https://github.com/lvgig/tubular/issues/314>_`
+- placeholder
+- placeholder
+- placeholder
+- placeholder
+- placeholder
 
 Changed
 ^^^^^^^
 
+- Modified OneHotEncodingTransformer, made an instance of OneHotEncoder and assign it to attribut _encoder `#308 <https://github.com/lvgig/tubular/pull/309>`
 - Refactored BaseDateTransformer, BaseDateTwoColumnTransformer and associated testing  `#273 <https://github.com/lvgig/tubular/pull/273>`_
 - BaseTwoColumnTransformer removed in favour of mixin classes TwoColumnMixin and NewColumnNameMixin to handle validation of two columns and new_column_name arguments `#273 <https://github.com/lvgig/tubular/pull/273>`_
 - Refactored tests for InteractionTransformer  `#283 <https://github.com/lvgig/tubular/pull/283>`_
+- Refactored tests for StringConcatenator and SeriesStrMethodTransformer, added separator mixin class. `#286 <https://github.com/lvgig/tubular/pull/286>`_
 - Refactored MeanResponseTransformer tests in new format `#262 <https://github.com/lvgig/tubular/pull/262>`_
 - refactored build tools and package config into pyproject.toml `#271 <https://github.com/lvgig/tubular/pull/271>`_
 - set up automatic versioning using setuptools-scm `#271 <https://github.com/lvgig/tubular/pull/271>`_
+- Refactored TwoColumnOperatorTransformer tests in new format `#274 <https://github.com/lvgig/tubular/issues/274>`_
+- Refactored PCATransformer tests in new format `#277 <https://github.com/lvgig/tubular/issues/277>`_
+- Refactored tests for NullIndicator `#301 <https://github.com/lvgig/tubular/issues/301>`_
+- Refactored BetweenDatesTransformer tests in new format `#294 <https://github.com/lvgig/tubular/issues/294>`_
+- As part of above, edited dates file transformers to use BaseDropOriginalMixin in transform
+- Refactored DateDifferenceTransformer tests in new format. Had to turn off autodefine new_column_name functionality to match generic test expectations. Suggest we look to turn back on in the future. `#296 https://github.com/lvgig/tubular/issues/296`
+- Refactored DateDiffLeapYearTransformer tests in new format. As part of this had to remove the autodefined new_column_name, as this conflicts with the generic testing. Suggest we look to turn back on in future. `#295 https://github.com/lvgig/tubular/issues/295`
+- Edited base testing setup for dates file, created new BaseDatetimeTransformer class
+- Refactored DatetimeInfoExtractor tests in new format `#297 <https://github.com/lvgig/tubular/issues/297>`_
+- Refactored DatetimeSinusoidCalculator tests in new format. `#310 <https://github.com/lvgig/tubular/issues/310>`_
+- fixed a bug in CappingTransformer which was preventing use of .get_params method `#311 <https://github.com/lvgig/tubular/issues/311>`_
+- Setup requirements for narwhals, remove python3.8 from our build pipelines as incompatible with polars
+- Narwhal-ified BaseTransformer `#313 <https://github.com/lvgig/tubular/issues/313>_`
+- Refactored ToDatetimeTransformer tests in new format `#300 <https://github.com/lvgig/tubular/issues/300>`_
+- Refactors tests for SeriesDtMethodTransformer in new format. Changed column arg to columns to fit generic format. `#299 <https://github.com/lvgig/tubular/issues/299>_`
+- Refactored OrdinalEncoderTransformer tests in new format `#330 <https://github.com/lvgig/tubular/issues/330>`_
+- Narwhal-ified NullIndicator `#319 <https://github.com/lvgig/tubular/issues/319>_`
+
 
 1.3.1 (2024-07-18)
 ------------------
@@ -39,6 +66,7 @@ Changed
 - DatetimeInfoExtractor.mappings_provided changed from a dict.keys() object to list so transformer is serialisable. `#258 <https://github.com/lvgig/tubular/pull/258>`_
 - Created BaseNumericTransformer class to support test refactor of numeric file `#266 <https://github.com/lvgig/tubular/pull/266>`_
 - Updated testing approach for LogTransformer `#268 <https://github.com/lvgig/tubular/pull/268>`_
+- Refactored ScalingTransformer tests in new format `#284 <https://github.com/lvgig/tubular/pull/284>`_
 
 
 1.3.0 (2024-06-13)

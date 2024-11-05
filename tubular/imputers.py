@@ -3,12 +3,17 @@
 from __future__ import annotations
 
 import warnings
+from typing import TYPE_CHECKING
 
+import narwhals as nw
 import numpy as np
 import pandas as pd
 
 from tubular.base import BaseTransformer
 from tubular.mixins import WeightColumnMixin
+
+if TYPE_CHECKING:
+    from narwhals.typing import FrameT
 
 
 class BaseImputer(BaseTransformer):
@@ -16,32 +21,45 @@ class BaseImputer(BaseTransformer):
     values in the impute_values_ attribute.
 
     Other imputers in this module should inherit from this class.
+
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = True
 
     FITS = False
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+    @nw.narwhalify
+    def transform(self, X: FrameT) -> FrameT:
         """Impute missing values with median values calculated from fit method.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : FrameT
             Data to impute.
 
         Returns
         -------
-        X : pd.DataFrame
+        X : FrameT
             Transformed input X with nulls imputed with the median value for the specified columns.
 
         """
         self.check_is_fitted(["impute_values_"])
 
-        X = super().transform(X)
+        X = nw.from_native(super().transform(X))
 
-        for c in self.columns:
-            X[c] = X[c].fillna(self.impute_values_[c])
+        new_col_expressions = [
+            nw.col(c).fill_null(self.impute_values_[c]) for c in self.columns
+        ]
 
-        return X
+        return X.with_columns(
+            new_col_expressions,
+        )
 
 
 class ArbitraryImputer(BaseImputer):
@@ -61,7 +79,12 @@ class ArbitraryImputer(BaseImputer):
     ----------
     impute_value : int or float or str
         Value to impute nulls with.
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
+
+    polars_compatible = False
 
     FITS = False
 
@@ -108,7 +131,6 @@ class ArbitraryImputer(BaseImputer):
         """
         self.check_is_fitted(["impute_value"])
         self.columns_check(X)
-
         for c in self.columns:
             if (
                 "category" in X[c].dtype.name
@@ -150,7 +172,12 @@ class MedianImputer(BaseImputer, WeightColumnMixin):
         Created during fit method. Dictionary of float / int (median) values of columns
         in the columns attribute. Keys of impute_values_ give the column names.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     FITS = True
 
@@ -234,7 +261,12 @@ class MeanImputer(WeightColumnMixin, BaseImputer):
         Created during fit method. Dictionary of float / int (mean) values of columns
         in the columns attribute. Keys of impute_values_ give the column names.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     FITS = True
 
@@ -313,7 +345,12 @@ class ModeImputer(BaseImputer, WeightColumnMixin):
         Created during fit method. Dictionary of float / int (mode) values of columns
         in the columns attribute. Keys of impute_values_ give the column names.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     FITS = True
 
@@ -388,7 +425,15 @@ class NearestMeanResponseImputer(BaseImputer):
         Columns to impute, if the default of None is supplied all columns in X are used
         when the transform method is called.
 
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     FITS = True
 
@@ -463,7 +508,15 @@ class NullIndicator(BaseTransformer):
         Columns to produce indicator columns for, if the default of None is supplied all columns in X are used
         when the transform method is called.
 
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = True
 
     def __init__(
         self,
@@ -472,18 +525,21 @@ class NullIndicator(BaseTransformer):
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+    @nw.narwhalify
+    def transform(self, X: FrameT) -> FrameT:
         """Create new columns indicating the position of null values for each variable in self.columns.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : FrameT
             Data to add indicators to.
 
         """
-        X = super().transform(X)
+        X = nw.from_native(super().transform(X))
 
         for c in self.columns:
-            X[f"{c}_nulls"] = X[c].isna().astype(np.int8)
+            X = X.with_columns(
+                (nw.col(c).is_null()).cast(nw.Boolean).alias(f"{c}_nulls"),
+            )
 
         return X

@@ -126,3 +126,20 @@ class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "CappingTransformer"
+
+    def test_get_params_call_with_capping_values_none(
+        self,
+        uninitialized_transformers,
+        minimal_attribute_dict,
+    ):
+        """Test get_params method when capping_values is None."""
+        args = minimal_attribute_dict[self.transformer_name]
+        args["capping_values"] = None
+        args["quantiles"] = {"a": [0.1, 0.9]}
+        transformer = uninitialized_transformers[self.transformer_name](**args)
+
+        # Ensure no AttributeError is raised when calling get_params method
+        try:
+            transformer.get_params()
+        except AttributeError as e:
+            pytest.fail(f"AttributeError was raised: {e}")

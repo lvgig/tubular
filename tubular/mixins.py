@@ -1,7 +1,39 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+import narwhals as nw
+import narwhals.selectors as ncs
 import numpy as np
 import pandas as pd
+
+if TYPE_CHECKING:
+    from narwhals.typing import FrameT
+
+
+class CheckNumericMixin:
+    def check_numeric_columns(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Helper function for checking column args are numeric for numeric transformers.
+
+        Args:
+        ----
+            X (pd.DataFrame): Data containing columns to check.
+
+        """
+        numeric_column_types = X[self.columns].apply(
+            pd.api.types.is_numeric_dtype,
+            axis=0,
+        )
+
+        if not numeric_column_types.all():
+            non_numeric_columns = list(
+                numeric_column_types.loc[~numeric_column_types].index,
+            )
+
+            msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
+            raise TypeError(msg)
+
+        return X
 
 
 class DropOriginalMixin:
@@ -71,6 +103,17 @@ class NewColumnNameMixin:
         self.new_column_name = new_column_name
 
 
+class SeparatorColumnMixin:
+    """Hel per to validate and set separator attribute"""
+
+    def check_and_set_separator_column(self, separator: str) -> None:
+        if not (isinstance(separator, str)):
+            msg = f"{self.classname()}: separator should be str"
+            raise TypeError(msg)
+
+        self.separator = separator
+
+
 class TwoColumnMixin:
     """helper to validate columns when exactly two columns are required"""
 
@@ -85,13 +128,26 @@ class TwoColumnMixin:
 
 
 class WeightColumnMixin:
-    def check_weights_column(self, X: pd.DataFrame, weights_column: str) -> None:
+    """
+    Mixin class with weights functionality
+
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+    """
+
+    polars_compatible = False
+
+    @nw.narwhalify
+    def check_weights_column(self, X: FrameT, weights_column: str) -> None:
         """Helper method for validating weights column in dataframe.
 
         Args:
         ----
-            X (pd.DataFrame): df containing weight column
-            weights_column (str): name of weight column
+            X: pandas or polars df containing weight column
+            weights_column: name of weight column
 
         """
         # check if given weight is in columns
@@ -100,28 +156,27 @@ class WeightColumnMixin:
             raise ValueError(msg)
 
         # check weight is numeric
-
-        if not pd.api.types.is_numeric_dtype(X[weights_column]):
+        if weights_column not in X.select(ncs.numeric()).columns:
             msg = f"{self.classname()}: weight column must be numeric."
             raise ValueError(msg)
 
         # check weight is positive
-
-        if (X[weights_column] < 0).sum() != 0:
+        if X[weights_column].min() < 0:
             msg = f"{self.classname()}: weight column must be positive"
             raise ValueError(msg)
 
         # check weight non-null
-        if X[weights_column].isna().sum() != 0:
+        if X[weights_column].is_null().sum() != 0:
             msg = f"{self.classname()}: weight column must be non-null"
             raise ValueError(msg)
 
         # check weight not inf
-        if np.isinf(X[weights_column]).any():
+        if np.isinf(X[weights_column].to_numpy()).any():
             msg = f"{self.classname()}: weight column must not contain infinite values."
             raise ValueError(msg)
 
-        if X[weights_column].sum() <= 0:
+        # check weight not all 0
+        if X[weights_column].sum() == 0:
             msg = f"{self.classname()}: total sample weights are not greater than 0"
             raise ValueError(msg)
 

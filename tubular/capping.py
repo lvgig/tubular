@@ -13,6 +13,8 @@ from tubular.mixins import WeightColumnMixin
 
 
 class BaseCappingTransformer(BaseTransformer, WeightColumnMixin):
+    polars_compatible = False
+
     def __init__(
         self,
         capping_values: dict[str, list[int | float | None]] | None = None,
@@ -68,6 +70,9 @@ class BaseCappingTransformer(BaseTransformer, WeightColumnMixin):
         _replacement_values : dict
             Replacement values when capping is applied. Will be a copy of capping_values.
 
+        polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
         """
         if capping_values is None and quantiles is None:
             msg = f"{self.classname()}: both capping_values and quantiles are None, either supply capping values in the capping_values argument or supply quantiles that can be learnt in the fit method"
@@ -79,8 +84,6 @@ class BaseCappingTransformer(BaseTransformer, WeightColumnMixin):
 
         if capping_values is not None:
             self.check_capping_values_dict(capping_values, "capping_values")
-
-            self.capping_values = capping_values
 
             super().__init__(columns=list(capping_values.keys()), **kwargs)
 
@@ -98,6 +101,7 @@ class BaseCappingTransformer(BaseTransformer, WeightColumnMixin):
             super().__init__(columns=list(quantiles.keys()), **kwargs)
 
         self.quantiles = quantiles
+        self.capping_values = capping_values
         WeightColumnMixin.check_and_set_weight(self, weights_column)
 
     def check_capping_values_dict(
@@ -478,7 +482,12 @@ class CappingTransformer(BaseCappingTransformer):
     _replacement_values : dict
         Replacement values when capping is applied. Will be a copy of capping_values.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -568,7 +577,12 @@ class OutOfRangeNullTransformer(BaseCappingTransformer):
     _replacement_values : dict
         Replacement values when capping is applied. This will contain nulls for each column.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,

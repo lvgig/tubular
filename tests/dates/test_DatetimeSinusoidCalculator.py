@@ -5,6 +5,14 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
+from tests.base_tests import (
+    ColumnStrListInitTests,
+    DropOriginalInitMixinTests,
+    GenericFitTests,
+    GenericTransformTests,
+    OtherBaseBehaviourTests,
+)
+from tests.dates.test_BaseDatetimeTransformer import DatetimeMixinTransformTests
 from tubular.dates import DatetimeSinusoidCalculator
 
 
@@ -13,8 +21,15 @@ def example_transformer():
     return DatetimeSinusoidCalculator("a", "cos", "hour", 24)
 
 
-class TestDatetimeSinusoidCalculatorInit:
-    """Tests for DateDifferenceTransformer.init()."""
+class TestInit(
+    ColumnStrListInitTests,
+    DropOriginalInitMixinTests,
+):
+    """Tests for DatetimeSinusoidCalculator.init()."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DatetimeSinusoidCalculator"
 
     @pytest.mark.parametrize("incorrect_type_method", [2, 2.0, True, {"a": 4}])
     def test_method_type_error(self, incorrect_type_method):
@@ -204,45 +219,21 @@ class TestDatetimeSinusoidCalculatorInit:
                 24,
             )
 
-    def test_attributes(self, example_transformer):
-        """Test that the value passed for new_column_name and units are saved in attributes of the same name."""
-        ta.classes.test_object_attributes(
-            obj=example_transformer,
-            expected_attributes={
-                "columns": ["a"],
-                "units": "hour",
-                "period": 24,
-            },
-            msg="Attributes for DateDifferenceTransformer set in init",
-        )
+
+class TestFit(GenericFitTests):
+    """Generic tests for transformer.fit()"""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DatetimeSinusoidCalculator"
 
 
-class TestDatetimeSinusoidCalculatorTransform:
-    @pytest.mark.parametrize(
-        ("columns"),
-        [
-            ["numeric_col"],
-            ["string_col"],
-            ["bool_col"],
-            ["empty_col"],
-            ["date_col"],
-        ],
-    )
-    def test_input_data_check_column_errors(self, columns):
-        """Check that errors are raised on a variety of different non datatypes"""
-        x = DatetimeSinusoidCalculator(
-            columns,
-            "cos",
-            "month",
-            12,
-        )
+class TestTransform(GenericTransformTests, DatetimeMixinTransformTests):
+    """Tests for BaseTwoColumnDateTransformer.transform."""
 
-        df = d.create_date_diff_incorrect_dtypes()
-
-        msg = rf"{x.classname()}: {columns[0]} type should be in \['datetime64'\] but got {df[columns[0]].dtype}"
-
-        with pytest.raises(TypeError, match=msg):
-            x.transform(df)
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DatetimeSinusoidCalculator"
 
     @pytest.mark.parametrize(
         "transformer",
@@ -387,3 +378,15 @@ class TestDatetimeSinusoidCalculatorTransform:
             expected=expected,
             msg_tag="DatetimeSinusoidCalculator transformer does not produce the expected output",
         )
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "DatetimeSinusoidCalculator"

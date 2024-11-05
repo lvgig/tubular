@@ -12,9 +12,13 @@ from tubular.base import BaseTransformer
 from tubular.mixins import DropOriginalMixin, NewColumnNameMixin, TwoColumnMixin
 
 
-class BaseDateTransformer(NewColumnNameMixin, DropOriginalMixin, BaseTransformer):
+class BaseGenericDateTransformer(
+    NewColumnNameMixin,
+    DropOriginalMixin,
+    BaseTransformer,
+):
     """
-    Extends BaseTransformer for datetime scenarios
+    Extends BaseTransformer for datetime/date scenarios
 
     Parameters
     ----------
@@ -29,7 +33,16 @@ class BaseDateTransformer(NewColumnNameMixin, DropOriginalMixin, BaseTransformer
 
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
+
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -69,25 +82,25 @@ class BaseDateTransformer(NewColumnNameMixin, DropOriginalMixin, BaseTransformer
             allowed_types = [*allowed_types, date_type]
 
         for col in self.columns:
-            if pd.api.types.is_datetime64_any_dtype(X[col]):
+            is_datetime = pd.api.types.is_datetime64_any_dtype(X[col])
+            is_date = pd.api.types.infer_dtype(X[col]) == date_type
+            if is_datetime:
                 type_dict[col] = datetime_type
 
-            elif (not datetime_only) and (
-                pd.api.types.infer_dtype(X[col]) == date_type
-            ):
+            elif (not datetime_only) and (is_date):
                 type_dict[col] = date_type
 
             else:
-                msg = f"{self.classname()}: {col} type should be in {allowed_types} but got {X[col].dtype}"
+                col_dtype = date_type if is_date else X[col].dtype
+
+                msg = f"{self.classname()}: {col} type should be in {allowed_types} but got {col_dtype}"
                 raise TypeError(msg)
 
         present_types = set(type_dict.values())
 
-        only_datetime_present = present_types == {datetime_type}
-        only_date_present = present_types == {date_type}
-        date_allowed = ~datetime_only
+        valid_types = present_types.issubset(set(allowed_types))
 
-        if not only_datetime_present and not (date_allowed and only_date_present):
+        if not valid_types or len(present_types) > 1:
             msg = f"{self.classname()}: Columns fed to datetime transformers should be {allowed_types} and have consistent types, but found {present_types}. Please use ToDatetimeTransformer to standardise."
             raise TypeError(
                 msg,
@@ -122,9 +135,71 @@ class BaseDateTransformer(NewColumnNameMixin, DropOriginalMixin, BaseTransformer
         return X
 
 
+class BaseDatetimeTransformer(BaseGenericDateTransformer):
+    """
+    Extends BaseTransformer for datetime scenarios
+
+    Parameters
+    ----------
+    columns : List[str]
+        List of 2 columns. First column will be subtracted from second.
+
+    new_column_name : str
+        Name for the new year column.
+
+    drop_original : bool
+        Flag for whether to drop the original columns.
+
+    **kwargs
+        Arbitrary keyword arguments passed onto BaseTransformer.init method.
+
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+    """
+
+    polars_compatible = False
+
+    def __init__(
+        self,
+        columns: list[str],
+        new_column_name: str | None = None,
+        drop_original: bool = False,
+        **kwargs: dict[str, bool],
+    ) -> None:
+        super().__init__(
+            columns=columns,
+            new_column_name=new_column_name,
+            drop_original=drop_original,
+            **kwargs,
+        )
+
+    def transform(
+        self,
+        X: pd.DataFrame,
+    ) -> pd.DataFrame:
+        """base transform method for transformers that operate exclusively on datetime columns
+
+        Parameters
+        ----------
+        X : pd.DataFrame
+            Data containing self.columns
+
+        Returns
+        -------
+        X : pd.DataFrame
+            Validated data
+
+        """
+
+        return super().transform(X, datetime_only=True)
+
+
 class BaseDateTwoColumnTransformer(
     TwoColumnMixin,
-    BaseDateTransformer,
+    BaseGenericDateTransformer,
 ):
 
     """Extends BaseDateTransformer for transformers which accept exactly two columns
@@ -144,7 +219,15 @@ class BaseDateTwoColumnTransformer(
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
 
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -196,7 +279,12 @@ class DateDiffLeapYearTransformer(BaseDateTwoColumnTransformer):
     drop_original : bool
         Indicator whether to drop old columns during transform method.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -206,9 +294,6 @@ class DateDiffLeapYearTransformer(BaseDateTwoColumnTransformer):
         drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
-        if not new_column_name:
-            new_column_name = f"{columns[1]}_{columns[0]}_datediff"
-
         super().__init__(
             columns=columns,
             new_column_name=new_column_name,
@@ -291,9 +376,13 @@ class DateDiffLeapYearTransformer(BaseDateTwoColumnTransformer):
 
         X[self.new_column_name] = X.apply(self.calculate_age, axis=1)
 
-        if self.drop_original:
-            for col in self.columns:
-                del X[col]
+        # Drop original columns if self.drop_original is True
+        DropOriginalMixin.drop_original_column(
+            self,
+            X,
+            self.drop_original,
+            self.columns,
+        )
 
         return X
 
@@ -316,7 +405,15 @@ class DateDifferenceTransformer(BaseDateTwoColumnTransformer):
         Control level of detail in printouts
     drop_original:
         Boolean flag indicating whether to drop original columns.
+
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -340,9 +437,6 @@ class DateDifferenceTransformer(BaseDateTwoColumnTransformer):
             raise ValueError(msg)
 
         self.units = units
-
-        if not new_column_name:
-            new_column_name = f"{columns[1]}_{columns[0]}_datediff_{units}"
 
         super().__init__(
             columns=columns,
@@ -374,14 +468,18 @@ class DateDifferenceTransformer(BaseDateTwoColumnTransformer):
             X[self.columns[1]] - X[self.columns[0]]
         ) / np.timedelta64(1, self.units)
 
-        if self.drop_original:
-            for col in self.columns:
-                del X[col]
+        # Drop original columns if self.drop_original is True
+        DropOriginalMixin.drop_original_column(
+            self,
+            X,
+            self.drop_original,
+            self.columns,
+        )
 
         return X
 
 
-class ToDatetimeTransformer(BaseDateTransformer):
+class ToDatetimeTransformer(BaseGenericDateTransformer):
     """Class to transform convert specified columns to datetime.
 
     Class simply uses the pd.to_datetime method on the specified columns.
@@ -403,7 +501,15 @@ class ToDatetimeTransformer(BaseDateTransformer):
     **kwargs
         Arbitrary keyword arguments passed onto pd.to_datetime().
 
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -456,14 +562,18 @@ class ToDatetimeTransformer(BaseDateTransformer):
             **self.to_datetime_kwargs,
         )
 
-        if self.drop_original:
-            for col in self.columns:
-                del X[col]
+        # Drop original columns if self.drop_original is True
+        DropOriginalMixin.drop_original_column(
+            self,
+            X,
+            self.drop_original,
+            self.columns,
+        )
 
         return X
 
 
-class SeriesDtMethodTransformer(BaseDateTransformer):
+class SeriesDtMethodTransformer(BaseDatetimeTransformer):
     """Tranformer that applies a pandas.Series.dt method.
 
     Transformer assigns the output of the method to a new column. It is possible to
@@ -521,27 +631,34 @@ class SeriesDtMethodTransformer(BaseDateTransformer):
     drop_original: bool
         Indicates whether to drop self.column post transform
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
         new_column_name: str,
         pd_method_name: str,
-        column: str,
+        columns: list[str],
         pd_method_kwargs: dict[str, object] | None = None,
         drop_original: bool = False,
         **kwargs: dict[str, bool],
     ) -> None:
-        if type(column) is not str:
-            msg = f"{self.classname()}: column should be a str but got {type(column)}"
-            raise TypeError(msg)
-
         super().__init__(
-            columns=[column],
+            columns=columns,
             new_column_name=new_column_name,
             drop_original=drop_original,
             **kwargs,
         )
+
+        if len(self.columns) > 1:
+            msg = rf"{self.classname()}: column should be a str or list of len 1, got {self.columns}"
+            raise ValueError(
+                msg,
+            )
 
         if type(pd_method_name) is not str:
             msg = f"{self.classname()}: unexpected type ({type(pd_method_name)}) for pd_method_name, expecting str"
@@ -580,7 +697,7 @@ class SeriesDtMethodTransformer(BaseDateTransformer):
 
         # This attribute is not for use in any method, use 'columns' instead.
         # Here only as a fix to allow string representation of transformer.
-        self.column = column
+        self.column = self.columns[0]
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform specific column on input pandas.DataFrame (X) using the given pandas.Series.dt method and
@@ -601,7 +718,7 @@ class SeriesDtMethodTransformer(BaseDateTransformer):
             running the pd.Series.dt method.
 
         """
-        X = super().transform(X, datetime_only=True)
+        X = super().transform(X)
 
         if self._callable:
             X[self.new_column_name] = getattr(
@@ -615,14 +732,18 @@ class SeriesDtMethodTransformer(BaseDateTransformer):
                 self.pd_method_name,
             )
 
-        if self.drop_original:
-            for col in self.columns:
-                del X[col]
+        # Drop original columns if self.drop_original is True
+        DropOriginalMixin.drop_original_column(
+            self,
+            X,
+            self.drop_original,
+            self.columns,
+        )
 
         return X
 
 
-class BetweenDatesTransformer(BaseDateTransformer):
+class BetweenDatesTransformer(BaseGenericDateTransformer):
     """Transformer to generate a boolean column indicating if one date is between two others.
 
     If not all column_lower values are less than or equal to column_upper when transform is run
@@ -680,7 +801,12 @@ class BetweenDatesTransformer(BaseDateTransformer):
     drop_original: bool
         indicates whether to drop original columns.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -759,14 +885,18 @@ class BetweenDatesTransformer(BaseDateTransformer):
 
         X[self.new_column_name] = lower_comparison & upper_comparison
 
-        if self.drop_original:
-            for col in self.columns:
-                del X[col]
+        # Drop original columns if self.drop_original is True
+        DropOriginalMixin.drop_original_column(
+            self,
+            X,
+            self.drop_original,
+            self.columns,
+        )
 
         return X
 
 
-class DatetimeInfoExtractor(BaseDateTransformer):
+class DatetimeInfoExtractor(BaseDatetimeTransformer):
     """Transformer to extract various features from datetime var.
 
     Parameters
@@ -841,7 +971,12 @@ class DatetimeInfoExtractor(BaseDateTransformer):
     drop_original: str
         indicates whether to drop provided columns post transform
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     TIME_OF_DAY = "timeofday"
     TIME_OF_MONTH = "timeofmonth"
@@ -1020,7 +1155,7 @@ class DatetimeInfoExtractor(BaseDateTransformer):
         X : pd.DataFrame
             Transformed input X with added columns of extracted information.
         """
-        X = super().transform(X, datetime_only=True)
+        X = super().transform(X)
 
         for col in self.columns:
             for include_option in self.include:
@@ -1032,14 +1167,18 @@ class DatetimeInfoExtractor(BaseDateTransformer):
                     include_option=include_option,
                 )
 
-        if self.drop_original:
-            for col in self.columns:
-                del X[col]
+        # Drop original columns if self.drop_original is True
+        DropOriginalMixin.drop_original_column(
+            self,
+            X,
+            self.drop_original,
+            self.columns,
+        )
 
         return X
 
 
-class DatetimeSinusoidCalculator(BaseDateTransformer):
+class DatetimeSinusoidCalculator(BaseDatetimeTransformer):
     """Transformer to derive a feature in a dataframe by calculating the
     sine or cosine of a datetime column in a given unit (e.g hour), with the option to scale
     period of the sine or cosine to match the natural period of the unit (e.g. 24).
@@ -1077,7 +1216,12 @@ class DatetimeSinusoidCalculator(BaseDateTransformer):
     period : str, float or dict, default = 2*np.pi
         The period of the output in the units specified above. Can be a string or a dict containing key-value pairs of column
         name and units to be used for that column.
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -1085,12 +1229,14 @@ class DatetimeSinusoidCalculator(BaseDateTransformer):
         method: str | list[str],
         units: str | dict,
         period: float | dict = 2 * np.pi,
+        verbose: bool = False,
         drop_original: bool = False,
     ) -> None:
         super().__init__(
             columns=columns,
             drop_original=drop_original,
             new_column_name="dummy",
+            verbose=verbose,
         )
 
         if not isinstance(method, str) and not isinstance(method, list):
@@ -1215,7 +1361,7 @@ class DatetimeSinusoidCalculator(BaseDateTransformer):
         X : pd.DataFrame
             Input X with additional columns added, these are named "<method>_<original_column>"
         """
-        X = super().transform(X, datetime_only=True)
+        X = super().transform(X)
 
         for column in self.columns:
             if not isinstance(self.units, dict):
@@ -1236,8 +1382,12 @@ class DatetimeSinusoidCalculator(BaseDateTransformer):
                     column_in_desired_unit * (2.0 * np.pi / desired_period),
                 )
 
-        if self.drop_original:
-            for col in self.columns:
-                del X[col]
+        # Drop original columns if self.drop_original is True
+        DropOriginalMixin.drop_original_column(
+            self,
+            X,
+            self.drop_original,
+            self.columns,
+        )
 
         return X

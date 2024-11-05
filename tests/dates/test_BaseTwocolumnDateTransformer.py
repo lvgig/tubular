@@ -6,7 +6,7 @@ from tests.base_tests import (
     OtherBaseBehaviourTests,
     TwoColumnListInitTests,
 )
-from tests.dates.test_BaseDateTransformer import DatesMixinTransformTests
+from tests.dates.test_BaseGenericDateTransformer import GenericDatesMixinTransformTests
 
 
 class TestInit(
@@ -29,7 +29,7 @@ class TestFit(GenericFitTests):
         cls.transformer_name = "BaseDateTwoColumnTransformer"
 
 
-class TestTransform(GenericTransformTests, DatesMixinTransformTests):
+class TestTransform(GenericTransformTests, GenericDatesMixinTransformTests):
     """Tests for BaseTwoColumnDateTransformer.transform."""
 
     @classmethod

@@ -10,11 +10,22 @@ from sklearn.preprocessing import OneHotEncoder
 
 from tubular.base import BaseTransformer
 from tubular.mapping import BaseMappingTransformMixin
-from tubular.mixins import DropOriginalMixin, WeightColumnMixin
+from tubular.mixins import DropOriginalMixin, SeparatorColumnMixin, WeightColumnMixin
 
 
 class BaseNominalTransformer(BaseTransformer):
-    """Base Transformer extension for nominal transformers."""
+    """
+    Base Transformer extension for nominal transformers.
+
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
+    """
+
+    polars_compatible = False
 
     FITS = False
 
@@ -94,7 +105,12 @@ class NominalToIntegerTransformer(BaseNominalTransformer, BaseMappingTransformMi
         Created in inverse_transform. Inverse mapping of mappings. Maps integer value back to categorical
         levels.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     FITS = True
 
@@ -273,7 +289,12 @@ class GroupRareLevelsTransformer(BaseTransformer, WeightColumnMixin):
         Dictionary containing the set of values present in the training data for each column in self.columns. It
         will only exist in if unseen_levels_to_rare is set to False.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     FITS = True
 
@@ -568,7 +589,12 @@ class MeanResponseTransformer(BaseNominalTransformer, WeightColumnMixin):
     cast_method: Literal[np.float32, np,float64]
         Store the casting method associated to return_type
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     FITS = True
 
@@ -924,7 +950,12 @@ class OrdinalEncoderTransformer(
         Created in fit. Dict of key (column names) value (mapping of categorical levels to numeric,
         ordinal encoded response values) pairs.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     FITS = True
 
@@ -1036,8 +1067,12 @@ class OrdinalEncoderTransformer(
         return BaseMappingTransformMixin.transform(self, X)
 
 
-class OneHotEncodingTransformer(DropOriginalMixin, BaseTransformer, OneHotEncoder):
-    """Transformer to convert cetegorical variables into dummy columns.
+class OneHotEncodingTransformer(
+    DropOriginalMixin,
+    SeparatorColumnMixin,
+    BaseTransformer,
+):
+    """Transformer to convert categorical variables into dummy columns.
 
     Extends the sklearn OneHotEncoder class to provide easy renaming of dummy columns.
 
@@ -1071,7 +1106,12 @@ class OneHotEncodingTransformer(DropOriginalMixin, BaseTransformer, OneHotEncode
     drop_original : bool
         Should original columns be dropped after creating dummy fields?
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     FITS = True
 
@@ -1092,23 +1132,19 @@ class OneHotEncodingTransformer(DropOriginalMixin, BaseTransformer, OneHotEncode
             copy=copy,
         )
 
-        # Set attributes for scikit-learn's OneHotEncoder
-        OneHotEncoder.__init__(
-            self,
+        # Set the dtype attribute
+        self.dtype = dtype
+
+        # Create an instance of OneHotEncoder and assign it to _encoder
+        self._encoder = OneHotEncoder(
             sparse_output=False,
             handle_unknown="ignore",
             dtype=dtype,
             **kwargs,
         )
 
-        # Set other class attrributes
-        if not isinstance(separator, str):
-            msg = f"{self.classname()}: separator must be a str"
-            raise TypeError(msg)
-
-        self.separator = separator
-
-        DropOriginalMixin.set_drop_original_column(self, drop_original)
+        self.set_drop_original_column(drop_original)
+        self.check_and_set_separator_column(separator)
 
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Gets list of levels for each column to be transformed. This defines which dummy columns
@@ -1143,7 +1179,10 @@ class OneHotEncodingTransformer(DropOriginalMixin, BaseTransformer, OneHotEncode
                     % c,
                 )
 
-        OneHotEncoder.fit(self, X=X[self.columns], y=y)
+        self._encoder.fit(X[self.columns], y=y)
+
+        # Set the categories_ attribute to ensure check_is_fitted works
+        self.categories_ = self._encoder.categories_
 
         return self
 
@@ -1159,20 +1198,20 @@ class OneHotEncodingTransformer(DropOriginalMixin, BaseTransformer, OneHotEncode
 
         Parameters
         ----------
-        input_features : list(str)
+        input_features : list[str]
             Input columns being transformed by the OHE transformer.
 
         kwargs : dict
-            Keyword arguments to be passed on to the scikit learn attriute.
+            Keyword arguments to be passed on to the scikit learn attribute.
         """
-        if hasattr(self, "get_feature_names"):
-            input_columns = self.get_feature_names(
+        if hasattr(self._encoder, "get_feature_names"):
+            input_columns = self._encoder.get_feature_names(
                 input_features=input_features,
                 **kwargs,
             )
 
-        elif hasattr(self, "get_feature_names_out"):
-            input_columns = self.get_feature_names_out(
+        elif hasattr(self._encoder, "get_feature_names_out"):
+            input_columns = self._encoder.get_feature_names_out(
                 input_features=input_features,
                 **kwargs,
             )
@@ -1213,8 +1252,18 @@ class OneHotEncodingTransformer(DropOriginalMixin, BaseTransformer, OneHotEncode
                     % c,
                 )
 
+        # Print warning for unseen levels
+        for i, c in enumerate(self.columns):
+            unseen_levels = set(X[c].unique().tolist()) - set(self.categories_[i])
+            if len(unseen_levels) > 0:
+                warnings.warn(
+                    f"{self.classname()}: column {c} has unseen categories: {unseen_levels}",
+                    UserWarning,
+                    stacklevel=2,
+                )
+
         # Apply OHE transform
-        X_transformed = OneHotEncoder.transform(self, X[self.columns])
+        X_transformed = self._encoder.transform(X[self.columns])
 
         input_columns = self._get_feature_names(input_features=self.columns)
 
@@ -1229,29 +1278,17 @@ class OneHotEncodingTransformer(DropOriginalMixin, BaseTransformer, OneHotEncode
             old_names = [
                 c + "_" + str(lvl)
                 for i, c in enumerate(self.columns)
-                for lvl in self.categories_[i]
+                for lvl in self._encoder.categories_[i]
             ]
             new_names = [
                 c + self.separator + str(lvl)
                 for i, c in enumerate(self.columns)
-                for lvl in self.categories_[i]
+                for lvl in self._encoder.categories_[i]
             ]
 
             X_transformed = X_transformed.rename(
                 columns=dict(zip(old_names, new_names)),
             )
-
-        # Print warning for unseen levels
-        if self.verbose:
-            for i, c in enumerate(self.columns):
-                unseen_levels = set(X[c].unique().tolist()) - set(self.categories_[i])
-
-                if len(unseen_levels) > 0:
-                    warnings.warn(
-                        f"{self.classname()}: column %s has unseen categories: %s"
-                        % (c, unseen_levels),
-                        stacklevel=2,
-                    )
 
         # Drop original columns if self.drop_original is True
         DropOriginalMixin.drop_original_column(

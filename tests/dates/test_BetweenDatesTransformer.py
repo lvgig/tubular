@@ -5,42 +5,83 @@ import pytest
 import test_aide as ta
 
 import tests.test_data as d
+from tests.base_tests import (
+    ColumnStrListInitTests,
+    DropOriginalInitMixinTests,
+    DropOriginalTransformMixinTests,
+    GenericTransformTests,
+    NewColumnNameInitMixintests,
+    OtherBaseBehaviourTests,
+)
+from tests.dates.test_BaseGenericDateTransformer import (
+    GenericDatesMixinTransformTests,
+    create_date_diff_different_dtypes,
+)
 from tubular.dates import BetweenDatesTransformer
 
 
-class TestInit:
+class TestInit(
+    ColumnStrListInitTests,
+    NewColumnNameInitMixintests,
+    DropOriginalInitMixinTests,
+):
     "tests for BetweenDatesTransformer.__init__."
 
-    @pytest.mark.parametrize("column_index", [0, 1, 2])
-    def test_columns_non_list_of_str_error(self, column_index):
-        """Test that an exception is raised if columns not list of str."""
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BetweenDatesTransformer"
 
-        columns = ["a", "b", "c"]
-        columns[column_index] = False
-        with pytest.raises(
-            TypeError,
-            match=r"BetweenDatesTransformer: each element of columns should be a single \(string\) column name",
-        ):
-            BetweenDatesTransformer(
-                columns=columns,
-                new_column_name="a",
-            )
-
-    def test_upper_inclusive_non_bool_error(self):
+    @pytest.mark.parametrize(
+        ("param", "value"),
+        [
+            ("upper_inclusive", 1000),
+            ("lower_inclusive", "hi"),
+        ],
+    )
+    def test_inclusive_args_non_bool_error(self, param, value):
         """Test that an exception is raised if upper_inclusive not a bool."""
+
+        param_dict = {param: value}
         with pytest.raises(
             TypeError,
-            match="BetweenDatesTransformer: upper_inclusive should be a bool",
+            match=f"BetweenDatesTransformer: {param} should be a bool",
         ):
             BetweenDatesTransformer(
                 columns=["a", "b", "c"],
                 new_column_name="d",
-                upper_inclusive=1,
+                **param_dict,
+            )
+
+    @pytest.mark.parametrize(
+        "columns",
+        [
+            ["a", "b"],
+            ["a", "b", "c", "d"],
+        ],
+    )
+    def test_wrong_col_count_error(self, columns):
+        """Test that an exception is raised if too many/too few columns."""
+
+        with pytest.raises(
+            ValueError,
+            match="BetweenDatesTransformer: This transformer works with three columns only",
+        ):
+            BetweenDatesTransformer(
+                columns=columns,
+                new_column_name="d",
             )
 
 
-class TestTransform:
+class TestTransform(
+    GenericTransformTests,
+    GenericDatesMixinTransformTests,
+    DropOriginalTransformMixinTests,
+):
     """Tests for BetweenDatesTransformer.transform."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BetweenDatesTransformer"
 
     def expected_df_1():
         """Expected output from transform in test_output."""
@@ -81,40 +122,6 @@ class TestTransform:
         df["e"] = [False, True, True, True, True, False]
 
         return df
-
-    @pytest.mark.parametrize(
-        ("columns, bad_col"),
-        [
-            (["date_col", "numeric_col", "date_col2"], 1),
-            (["date_col", "string_col", "date_col2"], 1),
-            (["date_col", "bool_col", "date_col2"], 1),
-            (["date_col", "empty_col", "date_col2"], 1),
-            (["numeric_col", "date_col", "date_col2"], 0),
-            (["string_col", "date_col", "date_col2"], 0),
-            (["bool_col", "date_col", "date_col2"], 0),
-            (["empty_col", "date_col", "date_col2"], 0),
-            (["date_col", "date_col2", "numeric_col"], 2),
-            (["date_col", "date_col2", "string_col"], 2),
-            (["date_col", "date_col2", "bool_col"], 2),
-            (["date_col", "date_col2", "empty_col"], 2),
-        ],
-    )
-    def test_input_data_check_column_errors(self, columns, bad_col):
-        """Check that errors are raised on a variety of different non date datatypes"""
-        x = BetweenDatesTransformer(
-            columns=columns,
-            new_column_name="d",
-        )
-        df = d.create_date_diff_incorrect_dtypes()
-        # types don't seem to come out of the above function as expected, hard enforce
-        df["date_col"] = pd.to_datetime(df["date_col"])
-        df["date_col2"] = df["date_col"].copy()
-        df = df[columns]
-
-        msg = rf"{x.classname()}: {columns[bad_col]} type should be in \['datetime64', 'date'\] but got {df[columns[bad_col]].dtype}"
-
-        with pytest.raises(TypeError, match=msg):
-            x.transform(df)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -284,3 +291,55 @@ class TestTransform:
             actual=df_transformed,
             msg="BetweenDatesTransformer.transform results not as expected",
         )
+
+    # overloading below test as column count is different for this one
+    @pytest.mark.parametrize(
+        ("columns, datetime_col, date_col"),
+        [
+            (["date_col_1", "datetime_col_2", "date_col_2"], 1, 0),
+            (["datetime_col_1", "date_col_2", "datetime_col_2"], 0, 1),
+        ],
+    )
+    def test_mismatched_datetypes_error(
+        self,
+        columns,
+        datetime_col,
+        date_col,
+        uninitialized_transformers,
+    ):
+        "Test that transform raises an error if one column is a date and one is datetime"
+
+        x = uninitialized_transformers[self.transformer_name](
+            columns=columns,
+            new_column_name="c",
+        )
+
+        df = create_date_diff_different_dtypes()
+        # types don't seem to come out of the above function as expected, hard enforce
+        for col in ["date_col_1", "date_col_2"]:
+            df[col] = pd.to_datetime(df[col]).dt.date
+
+        for col in ["datetime_col_1", "datetime_col_2"]:
+            df[col] = pd.to_datetime(df[col])
+
+        present_types = (
+            {"datetime64", "date"} if datetime_col == 0 else {"date", "datetime64"}
+        )
+        msg = rf"Columns fed to datetime transformers should be \['datetime64', 'date'\] and have consistent types, but found {present_types}. Please use ToDatetimeTransformer to standardise"
+        with pytest.raises(
+            TypeError,
+            match=msg,
+        ):
+            x.transform(df)
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BetweenDatesTransformer"

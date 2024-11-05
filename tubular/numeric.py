@@ -13,7 +13,12 @@ from sklearn.preprocessing import (
 )
 
 from tubular.base import BaseTransformer, DataFrameMethodTransformer
-from tubular.mixins import DropOriginalMixin
+from tubular.mixins import (
+    CheckNumericMixin,
+    DropOriginalMixin,
+    NewColumnNameMixin,
+    TwoColumnMixin,
+)
 
 
 class BaseNumericTransformer(BaseTransformer):
@@ -33,7 +38,12 @@ class BaseNumericTransformer(BaseTransformer):
     columns : List[str]
         List of columns to be operated on
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(self, columns: list[str], **kwargs: dict[str, bool]) -> None:
         super().__init__(columns=columns, **kwargs)
@@ -61,6 +71,8 @@ class BaseNumericTransformer(BaseTransformer):
 
             msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
             raise TypeError(msg)
+
+        return X
 
     def fit(
         self,
@@ -147,7 +159,12 @@ class LogTransformer(BaseNumericTransformer, DropOriginalMixin):
     suffix : str
         The suffix to add onto the end of column names for new columns.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -231,7 +248,7 @@ class LogTransformer(BaseNumericTransformer, DropOriginalMixin):
         return X
 
 
-class CutTransformer(BaseTransformer):
+class CutTransformer(BaseNumericTransformer):
     """Class to bin a column into discrete intervals.
 
     Class simply uses the [pd.cut](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.cut.html)
@@ -251,7 +268,15 @@ class CutTransformer(BaseTransformer):
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init().
 
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -300,10 +325,6 @@ class CutTransformer(BaseTransformer):
         """
         X = super().transform(X)
 
-        if not pd.api.types.is_numeric_dtype(X[self.columns[0]]):
-            msg = f"{self.classname()}: {self.columns[0]} should be a numeric dtype but got {X[self.columns[0]].dtype}"
-            raise TypeError(msg)
-
         X[self.new_column_name] = pd.cut(
             X[self.columns[0]].to_numpy(),
             **self.cut_kwargs,
@@ -312,7 +333,11 @@ class CutTransformer(BaseTransformer):
         return X
 
 
-class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
+class TwoColumnOperatorTransformer(
+    NewColumnNameMixin,
+    TwoColumnMixin,
+    DataFrameMethodTransformer,
+):
     """This transformer applies a pandas.DataFrame method to two columns (add, sub, mul, div, mod, pow).
 
     Transformer assigns the output of the method to a new column. The method will be applied
@@ -357,7 +382,12 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
     pd_method_kwargs : dict
         Dictionary of method kwargs to be passed to pandas.DataFrame method.
 
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -378,16 +408,9 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
                 msg = f"{self.classname()}: pd_method_kwargs 'axis' must be 0 or 1"
                 raise ValueError(msg)
 
-        if type(columns) is not list:
-            msg = f"{self.classname()}: columns must be a list containing two column names but got {columns}"
-            raise TypeError(msg)
-
-        if len(columns) != 2:
-            msg = f"{self.classname()}: columns must be a list containing two column names but got {columns}"
-            raise ValueError(msg)
-
-        self.column1_name = columns[0]
-        self.column2_name = columns[1]
+        # check_and_set_new_column_name function needs to be called before calling DataFrameMethodTransformer.__init__
+        # DFTransformer uses 'new_column_names' not 'new_column_name' so generic tests fail on regex if not ordered in this way
+        self.check_and_set_new_column_name(new_column_name)
 
         # call DataFrameMethodTransformer.__init__
         # This class will inherit all the below attributes from DataFrameMethodTransformer
@@ -398,6 +421,10 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
             pd_method_kwargs=pd_method_kwargs,
             **kwargs,
         )
+
+        self.check_two_columns(columns)
+        self.column1_name = columns[0]
+        self.column2_name = columns[1]
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform input data by applying the chosen method to the two specified columns.
@@ -410,7 +437,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         -------
             pd.DataFrame: Input X with an additional column.
         """
-        # call BaseTransformer.transform
+        # call DataFrameMethodTransformer.transform
         X = super(DataFrameMethodTransformer, self).transform(X)
 
         is_numeric = X[self.columns].apply(pd.api.types.is_numeric_dtype, axis=0)
@@ -419,7 +446,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
             msg = f"{self.classname()}: input columns in X must contain only numeric values"
             raise TypeError(msg)
 
-        X[self.new_column_names] = getattr(X[[self.column1_name]], self.pd_method_name)(
+        X[self.new_column_name] = getattr(X[[self.column1_name]], self.pd_method_name)(
             X[self.column2_name],
             **self.pd_method_kwargs,
         )
@@ -427,7 +454,7 @@ class TwoColumnOperatorTransformer(DataFrameMethodTransformer):
         return X
 
 
-class ScalingTransformer(BaseTransformer):
+class ScalingTransformer(BaseNumericTransformer):
     """Transformer to perform scaling of numeric columns.
 
     Transformer can apply min max scaling, max absolute scaling or standardisation (subtract mean and divide by std).
@@ -448,7 +475,22 @@ class ScalingTransformer(BaseTransformer):
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init().
 
+    Attributes
+    ----------
+
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+
     """
+
+    polars_compatible = False
+
+    # Dictionary mapping scaler types to their corresponding sklearn classes
+    scaler_options = {
+        "min_max": MinMaxScaler,
+        "max_abs": MaxAbsScaler,
+        "standard": StandardScaler,
+    }
 
     def __init__(
         self,
@@ -459,31 +501,25 @@ class ScalingTransformer(BaseTransformer):
     ) -> None:
         if scaler_kwargs is None:
             scaler_kwargs = {}
-        else:
-            if type(scaler_kwargs) is not dict:
-                msg = f"{self.classname()}: scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
-                raise TypeError(msg)
+
+        # Validate scaler_kwargs type
+        if not isinstance(scaler_kwargs, dict):
+            msg = f"{self.classname()}: scaler_kwargs should be a dict but got type {type(scaler_kwargs)}"
+            raise TypeError(msg)
 
         for i, k in enumerate(scaler_kwargs.keys()):
-            if type(k) is not str:
+            if not isinstance(k, str):
                 msg = f"{self.classname()}: unexpected type ({type(k)}) for scaler_kwargs key in position {i}, must be str"
                 raise TypeError(msg)
 
-        allowed_scaler_values = ["min_max", "max_abs", "standard"]
-
-        if scaler_type not in allowed_scaler_values:
+        # Validate scaler_type
+        if scaler_type not in self.scaler_options:
+            allowed_scaler_values = list(self.scaler_options.keys())
             msg = f"{self.classname()}: scaler_type should be one of; {allowed_scaler_values}"
             raise ValueError(msg)
 
-        if scaler_type == "min_max":
-            self.scaler = MinMaxScaler(**scaler_kwargs)
-
-        elif scaler_type == "max_abs":
-            self.scaler = MaxAbsScaler(**scaler_kwargs)
-
-        elif scaler_type == "standard":
-            self.scaler = StandardScaler(**scaler_kwargs)
-
+        # Initialize scaler using the dictionary
+        self.scaler = self.scaler_options[scaler_type](**scaler_kwargs)
         # This attribute is not for use in any method
         # Here only as a fix to allow string representation of transformer.
         self.scaler_kwargs = scaler_kwargs
@@ -491,31 +527,7 @@ class ScalingTransformer(BaseTransformer):
 
         super().__init__(columns=columns, **kwargs)
 
-    def check_numeric_columns(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Method to check all columns (specicifed in self.columns) in X are all numeric.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            Data containing columns to check.
-
-        """
-        numeric_column_types = X[self.columns].apply(
-            pd.api.types.is_numeric_dtype,
-            axis=0,
-        )
-
-        if not numeric_column_types.all():
-            non_numeric_columns = list(
-                numeric_column_types.loc[~numeric_column_types].index,
-            )
-
-            msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
-            raise TypeError(msg)
-
-        return X
-
-    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
+    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> ScalingTransformer:
         """Fit scaler to input data.
 
         Parameters
@@ -528,11 +540,7 @@ class ScalingTransformer(BaseTransformer):
 
         """
         super().fit(X, y)
-
-        X = self.check_numeric_columns(X)
-
         self.scaler.fit(X[self.columns])
-
         return self
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -550,8 +558,6 @@ class ScalingTransformer(BaseTransformer):
 
         """
         X = super().transform(X)
-
-        X = self.check_numeric_columns(X)
 
         X[self.columns] = self.scaler.transform(X[self.columns])
 
@@ -600,8 +606,12 @@ class InteractionTransformer(BaseNumericTransformer):
             column names joined with a whitespace. Interaction feature of ["col1","col2","col3] would be "col1 col2 col3".
         nb_feature_out : int
             number of total columns of transformed dataset, including new interaction features
+        polars_compatible : bool
+            class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -706,7 +716,7 @@ class InteractionTransformer(BaseNumericTransformer):
         return X
 
 
-class PCATransformer(BaseTransformer):
+class PCATransformer(CheckNumericMixin, BaseTransformer):
     """Transformer that generates variables using Principal component analysis (PCA).
     Linear dimensionality reduction using Singular Value Decomposition of the
     data to project it to a lower dimensional space.
@@ -771,9 +781,13 @@ class PCATransformer(BaseTransformer):
         if n_components is None.
     feature_names_out: list or None
         list of feature name representing the new dimensions.
+    polars_compatible : bool
+        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
 
     """
+
+    polars_compatible = False
 
     def __init__(
         self,
@@ -843,30 +857,6 @@ class PCATransformer(BaseTransformer):
         self.feature_names_out = None
         self.n_components_ = None
 
-    def check_numeric_columns(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Method to check all columns (specicifed in self.columns) in X are all numeric.
-
-        Parameters
-        ----------
-        X : pd.DataFrame
-            Data containing columns to check.
-
-        """
-        numeric_column_types = X[self.columns].apply(
-            pd.api.types.is_numeric_dtype,
-            axis=0,
-        )
-
-        if not numeric_column_types.all():
-            non_numeric_columns = list(
-                numeric_column_types.loc[~numeric_column_types].index,
-            )
-
-            msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
-            raise TypeError(msg)
-
-        return X
-
     def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
         """Fit PCA to input data.
 
@@ -881,7 +871,7 @@ class PCATransformer(BaseTransformer):
         """
         super().fit(X, y)
 
-        X = self.check_numeric_columns(X)
+        X = CheckNumericMixin.check_numeric_columns(self, X)
 
         if self.n_components != "mle":
             if 0 < self.n_components <= min(X[self.columns].shape):
@@ -913,7 +903,7 @@ class PCATransformer(BaseTransformer):
             running the  product pandas DataFrame method on identified combinations.
         """
         X = super().transform(X)
-        X = self.check_numeric_columns(X)
+        X = CheckNumericMixin.check_numeric_columns(self, X)
         X[self.feature_names_out] = self.pca.transform(X[self.columns])
 
         return X

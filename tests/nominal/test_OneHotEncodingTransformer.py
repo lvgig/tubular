@@ -11,21 +11,21 @@ from tests.base_tests import (
     DropOriginalTransformMixinTests,
     GenericFitTests,
     GenericTransformTests,
+    SeparatorInitMixintests,
 )
 from tubular.nominal import OneHotEncodingTransformer
 
 
-class TestInit(DropOriginalInitMixinTests, ColumnStrListInitTests):
+class TestInit(
+    SeparatorInitMixintests,
+    DropOriginalInitMixinTests,
+    ColumnStrListInitTests,
+):
     """Generic tests for transformer.init()."""
 
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "OneHotEncodingTransformer"
-
-    def test_separator_column_not_str_error(self):
-        """Test that an exception is raised if separator is not a str."""
-        with pytest.raises(TypeError, match="separator must be a str"):
-            OneHotEncodingTransformer(columns=["c"], separator=333)
 
 
 class TestFit(GenericFitTests):
@@ -232,7 +232,7 @@ class TestTransform(
 
         x.fit(df_train)
 
-        with pytest.warns(Warning):
+        with pytest.warns(UserWarning, match="unseen categories"):
             x.transform(df_test)
 
     @pytest.mark.parametrize(
