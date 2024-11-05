@@ -35,7 +35,7 @@ dates module
 .. autosummary::
     :toctree: api/
 
-    dates.BaseDateTransformer
+    dates.BaseGenericDateTransformer
     dates.BaseDateTwoColumnTransformer
     dates.BetweenDatesTransformer
     dates.DateDifferenceTransformer
