@@ -1,3 +1,5 @@
+import copy
+
 import pandas as pd
 import pytest
 from sklearn.exceptions import NotFittedError
@@ -9,6 +11,7 @@ from tests.base_tests import (
     GenericTransformTests,
     OtherBaseBehaviourTests,
 )
+from tests.utils import assert_frame_equal_dispatch
 
 
 # The first part of this file builds out the tests for BaseNominalTransformer so that they can be
@@ -60,6 +63,35 @@ class GenericNominalTransformTests(GenericTransformTests):
         _ = x.transform(df)
 
         pd.testing.assert_frame_equal(df, d.create_df_1())
+
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas"],
+        indirect=True,
+    )
+    def test_pandas_index_not_updated(
+        self,
+        initialized_transformers,
+        minimal_dataframe_lookup,
+    ):
+        """Test that the original (pandas) dataframe index is not transformed when transform method used."""
+
+        df = d.create_df_1()
+
+        x = initialized_transformers[self.transformer_name]
+
+        x = x.fit(df)
+
+        x.mappings = {"b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6}}
+
+        # update to abnormal index
+        df.index = [2 * i for i in df.index]
+
+        original_df = copy.deepcopy(df)
+
+        _ = x.transform(df)
+
+        assert_frame_equal_dispatch(df, original_df)
 
 
 class TestInit(ColumnStrListInitTests):
