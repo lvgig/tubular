@@ -24,28 +24,30 @@ def create_zeros_array(shape=(10, 3)):
     return np.zeros(shape)
 
 
-def create_numeric_df_1():
+def create_numeric_df_1(library="pandas"):
     """Example with numeric dataframe."""
-    return pd.DataFrame(
-        {
-            "a": [34.48, 21.71, 32.83, 1.08, 32.93, 4.74, 2.76, 75.7, 14.08, 61.31],
-            "b": [12.03, 20.32, 24.12, 24.18, 68.99, 0.0, 0.0, 59.46, 11.02, 60.68],
-            "c": [17.06, 12.25, 19.15, 29.73, 1.98, 8.23, 15.22, 20.59, 3.82, 39.73],
-            "d": [25.94, 70.22, 72.94, 64.55, 0.41, 13.62, 30.22, 4.6, 67.13, 10.38],
-            "e": [94.3, 4.18, 51.7, 16.63, 2.6, 16.57, 3.51, 30.79, 66.19, 25.44],
-        },
-    )
+
+    df_dict = {
+        "a": [34.48, 21.71, 32.83, 1.08, 32.93, 4.74, 2.76, 75.7, 14.08, 61.31],
+        "b": [12.03, 20.32, 24.12, 24.18, 68.99, 0.0, 0.0, 59.46, 11.02, 60.68],
+        "c": [17.06, 12.25, 19.15, 29.73, 1.98, 8.23, 15.22, 20.59, 3.82, 39.73],
+        "d": [25.94, 70.22, 72.94, 64.55, 0.41, 13.62, 30.22, 4.6, 67.13, 10.38],
+        "e": [94.3, 4.18, 51.7, 16.63, 2.6, 16.57, 3.51, 30.79, 66.19, 25.44],
+    }
+
+    return u.dataframe_init_dispatch(df_dict, library)
 
 
-def create_numeric_df_2():
+def create_numeric_df_2(library="pandas"):
     """Example with numeric dataframe that includes missings."""
-    return pd.DataFrame(
-        {
-            "a": [2, 3, 2, 1, 4, 1],
-            "b": [np.nan, np.nan, 1, 3, 3, 4],
-            "c": [1, 1, 2, 3, 3, np.nan],
-        },
-    )
+
+    df_dict = {
+        "a": [2, 3, 2, 1, 4, 1],
+        "b": [None, None, 1, 3, 3, 4],
+        "c": [1, 1, 2, 3, 3, None],
+    }
+
+    return u.dataframe_init_dispatch(df_dict, library)
 
 
 def create_object_df():
@@ -90,15 +92,16 @@ def create_df_2(library="pandas"):
     return df
 
 
-def create_df_3():
+def create_df_3(library="pandas"):
     """Create simple DataFrame to use in other tests."""
-    return pd.DataFrame(
-        {
-            "a": [1, 2, 3, 4, 5, 6, np.nan],
-            "b": [1, 2, 3, np.nan, 7, 8, 9],
-            "c": [np.nan, 1, 2, 3, -4, -5, -6],
-        },
-    )
+
+    df_dict = {
+        "a": [1, 2, 3, 4, 5, 6, None],
+        "b": [1, 2, 3, None, 7, 8, 9],
+        "c": [None, 1, 2, 3, -4, -5, -6],
+    }
+
+    return u.dataframe_init_dispatch(df_dict, library)
 
 
 def create_df_4():
