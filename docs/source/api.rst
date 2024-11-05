@@ -70,7 +70,7 @@ mapping module
     mapping.MappingTransformer
     mapping.BaseCrossColumnMappingTransformer
     mapping.CrossColumnMappingTransformer
-    mappping.BaseCrossColumnNumericTransformer
+    mapping.BaseCrossColumnNumericTransformer
     mapping.CrossColumnMultiplyTransformer
     mapping.CrossColumnAddTransformer
 
