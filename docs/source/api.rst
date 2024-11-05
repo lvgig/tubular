@@ -17,7 +17,7 @@ capping module
 
 .. autosummary::
     :toctree: api/
-
+    capping.BaseCappingTransformer
     capping.CappingTransformer
     capping.OutOfRangeNullTransformer
     
@@ -35,6 +35,8 @@ dates module
 .. autosummary::
     :toctree: api/
 
+    dates.BaseDateTransformer
+    dates.BaseDateTwoColumnTransformer
     dates.BetweenDatesTransformer
     dates.DateDifferenceTransformer
     dates.DateDiffLeapYearTransformer
@@ -66,7 +68,9 @@ mapping module
     mapping.BaseMappingTransformer
     mapping.BaseMappingTransformMixin
     mapping.MappingTransformer
-    mapping.CrossColumnMappingTransformer    
+    mapping.BaseCrossColumnMappingTransformer
+    mapping.CrossColumnMappingTransformer
+    mappping.BaseCrossColumnNumericTransformer
     mapping.CrossColumnMultiplyTransformer
     mapping.CrossColumnAddTransformer
 
@@ -77,7 +81,18 @@ misc module
     :toctree: api/
 
     misc.SetValueTransformer
-    misc.SetColumnDtype
+    misc.ColumnDtypeSetter
+
+mixin module
+------------------
+
+.. autosummary::
+    :toctree: api/
+
+    mixins.DropOriginalMixin
+    mixins.NewColumnNameMixin
+    mixins.WeightColumnMixin
+
 
 nominal module
 ------------------
@@ -98,6 +113,7 @@ numeric module
 .. autosummary::
     :toctree: api/
 
+    numeric.BaseNumericTransformer
     numeric.LogTransformer
     numeric.CutTransformer  
     numeric.TwoColumnOperatorTransformer
