@@ -64,6 +64,7 @@ def create_df_1(library="pandas"):
 
 def create_df_2(library="pandas"):
     """Create simple DataFrame to use in other tests."""
+
     df_dict = {
         "a": [1, 2, 3, 4, 5, 6, None],
         "b": ["a", "b", "c", "d", "e", "f", None],
