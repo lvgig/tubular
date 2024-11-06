@@ -857,6 +857,32 @@ class GenericTransformTests:
 
         assert_frame_equal_dispatch(df, original_df)
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas"],
+        indirect=True,
+    )
+    def test_pandas_index_not_updated(
+        self,
+        initialized_transformers,
+        minimal_dataframe_lookup,
+    ):
+        """Test that the original (pandas) dataframe index is not transformed when transform method used."""
+
+        df = minimal_dataframe_lookup[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
+
+        # update to abnormal index
+        df.index = [2 * i for i in df.index]
+
+        original_df = copy.deepcopy(df)
+
+        x = x.fit(df, df["a"])
+
+        _ = x.transform(df)
+
+        assert_frame_equal_dispatch(df, original_df)
+
 
 class DropOriginalTransformMixinTests:
     """
