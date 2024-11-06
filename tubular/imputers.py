@@ -475,7 +475,7 @@ class NearestMeanResponseImputer(BaseImputer):
         response_column = "_temporary_response"
 
         for c in self.columns:
-            c_nulls = X[c].is_null()
+            c_nulls = X.select(nw.col(c).is_null())[c]
 
             if c_nulls.sum() == 0:
                 msg = f"{self.classname()}: Column {c} has no missing values, cannot use this transformer."
@@ -488,16 +488,16 @@ class NearestMeanResponseImputer(BaseImputer):
             mean_response_nulls = X_y.filter(c_nulls)[response_column].mean()
 
             mean_response_by_levels = mean_response_by_levels.with_columns(
-                abs_diff_response=np.abs(
-                    mean_response_by_levels[response_column] - mean_response_nulls,
-                ),
+                (nw.col(response_column) - mean_response_nulls)
+                .abs()
+                .alias("abs_diff_response"),
             )
 
             # take first value having the minimum difference in terms of average response
             self.impute_values_[c] = mean_response_by_levels.filter(
                 mean_response_by_levels["abs_diff_response"]
                 == mean_response_by_levels["abs_diff_response"].min(),
-            )[c].to_numpy()[0]
+            )[c].item(index=0)
 
         return self
 
