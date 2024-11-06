@@ -20,7 +20,7 @@ Each individual change should have a link to the pull request after the descript
 ------------------
 
 - Refactored BaseImputer to utilise narwhals `#314 <https://github.com/lvgig/tubular/issues/314>_`
-- placeholder
+- Converted test dfs to flexible pandas/polars setup
 - placeholder
 - placeholder
 - placeholder
