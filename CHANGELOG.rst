@@ -23,7 +23,7 @@ Changed
 ^^^^^^^
 
 - narwhalified CheckNumericMixin `#336 <https://github.com/lvgig/tubular/issues/336>_`
-- placeholder
+- narwhalified ModeImputer `#321 <https://github.com/lvgig/tubular/issues/321>_`
 - placeholder
 - placeholder
 - placeholder

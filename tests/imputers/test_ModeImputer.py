@@ -1,7 +1,6 @@
+import narwhals as nw
 import numpy as np
-import pandas as pd
 import pytest
-import test_aide as ta
 
 import tests.test_data as d
 from tests.base_tests import (
@@ -16,7 +15,15 @@ from tests.imputers.test_BaseImputer import (
     GenericImputerTransformTests,
     GenericImputerTransformTestsWeight,
 )
+from tests.utils import dataframe_init_dispatch
 from tubular.imputers import ModeImputer
+
+
+def input_df_nan(library="pandas"):
+    return dataframe_init_dispatch(
+        dataframe_dict={"a": [None, None, None]},
+        library=library,
+    )
 
 
 class TestInit(ColumnStrListInitTests, WeightColumnInitMixinTests):
@@ -34,70 +41,175 @@ class TestFit(WeightColumnFitMixinTests, GenericFitTests):
     def setup_class(cls):
         cls.transformer_name = "ModeImputer"
 
-    def test_learnt_values(self):
+    @pytest.mark.parametrize(
+        "library",
+        ["pandas", "polars"],
+    )
+    def test_learnt_values(self, library):
         """Test that the impute values learnt during fit are expected."""
-        df = d.create_df_3()
+        df = d.create_df_6(library=library)
 
         x = ModeImputer(columns=["a", "b", "c"])
 
         x.fit(df)
 
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "impute_values_": {
-                    "a": df["a"].mode()[0],
-                    "b": df["b"].mode()[0],
-                    "c": df["c"].mode()[0],
-                },
-            },
-            msg="impute_values_ attribute",
-        )
+        expected_impute_values = {
+            "a": 2,
+            "b": "a",
+            "c": "f",
+        }
 
-    def expected_df_nan():
-        return pd.DataFrame({"a": ["NaN", "NaN", "NaN"], "b": [None, None, None]})
+        assert (
+            x.impute_values_ == expected_impute_values
+        ), f"impute_values_ attribute not expected, expected {expected_impute_values} but got {x.impute_values_}"
 
     @pytest.mark.parametrize(
-        ("df", "expected"),
-        ta.pandas.row_by_row_params(
-            pd.DataFrame({"a": [np.nan, np.nan, np.nan], "b": [None, None, None]}),
-            expected_df_nan(),
-        )
-        + ta.pandas.index_preserved_params(
-            pd.DataFrame({"a": [np.nan, np.nan, np.nan], "b": [None, None, None]}),
-            expected_df_nan(),
-        ),
+        "library",
+        ["pandas", "polars"],
     )
-    def test_warning_mode_is_nan(self, df, expected):
-        """Test that warning is raised when mode is NaN."""
-        x = ModeImputer(columns=["a", "b"])
+    def test_learnt_values_tied(self, library):
+        """Test that the impute values learnt during fit are expected - when mode is tied."""
+        df = d.create_df_3(library=library)
 
-        with pytest.warns(Warning, match="ModeImputer: The Mode of column a is NaN."):
+        x = ModeImputer(columns=["a"])
+
+        with pytest.warns(
+            UserWarning,
+            match="ModeImputer: The Mode of column a is tied, will sort in descending order and return first candidate",
+        ):
             x.fit(df)
 
-        with pytest.warns(Warning, match="ModeImputer: The Mode of column b is NaN."):
+        expected_impute_values = {
+            "a": 6,
+        }
+
+        assert (
+            x.impute_values_ == expected_impute_values
+        ), f"impute_values_ attribute not expected, expected {expected_impute_values} but got {x.impute_values_}"
+
+    @pytest.mark.parametrize(
+        "library",
+        ["pandas", "polars"],
+    )
+    def test_learnt_values_tied_weighted(self, library):
+        """
+        Test that the impute values learnt during fit are expected -
+        when mode is tied and transformer is weighted.
+        """
+        df = d.create_df_3(library=library)
+
+        df = nw.from_native(df)
+        native_namespace = nw.get_native_namespace(df)
+
+        weights_column = "weights_column"
+        x = ModeImputer(columns=["a"], weights_column=weights_column)
+
+        # setup weights column
+        df = df.with_columns(
+            nw.new_series(
+                name=weights_column,
+                values=[1] * len(df),
+                native_namespace=native_namespace,
+            ),
+        )
+
+        df = nw.to_native(df)
+
+        with pytest.warns(
+            UserWarning,
+            match="ModeImputer: The Mode of column a is tied, will sort in descending order and return first candidate",
+        ):
             x.fit(df)
 
-    def test_learnt_values_weighted_df(self):
+        expected_impute_values = {
+            "a": 6,
+        }
+
+        assert (
+            x.impute_values_ == expected_impute_values
+        ), f"impute_values_ attribute not expected, expected {expected_impute_values} but got {x.impute_values_}"
+
+    @pytest.mark.parametrize(
+        "library",
+        ["pandas", "polars"],
+    )
+    def test_nan_learnt_values(self, library):
+        """Test behaviour when learnt value is None."""
+        x = ModeImputer(columns=["a"])
+
+        df = input_df_nan(library)
+
+        with pytest.warns(
+            UserWarning,
+            match="ModeImputer: The Mode of column a is None",
+        ):
+            x.fit(df)
+
+        expected_impute_values = {"a": None}
+
+        assert (
+            x.impute_values_ == expected_impute_values
+        ), f"impute_values_ attribute not as expected, expected {expected_impute_values} but got {x.impute_values_}"
+
+    @pytest.mark.parametrize(
+        "library",
+        ["pandas", "polars"],
+    )
+    def test_nan_learnt_values_weighted(self, library):
+        """Test behaviour when learnt value is None - when weights are used."""
+        weights_column = "weights_column"
+        x = ModeImputer(columns=["a"], weights_column=weights_column)
+
+        df = d.create_weighted_imputers_test_df(library=library)
+
+        df = nw.from_native(df)
+        native_namespace = nw.get_native_namespace(df)
+
+        # replace 'a' with all null values to trigger warning
+        df = df.with_columns(
+            nw.new_series(
+                name="a",
+                values=[None] * len(df),
+                native_namespace=native_namespace,
+            ),
+        )
+
+        df = df.to_native()
+
+        with pytest.warns(
+            UserWarning,
+            match="ModeImputer: The Mode of column a is None",
+        ):
+            x.fit(df)
+
+        expected_impute_values = {"a": None}
+
+        assert (
+            x.impute_values_ == expected_impute_values
+        ), f"impute_values_ attribute not as expected, expected {expected_impute_values} but got {x.impute_values_}"
+
+    @pytest.mark.parametrize(
+        "library",
+        ["pandas", "polars"],
+    )
+    def test_learnt_values_weighted_df(self, library):
         """Test that the impute values learnt during fit are expected when df is weighted."""
-        df = d.create_weighted_imputers_test_df()
+        df = d.create_weighted_imputers_test_df(library=library)
 
         x = ModeImputer(columns=["a", "b", "c", "d"], weights_column="weights_column")
 
         x.fit(df)
 
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "impute_values_": {
-                    "a": np.float64(5.0),
-                    "b": "e",
-                    "c": "f",
-                    "d": np.float64(1.0),
-                },
-            },
-            msg="impute_values_ attribute",
-        )
+        expected_impute_values = {
+            "a": np.float64(5.0),
+            "b": "e",
+            "c": "f",
+            "d": np.float64(1.0),
+        }
+
+        assert (
+            x.impute_values_ == expected_impute_values
+        ), f"impute_values_ attribute not as expected, expected {expected_impute_values} but got {x.impute_values_}"
 
 
 class TestTransform(
