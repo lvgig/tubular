@@ -1,3 +1,5 @@
+import copy
+
 import polars as pl
 import pytest
 from sklearn.exceptions import NotFittedError
@@ -82,6 +84,35 @@ class GenericNominalTransformTests(GenericTransformTests):
         _ = transformer.transform(df)
 
         assert_frame_equal_dispatch(df, d.create_df_1(library=library))
+
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas"],
+        indirect=True,
+    )
+    def test_pandas_index_not_updated(
+        self,
+        initialized_transformers,
+        minimal_dataframe_lookup,
+    ):
+        """Test that the original (pandas) dataframe index is not transformed when transform method used."""
+
+        df = d.create_df_1()
+
+        x = initialized_transformers[self.transformer_name]
+
+        x = x.fit(df)
+
+        x.mappings = {"b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6}}
+
+        # update to abnormal index
+        df.index = [2 * i for i in df.index]
+
+        original_df = copy.deepcopy(df)
+
+        _ = x.transform(df)
+
+        assert_frame_equal_dispatch(df, original_df)
 
 
 class TestInit(ColumnStrListInitTests):

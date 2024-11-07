@@ -81,7 +81,7 @@ class TestFit(GenericFitTests, WeightColumnFitMixinTests):
         ta.classes.test_object_attributes(
             obj=x,
             expected_attributes={
-                "non_rare_levels": {"b": ["a", np.nan], "c": ["a", "c", "e"]},
+                "non_rare_levels": {"b": [None, "a"], "c": ["a", "c", "e"]},
             },
             msg="non_rare_levels attribute",
         )
@@ -235,7 +235,7 @@ class TestTransform(GenericNominalTransformTests):
         x = GroupRareLevelsTransformer(columns=["b", "c"], cut_off_percent=0.2)
 
         # set the mappging dict directly rather than fitting x on df so test works with decorators
-        x.non_rare_levels = {"b": ["a", np.nan], "c": ["e", "c", "a"]}
+        x.non_rare_levels = {"b": ["a", None], "c": ["e", "c", "a"]}
 
         df_transformed = x.transform(df)
 
@@ -299,7 +299,7 @@ class TestTransform(GenericNominalTransformTests):
         )
 
         # set the mappging dict directly rather than fitting x on df so test works with decorators
-        x.non_rare_levels = {"b": ["a", np.nan]}
+        x.non_rare_levels = {"b": ["a", None]}
 
         df_transformed = x.transform(df)
 
