@@ -16,15 +16,21 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
-1.4.0 (2024-10-15)
+1.4.1 (unreleased)
 ------------------
+
+Changed
+^^^^^^^
 
 - Refactored BaseImputer to utilise narwhals `#314 <https://github.com/lvgig/tubular/issues/314>_`
 - Converted test dfs to flexible pandas/polars setup
+- Converted BaseNominalTransformer to utilise narwhals `#334 <https://github.com/lvgig/tubular/issues/334>_`
 - placeholder
 - placeholder
 - placeholder
-- placeholder
+
+1.4.0 (2024-10-15)
+------------------
 
 Changed
 ^^^^^^^
