@@ -6,7 +6,6 @@ from importlib import import_module
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import polars as pl
 import pytest
 
 import tubular.base as base
@@ -297,10 +296,10 @@ def minimal_dataframe_lookup(request) -> dict[str, pd.DataFrame]:
     # setup to default to pandas if not provided
     library = getattr(request, "param", "pandas")
 
-    num_df = create_numeric_df_1()
-    nan_df = create_numeric_df_2()
-    object_df = create_object_df()
-    date_df = create_is_between_dates_df_1()
+    num_df = create_numeric_df_1(library=library)
+    nan_df = create_numeric_df_2(library=library)
+    object_df = create_object_df(library=library)
+    date_df = create_is_between_dates_df_1(library=library)
 
     # generally most transformers will work with num_df
     min_df_dict = {x[0]: num_df for x in get_all_classes()}
@@ -336,10 +335,6 @@ def minimal_dataframe_lookup(request) -> dict[str, pd.DataFrame]:
     ]
     for transformer in other_nan_transformers:
         min_df_dict[transformer] = nan_df
-
-    if library == "polars":
-        for key in min_df_dict:
-            min_df_dict[key] = pl.from_pandas(min_df_dict[key])
 
     return min_df_dict
 

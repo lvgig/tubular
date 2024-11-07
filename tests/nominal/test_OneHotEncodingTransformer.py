@@ -106,7 +106,6 @@ class TestTransform(
                 "b": ["w", "w", "z", "y", "x"],
                 "c": ["a", "a", "c", "b", "a"],
             },
-            index=[10, 15, 200, 251, 59],
         )
 
         df["c"] = df["c"].astype("category")

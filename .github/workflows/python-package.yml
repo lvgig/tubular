@@ -42,9 +42,9 @@ jobs:
 
       - name: Upload coverage pytest html test results to github
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: coverage-html-pytest-results
+          name: coverage-html-pytest-results-${{ matrix.python-version }}
           path: htmlcov
 
   lint:

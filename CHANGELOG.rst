@@ -33,7 +33,7 @@ Changed
 ------------------
 
 - Refactored BaseImputer to utilise narwhals `#314 <https://github.com/lvgig/tubular/issues/314>_`
-- placeholder
+- Converted test dfs to flexible pandas/polars setup
 - placeholder
 - placeholder
 - placeholder
@@ -66,6 +66,8 @@ Changed
 - Refactored ToDatetimeTransformer tests in new format `#300 <https://github.com/lvgig/tubular/issues/300>`_
 - Refactors tests for SeriesDtMethodTransformer in new format. Changed column arg to columns to fit generic format. `#299 <https://github.com/lvgig/tubular/issues/299>_`
 - Refactored OrdinalEncoderTransformer tests in new format `#330 <https://github.com/lvgig/tubular/issues/330>`_
+- Narwhal-ified NullIndicator `#319 <https://github.com/lvgig/tubular/issues/319>_`
+- Narwhal-ified NearestMeanResponseImputer `#320 <https://github.com/lvgig/tubular/issues/320>_`
 
 
 1.3.1 (2024-07-18)
