@@ -146,14 +146,7 @@ class WeightColumnMixin:
     """
     Mixin class with weights functionality
 
-    Attributes
-    ----------
-
-    polars_compatible : bool
-        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
-
-    polars_compatible = True
 
     @nw.narwhalify
     def check_weights_column(self, X: FrameT, weights_column: str) -> None:
