@@ -3,6 +3,7 @@
 import datetime
 
 import narwhals as nw
+import numpy as np
 import pandas as pd
 import polars as pl
 
@@ -206,6 +207,28 @@ def create_df_11(library="pandas"):
     df_dict = {
         "a": [1, 2, 3],
         "b": [4, 5, 6],
+    }
+
+    return u.dataframe_init_dispatch(df_dict, library=library)
+
+
+def create_bool_and_float_df(library="pandas"):
+    """Create simple DataFrame to use in other tests."""
+
+    df_dict = {
+        "a": [1.0, 2.0, np.nan],
+        "b": [True, False, None],
+    }
+
+    return u.dataframe_init_dispatch(df_dict, library=library)
+
+
+def create_df_with_none_and_nan_cols(library="pandas"):
+    """Create simple DataFrame to use in other tests."""
+
+    df_dict = {
+        "a": [np.nan, np.nan, np.nan],
+        "b": [None, None, None],
     }
 
     return u.dataframe_init_dispatch(df_dict, library=library)

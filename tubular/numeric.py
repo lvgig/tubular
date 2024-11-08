@@ -40,10 +40,14 @@ class BaseNumericTransformer(BaseTransformer, CheckNumericMixin):
 
     polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+    FITS: bool
+        class attribute, indicates whether transform requires fit to be run first
 
     """
 
     polars_compatible = False
+
+    FITS = False
 
     def __init__(self, columns: list[str], **kwargs: dict[str, bool]) -> None:
         super().__init__(columns=columns, **kwargs)
@@ -135,10 +139,14 @@ class LogTransformer(BaseNumericTransformer, DropOriginalMixin):
 
     polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+    FITS: bool
+        class attribute, indicates whether transform requires fit to be run first
 
     """
 
     polars_compatible = False
+
+    FITS = False
 
     def __init__(
         self,
@@ -247,10 +255,14 @@ class CutTransformer(BaseNumericTransformer):
 
     polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+    FITS: bool
+        class attribute, indicates whether transform requires fit to be run first
 
     """
 
     polars_compatible = False
+
+    FITS = False
 
     def __init__(
         self,
@@ -359,10 +371,14 @@ class TwoColumnOperatorTransformer(
 
     polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+    FITS: bool
+        class attribute, indicates whether transform requires fit to be run first
 
     """
 
     polars_compatible = False
+
+    FITS = False
 
     def __init__(
         self,
@@ -450,10 +466,14 @@ class ScalingTransformer(BaseNumericTransformer):
 
     polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+    FITS: bool
+        class attribute, indicates whether transform requires fit to be run first
 
     """
 
     polars_compatible = False
+
+    FITS = True
 
     # Dictionary mapping scaler types to their corresponding sklearn classes
     scaler_options = {
@@ -578,10 +598,14 @@ class InteractionTransformer(BaseNumericTransformer):
             number of total columns of transformed dataset, including new interaction features
         polars_compatible : bool
             class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+        FITS: bool
+        class attribute, indicates whether transform requires fit to be run first
 
     """
 
     polars_compatible = False
+
+    FITS = False
 
     def __init__(
         self,
@@ -753,11 +777,15 @@ class PCATransformer(BaseNumericTransformer):
         list of feature name representing the new dimensions.
     polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+    FITS: bool
+        class attribute, indicates whether transform requires fit to be run first
 
 
     """
 
     polars_compatible = False
+
+    FITS = True
 
     def __init__(
         self,
