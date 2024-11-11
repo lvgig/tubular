@@ -25,6 +25,9 @@ Changed
 - Refactored BaseImputer to utilise narwhals `#314 <https://github.com/lvgig/tubular/issues/314>_`
 - Converted test dfs to flexible pandas/polars setup
 - Converted BaseNominalTransformer to utilise narwhals `#334 <https://github.com/lvgig/tubular/issues/334>_`
+- narwhalified CheckNumericMixin `#336 <https://github.com/lvgig/tubular/issues/336>_`
+- placeholder
+- placeholder
 - placeholder
 - placeholder
 - placeholder

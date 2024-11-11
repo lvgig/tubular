@@ -21,7 +21,7 @@ from tubular.mixins import (
 )
 
 
-class BaseNumericTransformer(BaseTransformer):
+class BaseNumericTransformer(BaseTransformer, CheckNumericMixin):
     """
     Extends BaseTransformer for datetime scenarios.
 
@@ -40,39 +40,17 @@ class BaseNumericTransformer(BaseTransformer):
 
     polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+    FITS: bool
+        class attribute, indicates whether transform requires fit to be run first
 
     """
 
     polars_compatible = False
 
+    FITS = False
+
     def __init__(self, columns: list[str], **kwargs: dict[str, bool]) -> None:
         super().__init__(columns=columns, **kwargs)
-
-    def _check_numeric(self, X: pd.DataFrame) -> None:
-        """Raise a type error if a column to be operated on is not numeric
-
-        Parameters
-        ----------
-
-        X: pd.DataFrame
-            Data to validate
-
-        """
-
-        numeric_column_types = X[self.columns].apply(
-            pd.api.types.is_numeric_dtype,
-            axis=0,
-        )
-
-        if not numeric_column_types.all():
-            non_numeric_columns = list(
-                numeric_column_types.loc[~numeric_column_types].index,
-            )
-
-            msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
-            raise TypeError(msg)
-
-        return X
 
     def fit(
         self,
@@ -93,7 +71,7 @@ class BaseNumericTransformer(BaseTransformer):
 
         super().fit(X, y)
 
-        self._check_numeric(X)
+        CheckNumericMixin.check_numeric_columns(self, X)
 
         return self
 
@@ -114,7 +92,7 @@ class BaseNumericTransformer(BaseTransformer):
 
         X = super().transform(X)
 
-        self._check_numeric(X)
+        CheckNumericMixin.check_numeric_columns(self, X)
 
         return X
 
@@ -161,10 +139,14 @@ class LogTransformer(BaseNumericTransformer, DropOriginalMixin):
 
     polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+    FITS: bool
+        class attribute, indicates whether transform requires fit to be run first
 
     """
 
     polars_compatible = False
+
+    FITS = False
 
     def __init__(
         self,
@@ -273,10 +255,14 @@ class CutTransformer(BaseNumericTransformer):
 
     polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+    FITS: bool
+        class attribute, indicates whether transform requires fit to be run first
 
     """
 
     polars_compatible = False
+
+    FITS = False
 
     def __init__(
         self,
@@ -337,6 +323,7 @@ class TwoColumnOperatorTransformer(
     NewColumnNameMixin,
     TwoColumnMixin,
     DataFrameMethodTransformer,
+    BaseNumericTransformer,
 ):
     """This transformer applies a pandas.DataFrame method to two columns (add, sub, mul, div, mod, pow).
 
@@ -384,10 +371,14 @@ class TwoColumnOperatorTransformer(
 
     polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+    FITS: bool
+        class attribute, indicates whether transform requires fit to be run first
 
     """
 
     polars_compatible = False
+
+    FITS = False
 
     def __init__(
         self,
@@ -437,14 +428,9 @@ class TwoColumnOperatorTransformer(
         -------
             pd.DataFrame: Input X with an additional column.
         """
-        # call DataFrameMethodTransformer.transform
+        # call appropriate parent transforms
         X = super(DataFrameMethodTransformer, self).transform(X)
-
-        is_numeric = X[self.columns].apply(pd.api.types.is_numeric_dtype, axis=0)
-
-        if not is_numeric.all():
-            msg = f"{self.classname()}: input columns in X must contain only numeric values"
-            raise TypeError(msg)
+        X = super(BaseNumericTransformer, self).transform(X)
 
         X[self.new_column_name] = getattr(X[[self.column1_name]], self.pd_method_name)(
             X[self.column2_name],
@@ -480,10 +466,14 @@ class ScalingTransformer(BaseNumericTransformer):
 
     polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+    FITS: bool
+        class attribute, indicates whether transform requires fit to be run first
 
     """
 
     polars_compatible = False
+
+    FITS = True
 
     # Dictionary mapping scaler types to their corresponding sklearn classes
     scaler_options = {
@@ -608,10 +598,14 @@ class InteractionTransformer(BaseNumericTransformer):
             number of total columns of transformed dataset, including new interaction features
         polars_compatible : bool
             class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+        FITS: bool
+        class attribute, indicates whether transform requires fit to be run first
 
     """
 
     polars_compatible = False
+
+    FITS = False
 
     def __init__(
         self,
@@ -716,7 +710,7 @@ class InteractionTransformer(BaseNumericTransformer):
         return X
 
 
-class PCATransformer(CheckNumericMixin, BaseTransformer):
+class PCATransformer(BaseNumericTransformer):
     """Transformer that generates variables using Principal component analysis (PCA).
     Linear dimensionality reduction using Singular Value Decomposition of the
     data to project it to a lower dimensional space.
@@ -783,11 +777,15 @@ class PCATransformer(CheckNumericMixin, BaseTransformer):
         list of feature name representing the new dimensions.
     polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
+    FITS: bool
+        class attribute, indicates whether transform requires fit to be run first
 
 
     """
 
     polars_compatible = False
+
+    FITS = True
 
     def __init__(
         self,
