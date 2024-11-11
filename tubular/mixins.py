@@ -15,15 +15,7 @@ class CheckNumericMixin:
     """
     Mixin class with methods for numeric transformers
 
-    Attributes
-    ----------
-
-    polars_compatible : bool
-        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
-
     """
-
-    polars_compatible = False
 
     def classname(self) -> str:
         """Method that returns the name of the current class when called."""

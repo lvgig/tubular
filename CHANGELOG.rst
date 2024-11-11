@@ -22,6 +22,9 @@ Each individual change should have a link to the pull request after the descript
 Changed
 ^^^^^^^
 
+- Refactored BaseImputer to utilise narwhals `#314 <https://github.com/lvgig/tubular/issues/314>_`
+- Converted test dfs to flexible pandas/polars setup
+- Converted BaseNominalTransformer to utilise narwhals `#334 <https://github.com/lvgig/tubular/issues/334>_`
 - narwhalified CheckNumericMixin `#336 <https://github.com/lvgig/tubular/issues/336>_`
 - narwhalified ModeImputer `#321 <https://github.com/lvgig/tubular/issues/321>_`
 - placeholder
@@ -31,13 +34,6 @@ Changed
 
 1.4.0 (2024-10-15)
 ------------------
-
-- Refactored BaseImputer to utilise narwhals `#314 <https://github.com/lvgig/tubular/issues/314>_`
-- Converted test dfs to flexible pandas/polars setup
-- placeholder
-- placeholder
-- placeholder
-- placeholder
 
 Changed
 ^^^^^^^
