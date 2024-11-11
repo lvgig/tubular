@@ -131,14 +131,7 @@ class WeightColumnMixin:
     """
     Mixin class with weights functionality
 
-    Attributes
-    ----------
-
-    polars_compatible : bool
-        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
-
-    polars_compatible = True
 
     def classname(self) -> str:
         """Method that returns the name of the current class when called."""
