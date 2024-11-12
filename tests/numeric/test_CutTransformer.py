@@ -65,6 +65,29 @@ class TestTransform(BaseNumericTransformerTransformTests):
 
         return df
 
+    @pytest.mark.parametrize(
+        ("df_generator"),
+        [
+            d.create_df_2,  # int
+            d.create_bool_and_float_df,  # float
+        ],
+    )
+    def test_numeric_passes(self, initialized_transformers, df_generator):
+        """Test check passes if self.columns numeric in X - this transformer does not work on all null column
+        so overload this test"""
+        df = df_generator()
+        # add in 'target column' for and additional numeric column fit
+        df["c"] = [1] * len(df)
+        df["b"] = [1] * len(df)
+
+        x = initialized_transformers[self.transformer_name]
+        x.columns = ["a", "b"]
+
+        numeric_df = pd.DataFrame({col: df["c"] for col in [*x.columns, "c"]})
+        x.fit(numeric_df, numeric_df["c"])
+
+        x.transform(df)
+
     def test_output_from_cut_assigned_to_column(self, mocker):
         """Test that the output from pd.cut is assigned to column with name new_column_name."""
         df = d.create_df_9()

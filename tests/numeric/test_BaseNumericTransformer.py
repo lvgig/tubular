@@ -1,5 +1,6 @@
 import re
 
+import pandas as pd
 import pytest
 
 import tests.test_data as d
@@ -19,17 +20,55 @@ class BaseNumericTransformerFitTests(GenericFitTests):
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
-    def test_non_numeric_exception_raised(self, initialized_transformers):
+    @pytest.mark.parametrize(
+        ("df_generator", "bad_cols"),
+        [
+            (d.create_df_2, ["b"]),  # str
+            (d.create_is_between_dates_df_1, ["a"]),  # datetime
+            (d.create_bool_and_float_df, ["b"]),  # bool
+            (d.create_df_with_none_and_nan_cols, ["b"]),  # None
+        ],
+    )
+    def test_non_numeric_exception_raised(
+        self,
+        initialized_transformers,
+        df_generator,
+        bad_cols,
+    ):
         """Test an exception is raised if self.columns are non-numeric in X."""
-        df = d.create_df_2()
+        df = df_generator()
+        # add in 'target column' for fit
+        df["c"] = [1] * len(df)
 
         x = initialized_transformers[self.transformer_name]
+        x.columns = bad_cols
 
         with pytest.raises(
             TypeError,
-            match=rf"{self.transformer_name}: The following columns are not numeric in X; \['b'\]",
+            match=re.escape(
+                f"{self.transformer_name}: The following columns are not numeric in X; {bad_cols}",
+            ),
         ):
             x.fit(df, df["c"])
+
+    @pytest.mark.parametrize(
+        ("df_generator", "cols"),
+        [
+            (d.create_df_2, ["a"]),  # int
+            (d.create_bool_and_float_df, ["a"]),  # float
+            (d.create_df_with_none_and_nan_cols, ["a"]),  # nan
+        ],
+    )
+    def test_numeric_passes(self, initialized_transformers, df_generator, cols):
+        """Test check passes if self.columns numeric in X."""
+        df = df_generator()
+        # add in 'target column' for fit
+        df["c"] = [1] * len(df)
+
+        x = initialized_transformers[self.transformer_name]
+        x.columns = cols
+
+        x.fit(df, df["c"])
 
 
 class BaseNumericTransformerTransformTests(
@@ -40,13 +79,34 @@ class BaseNumericTransformerTransformTests(
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
-    def test_non_numeric_exception_raised(self, initialized_transformers):
+    @pytest.mark.parametrize(
+        ("df_generator", "bad_cols"),
+        [
+            (d.create_df_2, ["b"]),  # str
+            (d.create_is_between_dates_df_1, ["a"]),  # datetime
+            (d.create_bool_and_float_df, ["b"]),  # bool
+            (d.create_df_with_none_and_nan_cols, ["b"]),  # None
+        ],
+    )
+    def test_non_numeric_exception_raised(
+        self,
+        initialized_transformers,
+        df_generator,
+        bad_cols,
+    ):
         """Test an exception is raised if self.columns are non-numeric in X."""
-        df = d.create_df_2()
-        # make df all non-numeric
-        df["a"] = df["b"]
+        df = df_generator()
+        # add in 'target column' for and additional numeric column fit
+        df["c"] = [1] * len(df)
 
         x = initialized_transformers[self.transformer_name]
+        x.columns = bad_cols
+
+        # if the transformer fits, run a working fit before transform
+        if x.FITS:
+            # create numeric df to fit on
+            numeric_df = pd.DataFrame({col: df["c"] for col in [*x.columns, "c"]})
+            x.fit(numeric_df, numeric_df["c"])
 
         with pytest.raises(
             TypeError,
@@ -55,6 +115,31 @@ class BaseNumericTransformerTransformTests(
             ),
         ):
             x.transform(df)
+
+    @pytest.mark.parametrize(
+        ("df_generator"),
+        [
+            d.create_df_2,  # int
+            d.create_bool_and_float_df,  # float
+            d.create_df_with_none_and_nan_cols,  # nan
+        ],
+    )
+    def test_numeric_passes(self, initialized_transformers, df_generator):
+        """Test check passes if self.columns numeric in X."""
+        df = df_generator()
+        # add in 'target column' for and additional numeric column fit
+        df["c"] = [1] * len(df)
+        df["b"] = [1] * len(df)
+
+        x = initialized_transformers[self.transformer_name]
+        x.columns = ["a", "b"]
+
+        if x.FITS:
+            # create numeric df to fit on
+            numeric_df = pd.DataFrame({col: df["c"] for col in [*x.columns, "c"]})
+            x.fit(numeric_df, numeric_df["c"])
+
+        x.transform(df)
 
 
 class TestInit(BaseNumericTransformerInitTests):

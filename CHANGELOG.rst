@@ -16,15 +16,24 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
-1.4.0 (2024-10-15)
+1.4.1 (unreleased)
 ------------------
 
+Changed
+^^^^^^^
+
 - Refactored BaseImputer to utilise narwhals `#314 <https://github.com/lvgig/tubular/issues/314>_`
+- Converted test dfs to flexible pandas/polars setup
+- Converted BaseNominalTransformer to utilise narwhals `#334 <https://github.com/lvgig/tubular/issues/334>_`
+- narwhalified CheckNumericMixin `#336 <https://github.com/lvgig/tubular/issues/336>_`
 - placeholder
 - placeholder
 - placeholder
 - placeholder
 - placeholder
+
+1.4.0 (2024-10-15)
+------------------
 
 Changed
 ^^^^^^^
@@ -53,6 +62,8 @@ Changed
 - Refactored ToDatetimeTransformer tests in new format `#300 <https://github.com/lvgig/tubular/issues/300>`_
 - Refactors tests for SeriesDtMethodTransformer in new format. Changed column arg to columns to fit generic format. `#299 <https://github.com/lvgig/tubular/issues/299>_`
 - Refactored OrdinalEncoderTransformer tests in new format `#330 <https://github.com/lvgig/tubular/issues/330>`_
+- Narwhal-ified NullIndicator `#319 <https://github.com/lvgig/tubular/issues/319>_`
+- Narwhal-ified NearestMeanResponseImputer `#320 <https://github.com/lvgig/tubular/issues/320>_`
 
 
 1.3.1 (2024-07-18)

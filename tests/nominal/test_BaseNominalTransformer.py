@@ -1,4 +1,6 @@
-import pandas as pd
+import copy
+
+import polars as pl
 import pytest
 from sklearn.exceptions import NotFittedError
 
@@ -9,6 +11,7 @@ from tests.base_tests import (
     GenericTransformTests,
     OtherBaseBehaviourTests,
 )
+from tests.utils import assert_frame_equal_dispatch
 
 
 # The first part of this file builds out the tests for BaseNominalTransformer so that they can be
@@ -20,22 +23,38 @@ class GenericNominalTransformTests(GenericTransformTests):
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
-    def test_not_fitted_error_raised(self, initialized_transformers):
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
+    def test_not_fitted_error_raised(self, initialized_transformers, library):
         if initialized_transformers[self.transformer_name].FITS:
-            df = d.create_df_1()
+            df = d.create_df_1(library=library)
+
+            transformer = initialized_transformers[self.transformer_name]
+
+            # skip polars test if transformer not yet converted for polars
+            if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+                return
 
             with pytest.raises(NotFittedError):
                 initialized_transformers[self.transformer_name].transform(df)
 
-    def test_non_mappable_rows_exception_raised(self, initialized_transformers):
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
+    def test_non_mappable_rows_exception_raised(
+        self,
+        initialized_transformers,
+        library,
+    ):
         """Test an exception is raised if non-mappable rows are present in X."""
-        df = d.create_df_1()
+        df = d.create_df_1(library=library)
 
-        x = initialized_transformers[self.transformer_name]
+        transformer = initialized_transformers[self.transformer_name]
 
-        x.fit(df)
+        # skip polars test if transformer not yet converted for polars
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
-        x.mappings = {
+        transformer.fit(df)
+
+        transformer.mappings = {
             "a": {1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7},
             "b": {"a": 1, "c": 2, "d": 3, "e": 4, "f": 5},
         }
@@ -44,10 +63,39 @@ class GenericNominalTransformTests(GenericTransformTests):
             ValueError,
             match=f"{self.transformer_name}: nulls would be introduced into column b from levels not present in mapping",
         ):
-            x.transform(df)
+            transformer.transform(df)
 
-    def test_original_df_not_updated(self, initialized_transformers):
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
+    def test_original_df_not_updated(self, initialized_transformers, library):
         """Test that the original dataframe is not transformed when transform method used."""
+
+        df = d.create_df_1(library=library)
+
+        transformer = initialized_transformers[self.transformer_name]
+
+        # skip polars test if transformer not yet converted for polars
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
+
+        transformer = transformer.fit(df)
+
+        transformer.mappings = {"b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6}}
+
+        _ = transformer.transform(df)
+
+        assert_frame_equal_dispatch(df, d.create_df_1(library=library))
+
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas"],
+        indirect=True,
+    )
+    def test_pandas_index_not_updated(
+        self,
+        initialized_transformers,
+        minimal_dataframe_lookup,
+    ):
+        """Test that the original (pandas) dataframe index is not transformed when transform method used."""
 
         df = d.create_df_1()
 
@@ -57,9 +105,14 @@ class GenericNominalTransformTests(GenericTransformTests):
 
         x.mappings = {"b": {"a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6}}
 
+        # update to abnormal index
+        df.index = [2 * i for i in df.index]
+
+        original_df = copy.deepcopy(df)
+
         _ = x.transform(df)
 
-        pd.testing.assert_frame_equal(df, d.create_df_1())
+        assert_frame_equal_dispatch(df, original_df)
 
 
 class TestInit(ColumnStrListInitTests):

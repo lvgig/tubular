@@ -5,31 +5,38 @@ from typing import TYPE_CHECKING
 import narwhals as nw
 import narwhals.selectors as ncs
 import numpy as np
-import pandas as pd
 
 if TYPE_CHECKING:
-    from narwhals.typing import FrameT
+    import pandas as pd
+    from narhwals.typing import FrameT
 
 
 class CheckNumericMixin:
-    def check_numeric_columns(self, X: pd.DataFrame) -> pd.DataFrame:
+    """
+    Mixin class with methods for numeric transformers
+
+    """
+
+    def classname(self) -> str:
+        """Method that returns the name of the current class when called."""
+
+        return type(self).__name__
+
+    @nw.narwhalify
+    def check_numeric_columns(self, X: FrameT) -> FrameT:
         """Helper function for checking column args are numeric for numeric transformers.
 
         Args:
         ----
-            X (pd.DataFrame): Data containing columns to check.
+            X: Data containing columns to check.
 
         """
-        numeric_column_types = X[self.columns].apply(
-            pd.api.types.is_numeric_dtype,
-            axis=0,
+        non_numeric_columns = list(
+            set(self.columns).difference(set(X.select(ncs.numeric()).columns)),
         )
-
-        if not numeric_column_types.all():
-            non_numeric_columns = list(
-                numeric_column_types.loc[~numeric_column_types].index,
-            )
-
+        # sort as set ordering can be inconsistent
+        non_numeric_columns.sort()
+        if len(non_numeric_columns) > 0:
             msg = f"{self.classname()}: The following columns are not numeric in X; {non_numeric_columns}"
             raise TypeError(msg)
 

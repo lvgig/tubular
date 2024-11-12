@@ -1,3 +1,4 @@
+import copy
 import re
 
 import pandas as pd
@@ -11,6 +12,7 @@ from tests.base_tests import (
     GenericTransformTests,
     OtherBaseBehaviourTests,
 )
+from tests.utils import assert_frame_equal_dispatch
 from tubular.mapping import BaseMappingTransformMixin
 
 # Note there are no tests that need inheriting from this file as the only difference is an expected transform output
@@ -44,6 +46,10 @@ class TestTransform(GenericTransformTests):
 
     Because this is a Mixin transformer it is not always appropriate to inherit the generic transform tests. A number of the tests below overwrite the tests in GenericTransformTests.
     """
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseMappingTransformMixin"
 
     def test_expected_output(self, mapping):
         """Test that X is returned from transform."""
@@ -139,6 +145,34 @@ class TestTransform(GenericTransformTests):
         _ = x.transform(df)
 
         pd.testing.assert_frame_equal(df, d.create_df_10())
+
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas"],
+        indirect=True,
+    )
+    def test_pandas_index_not_updated(
+        self,
+        initialized_transformers,
+        minimal_dataframe_lookup,
+        mapping,
+    ):
+        """Test that the original (pandas) dataframe index is not transformed when transform method used."""
+
+        df = minimal_dataframe_lookup[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
+        x.mappings = mapping
+
+        # update to abnormal index
+        df.index = [2 * i for i in df.index]
+
+        original_df = copy.deepcopy(df)
+
+        x = x.fit(df, df["a"])
+
+        _ = x.transform(df)
+
+        assert_frame_equal_dispatch(df, original_df)
 
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):

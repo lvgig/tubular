@@ -13,6 +13,7 @@ from tubular.base import BaseTransformer
 from tubular.mixins import WeightColumnMixin
 
 if TYPE_CHECKING:
+    import pandas as pd
     from narwhals.typing import FrameT
 
 
@@ -433,7 +434,7 @@ class NearestMeanResponseImputer(BaseImputer):
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     FITS = True
 
@@ -444,15 +445,16 @@ class NearestMeanResponseImputer(BaseImputer):
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
-    def fit(self, X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
+    @nw.narwhalify
+    def fit(self, X: FrameT, y: nw.Series) -> FrameT:
         """Calculate mean values to impute with.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : FrameT
             Data to fit the transformer on.
 
-        y : pd.Series
+        y : nw.Series
             Response column used to determine the value to impute with. The average response for
             each level of every column is calculated. The level which has the closest average response
             to the average response of the unknown levels is selected as the imputation value.
@@ -461,7 +463,7 @@ class NearestMeanResponseImputer(BaseImputer):
 
         super().fit(X, y)
 
-        n_nulls = y.isna().sum()
+        n_nulls = y.is_null().sum()
 
         if n_nulls > 0:
             msg = f"{self.classname()}: y has {n_nulls} null values"
@@ -469,32 +471,33 @@ class NearestMeanResponseImputer(BaseImputer):
 
         self.impute_values_ = {}
 
-        X_y = self._combine_X_y(X, y)
+        X_y = nw.from_native(self._combine_X_y(X, y))
         response_column = "_temporary_response"
 
         for c in self.columns:
-            c_nulls = X[c].isna()
+            c_nulls = X.select(nw.col(c).is_null())[c]
 
             if c_nulls.sum() == 0:
                 msg = f"{self.classname()}: Column {c} has no missing values, cannot use this transformer."
                 raise ValueError(msg)
 
-            mean_response_by_levels = pd.DataFrame(
-                X_y.loc[~c_nulls].groupby(c)[response_column].mean(),
-            ).reset_index()
+            mean_response_by_levels = (
+                X_y.filter(~c_nulls).group_by(c).agg(nw.col(response_column).mean())
+            )
 
-            mean_response_nulls = X_y.loc[c_nulls, response_column].mean()
+            mean_response_nulls = X_y.filter(c_nulls)[response_column].mean()
 
-            mean_response_by_levels["abs_diff_response"] = np.abs(
-                mean_response_by_levels[response_column] - mean_response_nulls,
+            mean_response_by_levels = mean_response_by_levels.with_columns(
+                (nw.col(response_column) - mean_response_nulls)
+                .abs()
+                .alias("abs_diff_response"),
             )
 
             # take first value having the minimum difference in terms of average response
-            self.impute_values_[c] = mean_response_by_levels.loc[
+            self.impute_values_[c] = mean_response_by_levels.filter(
                 mean_response_by_levels["abs_diff_response"]
                 == mean_response_by_levels["abs_diff_response"].min(),
-                c,
-            ].to_numpy()[0]
+            )[c].item(index=0)
 
         return self
 
@@ -516,7 +519,7 @@ class NullIndicator(BaseTransformer):
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     def __init__(
         self,
@@ -525,18 +528,21 @@ class NullIndicator(BaseTransformer):
     ) -> None:
         super().__init__(columns=columns, **kwargs)
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+    @nw.narwhalify
+    def transform(self, X: FrameT) -> FrameT:
         """Create new columns indicating the position of null values for each variable in self.columns.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : FrameT
             Data to add indicators to.
 
         """
-        X = super().transform(X)
+        X = nw.from_native(super().transform(X))
 
         for c in self.columns:
-            X[f"{c}_nulls"] = X[c].isna().astype(np.int8)
+            X = X.with_columns(
+                (nw.col(c).is_null()).cast(nw.Boolean).alias(f"{c}_nulls"),
+            )
 
         return X

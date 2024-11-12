@@ -1,14 +1,14 @@
+import narwhals as nw
+import polars as pl
 import pytest
-import test_aide as ta
 
-import tests.test_data as d
 from tests.base_tests import (
     ColumnStrListInitTests,
     GenericFitTests,
     GenericTransformTests,
     OtherBaseBehaviourTests,
 )
-from tubular.base import BaseTransformer
+from tests.utils import assert_frame_equal_dispatch
 
 
 class TestInit(ColumnStrListInitTests):
@@ -33,20 +33,28 @@ class TestTransform(GenericTransformTests):
         cls.transformer_name = "BaseTransformer"
 
     @pytest.mark.parametrize(
-        ("df", "expected"),
-        ta.pandas.adjusted_dataframe_params(d.create_df_1(), d.create_df_1()),
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=True,
     )
-    def test_X_returned(self, df, expected):
+    def test_X_returned(self, minimal_dataframe_lookup, initialized_transformers):
         """Test that X is returned from transform."""
-        x = BaseTransformer(columns="a")
+        df = minimal_dataframe_lookup[self.transformer_name]
+        x = initialized_transformers[self.transformer_name]
+
+        # if transformer is not polars compatible, skip polars test
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
+            return
+
+        df = nw.from_native(df)
+        expected = df.clone()
+
+        df = nw.to_native(df)
+        expected = nw.to_native(expected)
 
         df_transformed = x.transform(X=df)
 
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="Check X returned from transform",
-        )
+        assert_frame_equal_dispatch(expected, df_transformed)
 
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):

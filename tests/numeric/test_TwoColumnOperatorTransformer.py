@@ -3,10 +3,12 @@ import test_aide as ta
 
 import tests.test_data as d
 from tests.base_tests import (
-    GenericTransformTests,
     NewColumnNameInitMixintests,
     OtherBaseBehaviourTests,
     TwoColumnListInitTests,
+)
+from tests.numeric.test_BaseNumericTransformer import (
+    BaseNumericTransformerTransformTests,
 )
 from tubular.numeric import TwoColumnOperatorTransformer
 
@@ -40,7 +42,7 @@ class TestInit(
             )
 
 
-class TestTransform(GenericTransformTests):
+class TestTransform(BaseNumericTransformerTransformTests):
     """Tests for transformer.transform."""
 
     @classmethod
@@ -73,19 +75,6 @@ class TestTransform(GenericTransformTests):
             expected=expected,
             msg_tag="TwoColumnMethod transformer does not produce the expected output",
         )
-
-    def test_non_numeric_error(self):
-        x = TwoColumnOperatorTransformer(
-            "mul",
-            ["a", "b"],
-            "c",
-        )
-
-        with pytest.raises(
-            TypeError,
-            match="TwoColumnOperatorTransformer: input columns in X must contain only numeric values",
-        ):
-            x.transform(d.create_df_8())
 
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
