@@ -138,14 +138,11 @@ class WeightColumnMixin:
     """
     Mixin class with weights functionality
 
-    Attributes
-    ----------
-
-    polars_compatible : bool
-        class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
 
-    polars_compatible = True
+    def classname(self) -> str:
+        """Method that returns the name of the current class when called."""
+        return type(self).__name__
 
     @nw.narwhalify
     def check_weights_column(self, X: FrameT, weights_column: str) -> None:
@@ -177,7 +174,7 @@ class WeightColumnMixin:
             msg = f"{self.classname()}: weight column must be non-null"
             raise ValueError(msg)
 
-        # check weight not inf, not currently a narwhals efficient way to do this
+        # check weight not inf, currently no polars-y way to do this in narwhals
         if np.isinf(X[weights_column].to_numpy()).any():
             msg = f"{self.classname()}: weight column must not contain infinite values."
             raise ValueError(msg)
