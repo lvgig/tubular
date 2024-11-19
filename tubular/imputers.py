@@ -178,7 +178,7 @@ class MedianImputer(BaseImputer, WeightColumnMixin):
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     FITS = True
 
@@ -192,15 +192,15 @@ class MedianImputer(BaseImputer, WeightColumnMixin):
 
         WeightColumnMixin.check_and_set_weight(self, weights_column)
 
-    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
+    def fit(self, X: FrameT, y: nw.Series | None = None) -> FrameT:
         """Calculate median values to impute with from X.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Data to "learn" the median values from.
 
-        y : None or pd.DataFrame or pd.Series, default = None
+        y : None or pd/pl.Series, default = None
             Not required.
 
         """
@@ -213,7 +213,7 @@ class MedianImputer(BaseImputer, WeightColumnMixin):
 
             for c in self.columns:
                 # filter out null rows so their weight doesn't influence calc
-                filtered = X[X[c].notna()]
+                filtered = X.filter(nw.col(c).is_not_null())
 
                 # below algorithm only works for >1 non null values
                 if len(filtered) <= 0:
@@ -221,22 +221,22 @@ class MedianImputer(BaseImputer, WeightColumnMixin):
 
                 else:
                     # first sort df by column to be imputed (order of weight column shouldn't matter for median)
-                    filtered = filtered.sort_values(c)
+                    filtered = filtered.sort(c)
 
                     # next calculate cumulative weight sums
-                    cumsum = filtered[self.weights_column].cumsum()
+                    cumsum = filtered[self.weights_column].cum_sum()
 
                     # find midpoint
                     cutoff = filtered[self.weights_column].sum() / 2.0
 
                     # find first value >= this point
-                    median = filtered[c][cumsum >= cutoff].iloc[0]
+                    median = filtered.filter[cumsum >= cutoff].select(c)[0].item()
 
                 self.impute_values_[c] = median
 
         else:
             for c in self.columns:
-                self.impute_values_[c] = X[c].median()
+                self.impute_values_[c] = X.select(nw.median(c)).item()
 
         return self
 
