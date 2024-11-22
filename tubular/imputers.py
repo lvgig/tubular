@@ -192,6 +192,7 @@ class MedianImputer(BaseImputer, WeightColumnMixin):
 
         WeightColumnMixin.check_and_set_weight(self, weights_column)
 
+    @nw.narwhalify
     def fit(self, X: FrameT, y: nw.Series | None = None) -> FrameT:
         """Calculate median values to impute with from X.
 
@@ -213,11 +214,11 @@ class MedianImputer(BaseImputer, WeightColumnMixin):
 
             for c in self.columns:
                 # filter out null rows so their weight doesn't influence calc
-                filtered = X.filter(nw.col(c).is_not_null())
+                filtered = X.filter(~nw.col(c).is_null())
 
                 # below algorithm only works for >1 non null values
                 if len(filtered) <= 0:
-                    median = np.nan
+                    median = None
 
                 else:
                     # first sort df by column to be imputed (order of weight column shouldn't matter for median)
@@ -230,13 +231,26 @@ class MedianImputer(BaseImputer, WeightColumnMixin):
                     cutoff = filtered[self.weights_column].sum() / 2.0
 
                     # find first value >= this point
-                    median = filtered.filter[cumsum >= cutoff].select(c)[0].item()
+                    median = filtered.filter(cumsum >= cutoff).select(c)[0].item()
 
                 self.impute_values_[c] = median
 
         else:
             for c in self.columns:
-                self.impute_values_[c] = X.select(nw.median(c)).item()
+                filtered = X.filter(~nw.col(c).is_null())
+
+                # need to return None not NaN
+                if len(filtered) <= 0:
+                    median = None
+
+                else:
+                    # why doesn't this work - median = X.select(nw.col(c).median()).item()
+                    # potential bug?
+                    X = nw.to_native(X)
+                    median = X[c].median()
+                    X = nw.from_native(X)
+
+                self.impute_values_[c] = median
 
         return self
 
