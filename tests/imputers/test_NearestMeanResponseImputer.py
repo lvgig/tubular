@@ -6,6 +6,7 @@ from tests.base_tests import (
     ColumnStrListInitTests,
     GenericFitTests,
     GenericTransformTests,
+    OtherBaseBehaviourTests,
 )
 from tests.imputers.test_BaseImputer import (
     GenericImputerTransformTests,
@@ -74,6 +75,18 @@ class TestTransform(
     GenericImputerTransformTests,
 ):
     """Tests for transformer.transform."""
+
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "NearestMeanResponseImputer"
+
+
+class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
+    """
+    Class to run tests for BaseTransformerBehaviour outside the three standard methods.
+
+    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    """
 
     @classmethod
     def setup_class(cls):

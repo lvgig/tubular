@@ -1,8 +1,9 @@
+import narwhals as nw
 import numpy as np
-import pandas as pd
-import test_aide as ta
+import pytest
 
 import tests.test_data as d
+from tests import utils as u
 from tests.base_tests import (
     ColumnStrListInitTests,
     GenericFitTests,
@@ -33,68 +34,77 @@ class TestFit(WeightColumnFitMixinTests, GenericFitTests):
     def setup_class(cls):
         cls.transformer_name = "MedianImputer"
 
-    def test_learnt_values(self):
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
+    def test_learnt_values(self, library):
         """Test that the impute values learnt during fit are expected."""
-        df = d.create_df_3()
-        df["d"] = np.nan
+        df = d.create_df_3(library=library)
 
-        x = MedianImputer(columns=["a", "b", "c", "d"])
+        df = nw.from_native(df)
+        native_namespace = nw.get_native_namespace(df)
 
-        x.fit(df)
-
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "impute_values_": {
-                    "a": df["a"].median(),
-                    "b": df["b"].median(),
-                    "c": df["c"].median(),
-                    "d": np.float64(np.nan),
-                },
-            },
-            msg="impute_values_ attribute",
+        # replace 'a' with all null values to trigger warning
+        df = df.with_columns(
+            nw.new_series(
+                name="d",
+                values=[None] * len(df),
+                native_namespace=native_namespace,
+            ),
         )
 
-    def test_learnt_values_weighted(self):
+        df = df.to_native()
+
+        transformer = MedianImputer(columns=["a", "b", "c", "d"])
+
+        transformer.fit(df)
+
+        assert transformer.impute_values_ == {
+            "a": df["a"].median(),
+            "b": df["b"].median(),
+            "c": df["c"].median(),
+            "d": None,
+        }, "impute_values_ attribute"
+
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
+    def test_learnt_values_weighted(self, library):
         """Test that the impute values learnt during fit are expected - when using weights."""
-        df = d.create_df_9()
-        df["d"] = np.nan
+        df = d.create_df_9(library=library)
 
-        df = pd.DataFrame(
-            {
-                "a": [1, 2, 4, 6],
-                "c": [3, 2, 4, 6],
-                "d": np.nan,
-            },
+        df = nw.from_native(df)
+        native_namespace = nw.get_native_namespace(df)
+
+        # replace 'a' with all null values to trigger warning
+        df = df.with_columns(
+            nw.new_series(
+                name="d",
+                values=[None] * len(df),
+                native_namespace=native_namespace,
+            ),
         )
 
-        x = MedianImputer(columns=["a", "d"], weights_column="c")
+        df = df.to_native()
 
-        x.fit(df)
+        transformer = MedianImputer(columns=["a", "d"], weights_column="c")
 
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "impute_values_": {
-                    "a": np.int64(4),
-                    "d": np.nan,
-                },
-            },
-            msg="impute_values_ attribute",
-        )
+        transformer.fit(df)
 
-    def test_fit_not_changing_data(self):
+        assert transformer.impute_values_ == {
+            "a": np.int64(4),
+            "d": None,
+        }, "impute_values_ attribute"
+
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
+    def test_fit_not_changing_data(self, library):
         """Test fit does not change X."""
-        df = d.create_df_1()
+        df = d.create_df_1(library=library)
 
-        x = MedianImputer(columns="a")
+        transformer = MedianImputer(columns="a")
 
-        x.fit(df)
+        transformer.fit(df)
 
-        ta.equality.assert_equal_dispatch(
-            expected=d.create_df_1(),
-            actual=df,
-            msg="Check X not changing during fit",
+        # Check whole dataframes
+        u.assert_frame_equal_dispatch(
+            d.create_df_1(library=library),
+            df,
         )
 
 
