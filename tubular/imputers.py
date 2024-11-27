@@ -209,48 +209,35 @@ class MedianImputer(BaseImputer, WeightColumnMixin):
 
         self.impute_values_ = {}
 
-        if self.weights_column is not None:
-            WeightColumnMixin.check_weights_column(self, X, self.weights_column)
+        for c in self.columns:
+            # filter out null rows so their weight doesn't influence calc
+            filtered = X.filter(~nw.col(c).is_null())
 
-            for c in self.columns:
-                # filter out null rows so their weight doesn't influence calc
-                filtered = X.filter(~nw.col(c).is_null())
+            # if column is only nulls, then median is None
+            if len(filtered) <= 0:
+                self.impute_values_[c] = None
 
-                # below algorithm only works for >1 non null values
-                if len(filtered) <= 0:
-                    median = None
+            elif self.weights_column is not None:
+                WeightColumnMixin.check_weights_column(self, X, self.weights_column)
 
-                else:
-                    # first sort df by column to be imputed (order of weight column shouldn't matter for median)
-                    filtered = filtered.sort(c)
+                # first sort df by column to be imputed (order of weight column shouldn't matter for median)
+                filtered = filtered.sort(c)
 
-                    # next calculate cumulative weight sums
-                    cumsum = filtered[self.weights_column].cum_sum()
+                # next calculate cumulative weight sums
+                cumsum = filtered[self.weights_column].cum_sum()
 
-                    # find midpoint
-                    cutoff = filtered[self.weights_column].sum() / 2.0
+                # find midpoint
+                cutoff = filtered[self.weights_column].sum() / 2.0
 
-                    # find first value >= this point
-                    median = filtered.filter(cumsum >= cutoff).select(c)[0].item()
+                # find first value >= this point
+                median = filtered.filter(cumsum >= cutoff).select(c)[0].item()
 
+                # impute value is weighted median
                 self.impute_values_[c] = median
 
-        else:
-            for c in self.columns:
-                filtered = X.filter(~nw.col(c).is_null())
-
-                # need to return None not NaN
-                if len(filtered) <= 0:
-                    median = None
-
-                else:
-                    # why doesn't this work - median = X.select(nw.col(c).median()).item()
-                    # potential bug?
-                    X = nw.to_native(X)
-                    median = X[c].median()
-                    X = nw.from_native(X)
-
-                self.impute_values_[c] = median
+            else:
+                # impute value is median without considering weight
+                self.impute_values_[c] = X.select(nw.col(c).median()).item()
 
         return self
 
