@@ -26,7 +26,9 @@ Changed
 - Converted test dfs to flexible pandas/polars setup
 - Converted BaseNominalTransformer to utilise narwhals `#334 <https://github.com/lvgig/tubular/issues/334>_`
 - narwhalified CheckNumericMixin `#336 <https://github.com/lvgig/tubular/issues/336>_`
-- placeholder
+- Changed behaviour of NearestMeanResponseImputer so that if there are no nulls at fit, 
+  it warns and has no effect at transform, as opposed to erroring. The error was problematic for e.g.
+  lightweight test runs where nulls are less likely to be present.
 - placeholder
 - placeholder
 - placeholder
