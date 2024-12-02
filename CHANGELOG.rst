@@ -16,7 +16,19 @@ Subsections for each version can be one of the following;
 
 Each individual change should have a link to the pull request after the description of the change.
 
-1.4.1 (unreleased)
+1.4.2 (unreleased)
+------------------
+
+Changed
+^^^^^^^
+
+- placeholder
+- placeholder
+- placeholder
+- placeholder
+- placeholder
+
+1.4.1 (02/12/2024)
 ------------------
 
 Changed
@@ -26,11 +38,9 @@ Changed
 - Converted test dfs to flexible pandas/polars setup
 - Converted BaseNominalTransformer to utilise narwhals `#334 <https://github.com/lvgig/tubular/issues/334>_`
 - narwhalified CheckNumericMixin `#336 <https://github.com/lvgig/tubular/issues/336>_`
-- placeholder
-- placeholder
-- placeholder
-- placeholder
-- placeholder
+- Changed behaviour of NearestMeanResponseImputer so that if there are no nulls at fit, 
+  it warns and has no effect at transform, as opposed to erroring. The error was problematic for e.g.
+  lightweight test runs where nulls are less likely to be present.
 
 1.4.0 (2024-10-15)
 ------------------
