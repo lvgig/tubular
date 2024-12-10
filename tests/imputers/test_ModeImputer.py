@@ -47,16 +47,34 @@ class TestFit(WeightColumnFitMixinTests, GenericFitTests):
     )
     def test_learnt_values(self, library):
         """Test that the impute values learnt during fit are expected."""
-        df = d.create_df_6(library=library)
 
-        x = ModeImputer(columns=["a", "b", "c"])
+        df_dict = {
+            # skipping int, as non-nullable for pandas
+            # float
+            "float_col": [1.0, 2.0, 1.0, None, 3.0],
+            # str
+            "str_col": ["a", "b", "b", None, None],
+            # bool
+            "bool_col": [True, True, None, False, True],
+            # cat
+            "cat_col": ["b", "b", "d", "e", None],
+        }
+
+        df = dataframe_init_dispatch(df_dict, library=library)
+
+        # create categorical col
+        df = nw.from_native(df)
+        df = nw.to_native(df.with_columns(nw.col("cat_col").cast(nw.Categorical)))
+
+        x = ModeImputer(columns=["float_col", "str_col", "cat_col", "bool_col"])
 
         x.fit(df)
 
         expected_impute_values = {
-            "a": 2,
-            "b": "a",
-            "c": "f",
+            "float_col": 1.0,
+            "str_col": "b",
+            "cat_col": "b",
+            "bool_col": True,
         }
 
         assert (
@@ -69,19 +87,47 @@ class TestFit(WeightColumnFitMixinTests, GenericFitTests):
     )
     def test_learnt_values_tied(self, library):
         """Test that the impute values learnt during fit are expected - when mode is tied."""
-        df = d.create_df_3(library=library)
 
-        x = ModeImputer(columns=["a"])
+        df_dict = {
+            # skipping int, as non-nullable for pandas
+            # float
+            "float_col": [1.0, 2.0, 1.0, None, 2.0],
+            # str
+            "str_col": ["a", "b", "b", "a", None],
+            # bool
+            "bool_col": [True, True, None, False, False],
+            # cat
+            "cat_col": ["b", "b", "e", "e", None],
+        }
+
+        df = dataframe_init_dispatch(df_dict, library=library)
+
+        # create categorical col
+        df = nw.from_native(df)
+        df = nw.to_native(df.with_columns(nw.col("cat_col").cast(nw.Categorical)))
+
+        columns = ["float_col", "str_col", "cat_col", "bool_col"]
+        x = ModeImputer(columns=columns)
+
+        x.fit(df)
+
+        expected_impute_values = {
+            "float_col": 2.0,
+            "str_col": "b",
+            "cat_col": "e",
+            "bool_col": True,
+        }
 
         with pytest.warns(
             UserWarning,
-            match="ModeImputer: The Mode of column a is tied, will sort in descending order and return first candidate",
-        ):
+        ) as warnings:
             x.fit(df)
 
-        expected_impute_values = {
-            "a": 6,
-        }
+        for col, w in zip(columns, warnings):
+            assert (
+                w.message.args[0]
+                == f"ModeImputer: The Mode of column {col} is tied, will sort in descending order and return first candidate"
+            )
 
         assert (
             x.impute_values_ == expected_impute_values
@@ -91,39 +137,62 @@ class TestFit(WeightColumnFitMixinTests, GenericFitTests):
         "library",
         ["pandas", "polars"],
     )
-    def test_learnt_values_tied_weighted(self, library):
+    @pytest.mark.parametrize(
+        ("input_col", "weight_col", "learnt_value", "categorical"),
+        [
+            # float
+            ([1.0, 2.0, None], [2, 2, 2], 2.0, False),
+            # str
+            (["a", "b", "a", "b", None], [2, 1, 1, 2, 4], "b", False),
+            # bool
+            ([True, False, None], [4, 4, 1], True, False),
+            # cat
+            (["g", "g", "h", None], [2, 2, 4, 1], "h", True),
+        ],
+    )
+    def test_learnt_values_tied_weighted(
+        self,
+        library,
+        input_col,
+        weight_col,
+        learnt_value,
+        categorical,
+    ):
         """
         Test that the impute values learnt during fit are expected -
         when mode is tied and transformer is weighted.
         """
-        df = d.create_df_3(library=library)
+        df_dict = {
+            "col": input_col,
+            "weight": weight_col,
+        }
 
-        df = nw.from_native(df)
-        native_namespace = nw.get_native_namespace(df)
+        df = dataframe_init_dispatch(df_dict, library=library)
 
-        weights_column = "weights_column"
-        x = ModeImputer(columns=["a"], weights_column=weights_column)
+        if categorical:
+            # create categorical col
+            df = nw.from_native(df)
+            df = nw.to_native(df.with_columns(nw.col("col").cast(nw.Categorical)))
 
-        # setup weights column
-        df = df.with_columns(
-            nw.new_series(
-                name=weights_column,
-                values=[1] * len(df),
-                native_namespace=native_namespace,
-            ),
-        )
+        columns = ["col"]
+        x = ModeImputer(columns=columns, weights_column="weight")
 
-        df = nw.to_native(df)
+        x.fit(df)
+
+        expected_impute_values = {
+            "col": learnt_value,
+        }
 
         with pytest.warns(
             UserWarning,
-            match="ModeImputer: The Mode of column a is tied, will sort in descending order and return first candidate",
-        ):
+        ) as warnings:
             x.fit(df)
 
-        expected_impute_values = {
-            "a": 6,
-        }
+        for col, w in zip(columns, warnings):
+            assert (
+                w.message.args[0]
+                == f"ModeImputer: The Mode of column {col} is tied, will sort in descending order and return first candidate"
+            )
 
         assert (
             x.impute_values_ == expected_impute_values
@@ -192,19 +261,47 @@ class TestFit(WeightColumnFitMixinTests, GenericFitTests):
         "library",
         ["pandas", "polars"],
     )
-    def test_learnt_values_weighted_df(self, library):
+    @pytest.mark.parametrize(
+        ("input_col", "weight_col", "learnt_value", "categorical"),
+        [
+            # float
+            ([1.0, 2.0, 2.0, np.nan], [2, 2, 2, 1], 2.0, False),
+            # str
+            (["a", "b", "a", "b", None, "b"], [2, 1, 1, 2, 4, 3], "b", False),
+            # bool
+            ([True, False, None, True, True], [4, 4, 1, 1, 1], True, False),
+            # cat
+            (["a", "b", "c", "c", None], [1, 2, 3, 4, 5], "c", True),
+        ],
+    )
+    def test_learnt_values_weighted_df(
+        self,
+        library,
+        input_col,
+        weight_col,
+        learnt_value,
+        categorical,
+    ):
         """Test that the impute values learnt during fit are expected when df is weighted."""
-        df = d.create_weighted_imputers_test_df(library=library)
+        df_dict = {
+            "col": input_col,
+            "weight": weight_col,
+        }
 
-        x = ModeImputer(columns=["a", "b", "c", "d"], weights_column="weights_column")
+        df = dataframe_init_dispatch(df_dict, library=library)
+
+        if categorical:
+            # create categorical col
+            df = nw.from_native(df)
+            df = nw.to_native(df.with_columns(nw.col("col").cast(nw.Categorical)))
+
+        columns = ["col"]
+        x = ModeImputer(columns=columns, weights_column="weight")
 
         x.fit(df)
 
         expected_impute_values = {
-            "a": np.float64(5.0),
-            "b": "e",
-            "c": "f",
-            "d": np.float64(1.0),
+            "col": learnt_value,
         }
 
         assert (

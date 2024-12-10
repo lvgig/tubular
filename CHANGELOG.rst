@@ -23,7 +23,7 @@ Changed
 ^^^^^^^
 
 - narwhalified ModeImputer `#321 <https://github.com/lvgig/tubular/issues/321>_`
-- placeholder
+- fixed issues with all null and nullable-bool column handling in dataframe_init_dispatch
 - placeholder
 - placeholder
 - placeholder
