@@ -55,7 +55,10 @@ class BaseImputer(BaseTransformer):
         X = nw.from_native(super().transform(X))
 
         new_col_expressions = [
-            nw.col(c).fill_null(value=self.impute_values_[c]) for c in self.columns
+            nw.col(c).fill_null(self.impute_values_[c])
+            if self.impute_values_[c]
+            else nw.col(c)
+            for c in self.columns
         ]
 
         return X.with_columns(
@@ -442,7 +445,8 @@ class NearestMeanResponseImputer(BaseImputer):
     ----------
     columns : None or str or list, default = None
         Columns to impute, if the default of None is supplied all columns in X are used
-        when the transform method is called.
+        when the transform method is called. If the column does not contain nulls at fit,
+        a warning will be issues and this transformer will have no effect on that column.
 
     Attributes
     ----------
@@ -496,26 +500,28 @@ class NearestMeanResponseImputer(BaseImputer):
             c_nulls = X.select(nw.col(c).is_null())[c]
 
             if c_nulls.sum() == 0:
-                msg = f"{self.classname()}: Column {c} has no missing values, cannot use this transformer."
-                raise ValueError(msg)
+                msg = f"{self.classname()}: Column {c} has no missing values, this transformer will have no effect for this column."
+                warnings.warn(msg, stacklevel=2)
+                self.impute_values_[c] = None
 
-            mean_response_by_levels = (
-                X_y.filter(~c_nulls).group_by(c).agg(nw.col(response_column).mean())
-            )
+            else:
+                mean_response_by_levels = (
+                    X_y.filter(~c_nulls).group_by(c).agg(nw.col(response_column).mean())
+                )
 
-            mean_response_nulls = X_y.filter(c_nulls)[response_column].mean()
+                mean_response_nulls = X_y.filter(c_nulls)[response_column].mean()
 
-            mean_response_by_levels = mean_response_by_levels.with_columns(
-                (nw.col(response_column) - mean_response_nulls)
-                .abs()
-                .alias("abs_diff_response"),
-            )
+                mean_response_by_levels = mean_response_by_levels.with_columns(
+                    (nw.col(response_column) - mean_response_nulls)
+                    .abs()
+                    .alias("abs_diff_response"),
+                )
 
-            # take first value having the minimum difference in terms of average response
-            self.impute_values_[c] = mean_response_by_levels.filter(
-                mean_response_by_levels["abs_diff_response"]
-                == mean_response_by_levels["abs_diff_response"].min(),
-            )[c].item(index=0)
+                # take first value having the minimum difference in terms of average response
+                self.impute_values_[c] = mean_response_by_levels.filter(
+                    mean_response_by_levels["abs_diff_response"]
+                    == mean_response_by_levels["abs_diff_response"].min(),
+                )[c].item(index=0)
 
         return self
 
