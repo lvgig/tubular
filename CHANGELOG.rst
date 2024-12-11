@@ -22,7 +22,7 @@ Each individual change should have a link to the pull request after the descript
 Changed
 ^^^^^^^
 
-- placeholder
+- updated WeightsColumnMixin to use new narwhals 'is_finite' method
 - placeholder
 - placeholder
 - placeholder
