@@ -23,7 +23,7 @@ Changed
 ^^^^^^^
 
 - converted DropOriginalMixin to narwhals `#352 <https://github.com/lvgig/tubular/issues/352>_`
-- placeholder
+- converted OneHotEncodingTransformer to narwhals `#355 <https://github.com/lvgig/tubular/issues/355>_`
 - placeholder
 - placeholder
 - placeholder
