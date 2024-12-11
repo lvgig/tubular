@@ -22,7 +22,9 @@ Each individual change should have a link to the pull request after the descript
 Changed
 ^^^^^^^
 
-- placeholder
+- narwhalified ModeImputer `#321 <https://github.com/lvgig/tubular/issues/321>_`
+- fixed issues with all null and nullable-bool column handling in dataframe_init_dispatch
+- added NaN error handling to WeightColumnMixin
 - placeholder
 - placeholder
 - placeholder
