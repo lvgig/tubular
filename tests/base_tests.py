@@ -586,6 +586,7 @@ class WeightColumnFitMixinTests:
         "bad_weight_value, expected_message",
         [
             (np.nan, "weight column must be non-null"),
+            (None, "weight column must be non-null"),
             (np.inf, "weight column must not contain infinite values."),
             (-np.inf, "weight column must be positive"),
             (-1, "weight column must be positive"),
