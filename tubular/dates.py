@@ -377,14 +377,12 @@ class DateDiffLeapYearTransformer(BaseDateTwoColumnTransformer):
         X[self.new_column_name] = X.apply(self.calculate_age, axis=1)
 
         # Drop original columns if self.drop_original is True
-        DropOriginalMixin.drop_original_column(
+        return DropOriginalMixin.drop_original_column(
             self,
             X,
             self.drop_original,
             self.columns,
         )
-
-        return X
 
 
 class DateDifferenceTransformer(BaseDateTwoColumnTransformer):
@@ -469,14 +467,12 @@ class DateDifferenceTransformer(BaseDateTwoColumnTransformer):
         ) / np.timedelta64(1, self.units)
 
         # Drop original columns if self.drop_original is True
-        DropOriginalMixin.drop_original_column(
+        return DropOriginalMixin.drop_original_column(
             self,
             X,
             self.drop_original,
             self.columns,
         )
-
-        return X
 
 
 class ToDatetimeTransformer(BaseGenericDateTransformer):
@@ -562,15 +558,12 @@ class ToDatetimeTransformer(BaseGenericDateTransformer):
             **self.to_datetime_kwargs,
         )
 
-        # Drop original columns if self.drop_original is True
-        DropOriginalMixin.drop_original_column(
+        return DropOriginalMixin.drop_original_column(
             self,
             X,
             self.drop_original,
             self.columns,
         )
-
-        return X
 
 
 class SeriesDtMethodTransformer(BaseDatetimeTransformer):
@@ -733,14 +726,12 @@ class SeriesDtMethodTransformer(BaseDatetimeTransformer):
             )
 
         # Drop original columns if self.drop_original is True
-        DropOriginalMixin.drop_original_column(
+        return DropOriginalMixin.drop_original_column(
             self,
             X,
             self.drop_original,
             self.columns,
         )
-
-        return X
 
 
 class BetweenDatesTransformer(BaseGenericDateTransformer):
@@ -886,14 +877,12 @@ class BetweenDatesTransformer(BaseGenericDateTransformer):
         X[self.new_column_name] = lower_comparison & upper_comparison
 
         # Drop original columns if self.drop_original is True
-        DropOriginalMixin.drop_original_column(
+        return DropOriginalMixin.drop_original_column(
             self,
             X,
             self.drop_original,
             self.columns,
         )
-
-        return X
 
 
 class DatetimeInfoExtractor(BaseDatetimeTransformer):
@@ -1168,14 +1157,12 @@ class DatetimeInfoExtractor(BaseDatetimeTransformer):
                 )
 
         # Drop original columns if self.drop_original is True
-        DropOriginalMixin.drop_original_column(
+        return DropOriginalMixin.drop_original_column(
             self,
             X,
             self.drop_original,
             self.columns,
         )
-
-        return X
 
 
 class DatetimeSinusoidCalculator(BaseDatetimeTransformer):
@@ -1383,11 +1370,9 @@ class DatetimeSinusoidCalculator(BaseDatetimeTransformer):
                 )
 
         # Drop original columns if self.drop_original is True
-        DropOriginalMixin.drop_original_column(
+        return DropOriginalMixin.drop_original_column(
             self,
             X,
             self.drop_original,
             self.columns,
         )
-
-        return X

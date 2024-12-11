@@ -9,7 +9,6 @@ import pandas as pd
 import polars as pl
 import pytest
 import sklearn.base as b
-import test_aide as ta
 
 from tests.utils import assert_frame_equal_dispatch
 
@@ -876,6 +875,11 @@ class DropOriginalTransformMixinTests:
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=["minimal_dataframe_lookup"],
+    )
     def test_original_columns_dropped_when_specified(
         self,
         initialized_transformers,
@@ -887,15 +891,24 @@ class DropOriginalTransformMixinTests:
 
         x = initialized_transformers[self.transformer_name]
 
+        # skip polars test if not narwhalified
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
+            return
+
         x.drop_original = True
 
         x.fit(df)
 
         df_transformed = x.transform(df)
-        remaining_cols = df_transformed.columns.to_numpy()
+        remaining_cols = df_transformed.columns
         for col in x.columns:
             assert col not in remaining_cols, "original columns not dropped"
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=["minimal_dataframe_lookup"],
+    )
     def test_original_columns_kept_when_specified(
         self,
         initialized_transformers,
@@ -907,15 +920,24 @@ class DropOriginalTransformMixinTests:
 
         x = initialized_transformers[self.transformer_name]
 
+        # skip polars test if not narwhalified
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
+            return
+
         x.drop_original = False
 
         x.fit(df)
 
         df_transformed = x.transform(df)
-        remaining_cols = df_transformed.columns.to_numpy()
+        remaining_cols = df_transformed.columns
         for col in x.columns:
             assert col in remaining_cols, "original columns not kept"
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=["minimal_dataframe_lookup"],
+    )
     def test_other_columns_not_modified(
         self,
         initialized_transformers,
@@ -927,6 +949,10 @@ class DropOriginalTransformMixinTests:
 
         x = initialized_transformers[self.transformer_name]
 
+        # skip polars test if not narwhalified
+        if not x.polars_compatible and isinstance(df, pl.DataFrame):
+            return
+
         other_columns = list(set(df.columns) - set(x.columns))
         x.drop_original = True
 
@@ -934,11 +960,7 @@ class DropOriginalTransformMixinTests:
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_equal_dispatch(
-            expected=df[other_columns],
-            actual=df_transformed[other_columns],
-            msg=f"{self.transformer_name}.transform has changed other columns unexpectedly",
-        )
+        assert_frame_equal_dispatch(df[other_columns], df_transformed[other_columns])
 
 
 class ColumnsCheckTests:
