@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import narwhals as nw
 import narwhals.selectors as ncs
+import numpy as np
 
 if TYPE_CHECKING:
     import pandas as pd
