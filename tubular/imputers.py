@@ -270,7 +270,7 @@ class MeanImputer(WeightColumnMixin, BaseImputer):
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     FITS = True
 
@@ -284,7 +284,8 @@ class MeanImputer(WeightColumnMixin, BaseImputer):
 
         WeightColumnMixin.check_and_set_weight(self, weights_column)
 
-    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
+    @nw.narwhalify
+    def fit(self, X: FrameT, y: nw.Series | None = None) -> MeanImputer:
         """Calculate mean values to impute with from X.
 
         Parameters
@@ -305,13 +306,13 @@ class MeanImputer(WeightColumnMixin, BaseImputer):
 
             for c in self.columns:
                 # filter out null rows so they don't count towards total weight
-                filtered = X[X[c].notna()]
+                filtered = X.filter(~nw.col(c).is_null())
 
                 # calculate total weight and total of weighted col
-                total_weight = filtered[self.weights_column].sum()
-                total_weighted_col = (
-                    filtered[c].mul(filtered[self.weights_column]).sum()
-                )
+                total_weight = filtered.select(nw.col(self.weights_column).sum()).item()
+                total_weighted_col = filtered.select(
+                    (nw.col(c) * nw.col(self.weights_column)).sum(),
+                ).item()
 
                 # find weighted mean and add to dict
                 weighted_mean = total_weighted_col / total_weight
@@ -320,7 +321,7 @@ class MeanImputer(WeightColumnMixin, BaseImputer):
 
         else:
             for c in self.columns:
-                self.impute_values_[c] = X[c].mean()
+                self.impute_values_[c] = X.select(nw.col(c).mean()).item()
 
         return self
 

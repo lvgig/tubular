@@ -25,7 +25,7 @@ Changed
 - narwhalified ModeImputer `#321 <https://github.com/lvgig/tubular/issues/321>_`
 - fixed issues with all null and nullable-bool column handling in dataframe_init_dispatch
 - added NaN error handling to WeightColumnMixin
-- placeholder
+- narwhalified MeanImputer `#344 https://github.com/lvgig/tubular/issues/344_`
 - placeholder
 - placeholder
 - placeholder
