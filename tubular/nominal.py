@@ -1299,7 +1299,7 @@ class OneHotEncodingTransformer(
             )
 
         # Drop original columns if self.drop_original is True
-        DropOriginalMixin.drop_original_column(
+        X = DropOriginalMixin.drop_original_column(
             self,
             X,
             self.drop_original,
