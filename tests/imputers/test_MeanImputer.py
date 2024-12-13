@@ -1,5 +1,4 @@
-import numpy as np
-import test_aide as ta
+import pytest
 
 import tests.test_data as d
 from tests.base_tests import (
@@ -32,44 +31,42 @@ class TestFit(WeightColumnFitMixinTests, GenericFitTests):
     def setup_class(cls):
         cls.transformer_name = "MeanImputer"
 
-    def test_learnt_values(self):
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
+    def test_learnt_values(self, library):
         """Test that the impute values learnt during fit are expected."""
-        df = d.create_df_3()
+        df = d.create_df_3(library=library)
 
         x = MeanImputer(columns=["a", "b", "c"])
 
         x.fit(df)
 
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "impute_values_": {
-                    "a": df["a"].mean(),
-                    "b": df["b"].mean(),
-                    "c": df["c"].mean(),
-                },
-            },
-            msg="impute_values_ attribute",
-        )
+        expected_impute_values = {
+            "a": df["a"].mean(),
+            "b": df["b"].mean(),
+            "c": df["c"].mean(),
+        }
 
-    def test_learnt_values_weighted(self):
+        assert (
+            x.impute_values_ == expected_impute_values
+        ), f"impute_values_attr not as expected, expected {expected_impute_values} but got {x.impute_values_}"
+
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
+    def test_learnt_values_weighted(self, library):
         """Test that the impute values learnt during fit are expected - when weights are used."""
-        df = d.create_df_9()
+        df = d.create_df_9(library=library)
 
         x = MeanImputer(columns=["a", "b"], weights_column="c")
 
         x.fit(df)
 
-        ta.classes.test_object_attributes(
-            obj=x,
-            expected_attributes={
-                "impute_values_": {
-                    "a": np.float64((3 + 4 + 16 + 36) / (3 + 2 + 4 + 6)),
-                    "b": np.float64((10 + 4 + 12 + 10 + 6) / (2 + 1 + 4 + 5 + 6)),
-                },
-            },
-            msg="impute_values_ attribute",
-        )
+        expected_impute_values = {
+            "a": (3 + 4 + 16 + 36) / (3 + 2 + 4 + 6),
+            "b": (10 + 4 + 12 + 10 + 6) / (2 + 1 + 4 + 5 + 6),
+        }
+
+        assert (
+            x.impute_values_ == expected_impute_values
+        ), f"learnt impute_values_ attr not as expected, expected {expected_impute_values} but got {x.impute_values_}"
 
 
 class TestTransform(

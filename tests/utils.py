@@ -4,8 +4,23 @@ from narwhals.typing import FrameT
 from pandas.testing import assert_frame_equal as assert_pandas_frame_equal
 from polars.testing import assert_frame_equal as assert_polars_frame_equal
 
+PANDAS_TO_POLARS_TYPES = {
+    "int64": pl.Int64,
+    "int32": pl.Int32,
+    "int16": pl.Int16,
+    "int8": pl.Int8,
+    "float64": pl.Float64,
+    "float32": pl.Float32,
+    "object": pl.Utf8,
+    "str": pl.String,
+    "bool": pl.Boolean,
+    "datetime64[ns]": pl.Datetime,
+    # this is not a pandas type, but include to help manage null column handling
+    "null": pl.Null,
+}
 
-def align_pandas_and_polars_dtypes(
+
+def _align_pandas_and_polars_dtypes(
     pandas_df: pd.DataFrame,
     polars_df: pl.DataFrame,
 ) -> pl.DataFrame:
@@ -27,21 +42,21 @@ def align_pandas_and_polars_dtypes(
 
     """
 
-    PANDAS_TO_POLARS_TYPES = {
-        "int64": pl.Int64,
-        "int32": pl.Int32,
-        "int16": pl.Int16,
-        "int8": pl.Int8,
-        "float64": pl.Float64,
-        "float32": pl.Float32,
-        "object": pl.Utf8,
-        "str": pl.String,
-        "bool": pl.Boolean,
-        "datetime64[ns]": pl.Datetime,
-    }
-
     for col in pandas_df:
         pandas_col_type = str(pandas_df[col].dtype)
+
+        # pandas would assign dtype object to bools with nulls, but have values like True
+        # it would also assign all null cols to object, but have values like None
+        # creating a polars col with object type would give values like 'true', 'none'
+        # overwrite these cases for better handling
+        if pandas_col_type == "object":
+            if pandas_df[col].notna().sum() == 0:
+                pandas_col_type = "null"
+
+            # check if all non-null values are bool
+            elif sum(isinstance(value, bool) for value in pandas_df[col] if value):
+                pandas_col_type = "bool"
+
         polars_col_type = PANDAS_TO_POLARS_TYPES[pandas_col_type]
         polars_df = polars_df.with_columns(polars_df[col].cast(polars_col_type))
 
@@ -97,7 +112,7 @@ def dataframe_init_dispatch(
     if library == "polars":
         polars_df = pl.DataFrame(dataframe_dict)
 
-        return align_pandas_and_polars_dtypes(pandas_df, polars_df)
+        return _align_pandas_and_polars_dtypes(pandas_df, polars_df)
 
     library_error_message = (
         "The library parameter should be either 'pandas' or 'polars'."

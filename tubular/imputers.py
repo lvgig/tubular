@@ -6,7 +6,6 @@ import warnings
 from typing import TYPE_CHECKING
 
 import narwhals as nw
-import numpy as np
 import pandas as pd
 
 from tubular.base import BaseTransformer
@@ -55,7 +54,10 @@ class BaseImputer(BaseTransformer):
         X = nw.from_native(super().transform(X))
 
         new_col_expressions = [
-            nw.col(c).fill_null(self.impute_values_[c]) for c in self.columns
+            nw.col(c).fill_null(self.impute_values_[c])
+            if self.impute_values_[c]
+            else nw.col(c)
+            for c in self.columns
         ]
 
         return X.with_columns(
@@ -268,7 +270,7 @@ class MeanImputer(WeightColumnMixin, BaseImputer):
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     FITS = True
 
@@ -282,7 +284,8 @@ class MeanImputer(WeightColumnMixin, BaseImputer):
 
         WeightColumnMixin.check_and_set_weight(self, weights_column)
 
-    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
+    @nw.narwhalify
+    def fit(self, X: FrameT, y: nw.Series | None = None) -> MeanImputer:
         """Calculate mean values to impute with from X.
 
         Parameters
@@ -303,13 +306,13 @@ class MeanImputer(WeightColumnMixin, BaseImputer):
 
             for c in self.columns:
                 # filter out null rows so they don't count towards total weight
-                filtered = X[X[c].notna()]
+                filtered = X.filter(~nw.col(c).is_null())
 
                 # calculate total weight and total of weighted col
-                total_weight = filtered[self.weights_column].sum()
-                total_weighted_col = (
-                    filtered[c].mul(filtered[self.weights_column]).sum()
-                )
+                total_weight = filtered.select(nw.col(self.weights_column).sum()).item()
+                total_weighted_col = filtered.select(
+                    (nw.col(c) * nw.col(self.weights_column)).sum(),
+                ).item()
 
                 # find weighted mean and add to dict
                 weighted_mean = total_weighted_col / total_weight
@@ -318,7 +321,7 @@ class MeanImputer(WeightColumnMixin, BaseImputer):
 
         else:
             for c in self.columns:
-                self.impute_values_[c] = X[c].mean()
+                self.impute_values_[c] = X.select(nw.col(c).mean()).item()
 
         return self
 
@@ -352,7 +355,7 @@ class ModeImputer(BaseImputer, WeightColumnMixin):
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     FITS = True
 
@@ -366,15 +369,17 @@ class ModeImputer(BaseImputer, WeightColumnMixin):
 
         WeightColumnMixin.check_and_set_weight(self, weights_column)
 
-    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
-        """Calculate mode values to impute with from X.
+    @nw.narwhalify
+    def fit(self, X: FrameT, y: nw.Series | None = None) -> FrameT:
+        """Calculate mode values to impute with from X - in the event of a tie,
+        the highest modal value will be returned.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Data to "learn" the mode values from.
 
-        y : None or pd.DataFrame or pd.Series, default = None
+        y : None or pd/pl.DataFrame or pd/pl.Series, default = None
             Not required.
 
         """
@@ -382,37 +387,53 @@ class ModeImputer(BaseImputer, WeightColumnMixin):
 
         self.impute_values_ = {}
 
-        if self.weights_column is None:
-            for c in self.columns:
-                mode_value = X[c].mode(dropna=True)
-
-                if len(mode_value) == 0:
-                    self.impute_values_[c] = np.nan
-
-                    warnings.warn(
-                        f"ModeImputer: The Mode of column {c} is NaN.",
-                        stacklevel=2,
-                    )
-
-                else:
-                    self.impute_values_[c] = mode_value[0]
+        if self.weights_column:
+            # pull this out of loop to only check weights once
+            WeightColumnMixin.check_weights_column(self, X, self.weights_column)
+            weights_column = self.weights_column
 
         else:
-            WeightColumnMixin.check_weights_column(self, X, self.weights_column)
+            weights_column = "dummy_unit_weights"
+            native_namespace = nw.get_native_namespace(X)
+            X = X.with_columns(
+                nw.new_series(
+                    name=weights_column,
+                    values=[1] * len(X),
+                    native_namespace=native_namespace,
+                ),
+            )
 
-            for c in self.columns:
-                grouped = X.groupby(c)[self.weights_column].sum()
+        for c in self.columns:
+            level_weights = (
+                X.filter(~nw.col(c).is_null())
+                .group_by(c)
+                .agg(
+                    nw.col(weights_column).sum(),
+                )
+            )
 
-                if grouped.isna().all():
+            if level_weights.is_empty():
+                self.impute_values_[c] = None
+
+                warnings.warn(
+                    f"ModeImputer: The Mode of column {c} is None",
+                    stacklevel=2,
+                )
+
+            else:
+                max_weight = level_weights.select(nw.col(weights_column).max()).item()
+
+                mode_values = level_weights.filter(
+                    nw.col(weights_column) == max_weight,
+                ).sort(by=c, descending=True)
+
+                if len(mode_values) > 1:
                     warnings.warn(
-                        f"ModeImputer: The Mode of column {c} is NaN.",
+                        f"ModeImputer: The Mode of column {c} is tied, will sort in descending order and return first candidate",
                         stacklevel=2,
                     )
 
-                    self.impute_values_[c] = np.nan
-
-                else:
-                    self.impute_values_[c] = grouped.idxmax()
+                self.impute_values_[c] = mode_values.item(row=0, column=0)
 
         return self
 
@@ -425,7 +446,8 @@ class NearestMeanResponseImputer(BaseImputer):
     ----------
     columns : None or str or list, default = None
         Columns to impute, if the default of None is supplied all columns in X are used
-        when the transform method is called.
+        when the transform method is called. If the column does not contain nulls at fit,
+        a warning will be issues and this transformer will have no effect on that column.
 
     Attributes
     ----------
@@ -479,26 +501,28 @@ class NearestMeanResponseImputer(BaseImputer):
             c_nulls = X.select(nw.col(c).is_null())[c]
 
             if c_nulls.sum() == 0:
-                msg = f"{self.classname()}: Column {c} has no missing values, cannot use this transformer."
-                raise ValueError(msg)
+                msg = f"{self.classname()}: Column {c} has no missing values, this transformer will have no effect for this column."
+                warnings.warn(msg, stacklevel=2)
+                self.impute_values_[c] = None
 
-            mean_response_by_levels = (
-                X_y.filter(~c_nulls).group_by(c).agg(nw.col(response_column).mean())
-            )
+            else:
+                mean_response_by_levels = (
+                    X_y.filter(~c_nulls).group_by(c).agg(nw.col(response_column).mean())
+                )
 
-            mean_response_nulls = X_y.filter(c_nulls)[response_column].mean()
+                mean_response_nulls = X_y.filter(c_nulls)[response_column].mean()
 
-            mean_response_by_levels = mean_response_by_levels.with_columns(
-                (nw.col(response_column) - mean_response_nulls)
-                .abs()
-                .alias("abs_diff_response"),
-            )
+                mean_response_by_levels = mean_response_by_levels.with_columns(
+                    (nw.col(response_column) - mean_response_nulls)
+                    .abs()
+                    .alias("abs_diff_response"),
+                )
 
-            # take first value having the minimum difference in terms of average response
-            self.impute_values_[c] = mean_response_by_levels.filter(
-                mean_response_by_levels["abs_diff_response"]
-                == mean_response_by_levels["abs_diff_response"].min(),
-            )[c].item(index=0)
+                # take first value having the minimum difference in terms of average response
+                self.impute_values_[c] = mean_response_by_levels.filter(
+                    mean_response_by_levels["abs_diff_response"]
+                    == mean_response_by_levels["abs_diff_response"].min(),
+                )[c].item(index=0)
 
         return self
 
