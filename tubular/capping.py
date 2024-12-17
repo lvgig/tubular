@@ -360,11 +360,11 @@ class BaseCappingTransformer(BaseNumericTransformer, WeightColumnMixin):
         """
         quantiles = np.array(quantiles)
 
-        nan_filter = X.select(~nw.col(values_column).is_null())
+        nan_filter = ~(nw.col(values_column).is_null())
         X = X.filter(nan_filter)
 
-        zero_weight_filter = X.select(~nw.col(weights_column) == 0)
-        X.filter(zero_weight_filter)
+        zero_weight_filter = ~(nw.col(weights_column) == 0)
+        X = X.filter(zero_weight_filter)
 
         X = X.sort(by=values_column, descending=False)
 
@@ -374,8 +374,9 @@ class BaseCappingTransformer(BaseNumericTransformer, WeightColumnMixin):
 
         # TODO - once narwhals implements interpolate, replace this with nw
         # syntax
-        weighted_quantiles = weighted_quantiles.to_numpy()
+        weighted_quantiles = weighted_quantiles.get_column(weights_column).to_numpy()
         values = X.get_column(values_column).to_numpy()
+
         return list(np.interp(quantiles, weighted_quantiles, values))
 
     @nw.narwhalify
