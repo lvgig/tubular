@@ -1,10 +1,11 @@
 import re
 
-import pandas as pd
+import narwhals as nw
 import pytest
 
 import tests.test_data as d
 from tests.base_tests import GenericFitTests, GenericInitTests, GenericTransformTests
+from tests.utils import dataframe_init_dispatch
 
 
 class BaseNumericTransformerInitTests(GenericInitTests):
@@ -20,6 +21,7 @@ class BaseNumericTransformerFitTests(GenericFitTests):
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     @pytest.mark.parametrize(
         ("df_generator", "bad_cols"),
         [
@@ -34,11 +36,21 @@ class BaseNumericTransformerFitTests(GenericFitTests):
         initialized_transformers,
         df_generator,
         bad_cols,
+        library,
     ):
         """Test an exception is raised if self.columns are non-numeric in X."""
-        df = df_generator()
+        df = df_generator(library=library)
+
         # add in 'target column' for fit
-        df["c"] = [1] * len(df)
+        df = nw.from_native(df)
+        native_namespace = nw.get_native_namespace(df)
+        df = df.with_columns(
+            nw.new_series(
+                name="c",
+                values=[1] * len(df),
+                native_namespace=native_namespace,
+            ),
+        ).to_native()
 
         x = initialized_transformers[self.transformer_name]
         x.columns = bad_cols
@@ -51,6 +63,7 @@ class BaseNumericTransformerFitTests(GenericFitTests):
         ):
             x.fit(df, df["c"])
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     @pytest.mark.parametrize(
         ("df_generator", "cols"),
         [
@@ -59,11 +72,25 @@ class BaseNumericTransformerFitTests(GenericFitTests):
             (d.create_df_with_none_and_nan_cols, ["a"]),  # nan
         ],
     )
-    def test_numeric_passes(self, initialized_transformers, df_generator, cols):
+    def test_numeric_passes(
+        self,
+        initialized_transformers,
+        df_generator,
+        cols,
+        library,
+    ):
         """Test check passes if self.columns numeric in X."""
-        df = df_generator()
+        df = df_generator(library=library)
         # add in 'target column' for fit
-        df["c"] = [1] * len(df)
+        df = nw.from_native(df)
+        native_namespace = nw.get_native_namespace(df)
+        df = df.with_columns(
+            nw.new_series(
+                name="c",
+                values=[1] * len(df),
+                native_namespace=native_namespace,
+            ),
+        ).to_native()
 
         x = initialized_transformers[self.transformer_name]
         x.columns = cols
@@ -79,6 +106,7 @@ class BaseNumericTransformerTransformTests(
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     @pytest.mark.parametrize(
         ("df_generator", "bad_cols"),
         [
@@ -93,11 +121,20 @@ class BaseNumericTransformerTransformTests(
         initialized_transformers,
         df_generator,
         bad_cols,
+        library,
     ):
         """Test an exception is raised if self.columns are non-numeric in X."""
-        df = df_generator()
+        df = df_generator(library=library)
         # add in 'target column' for and additional numeric column fit
-        df["c"] = [1] * len(df)
+        df = nw.from_native(df)
+        native_namespace = nw.get_native_namespace(df)
+        df = df.with_columns(
+            nw.new_series(
+                name="c",
+                values=[1] * len(df),
+                native_namespace=native_namespace,
+            ),
+        ).to_native()
 
         x = initialized_transformers[self.transformer_name]
         x.columns = bad_cols
@@ -105,7 +142,11 @@ class BaseNumericTransformerTransformTests(
         # if the transformer fits, run a working fit before transform
         if x.FITS:
             # create numeric df to fit on
-            numeric_df = pd.DataFrame({col: df["c"] for col in [*x.columns, "c"]})
+            df_dict = {col: df["c"] for col in [*x.columns, "c"]}
+            numeric_df = dataframe_init_dispatch(
+                dataframe_dict=df_dict,
+                library=library,
+            )
             x.fit(numeric_df, numeric_df["c"])
 
         with pytest.raises(
@@ -116,6 +157,7 @@ class BaseNumericTransformerTransformTests(
         ):
             x.transform(df)
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     @pytest.mark.parametrize(
         ("df_generator"),
         [
@@ -124,19 +166,35 @@ class BaseNumericTransformerTransformTests(
             d.create_df_with_none_and_nan_cols,  # nan
         ],
     )
-    def test_numeric_passes(self, initialized_transformers, df_generator):
+    def test_numeric_passes(self, initialized_transformers, df_generator, library):
         """Test check passes if self.columns numeric in X."""
-        df = df_generator()
+        df = df_generator(library=library)
         # add in 'target column' for and additional numeric column fit
-        df["c"] = [1] * len(df)
-        df["b"] = [1] * len(df)
+        df = nw.from_native(df)
+        native_namespace = nw.get_native_namespace(df)
+        df = df.with_columns(
+            nw.new_series(
+                name="c",
+                values=[1] * len(df),
+                native_namespace=native_namespace,
+            ),
+            nw.new_series(
+                name="b",
+                values=[1] * len(df),
+                native_namespace=native_namespace,
+            ),
+        ).to_native()
 
         x = initialized_transformers[self.transformer_name]
         x.columns = ["a", "b"]
 
         if x.FITS:
             # create numeric df to fit on
-            numeric_df = pd.DataFrame({col: df["c"] for col in [*x.columns, "c"]})
+            df_dict = {col: df["c"] for col in [*x.columns, "c"]}
+            numeric_df = dataframe_init_dispatch(
+                dataframe_dict=df_dict,
+                library=library,
+            )
             x.fit(numeric_df, numeric_df["c"])
 
         x.transform(df)

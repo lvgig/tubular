@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+import narwhals as nw
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
@@ -19,6 +22,9 @@ from tubular.mixins import (
     NewColumnNameMixin,
     TwoColumnMixin,
 )
+
+if TYPE_CHECKING:
+    from narwhals.typing import FrameT
 
 
 class BaseNumericTransformer(BaseTransformer, CheckNumericMixin):
@@ -45,23 +51,24 @@ class BaseNumericTransformer(BaseTransformer, CheckNumericMixin):
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     FITS = False
 
     def __init__(self, columns: list[str], **kwargs: dict[str, bool]) -> None:
         super().__init__(columns=columns, **kwargs)
 
+    @nw.narwhalify
     def fit(
         self,
-        X: pd.DataFrame,
-        y: pd.Series | None = None,
+        X: FrameT,
+        y: nw.Series | None = None,
     ) -> BaseNumericTransformer:
         """Base fit method. Validates data and attributes prior to the child objects fit logic.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             A dataframe containing the required columns
 
         y : None
@@ -75,17 +82,18 @@ class BaseNumericTransformer(BaseTransformer, CheckNumericMixin):
 
         return self
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+    @nw.narwhalify
+    def transform(self, X: FrameT) -> FrameT:
         """Base transform method. Validates data and attributes prior to the child objects tranform logic.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Data to transform.
 
         Returns
         -------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Validated data
 
         """
