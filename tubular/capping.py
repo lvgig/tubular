@@ -110,6 +110,9 @@ class BaseCappingTransformer(BaseNumericTransformer, WeightColumnMixin):
         self.capping_values = capping_values
         WeightColumnMixin.check_and_set_weight(self, weights_column)
 
+        if capping_values:
+            self._replacement_values = copy.deepcopy(self.capping_values)
+
     def check_capping_values_dict(
         self,
         capping_values_dict: dict[str, list[int | float | None]],
@@ -214,6 +217,8 @@ class BaseCappingTransformer(BaseNumericTransformer, WeightColumnMixin):
                 )
 
                 self.quantile_capping_values[col] = cap_values
+
+                self._replacement_values = copy.deepcopy(self.quantile_capping_values)
 
         else:
             warnings.warn(
@@ -398,7 +403,7 @@ class BaseCappingTransformer(BaseNumericTransformer, WeightColumnMixin):
 
         """
 
-        X = super().transform(X)
+        X = nw.from_native(super().transform(X))
 
         self.check_is_fitted(["_replacement_values"])
 
@@ -498,9 +503,6 @@ class CappingTransformer(BaseCappingTransformer):
     ) -> None:
         super().__init__(capping_values, quantiles, weights_column, **kwargs)
 
-        if capping_values:
-            self._replacement_values = copy.deepcopy(self.capping_values)
-
     def fit(self, X: pd.DataFrame, y: None = None) -> CappingTransformer:
         """Learn capping values from input data X.
 
@@ -518,9 +520,6 @@ class CappingTransformer(BaseCappingTransformer):
 
         """
         super().fit(X, y)
-
-        if self.quantiles is not None:
-            self._replacement_values = copy.deepcopy(self.quantile_capping_values)
 
         return self
 

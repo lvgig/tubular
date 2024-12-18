@@ -2,7 +2,6 @@ import re
 
 import narwhals as nw
 import numpy as np
-import pandas as pd
 import polars as pl
 import pytest
 
@@ -238,10 +237,12 @@ class GenericCappingFitTests(WeightColumnFitMixinTests, GenericFitTests):
     def setup_class(cls):
         cls.transformer_name = "BaseCappingTransformer"
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     def test_quantiles_none_error(
         self,
         minimal_attribute_dict,
         uninitialized_transformers,
+        library,
     ):
         """Test that a warning is raised if quantiles is None when fit is run."""
 
@@ -250,14 +251,19 @@ class GenericCappingFitTests(WeightColumnFitMixinTests, GenericFitTests):
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
+        df = d.create_df_3(library=library)
+
+        # if transformer is not polars compatible, skip polars test
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
+
         with pytest.warns(
             UserWarning,
             match=f"{self.transformer_name}: quantiles not set so no fitting done",
         ):
-            df = d.create_df_3()
-
             transformer.fit(df)
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     @pytest.mark.parametrize(
         ("values", "sample_weight", "quantiles", "expected_quantiles"),
         # quantiles use linear interpolation, which is manually replicated here where needed
@@ -299,6 +305,7 @@ class GenericCappingFitTests(WeightColumnFitMixinTests, GenericFitTests):
         expected_quantiles,
         minimal_attribute_dict,
         uninitialized_transformers,
+        library,
     ):
         """Test that weighted_quantile gives the expected outputs."""
 
@@ -309,15 +316,20 @@ class GenericCappingFitTests(WeightColumnFitMixinTests, GenericFitTests):
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
-        if not sample_weight:
-            sample_weight = [1] * len(values)
+        df_dict = {
+            "a": values,
+        }
+        if sample_weight:
+            df_dict["w"] = sample_weight
 
-        df = pd.DataFrame(
-            {
-                "a": values,
-                "w": sample_weight,
-            },
-        )
+        else:
+            transformer.weights_column = None
+
+        df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
+
+        # if transformer is not polars compatible, skip polars test
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
         transformer.fit(df)
 
@@ -434,7 +446,7 @@ class GenericCappingTransformTests(GenericTransformTests):
         """Test that transform will raise an error if a column to transform is not numeric."""
 
         args = minimal_attribute_dict[self.transformer_name].copy()
-        args["capping_values"] = {"c": [1, 2]}
+        args["capping_values"] = {"a": [1, 2]}
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
@@ -446,9 +458,20 @@ class GenericCappingTransformTests(GenericTransformTests):
 
         transformer.fit(df)
 
+        # convert column to non-numeric
+        df = nw.from_native(df)
+        native_namespace = nw.get_native_namespace(df)
+        df = df.with_columns(
+            nw.new_series(
+                name="a",
+                values=["a"] * len(df),
+                native_namespace=native_namespace,
+            ),
+        )
+
         with pytest.raises(
             TypeError,
-            match=rf"{self.transformer_name}: The following columns are not numeric in X; \['c'\]",
+            match=rf"{self.transformer_name}: The following columns are not numeric in X; \['a'\]",
         ):
             transformer.transform(df)
 
