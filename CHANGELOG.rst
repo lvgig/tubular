@@ -30,7 +30,7 @@ Changed
 - narwhalified BaseNumericTransformer `#358 <https://github.com/lvgig/tubular/issues/358>_`
 - narwhalified BaseCappingTransformer `#357 <https://github.com/lvgig/tubular/issues/357>_`
 - narwhalified CappingTransformer `#361 <https://github.com/lvgig/tubular/issues/361>_`
-- placeholder
+- narwhalified OutOfRangeNullTransformer `#362 <https://github.com/lvgig/tubular/issues/362>_`
 - placeholder
 - placeholder
 - placeholder
