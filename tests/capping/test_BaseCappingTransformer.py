@@ -443,10 +443,6 @@ class GenericCappingTransformTests(GenericTransformTests):
         df_transformed = transformer.transform(df)
 
         # exclude transformed columns for this test
-        # outcomes on transformed columns are currently tested in the child classes
-        # CappingTransformer and OutOfRangeNullTransformer
-        # TODO - open question as to whether we want to try moving some of those tests into
-        # this file
         columns_to_test = [
             col for col in df_transformed.columns if col not in transformer.columns
         ]
