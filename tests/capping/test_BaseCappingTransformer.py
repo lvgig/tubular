@@ -384,6 +384,8 @@ class GenericCappingTransformTests(GenericTransformTests):
 
         df = d.create_df_4(library=library)
 
+        expected = self.expected_df_2(library=library)
+
         transformer = initialized_transformers[self.transformer_name]
 
         # if transformer is not polars compatible, skip polars test
@@ -394,12 +396,31 @@ class GenericCappingTransformTests(GenericTransformTests):
 
         df_transformed = transformer.transform(df)
 
-        expected = self.expected_df_2(library=library)
+        # exclude transformed columns for this test
+        # outcomes on transformed columns are currently tested in the child classes
+        # CappingTransformer and OutOfRangeNullTransformer
+        # TODO - open question as to whether we want to try moving some of those tests into
+        # this file
+        columns_to_test = [
+            col for col in df_transformed.columns if col not in transformer.columns
+        ]
 
-        expected = nw.from_native(expected).drop("a").to_native()
-        df_transformed = nw.from_native(df_transformed).drop("a").to_native()
+        assert_frame_equal_dispatch(
+            df_transformed[columns_to_test],
+            expected[columns_to_test],
+        )
 
-        assert_frame_equal_dispatch(df_transformed, expected)
+        # Check outcomes for single rows
+        df = nw.from_native(df)
+        expected = nw.from_native(expected)
+        for i in range(len(df)):
+            df_transformed_row = transformer.transform(df[[i]].to_native())
+            df_expected_row = expected[[i]].to_native()
+
+            assert_frame_equal_dispatch(
+                df_transformed_row[columns_to_test],
+                df_expected_row[columns_to_test],
+            )
 
     @pytest.mark.parametrize("library", ["pandas", "polars"])
     @pytest.mark.parametrize(
@@ -433,6 +454,15 @@ class GenericCappingTransformTests(GenericTransformTests):
         assert (
             learnt_values == new_learnt_values
         ), f"learnt_value {fit_value} changed by transform, expected {learnt_values} but got {new_learnt_values}"
+
+        # Check outcomes for single rows
+        df = nw.from_native(df)
+        for i in range(len(df)):
+            transformer.transform(df[[i]].to_native())
+
+            assert (
+                learnt_values == new_learnt_values
+            ), f"learnt_value {fit_value} changed by transform, expected {learnt_values} but got {new_learnt_values}"
 
     @pytest.mark.parametrize("library", ["pandas", "polars"])
     def test_non_numeric_column_error(

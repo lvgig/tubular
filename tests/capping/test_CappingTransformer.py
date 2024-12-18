@@ -1,7 +1,5 @@
-import numpy as np
 import pandas as pd
 import pytest
-import test_aide as ta
 
 import tests.test_data as d
 from tests.base_tests import OtherBaseBehaviourTests
@@ -10,6 +8,7 @@ from tests.capping.test_BaseCappingTransformer import (
     GenericCappingInitTests,
     GenericCappingTransformTests,
 )
+from tests.utils import assert_frame_equal_dispatch
 
 
 class TestInit(GenericCappingInitTests):
@@ -79,28 +78,26 @@ class TestTransform(GenericCappingTransformTests):
     def setup_class(cls):
         cls.transformer_name = "CappingTransformer"
 
-    def expected_df_1():
+    def expected_df_1(self):
         """Expected output from test_expected_output_min_and_max."""
         return pd.DataFrame(
             {
-                "a": [2, 2, 3, 4, 5, 5, np.nan],
-                "b": [1, 2, 3, np.nan, 7, 7, 7],
-                "c": [np.nan, 1, 2, 3, 0, 0, 0],
+                "a": [2, 2, 3, 4, 5, 5, None],
+                "b": [1, 2, 3, None, 7, 7, 7],
+                "c": [None, 1, 2, 3, 0, 0, 0],
             },
         )
 
-    @pytest.mark.parametrize(
-        ("df", "expected"),
-        ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
-    )
     def test_expected_output_min_and_max_combinations(
         self,
-        df,
-        expected,
         minimal_attribute_dict,
         uninitialized_transformers,
     ):
         """Test that capping is applied correctly in transform."""
+
+        df = d.create_df_3()
+        print(df)
+        expected = self.expected_df_1()
 
         args = minimal_attribute_dict[self.transformer_name].copy()
         args["capping_values"] = {"a": [2, 5], "b": [None, 7], "c": [0, None]}
@@ -109,11 +106,17 @@ class TestTransform(GenericCappingTransformTests):
 
         df_transformed = transformer.transform(df)
 
-        ta.equality.assert_frame_equal_msg(
-            actual=df_transformed,
-            expected=expected,
-            msg_tag=f"Unexpected values in {self.transformer_name}.transform",
-        )
+        assert_frame_equal_dispatch(df_transformed, expected)
+
+        # Check outcomes for single rows
+        for i in range(len(df)):
+            df_transformed_row = transformer.transform(df.iloc[[i]])
+            df_expected_row = expected.iloc[[i]]
+
+            assert_frame_equal_dispatch(
+                df_transformed_row,
+                df_expected_row,
+            )
 
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):

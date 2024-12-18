@@ -412,9 +412,13 @@ class BaseCappingTransformer(BaseNumericTransformer, WeightColumnMixin):
         if self.quantiles:
             self.check_is_fitted(["quantile_capping_values"])
 
+            capping_values_for_transform = self.quantile_capping_values
+
             dict_attrs = dict_attrs + ["quantile_capping_values"]
 
         else:
+            capping_values_for_transform = self.capping_values
+
             dict_attrs = dict_attrs + ["capping_values"]
 
         for attr_name in dict_attrs:
@@ -423,15 +427,37 @@ class BaseCappingTransformer(BaseNumericTransformer, WeightColumnMixin):
                 raise ValueError(msg)
 
         for col in self.columns:
+            cap_value_min = capping_values_for_transform[col][0]
+            cap_value_max = capping_values_for_transform[col][1]
+
             replacement_min = self._replacement_values[col][0]
             replacement_max = self._replacement_values[col][1]
 
-            X = X.with_columns(
-                nw.col(col).clip(
-                    lower_bound=replacement_min,
-                    upper_bound=replacement_max,
-                ),
-            )
+            for cap_value, replacement_value, condition in zip(
+                [cap_value_min, cap_value_max],
+                [replacement_min, replacement_max],
+                [nw.col(col) < cap_value_min, nw.col(col) > cap_value_max],
+            ):
+                if cap_value is not None:
+                    X = X.with_columns(
+                        nw.when(
+                            condition,
+                        )
+                        .then(
+                            replacement_value,
+                        )
+                        .otherwise(
+                            nw.col(col),
+                        )
+                        # make sure type is preserved for single row,
+                        # e.g. mapping single row to int could convert
+                        # from float to int
+                        # TODO - look into better ways to achieve this
+                        .cast(
+                            X.get_column(col).dtype,
+                        )
+                        .alias(col),
+                    )
 
         return X
 
@@ -638,11 +664,24 @@ class OutOfRangeNullTransformer(BaseCappingTransformer):
             Required for pipeline.
 
         """
-        super().fit(X=X, y=y)
+        # be careful to only run BaseCappingTransformer fit for quantiles case
+        # or we will overwrite our _replacement_values from init
+        BaseNumericTransformer.fit(self, X=X, y=y)
+
+        if self.weights_column:
+            WeightColumnMixin.check_weights_column(self, X, self.weights_column)
 
         if self.quantiles:
+            BaseCappingTransformer.fit(self, X=X, y=y)
+
             self._replacement_values = OutOfRangeNullTransformer.set_replacement_values(
                 self.quantile_capping_values,
+            )
+
+        else:
+            warnings.warn(
+                f"{self.classname()}: quantiles not set so no fitting done in OutOfRangeNullTransformer",
+                stacklevel=2,
             )
 
         return self
