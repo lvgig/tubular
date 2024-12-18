@@ -358,7 +358,7 @@ class GenericCappingTransformTests(GenericTransformTests):
     def setup_class(cls):
         cls.transformer_name = "BaseCappingTransformer"
 
-    def expected_df_2(library="pandas"):
+    def expected_df_2(self, library="pandas"):
         """Expected output from test_expected_output_max."""
 
         df_dict = {
@@ -377,8 +377,6 @@ class GenericCappingTransformTests(GenericTransformTests):
     @pytest.mark.parametrize("library", ["pandas", "polars"])
     def test_non_cap_column_left_untouched(
         self,
-        df,
-        expected,
         initialized_transformers,
         library,
     ):
