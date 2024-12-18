@@ -1,9 +1,9 @@
 import re
 
+import narwhals as nw
 import numpy as np
-import pandas as pd
+import polars as pl
 import pytest
-import test_aide as ta
 
 import tests.test_data as d
 from tests.base_tests import (
@@ -13,6 +13,7 @@ from tests.base_tests import (
     WeightColumnFitMixinTests,
     WeightColumnInitMixinTests,
 )
+from tests.utils import assert_frame_equal_dispatch, dataframe_init_dispatch
 from tubular.capping import BaseCappingTransformer
 
 
@@ -236,10 +237,12 @@ class GenericCappingFitTests(WeightColumnFitMixinTests, GenericFitTests):
     def setup_class(cls):
         cls.transformer_name = "BaseCappingTransformer"
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     def test_quantiles_none_error(
         self,
         minimal_attribute_dict,
         uninitialized_transformers,
+        library,
     ):
         """Test that a warning is raised if quantiles is None when fit is run."""
 
@@ -248,14 +251,19 @@ class GenericCappingFitTests(WeightColumnFitMixinTests, GenericFitTests):
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
+        df = d.create_df_3(library=library)
+
+        # if transformer is not polars compatible, skip polars test
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
+
         with pytest.warns(
             UserWarning,
             match=f"{self.transformer_name}: quantiles not set so no fitting done",
         ):
-            df = d.create_df_3()
-
             transformer.fit(df)
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     @pytest.mark.parametrize(
         ("values", "sample_weight", "quantiles", "expected_quantiles"),
         # quantiles use linear interpolation, which is manually replicated here where needed
@@ -297,6 +305,7 @@ class GenericCappingFitTests(WeightColumnFitMixinTests, GenericFitTests):
         expected_quantiles,
         minimal_attribute_dict,
         uninitialized_transformers,
+        library,
     ):
         """Test that weighted_quantile gives the expected outputs."""
 
@@ -307,15 +316,20 @@ class GenericCappingFitTests(WeightColumnFitMixinTests, GenericFitTests):
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
-        if not sample_weight:
-            sample_weight = [1] * len(values)
+        df_dict = {
+            "a": values,
+        }
+        if sample_weight:
+            df_dict["w"] = sample_weight
 
-        df = pd.DataFrame(
-            {
-                "a": values,
-                "w": sample_weight,
-            },
-        )
+        else:
+            transformer.weights_column = None
+
+        df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
+
+        # if transformer is not polars compatible, skip polars test
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
         transformer.fit(df)
 
@@ -336,6 +350,52 @@ class GenericCappingFitTests(WeightColumnFitMixinTests, GenericFitTests):
                 actuals_dict[name] == value
             ), f"unexpected replacement values fit, for {name} value expected {value} but got {actuals_dict[name]}"
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
+    @pytest.mark.parametrize(
+        ("values", "sample_weight", "quantiles"),
+        [
+            ([1, 2, 3], [1, 2, 1], [0.1, 0.5]),
+            ([1, 2, 3], None, [0.1, 0.5]),
+            ([2, 4, 6, 8], [3, 2, 1, 1], [None, 0.5]),
+            ([2, 4, 6, 8], None, [None, 0.5]),
+            ([-1, -5, -10, 20, 30], [1, 2, 2, 2, 2], [0.1, None]),
+            ([-1, -5, -10, 20, 40], None, [0.1, None]),
+        ],
+    )
+    def test_replacement_values_updated(
+        self,
+        values,
+        sample_weight,
+        quantiles,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+        library,
+    ):
+        """Test that weighted_quantile gives the expected outputs."""
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["quantiles"] = {"a": quantiles}
+        args["capping_values"] = None
+        args["weights_column"] = "w"
+
+        transformer = uninitialized_transformers[self.transformer_name](**args)
+
+        if not sample_weight:
+            sample_weight = [1] * len(values)
+
+        df_dict = {
+            "a": values,
+            "w": sample_weight,
+        }
+
+        df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
+
+        transformer.fit(df)
+
+        assert (
+            transformer._replacement_values == transformer.quantile_capping_values
+        ), f"unexpected value for replacement_values attribute, expected {transformer.quantile_capping_values} but got {transformer.replacement_values_}"
+
 
 class GenericCappingTransformTests(GenericTransformTests):
     """Tests for BaseCappingTransformer.transform()."""
@@ -344,57 +404,86 @@ class GenericCappingTransformTests(GenericTransformTests):
     def setup_class(cls):
         cls.transformer_name = "BaseCappingTransformer"
 
-    def expected_df_2():
+    def expected_df_2(self, library="pandas"):
         """Expected output from test_expected_output_max."""
-        df = pd.DataFrame(
-            {
-                "a": [2, 2, 3, 4, 5, 6, 7, np.nan],
-                "b": ["a", "b", "c", "d", "e", "f", "g", np.nan],
-                "c": ["a", "b", "c", "d", "e", "f", "g", np.nan],
-            },
-        )
 
-        df["c"] = df["c"].astype("category")
+        df_dict = {
+            "a": [2, 2, 3, 4, 5, 6, 7, None],
+            "b": ["a", "b", "c", "d", "e", "f", "g", None],
+            "c": ["a", "b", "c", "d", "e", "f", "g", None],
+        }
 
-        return df
+        df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
 
-    @pytest.mark.parametrize(
-        ("df", "expected"),
-        ta.pandas.adjusted_dataframe_params(d.create_df_4(), expected_df_2()),
-    )
+        df = nw.from_native(df)
+        df = df.with_columns(nw.col("c").cast(nw.Categorical))
+
+        return df.to_native()
+
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     def test_non_cap_column_left_untouched(
         self,
-        df,
-        expected,
         initialized_transformers,
+        library,
     ):
         """Test that capping is applied only to specific columns, others remain the same."""
 
+        df = d.create_df_4(library=library)
+
+        expected = self.expected_df_2(library=library)
+
         transformer = initialized_transformers[self.transformer_name]
+
+        # if transformer is not polars compatible, skip polars test
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
         transformer.fit(df)
 
         df_transformed = transformer.transform(df)
 
-        non_capped_df = df_transformed.drop("a", axis=1)
-        non_capped_expected = expected.drop("a", axis=1)
+        # exclude transformed columns for this test
+        columns_to_test = [
+            col for col in df_transformed.columns if col not in transformer.columns
+        ]
 
-        ta.equality.assert_frame_equal_msg(
-            actual=non_capped_df,
-            expected=non_capped_expected,
-            msg_tag=f"Unexpected values in {self.transformer_name}.transform, with columns meant to not be transformed",
+        assert_frame_equal_dispatch(
+            df_transformed[columns_to_test],
+            expected[columns_to_test],
         )
 
+        # Check outcomes for single rows
+        df = nw.from_native(df)
+        expected = nw.from_native(expected)
+        for i in range(len(df)):
+            df_transformed_row = transformer.transform(df[[i]].to_native())
+            df_expected_row = expected[[i]].to_native()
+
+            assert_frame_equal_dispatch(
+                df_transformed_row[columns_to_test],
+                df_expected_row[columns_to_test],
+            )
+
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     @pytest.mark.parametrize(
         "fit_value",
         ["_replacement_values", "capping_values"],
     )
-    def test_learnt_values_not_modified(self, fit_value, initialized_transformers):
+    def test_learnt_values_not_modified(
+        self,
+        fit_value,
+        initialized_transformers,
+        library,
+    ):
         """Test that the replacements from fit are not changed in transform."""
 
         transformer = initialized_transformers[self.transformer_name]
 
-        df = d.create_df_3()
+        df = d.create_df_3(library=library)
+
+        # if transformer is not polars compatible, skip polars test
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
         transformer.fit(df)
 
@@ -402,47 +491,79 @@ class GenericCappingTransformTests(GenericTransformTests):
 
         transformer.transform(df)
 
-        ta.classes.test_object_attributes(
-            obj=transformer,
-            expected_attributes={fit_value: learnt_values},
-            msg=f"learnt attribute {fit_value} for {self.transformer_name} changed in transform",
-        )
+        new_learnt_values = getattr(transformer, fit_value)
 
+        assert (
+            learnt_values == new_learnt_values
+        ), f"learnt_value {fit_value} changed by transform, expected {learnt_values} but got {new_learnt_values}"
+
+        # Check outcomes for single rows
+        df = nw.from_native(df)
+        for i in range(len(df)):
+            transformer.transform(df[[i]].to_native())
+
+            assert (
+                learnt_values == new_learnt_values
+            ), f"learnt_value {fit_value} changed by transform, expected {learnt_values} but got {new_learnt_values}"
+
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     def test_non_numeric_column_error(
         self,
         minimal_attribute_dict,
         uninitialized_transformers,
+        library,
     ):
         """Test that transform will raise an error if a column to transform is not numeric."""
 
         args = minimal_attribute_dict[self.transformer_name].copy()
-        args["capping_values"] = {"c": [1, 2]}
+        args["capping_values"] = {"a": [1, 2]}
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
 
-        df = d.create_df_5()
+        df = d.create_df_5(library=library)
+
+        # if transformer is not polars compatible, skip polars test
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
         transformer.fit(df)
 
+        # convert column to non-numeric
+        df = nw.from_native(df)
+        native_namespace = nw.get_native_namespace(df)
+        df = df.with_columns(
+            nw.new_series(
+                name="a",
+                values=["a"] * len(df),
+                native_namespace=native_namespace,
+            ),
+        )
+
         with pytest.raises(
             TypeError,
-            match=rf"{self.transformer_name}: The following columns are not numeric in X; \['c'\]",
+            match=rf"{self.transformer_name}: The following columns are not numeric in X; \['a'\]",
         ):
             transformer.transform(df)
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     def test_quantile_capping_values_not_fit_error(
         self,
         minimal_attribute_dict,
         uninitialized_transformers,
+        library,
     ):
         """Test that transform will raise an error if capping_values attr has not fit"""
-        df = d.create_df_9()
+        df = d.create_df_9(library=library)
 
         args = minimal_attribute_dict[self.transformer_name].copy()
         args["quantiles"] = {"a": [0.1, 0.2]}
         args["capping_values"] = None
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
+
+        # if transformer is not polars compatible, skip polars test
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
         with pytest.raises(
             ValueError,
@@ -450,19 +571,26 @@ class GenericCappingTransformTests(GenericTransformTests):
         ):
             transformer.transform(df)
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     def test_quantile_capping_values_empty_error(
         self,
         minimal_attribute_dict,
         uninitialized_transformers,
+        library,
     ):
         """Test that transform will raise an error if quantile_capping_values is empty dict"""
-        df = d.create_df_9()
+        df = d.create_df_9(library=library)
 
         args = minimal_attribute_dict[self.transformer_name].copy()
         args["quantiles"] = {"a": [0.1, 0.2]}
         args["capping_values"] = None
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
+
+        # if transformer is not polars compatible, skip polars test
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
+
         transformer.fit(df)
         transformer.quantile_capping_values = {}
 
@@ -472,18 +600,25 @@ class GenericCappingTransformTests(GenericTransformTests):
         ):
             transformer.transform(df)
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     def test_capping_values_empty_error(
         self,
         minimal_attribute_dict,
         uninitialized_transformers,
+        library,
     ):
         """Test that transform will raise an error if capping_values is empty dict"""
-        df = d.create_df_9()
+        df = d.create_df_9(library=library)
 
         args = minimal_attribute_dict[self.transformer_name].copy()
         args["capping_values"] = {"a": [0.1, 0.2]}
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
+
+        # if transformer is not polars compatible, skip polars test
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
+
         transformer.fit(df)
         transformer.capping_values = {}
 
@@ -493,19 +628,25 @@ class GenericCappingTransformTests(GenericTransformTests):
         ):
             transformer.transform(df)
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     def test_replacement_values_not_fit_error(
         self,
         minimal_attribute_dict,
         uninitialized_transformers,
+        library,
     ):
         """Test that transform will raise an error if replacement values attr has not fit"""
-        df = d.create_df_9()
+        df = d.create_df_9(library=library)
 
         args = minimal_attribute_dict[self.transformer_name].copy()
         args["quantiles"] = {"a": [0.1, 0.2]}
         args["capping_values"] = None
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
+
+        # if transformer is not polars compatible, skip polars test
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
         with pytest.raises(
             ValueError,
@@ -513,19 +654,25 @@ class GenericCappingTransformTests(GenericTransformTests):
         ):
             transformer.transform(df)
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     def test_replacement_values_dict_empty_error(
         self,
         minimal_attribute_dict,
         uninitialized_transformers,
+        library,
     ):
         """Test that transform will raise an error if _replacement_values is an empty dict."""
-        df = d.create_df_9()
+        df = d.create_df_9(library=library)
 
         args = minimal_attribute_dict[self.transformer_name].copy()
         args["quantiles"] = {"a": [0.1, 0.2]}
         args["capping_values"] = None
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
+
+        # if transformer is not polars compatible, skip polars test
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
         # manually set attribute to get past the capping_values attribute is an empty dict exception
         transformer.quantile_capping_values = {"a": [1, 4]}
@@ -537,19 +684,25 @@ class GenericCappingTransformTests(GenericTransformTests):
         ):
             transformer.transform(df)
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     def test_fixed_attributes_unchanged_from_transform(
         self,
         minimal_attribute_dict,
         uninitialized_transformers,
+        library,
     ):
         """Test that attributes are unchanged after transform is run."""
-        df = d.create_df_9()
+        df = d.create_df_9(library=library)
 
         args = minimal_attribute_dict[self.transformer_name].copy()
         args["quantiles"] = {"a": [0.2, 1], "b": [0, 1]}
         args["capping_values"] = None
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
+
+        # if transformer is not polars compatible, skip polars test
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
         transformer.fit(df)
 
@@ -566,10 +719,72 @@ class GenericCappingTransformTests(GenericTransformTests):
             transformer.quantiles == transformer2.quantiles
         ), "quantiles attribute modified in transform"
 
+    def expected_df_1(self, library="pandas"):
+        """Expected output from test_expected_output_min_and_max."""
+        df_dict = {
+            "a": [2, 2, 3, 4, 5, 5, None],
+            "b": [1, 2, 3, None, 7, 7, 7],
+            "c": [None, 1, 2, 3, 0, 0, 0],
+        }
+
+        return dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
+
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
+    def test_expected_output_min_and_max_combinations(
+        self,
+        minimal_attribute_dict,
+        uninitialized_transformers,
+        library,
+    ):
+        """Test that capping is applied correctly in transform."""
+
+        df = d.create_df_3(library=library)
+        expected = self.expected_df_1(library=library)
+
+        args = minimal_attribute_dict[self.transformer_name].copy()
+        args["capping_values"] = {"a": [2, 5], "b": [None, 7], "c": [0, None]}
+
+        transformer = uninitialized_transformers[self.transformer_name](**args)
+
+        df_transformed = transformer.transform(df)
+
+        assert_frame_equal_dispatch(df_transformed, expected)
+
+        # Check outcomes for single rows
+        df = nw.from_native(df)
+        expected = nw.from_native(expected)
+        for i in range(len(df)):
+            df_transformed_row = transformer.transform(df[[i]].to_native())
+            df_expected_row = expected[[i]].to_native()
+
+            assert_frame_equal_dispatch(
+                df_transformed_row,
+                df_expected_row,
+            )
+
+
+class TestBaseCappingTransformerInit(GenericCappingInitTests):
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseCappingTransformer"
+
+
+class TestBaseCappingTransformerFit(GenericCappingFitTests):
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseCappingTransformer"
+
+
+class TestBaseCappingTransformerTransform(GenericCappingTransformTests):
+    @classmethod
+    def setup_class(cls):
+        cls.transformer_name = "BaseCappingTransformer"
+
 
 class TestWeightedQuantile:
     """Tests for the BaseCappingTransformer.weighted_quantile method."""
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     @pytest.mark.parametrize(
         ("values", "sample_weight", "quantiles", "expected_quantiles"),
         [
@@ -606,13 +821,26 @@ class TestWeightedQuantile:
         sample_weight,
         quantiles,
         expected_quantiles,
+        library,
     ):
         """Test that weighted_quantile gives the expected outputs."""
         x = BaseCappingTransformer(capping_values={"a": [2, 10]})
 
-        values = pd.Series(values)
+        values_col = "values"
+        weights_col = "weight"
+        df_dict = {
+            values_col: values,
+            weights_col: sample_weight,
+        }
 
-        actual = x.weighted_quantile(values, quantiles, sample_weight)
+        df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
+
+        actual = x.weighted_quantile(
+            df,
+            quantiles,
+            values_column=values_col,
+            weights_column=weights_col,
+        )
 
         # round to 1dp to avoid mismatches due to numerical precision
         actual_rounded_1_dp = list(np.round(actual, 1))
