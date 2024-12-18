@@ -29,7 +29,7 @@ Changed
 - narwhalified MeanImputer `#344 <https://github.com/lvgig/tubular/issues/344>_`
 - narwhalified BaseNumericTransformer `#358 <https://github.com/lvgig/tubular/issues/358>_`
 - narwhalified BaseCappingTransformer `#357 <https://github.com/lvgig/tubular/issues/357>_`
-- placeholder
+- narwhalified CappingTransformer `#361 <https://github.com/lvgig/tubular/issues/361>_`
 - placeholder
 - placeholder
 - placeholder
