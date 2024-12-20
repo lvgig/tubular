@@ -1,6 +1,7 @@
 import datetime
+import re
 
-import pandas as pd
+import narwhals as nw
 import pytest
 import test_aide as ta
 
@@ -17,6 +18,7 @@ from tests.dates.test_BaseGenericDateTransformer import (
     GenericDatesMixinTransformTests,
     create_date_diff_different_dtypes,
 )
+from tests.utils import assert_frame_equal_dispatch
 from tubular.dates import BetweenDatesTransformer
 
 
@@ -72,6 +74,91 @@ class TestInit(
             )
 
 
+def expected_df_1(library="pandas"):
+    """Expected output from transform in test_output."""
+    df = d.create_is_between_dates_df_1(library=library)
+
+    df = nw.from_native(df)
+    native_namespace = nw.get_native_namespace(df)
+    df = df.with_columns(
+        nw.new_series(
+            name="d",
+            values=[True, False],
+            native_namespace=native_namespace,
+        ),
+    )
+
+    return df.to_native()
+
+
+def expected_df_2(library="pandas"):
+    """Expected output from transform in test_output_both_exclusive."""
+    df = d.create_is_between_dates_df_2(library=library)
+
+    df = nw.from_native(df)
+    native_namespace = nw.get_native_namespace(df)
+    df = df.with_columns(
+        nw.new_series(
+            name="e",
+            values=[False, False, True, True, False, False],
+            native_namespace=native_namespace,
+        ),
+    )
+
+    return df.to_native()
+
+
+def expected_df_3(library="pandas"):
+    """Expected output from transform in test_output_lower_exclusive."""
+    df = d.create_is_between_dates_df_2(library=library)
+
+    df = nw.from_native(df)
+    native_namespace = nw.get_native_namespace(df)
+    df = df.with_columns(
+        nw.new_series(
+            name="e",
+            values=[False, False, True, True, True, False],
+            native_namespace=native_namespace,
+        ),
+    )
+
+    return df.to_native()
+
+
+def expected_df_4(library="pandas"):
+    """Expected output from transform in test_output_upper_exclusive."""
+    df = d.create_is_between_dates_df_2(library=library)
+
+    df = nw.from_native(df)
+    native_namespace = nw.get_native_namespace(df)
+    df = df.with_columns(
+        nw.new_series(
+            name="e",
+            values=[False, True, True, True, False, False],
+            native_namespace=native_namespace,
+        ),
+    )
+
+    return df.to_native()
+
+
+def expected_df_5(library="pandas"):
+    """Expected output from transform in test_output_both_inclusive."""
+    df = d.create_is_between_dates_df_2(library=library)
+
+    df = nw.from_native(df)
+    native_namespace = nw.get_native_namespace(df)
+    df = df.with_columns(
+        nw.new_series(
+            name="e",
+            values=[False, True, True, True, True, False],
+            native_namespace=native_namespace,
+        ),
+    )
+
+    return df.to_native()
+
+
 class TestTransform(
     GenericTransformTests,
     GenericDatesMixinTransformTests,
@@ -82,46 +169,6 @@ class TestTransform(
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "BetweenDatesTransformer"
-
-    def expected_df_1():
-        """Expected output from transform in test_output."""
-        df = d.create_is_between_dates_df_1()
-
-        df["d"] = [True, False]
-
-        return df
-
-    def expected_df_2():
-        """Expected output from transform in test_output_both_exclusive."""
-        df = d.create_is_between_dates_df_2()
-
-        df["e"] = [False, False, True, True, False, False]
-
-        return df
-
-    def expected_df_3():
-        """Expected output from transform in test_output_lower_exclusive."""
-        df = d.create_is_between_dates_df_2()
-
-        df["e"] = [False, False, True, True, True, False]
-
-        return df
-
-    def expected_df_4():
-        """Expected output from transform in test_output_upper_exclusive."""
-        df = d.create_is_between_dates_df_2()
-
-        df["e"] = [False, True, True, True, False, False]
-
-        return df
-
-    def expected_df_5():
-        """Expected output from transform in test_output_both_inclusive."""
-        df = d.create_is_between_dates_df_2()
-
-        df["e"] = [False, True, True, True, True, False]
-
-        return df
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -141,11 +188,7 @@ class TestTransform(
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="BetweenDatesTransformer.transform results not as expected",
-        )
+        assert_frame_equal_dispatch(df_transformed, expected)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -165,11 +208,7 @@ class TestTransform(
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="BetweenDatesTransformer.transform results not as expected",
-        )
+        assert_frame_equal_dispatch(df_transformed, expected)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -189,11 +228,7 @@ class TestTransform(
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="BetweenDatesTransformer.transform results not as expected",
-        )
+        assert_frame_equal_dispatch(df_transformed, expected)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -213,11 +248,7 @@ class TestTransform(
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="BetweenDatesTransformer.transform results not as expected",
-        )
+        assert_frame_equal_dispatch(df_transformed, expected)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -237,11 +268,7 @@ class TestTransform(
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="BetweenDatesTransformer.transform results not as expected",
-        )
+        assert_frame_equal_dispatch(expected, df_transformed)
 
     def test_warning_message(self):
         """Test a warning is generated if not all the values in column_upper are greater than or equal to column_lower."""
@@ -286,11 +313,7 @@ class TestTransform(
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="BetweenDatesTransformer.transform results not as expected",
-        )
+        assert_frame_equal_dispatch(df_transformed, expected)
 
     # overloading below test as column count is different for this one
     @pytest.mark.parametrize(
@@ -315,17 +338,15 @@ class TestTransform(
         )
 
         df = create_date_diff_different_dtypes()
-        # types don't seem to come out of the above function as expected, hard enforce
-        for col in ["date_col_1", "date_col_2"]:
-            df[col] = pd.to_datetime(df[col]).dt.date
-
-        for col in ["datetime_col_1", "datetime_col_2"]:
-            df[col] = pd.to_datetime(df[col])
 
         present_types = (
-            {"datetime64", "date"} if datetime_col == 0 else {"date", "datetime64"}
+            {"datetime64", "date32[pyarrow]"}
+            if datetime_col == 0
+            else {"date32[pyarrow]", "datetime64"}
         )
-        msg = rf"Columns fed to datetime transformers should be \['datetime64', 'date'\] and have consistent types, but found {present_types}. Please use ToDatetimeTransformer to standardise"
+        msg = re.escape(
+            f"Columns fed to datetime transformers should be ['datetime64', 'date32[pyarrow]'] and have consistent types, but found {present_types}. Please use ToDatetimeTransformer to standardise",
+        )
         with pytest.raises(
             TypeError,
             match=msg,
