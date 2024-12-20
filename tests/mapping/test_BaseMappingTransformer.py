@@ -1,5 +1,6 @@
 import re
 
+import polars as pl
 import pytest
 import test_aide as ta
 
@@ -101,13 +102,15 @@ class BaseMappingTransformerTransformTests(GenericTransformTests):
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     def test_mappings_unchanged(
         self,
         minimal_attribute_dict,
         uninitialized_transformers,
+        library,
     ):
         """Test that mappings is unchanged in transform."""
-        df = d.create_df_3()
+        df = d.create_df_3(library=library)
 
         mapping = {
             "b": {1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7},
@@ -116,18 +119,17 @@ class BaseMappingTransformerTransformTests(GenericTransformTests):
         args = minimal_attribute_dict[self.transformer_name].copy()
         args["mappings"] = mapping
 
-        x = uninitialized_transformers[self.transformer_name](**args)
+        transformer = uninitialized_transformers[self.transformer_name](**args)
 
-        x.transform(df)
+        # if transformer is not yet polars compatible, skip this test
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
 
-        ta.equality.assert_equal_dispatch(
-            expected=mapping,
-            actual=x.mappings,
-            msg=f"{self.transformer_name}.transform has changed self.mappings unexpectedly",
-        )
+        transformer.transform(df)
 
-
-# Running the BaseMappingTransformerTestSuite
+        assert (
+            mapping == transformer.mappings
+        ), f"{self.transformer_name}.transform has changed self.mappings unexpectedly, expected {mapping} but got {transformer.mappings}"
 
 
 class TestInit(BaseMappingTransformerInitTests):

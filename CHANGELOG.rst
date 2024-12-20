@@ -27,6 +27,8 @@ Changed
 - fixed issues with all null and nullable-bool column handling in dataframe_init_dispatch
 - added NaN error handling to WeightColumnMixin
 - narwhalified MeanImputer `#344 https://github.com/lvgig/tubular/issues/344_`
+- narwhalified BaseMappingTransformer `#367 <https://github.com/lvgig/tubular/issues/367>_`
+- placeholder
 - placeholder
 - placeholder
 - placeholder
