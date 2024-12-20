@@ -1,7 +1,7 @@
 import datetime
 
+import narwhals as nw
 import numpy as np
-import pandas as pd
 import pytest
 import test_aide as ta
 
@@ -17,6 +17,7 @@ from tests.base_tests import (
 from tests.dates.test_BaseGenericDateTransformer import (
     GenericDatesMixinTransformTests,
 )
+from tests.utils import assert_frame_equal_dispatch, dataframe_init_dispatch
 from tubular.dates import DateDifferenceTransformer
 
 
@@ -45,6 +46,798 @@ class TestInit(
             )
 
 
+def expected_df_3(library="pandas"):
+    """Expected output for test_expected_output_units_D."""
+
+    df_dict = {
+        "a": [
+            datetime.datetime(
+                1993,
+                9,
+                27,
+                11,
+                58,
+                58,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2000,
+                3,
+                19,
+                12,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                11,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                10,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                10,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                10,
+                10,
+                10,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                12,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                1985,
+                7,
+                23,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+        ],
+        "b": [
+            datetime.datetime(
+                2020,
+                5,
+                1,
+                12,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2019,
+                12,
+                25,
+                11,
+                58,
+                58,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                11,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                11,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                9,
+                10,
+                9,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2015,
+                11,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2015,
+                11,
+                10,
+                12,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2015,
+                7,
+                23,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+        ],
+        "D": [
+            9713.042372685186,
+            7219.957627314815,
+            0.0,
+            31.0,
+            -30.083333333333332,
+            -1064.9583333333333,
+            -1125.9583333333333,
+            10957.0,
+        ],
+    }
+
+    df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
+
+    # ensure types line up with test data
+    df = nw.from_native(df)
+    for col in [col for col in df.columns if col not in ["D"]]:
+        df = df.with_columns(
+            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
+        )
+
+    return nw.to_native(df)
+
+
+def expected_df_4(library="pandas"):
+    """Expected output for test_expected_output_units_h."""
+
+    df_dict = {
+        "a": [
+            datetime.datetime(
+                1993,
+                9,
+                27,
+                11,
+                58,
+                58,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2000,
+                3,
+                19,
+                12,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                11,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                10,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                10,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                10,
+                10,
+                10,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                12,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                1985,
+                7,
+                23,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+        ],
+        "b": [
+            datetime.datetime(
+                2020,
+                5,
+                1,
+                12,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2019,
+                12,
+                25,
+                11,
+                58,
+                58,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                11,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                11,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                9,
+                10,
+                9,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2015,
+                11,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2015,
+                11,
+                10,
+                12,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2015,
+                7,
+                23,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+        ],
+        "h": [
+            233113.01694444445,
+            173278.98305555555,
+            0.0,
+            744.0,
+            -722.0,
+            -25559.0,
+            -27023.0,
+            262968.0,
+        ],
+    }
+
+    df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
+
+    # ensure types line up with test data
+    df = nw.from_native(df)
+    for col in [col for col in df.columns if col not in ["h"]]:
+        df = df.with_columns(
+            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
+        )
+
+    return nw.to_native(df)
+
+
+def expected_df_5(library="pandas"):
+    """Expected output for test_expected_output_units_m."""
+
+    df_dict = {
+        "a": [
+            datetime.datetime(
+                1993,
+                9,
+                27,
+                11,
+                58,
+                58,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2000,
+                3,
+                19,
+                12,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                11,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                10,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                10,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                10,
+                10,
+                10,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                12,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                1985,
+                7,
+                23,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+        ],
+        "b": [
+            datetime.datetime(
+                2020,
+                5,
+                1,
+                12,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2019,
+                12,
+                25,
+                11,
+                58,
+                58,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                11,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                11,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                9,
+                10,
+                9,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2015,
+                11,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2015,
+                11,
+                10,
+                12,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2015,
+                7,
+                23,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+        ],
+        "m": [
+            13986781.016666668,
+            10396738.983333332,
+            0.0,
+            44640.0,
+            -43320.0,
+            -1533540.0,
+            -1621380.0,
+            15778080.0,
+        ],
+    }
+
+    df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
+
+    # ensure types line up with test data
+    df = nw.from_native(df)
+    for col in [col for col in df.columns if col not in ["m"]]:
+        df = df.with_columns(
+            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
+        )
+
+    return nw.to_native(df)
+
+
+def expected_df_6(library="pandas"):
+    """Expected output for test_expected_output_units_s."""
+
+    df_dict = {
+        "a": [
+            datetime.datetime(
+                1993,
+                9,
+                27,
+                11,
+                58,
+                58,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2000,
+                3,
+                19,
+                12,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                11,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                10,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                10,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                10,
+                10,
+                10,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                12,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                1985,
+                7,
+                23,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+        ],
+        "b": [
+            datetime.datetime(
+                2020,
+                5,
+                1,
+                12,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2019,
+                12,
+                25,
+                11,
+                58,
+                58,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                11,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                11,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2018,
+                9,
+                10,
+                9,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2015,
+                11,
+                10,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2015,
+                11,
+                10,
+                12,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+            datetime.datetime(
+                2015,
+                7,
+                23,
+                11,
+                59,
+                59,
+                tzinfo=datetime.timezone.utc,
+            ),
+        ],
+        "s": [
+            839206861.0,
+            623804339.0,
+            0.0,
+            2678400.0,
+            -2599200.0,
+            -92012400.0,
+            -97282800.0,
+            946684800.0,
+        ],
+    }
+
+    df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
+
+    # ensure types line up with test data
+    df = nw.from_native(df)
+    for col in [col for col in df.columns if col not in ["s"]]:
+        df = df.with_columns(
+            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
+        )
+
+    return nw.to_native(df)
+
+
+def expected_df_7(library="pandas"):
+    """Expected output for test_expected_output_nulls."""
+
+    df_dict = {
+        "a": [
+            datetime.datetime(
+                1993,
+                9,
+                27,
+                11,
+                58,
+                58,
+                tzinfo=datetime.timezone.utc,
+            ),
+            np.nan,
+        ],
+        "b": [
+            np.nan,
+            datetime.datetime(
+                2019,
+                12,
+                25,
+                11,
+                58,
+                58,
+                tzinfo=datetime.timezone.utc,
+            ),
+        ],
+        "D": [
+            np.nan,
+            np.nan,
+        ],
+    }
+
+    df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
+
+    # ensure types line up with test data
+    df = nw.from_native(df)
+    for col in [col for col in df.columns if col not in ["D"]]:
+        df = df.with_columns(
+            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
+        )
+
+    return nw.to_native(df)
+
+
+def create_datediff_test_nulls_df(library="pandas"):
+    """Create DataFrame with nulls only for DateDifferenceTransformer tests."""
+
+    df_dict = {
+        "a": [
+            datetime.datetime(
+                1993,
+                9,
+                27,
+                11,
+                58,
+                58,
+                tzinfo=datetime.timezone.utc,
+            ),
+            np.nan,
+        ],
+        "b": [
+            np.nan,
+            datetime.datetime(
+                2019,
+                12,
+                25,
+                11,
+                58,
+                58,
+                tzinfo=datetime.timezone.utc,
+            ),
+        ],
+    }
+
+    df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
+
+    # ensure types line up with test data
+    df = nw.from_native(df)
+    for col in df.columns:
+        df = df.with_columns(
+            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
+        )
+
+    return nw.to_native(df)
+
+
 class TestTransform(
     GenericTransformTests,
     GenericDatesMixinTransformTests,
@@ -55,734 +848,6 @@ class TestTransform(
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "DateDifferenceTransformer"
-
-    def expected_df_3():
-        """Expected output for test_expected_output_units_D."""
-        return pd.DataFrame(
-            {
-                "a": [
-                    datetime.datetime(
-                        1993,
-                        9,
-                        27,
-                        11,
-                        58,
-                        58,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2000,
-                        3,
-                        19,
-                        12,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        11,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        10,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        10,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        10,
-                        10,
-                        10,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        12,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        1985,
-                        7,
-                        23,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                ],
-                "b": [
-                    datetime.datetime(
-                        2020,
-                        5,
-                        1,
-                        12,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2019,
-                        12,
-                        25,
-                        11,
-                        58,
-                        58,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        11,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        11,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        9,
-                        10,
-                        9,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2015,
-                        11,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2015,
-                        11,
-                        10,
-                        12,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2015,
-                        7,
-                        23,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                ],
-                "D": [
-                    9713.042372685186,
-                    7219.957627314815,
-                    0.0,
-                    31.0,
-                    -30.083333333333332,
-                    -1064.9583333333333,
-                    -1125.9583333333333,
-                    10957.0,
-                ],
-            },
-        )
-
-    def expected_df_4():
-        """Expected output for test_expected_output_units_h."""
-        return pd.DataFrame(
-            {
-                "a": [
-                    datetime.datetime(
-                        1993,
-                        9,
-                        27,
-                        11,
-                        58,
-                        58,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2000,
-                        3,
-                        19,
-                        12,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        11,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        10,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        10,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        10,
-                        10,
-                        10,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        12,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        1985,
-                        7,
-                        23,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                ],
-                "b": [
-                    datetime.datetime(
-                        2020,
-                        5,
-                        1,
-                        12,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2019,
-                        12,
-                        25,
-                        11,
-                        58,
-                        58,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        11,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        11,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        9,
-                        10,
-                        9,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2015,
-                        11,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2015,
-                        11,
-                        10,
-                        12,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2015,
-                        7,
-                        23,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                ],
-                "h": [
-                    233113.01694444445,
-                    173278.98305555555,
-                    0.0,
-                    744.0,
-                    -722.0,
-                    -25559.0,
-                    -27023.0,
-                    262968.0,
-                ],
-            },
-        )
-
-    def expected_df_5():
-        """Expected output for test_expected_output_units_m."""
-        return pd.DataFrame(
-            {
-                "a": [
-                    datetime.datetime(
-                        1993,
-                        9,
-                        27,
-                        11,
-                        58,
-                        58,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2000,
-                        3,
-                        19,
-                        12,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        11,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        10,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        10,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        10,
-                        10,
-                        10,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        12,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        1985,
-                        7,
-                        23,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                ],
-                "b": [
-                    datetime.datetime(
-                        2020,
-                        5,
-                        1,
-                        12,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2019,
-                        12,
-                        25,
-                        11,
-                        58,
-                        58,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        11,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        11,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        9,
-                        10,
-                        9,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2015,
-                        11,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2015,
-                        11,
-                        10,
-                        12,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2015,
-                        7,
-                        23,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                ],
-                "m": [
-                    13986781.016666668,
-                    10396738.983333332,
-                    0.0,
-                    44640.0,
-                    -43320.0,
-                    -1533540.0,
-                    -1621380.0,
-                    15778080.0,
-                ],
-            },
-        )
-
-    def expected_df_6():
-        """Expected output for test_expected_output_units_s."""
-        return pd.DataFrame(
-            {
-                "a": [
-                    datetime.datetime(
-                        1993,
-                        9,
-                        27,
-                        11,
-                        58,
-                        58,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2000,
-                        3,
-                        19,
-                        12,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        11,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        10,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        10,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        10,
-                        10,
-                        10,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        12,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        1985,
-                        7,
-                        23,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                ],
-                "b": [
-                    datetime.datetime(
-                        2020,
-                        5,
-                        1,
-                        12,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2019,
-                        12,
-                        25,
-                        11,
-                        58,
-                        58,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        11,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        11,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2018,
-                        9,
-                        10,
-                        9,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2015,
-                        11,
-                        10,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2015,
-                        11,
-                        10,
-                        12,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    datetime.datetime(
-                        2015,
-                        7,
-                        23,
-                        11,
-                        59,
-                        59,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                ],
-                "s": [
-                    839206861.0,
-                    623804339.0,
-                    0.0,
-                    2678400.0,
-                    -2599200.0,
-                    -92012400.0,
-                    -97282800.0,
-                    946684800.0,
-                ],
-            },
-        )
-
-    def expected_df_7():
-        """Expected output for test_expected_output_nulls."""
-        return pd.DataFrame(
-            {
-                "a": [
-                    datetime.datetime(
-                        1993,
-                        9,
-                        27,
-                        11,
-                        58,
-                        58,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    np.nan,
-                ],
-                "b": [
-                    np.nan,
-                    datetime.datetime(
-                        2019,
-                        12,
-                        25,
-                        11,
-                        58,
-                        58,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                ],
-                "D": [
-                    np.nan,
-                    np.nan,
-                ],
-            },
-            index=[0, 1],
-        )
-
-    def create_datediff_test_nulls_df():
-        """Create DataFrame with nulls only for DateDifferenceTransformer tests."""
-        return pd.DataFrame(
-            {
-                "a": [
-                    datetime.datetime(
-                        1993,
-                        9,
-                        27,
-                        11,
-                        58,
-                        58,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                    np.nan,
-                ],
-                "b": [
-                    np.nan,
-                    datetime.datetime(
-                        2019,
-                        12,
-                        25,
-                        11,
-                        58,
-                        58,
-                        tzinfo=datetime.timezone.utc,
-                    ),
-                ],
-            },
-            index=[0, 1],
-        )
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -806,11 +871,7 @@ class TestTransform(
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="Unexpected values in DateDifferenceYearTransformer.transform",
-        )
+        assert_frame_equal_dispatch(expected, df_transformed)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -834,11 +895,7 @@ class TestTransform(
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="Unexpected values in DateDifferenceYearTransformer.transform",
-        )
+        assert_frame_equal_dispatch(expected, df_transformed)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -862,11 +919,7 @@ class TestTransform(
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="Unexpected values in DateDifferenceYearTransformer.transform",
-        )
+        assert_frame_equal_dispatch(df_transformed, expected)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -890,11 +943,7 @@ class TestTransform(
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="Unexpected values in DateDifferenceYearTransformer.transform",
-        )
+        assert_frame_equal_dispatch(expected, df_transformed)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -914,11 +963,7 @@ class TestTransform(
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_frame_equal_msg(
-            actual=df_transformed,
-            expected=expected,
-            msg_tag="Unexpected values in DateDifferenceTransformer.transform (nulls)",
-        )
+        assert_frame_equal_dispatch(df_transformed, expected)
 
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):

@@ -93,7 +93,6 @@ class GenericNominalTransformTests(GenericTransformTests):
     def test_pandas_index_not_updated(
         self,
         initialized_transformers,
-        minimal_dataframe_lookup,
     ):
         """Test that the original (pandas) dataframe index is not transformed when transform method used."""
 

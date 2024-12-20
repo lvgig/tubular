@@ -278,7 +278,14 @@ def create_date_test_df(library="pandas"):
         ],
     }
 
-    return u.dataframe_init_dispatch(df_dict, library=library)
+    df = u.dataframe_init_dispatch(df_dict, library=library)
+
+    # ensure cols have date type
+    df = nw.from_native(df)
+    for col in df.columns:
+        df = df.with_columns(nw.col(col).cast(nw.Date))
+
+    return nw.to_native(df)
 
 
 def create_datediff_test_df(library="pandas"):
@@ -419,12 +426,21 @@ def create_datediff_test_df(library="pandas"):
         ],
     }
 
-    return u.dataframe_init_dispatch(df_dict, library=library)
+    df = u.dataframe_init_dispatch(df_dict, library=library)
+
+    df = nw.from_native(df)
+    # ensure cols have correct type
+    for col in df.columns:
+        df = df.with_columns(
+            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
+        )
+
+    return nw.to_native(df)
 
 
 # Create between dates df staying here as used in conftest also
 def create_is_between_dates_df_1(library="pandas"):
-    """Create df to use in IsBetweenDates tests. Contains 3 columns of 2 datatime values."""
+    """Create df to use in IsBetweenDates tests. Contains 3 columns of 2 datetime values."""
 
     df_dict = {
         "a": pd.date_range(start="1/1/2016", end="27/02/2017", periods=2),
@@ -432,7 +448,15 @@ def create_is_between_dates_df_1(library="pandas"):
         "c": pd.date_range(start="1/3/2016", end="27/04/2017", periods=2),
     }
 
-    return u.dataframe_init_dispatch(df_dict, library)
+    df = u.dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
+    # ensure cols have correct type
+    df = nw.from_native(df)
+    for col in df.columns:
+        df = df.with_columns(
+            nw.col(col).cast(nw.Datetime(time_unit="ns")),
+        )
+
+    return nw.to_native(df)
 
 
 def create_is_between_dates_df_2(library="pandas"):
@@ -465,7 +489,16 @@ def create_is_between_dates_df_2(library="pandas"):
         ],
     }
 
-    return u.dataframe_init_dispatch(df_dict, library=library)
+    df = u.dataframe_init_dispatch(df_dict, library=library)
+
+    # ensure cols have correct type
+    df = nw.from_native(df)
+    for col in df.columns:
+        df = df.with_columns(
+            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
+        )
+
+    return nw.to_native(df)
 
 
 def create_is_between_dates_df_3(library="pandas"):
@@ -522,67 +555,88 @@ def create_is_between_dates_df_3(library="pandas"):
         ],
     }
 
-    return u.dataframe_init_dispatch(df_dict, library=library)
+    df = u.dataframe_init_dispatch(df_dict, library=library)
+
+    # ensure cols have correct type
+    df = nw.from_native(df)
+    for col in df.columns:
+        df = df.with_columns(
+            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
+        )
+
+    return nw.to_native(df)
 
 
 def create_date_diff_different_dtypes(library="pandas"):
     """Dataframe with different datetime formats"""
 
-    df_dict = (
-        {
-            "date_col_1": [
-                datetime.date(1993, 9, 27),
-                datetime.date(2000, 3, 19),
-                datetime.date(2018, 11, 10),
-                datetime.date(2018, 10, 10),
-                datetime.date(2018, 10, 10),
-                datetime.date(2018, 10, 10),
-                datetime.date(2018, 12, 10),
-                datetime.date(
-                    1985,
-                    7,
-                    23,
-                ),
-            ],
-            "date_col_2": [
-                datetime.date(2020, 5, 1),
-                datetime.date(2019, 12, 25),
-                datetime.date(2018, 11, 10),
-                datetime.date(2018, 11, 10),
-                datetime.date(2018, 9, 10),
-                datetime.date(2015, 11, 10),
-                datetime.date(2015, 11, 10),
-                datetime.date(2015, 7, 23),
-            ],
-            "datetime_col_1": [
-                datetime.datetime(1993, 9, 27, tzinfo=datetime.timezone.utc),
-                datetime.datetime(2000, 3, 19, tzinfo=datetime.timezone.utc),
-                datetime.datetime(2018, 11, 10, tzinfo=datetime.timezone.utc),
-                datetime.datetime(2018, 10, 10, tzinfo=datetime.timezone.utc),
-                datetime.datetime(2018, 10, 10, tzinfo=datetime.timezone.utc),
-                datetime.datetime(2018, 10, 10, tzinfo=datetime.timezone.utc),
-                datetime.datetime(2018, 12, 10, tzinfo=datetime.timezone.utc),
-                datetime.datetime(
-                    1985,
-                    7,
-                    23,
-                    tzinfo=datetime.timezone.utc,
-                ),
-            ],
-            "datetime_col_2": [
-                datetime.datetime(2020, 5, 1, tzinfo=datetime.timezone.utc),
-                datetime.datetime(2019, 12, 25, tzinfo=datetime.timezone.utc),
-                datetime.datetime(2018, 11, 10, tzinfo=datetime.timezone.utc),
-                datetime.datetime(2018, 11, 10, tzinfo=datetime.timezone.utc),
-                datetime.datetime(2018, 9, 10, tzinfo=datetime.timezone.utc),
-                datetime.datetime(2015, 11, 10, tzinfo=datetime.timezone.utc),
-                datetime.datetime(2015, 11, 10, tzinfo=datetime.timezone.utc),
-                datetime.datetime(2015, 7, 23, tzinfo=datetime.timezone.utc),
-            ],
-        },
-    )
+    df_dict = {
+        "date_col_1": [
+            datetime.date(1993, 9, 27),
+            datetime.date(2000, 3, 19),
+            datetime.date(2018, 11, 10),
+            datetime.date(2018, 10, 10),
+            datetime.date(2018, 10, 10),
+            datetime.date(2018, 10, 10),
+            datetime.date(2018, 12, 10),
+            datetime.date(
+                1985,
+                7,
+                23,
+            ),
+        ],
+        "date_col_2": [
+            datetime.date(2020, 5, 1),
+            datetime.date(2019, 12, 25),
+            datetime.date(2018, 11, 10),
+            datetime.date(2018, 11, 10),
+            datetime.date(2018, 9, 10),
+            datetime.date(2015, 11, 10),
+            datetime.date(2015, 11, 10),
+            datetime.date(2015, 7, 23),
+        ],
+        "datetime_col_1": [
+            datetime.datetime(1993, 9, 27, tzinfo=datetime.timezone.utc),
+            datetime.datetime(2000, 3, 19, tzinfo=datetime.timezone.utc),
+            datetime.datetime(2018, 11, 10, tzinfo=datetime.timezone.utc),
+            datetime.datetime(2018, 10, 10, tzinfo=datetime.timezone.utc),
+            datetime.datetime(2018, 10, 10, tzinfo=datetime.timezone.utc),
+            datetime.datetime(2018, 10, 10, tzinfo=datetime.timezone.utc),
+            datetime.datetime(2018, 12, 10, tzinfo=datetime.timezone.utc),
+            datetime.datetime(
+                1985,
+                7,
+                23,
+                tzinfo=datetime.timezone.utc,
+            ),
+        ],
+        "datetime_col_2": [
+            datetime.datetime(2020, 5, 1, tzinfo=datetime.timezone.utc),
+            datetime.datetime(2019, 12, 25, tzinfo=datetime.timezone.utc),
+            datetime.datetime(2018, 11, 10, tzinfo=datetime.timezone.utc),
+            datetime.datetime(2018, 11, 10, tzinfo=datetime.timezone.utc),
+            datetime.datetime(2018, 9, 10, tzinfo=datetime.timezone.utc),
+            datetime.datetime(2015, 11, 10, tzinfo=datetime.timezone.utc),
+            datetime.datetime(2015, 11, 10, tzinfo=datetime.timezone.utc),
+            datetime.datetime(2015, 7, 23, tzinfo=datetime.timezone.utc),
+        ],
+    }
 
-    return u.dataframe_init_dispatch(df_dict, library=library)
+    df = u.dataframe_init_dispatch(df_dict, library=library)
+
+    # ensure cols have correct type
+    df = nw.from_native(df)
+    for col in ["datetime_col_1", "datetime_col_2"]:
+        df = df.with_columns(
+            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
+        )
+
+    for col in ["date_col_1", "date_col_2"]:
+        df = df.with_columns(
+            nw.col(col).cast(nw.Date),
+        )
+
+    return nw.to_native(df)
 
 
 def create_date_diff_different_dtypes_and_nans(library="pandas"):
@@ -640,7 +694,21 @@ def create_date_diff_different_dtypes_and_nans(library="pandas"):
         ],
     }
 
-    return u.dataframe_init_dispatch(df_dict, library=library)
+    df = u.dataframe_init_dispatch(df_dict, library=library)
+
+    # ensure cols have correct type
+    df = nw.from_native(df)
+    for col in ["datetime_col_1", "datetime_col_2"]:
+        df = df.with_columns(
+            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
+        )
+
+    for col in ["date_col_1", "date_col_2"]:
+        df = df.with_columns(
+            nw.col(col).cast(nw.Date),
+        )
+
+    return nw.to_native(df)
 
 
 def expected_date_diff_df_2(library="pandas"):
