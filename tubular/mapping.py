@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import warnings
 from collections import OrderedDict
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 import narwhals as nw
 import numpy as np
@@ -28,6 +28,9 @@ class BaseMappingTransformer(BaseTransformer):
         example the following dict {'a': {1: 2, 3: 4}, 'b': {'a': 1, 'b': 2}} would specify
         a mapping for column a of 1->2, 3->4 and a mapping for column b of 'a'->1, b->2.
 
+    return_dtype: Dict[str, RETURN_DTYPES_TYPE]
+        Dictionary of col:dtype for returned columns
+
     **kwargs
         Arbitrary keyword arguments passed onto BaseTransformer.init method.
 
@@ -37,6 +40,9 @@ class BaseMappingTransformer(BaseTransformer):
         Dictionary of mappings for each column individually. The dict passed to mappings in
         init is set to the mappings attribute.
 
+    return_dtypes: dict[str, RETURN_DTYPES_TYPE]
+        Dictionary of col:dtype for returned columns
+
     polars_compatible : bool
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
 
@@ -44,7 +50,22 @@ class BaseMappingTransformer(BaseTransformer):
 
     polars_compatible = False
 
-    def __init__(self, mappings: dict[str, dict], **kwargs: dict[str, bool]) -> None:
+    RETURN_DTYPES_TYPE = Literal[
+        "String",
+        "CategoricalInt8",
+        "Int16",
+        "Int32",
+        "Int64",
+        "Float32",
+        "Float64",
+    ]
+
+    def __init__(
+        self,
+        mappings: dict[str, dict],
+        return_dtypes: dict[str, RETURN_DTYPES_TYPE],
+        **kwargs: dict[str, bool],
+    ) -> None:
         if isinstance(mappings, dict):
             if not len(mappings) > 0:
                 msg = f"{self.classname()}: mappings has no values"
@@ -62,6 +83,7 @@ class BaseMappingTransformer(BaseTransformer):
             raise ValueError(msg)
 
         columns = list(mappings.keys())
+        self.return_dtypes = return_dtypes
 
         super().__init__(columns=columns, **kwargs)
 
@@ -120,21 +142,41 @@ class BaseMappingTransformMixin(BaseTransformer):
         self.check_is_fitted(["mappings", "return_dtype"])
 
         X = nw.from_native(super().transform(X))
+        native_namespace = nw.get_native_namespace(X)
 
         for col in self.mappings:
             mappings = self.mappings[col]
 
-            # mapping dict needs to be 1:1 for replace_strict
-            values = X.get_column(col).unique()
+            # TODO - update this logic once narwhals implements map_dict
 
-            mappings = {value: mappings.get(value, value) for value in values}
+            # differentiate between unmapped cols and cols mapped to null
+            # by including unmapped cols
+            unique = X.get_column(col).unique()
+            mappings = {key: mappings.get(key, key) for key in unique}
 
-            X = X.with_columns(
-                nw.col(col).replace_strict(
-                    old=list(mappings.keys()),
-                    new=list(mappings.values()),
-                ),
+            new_col_values = f"new_{col}_values"
+            mappings_df = nw.from_dict(
+                {
+                    col: list(mappings.keys()),
+                    new_col_values: list(mappings.values()),
+                },
+                schema={
+                    col: X.get_column(col).dtype,
+                    new_col_values: self.return_dtype,
+                },
+                native_namespace=native_namespace,
             )
+
+            X = (
+                X.join(
+                    mappings_df,
+                    how="left",
+                    on=col,
+                )
+                .drop(col)
+                .rename({new_col_values: col})
+            )
+            print(X.to_native())
 
         return X
 
