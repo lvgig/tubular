@@ -4,12 +4,17 @@ from __future__ import annotations
 
 import warnings
 from collections import OrderedDict
+from typing import TYPE_CHECKING
 
+import narwhals as nw
 import numpy as np
 import pandas as pd
 from pandas.api.types import is_categorical_dtype
 
 from tubular.base import BaseTransformer
+
+if TYPE_CHECKING:
+    from narwhals.typing import FrameT
 
 
 class BaseMappingTransformer(BaseTransformer):
@@ -81,7 +86,7 @@ class BaseMappingTransformer(BaseTransformer):
 
 
 class BaseMappingTransformMixin(BaseTransformer):
-    """Mixin class to apply standard pd.Series.map transform method.
+    """Mixin class to apply mappings to columns method.
 
     Transformer uses the mappings attribute which should be a dict of dicts/mappings
     for each required column.
@@ -94,28 +99,44 @@ class BaseMappingTransformMixin(BaseTransformer):
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+    @nw.narwhalify
+    def transform(self, X: FrameT) -> FrameT:
         """Applies the mapping defined in the mappings dict to each column in the columns
         attribute.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Data with nominal columns to transform.
 
         Returns
         -------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Transformed input X with levels mapped accoriding to mappings dict.
 
         """
-        self.check_is_fitted(["mappings"])
+        self.check_is_fitted(["mappings", "return_dtype"])
 
-        X = super().transform(X)
+        X = nw.from_native(super().transform(X))
 
-        return X.replace(self.mappings)
+        for col in self.mappings:
+            mappings = self.mappings[col]
+
+            # mapping dict needs to be 1:1 for replace_strict
+            values = X.get_column(col).unique()
+
+            mappings = {value: mappings.get(value, value) for value in values}
+
+            X = X.with_columns(
+                nw.col(col).replace_strict(
+                    old=list(mappings.keys()),
+                    new=list(mappings.values()),
+                ),
+            )
+
+        return X
 
 
 class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
