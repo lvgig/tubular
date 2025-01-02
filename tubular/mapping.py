@@ -28,7 +28,7 @@ class BaseMappingTransformer(BaseTransformer):
         example the following dict {'a': {1: 2, 3: 4}, 'b': {'a': 1, 'b': 2}} would specify
         a mapping for column a of 1->2, 3->4 and a mapping for column b of 'a'->1, b->2.
 
-    return_dtype: Dict[str, RETURN_DTYPES_TYPE]
+    return_dtype: Optional[Dict[str, RETURN_DTYPES]]
         Dictionary of col:dtype for returned columns
 
     **kwargs
@@ -40,7 +40,7 @@ class BaseMappingTransformer(BaseTransformer):
         Dictionary of mappings for each column individually. The dict passed to mappings in
         init is set to the mappings attribute.
 
-    return_dtypes: dict[str, RETURN_DTYPES_TYPE]
+    return_dtypes: dict[str, RETURN_DTYPES]
         Dictionary of col:dtype for returned columns
 
     polars_compatible : bool
@@ -48,11 +48,14 @@ class BaseMappingTransformer(BaseTransformer):
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
-    RETURN_DTYPES_TYPE = Literal[
+    RETURN_DTYPES = Literal[
         "String",
-        "CategoricalInt8",
+        "Object",
+        "Categorical",
+        "Boolean",
+        "Int8",
         "Int16",
         "Int32",
         "Int64",
@@ -63,7 +66,7 @@ class BaseMappingTransformer(BaseTransformer):
     def __init__(
         self,
         mappings: dict[str, dict],
-        return_dtypes: dict[str, RETURN_DTYPES_TYPE],
+        return_dtypes: dict[str, RETURN_DTYPES] | None = None,
         **kwargs: dict[str, bool],
     ) -> None:
         if isinstance(mappings, dict):
@@ -87,7 +90,8 @@ class BaseMappingTransformer(BaseTransformer):
 
         super().__init__(columns=columns, **kwargs)
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+    @nw.narwhalify
+    def transform(self, X: FrameT) -> FrameT:
         """Base mapping transformer transform method.  Checks that the mappings
         dict has been fitted and calls the BaseTransformer transform method.
 
@@ -102,7 +106,7 @@ class BaseMappingTransformer(BaseTransformer):
             Input X, copied if specified by user.
 
         """
-        self.check_is_fitted(["mappings"])
+        self.check_is_fitted(["mappings", "return_dtypes"])
 
         return super().transform(X)
 
@@ -139,7 +143,13 @@ class BaseMappingTransformMixin(BaseTransformer):
             Transformed input X with levels mapped accoriding to mappings dict.
 
         """
-        self.check_is_fitted(["mappings", "return_dtype"])
+        self.check_is_fitted(["mappings"])
+
+        if not self.return_dtypes:
+            msg = f"{self.classname()}.transform requires return_dtypes attr to be specified"
+            raise ValueError(
+                msg,
+            )
 
         X = nw.from_native(super().transform(X))
         native_namespace = nw.get_native_namespace(X)
@@ -162,7 +172,7 @@ class BaseMappingTransformMixin(BaseTransformer):
                 },
                 schema={
                     col: X.get_column(col).dtype,
-                    new_col_values: self.return_dtype,
+                    new_col_values: getattr(nw, self.return_dtypes[col]),
                 },
                 native_namespace=native_namespace,
             )
@@ -176,7 +186,6 @@ class BaseMappingTransformMixin(BaseTransformer):
                 .drop(col)
                 .rename({new_col_values: col})
             )
-            print(X.to_native())
 
         return X
 
