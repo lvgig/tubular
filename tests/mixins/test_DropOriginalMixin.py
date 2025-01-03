@@ -28,41 +28,17 @@ class TestDropOriginalColumn:
     "tests for DropOriginalMixin.drop_original_column"
 
     @pytest.mark.parametrize("library", ["pandas", "polars"])
-    def test_original_columns_dropped_when_specified(
+    @pytest.mark.parametrize("drop_original", [True, False])
+    def test_drop_original_arg_handling(
         self,
         library,
+        drop_original,
     ):
-        """Test transformer drops original columns when specified."""
+        """Test transformer drops/keeps original columns when specified/not specified."""
 
         df = create_df_1(library=library)
 
         obj = DropOriginalMixin()
-
-        drop_original = True
-
-        columns = list(df.columns)
-
-        df_transformed = obj.drop_original_column(
-            df,
-            drop_original=drop_original,
-            columns=columns,
-        )
-        remaining_cols = df_transformed.columns
-        for col in columns:
-            assert col not in remaining_cols, "original columns not dropped"
-
-    @pytest.mark.parametrize("library", ["pandas", "polars"])
-    def test_original_columns_kept_when_specified(
-        self,
-        library,
-    ):
-        """Test transformer keeps original columns when specified."""
-
-        df = create_df_1(library=library)
-
-        obj = DropOriginalMixin()
-
-        drop_original = False
 
         columns = list(df.columns)
 
@@ -73,8 +49,14 @@ class TestDropOriginalColumn:
         )
 
         remaining_cols = df_transformed.columns
-        for col in columns:
-            assert col in remaining_cols, "original columns not kept"
+
+        if drop_original:
+            for col in columns:
+                assert col not in remaining_cols, "original columns not dropped"
+
+        else:
+            for col in columns:
+                assert col in remaining_cols, "original columns not kept"
 
     @pytest.mark.parametrize("library", ["pandas", "polars"])
     def test_other_columns_not_modified(
