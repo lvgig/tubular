@@ -4,12 +4,17 @@ from __future__ import annotations
 
 import warnings
 from collections import OrderedDict
+from typing import TYPE_CHECKING
 
+import narwhals as nw
 import numpy as np
 import pandas as pd
 from pandas.api.types import is_categorical_dtype
 
 from tubular.base import BaseTransformer
+
+if TYPE_CHECKING:
+    from narwhals.typing import FrameT
 
 
 class BaseMappingTransformer(BaseTransformer):
@@ -37,7 +42,7 @@ class BaseMappingTransformer(BaseTransformer):
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     def __init__(self, mappings: dict[str, dict], **kwargs: dict[str, bool]) -> None:
         if isinstance(mappings, dict):
@@ -60,18 +65,19 @@ class BaseMappingTransformer(BaseTransformer):
 
         super().__init__(columns=columns, **kwargs)
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+    @nw.narwhalify
+    def transform(self, X: FrameT) -> FrameT:
         """Base mapping transformer transform method.  Checks that the mappings
         dict has been fitted and calls the BaseTransformer transform method.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Data to apply mappings to.
 
         Returns
         -------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Input X, copied if specified by user.
 
         """

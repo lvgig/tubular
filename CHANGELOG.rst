@@ -22,11 +22,15 @@ Each individual change should have a link to the pull request after the descript
 Changed
 ^^^^^^^
 
+- updated WeightsColumnMixin to use new narwhals 'is_finite' method
 - narwhalified ModeImputer `#321 <https://github.com/lvgig/tubular/issues/321>_`
 - fixed issues with all null and nullable-bool column handling in dataframe_init_dispatch
 - added NaN error handling to WeightColumnMixin
 - narwhalified MeanImputer `#344 https://github.com/lvgig/tubular/issues/344_`
 - narwhalified DropOriginalMixin `#352 <https://github.com/lvgig/tubular/issues/352>_`
+- narwhalified BaseMappingTransformer `#367 <https://github.com/lvgig/tubular/issues/367>_`
+- placeholder
+- placeholder
 - placeholder
 - placeholder
 
@@ -76,6 +80,7 @@ Changed
 - Refactored OrdinalEncoderTransformer tests in new format `#330 <https://github.com/lvgig/tubular/issues/330>`_
 - Narwhal-ified NullIndicator `#319 <https://github.com/lvgig/tubular/issues/319>_`
 - Narwhal-ified NearestMeanResponseImputer `#320 <https://github.com/lvgig/tubular/issues/320>_`
+- Narwhal-ified MedianImputer `#317 <https://github.com/lvgig/tubular/issues/317>_`
 
 
 1.3.1 (2024-07-18)
