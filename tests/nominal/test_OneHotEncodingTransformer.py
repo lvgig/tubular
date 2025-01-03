@@ -42,13 +42,13 @@ class TestFit(GenericFitTests):
         """Test that an exception is raised if X has nulls in column to be fit on."""
         df = d.create_df_2(library=library)
 
-        x = OneHotEncodingTransformer(columns=["b", "c"])
+        transformer = OneHotEncodingTransformer(columns=["b", "c"])
 
         with pytest.raises(
             ValueError,
             match="OneHotEncodingTransformer: column b has nulls - replace before proceeding",
         ):
-            x.fit(df)
+            transformer.fit(df)
 
     @pytest.mark.parametrize(
         "library",
@@ -60,13 +60,13 @@ class TestFit(GenericFitTests):
 
         df = dataframe_init_dispatch(library=library, dataframe_dict=df_dict)
 
-        x = OneHotEncodingTransformer(columns=["a", "b"])
+        transformer = OneHotEncodingTransformer(columns=["a", "b"])
 
         with pytest.raises(
             ValueError,
             match="OneHotEncodingTransformer: column b has over 100 unique values - consider another type of encoding",
         ):
-            x.fit(df)
+            transformer.fit(df)
 
 
 class TestTransform(
@@ -157,15 +157,15 @@ class TestTransform(
         df_train = d.create_df_1(library=library)
         df_test = d.create_df_2(library=library)
 
-        x = OneHotEncodingTransformer(columns=["b"])
+        transformer = OneHotEncodingTransformer(columns=["b"])
 
-        x.fit(df_train)
+        transformer.fit(df_train)
 
         with pytest.raises(
             ValueError,
             match="OneHotEncodingTransformer: column b has nulls - replace before proceeding",
         ):
-            x.transform(df_test)
+            transformer.transform(df_test)
 
     @pytest.mark.parametrize(
         "library",
@@ -184,10 +184,10 @@ class TestTransform(
         df_test = df_train.clone()
         expected = self.create_OneHotEncoderTransformer_test_df_1(library=library)
 
-        x = OneHotEncodingTransformer(columns=columns)
-        x.fit(df_train)
+        transformer = OneHotEncodingTransformer(columns=columns)
+        transformer.fit(df_train)
 
-        df_transformed = x.transform(df_test.to_native())
+        df_transformed = transformer.transform(df_test.to_native())
 
         expected = nw.from_native(expected)
         for col in [
@@ -203,7 +203,7 @@ class TestTransform(
 
         # also test single row transform
         for i in range(len(df_test)):
-            df_transformed_row = x.transform(df_test[[i]].to_native())
+            df_transformed_row = transformer.transform(df_test[[i]].to_native())
             df_expected_row = expected[[i]].to_native()
 
             assert_frame_equal_dispatch(
@@ -220,17 +220,17 @@ class TestTransform(
         df_train = d.create_df_1(library=library)
         df_test = d.create_df_7(library=library)
 
-        x = OneHotEncodingTransformer(columns=["a", "b"], verbose=False)
-        x2 = OneHotEncodingTransformer(columns=["a", "b"], verbose=False)
+        transformer = OneHotEncodingTransformer(columns=["a", "b"], verbose=False)
+        transformer2 = OneHotEncodingTransformer(columns=["a", "b"], verbose=False)
 
-        x.fit(df_train)
-        x2.fit(df_train)
+        transformer.fit(df_train)
+        transformer2.fit(df_train)
 
-        x.transform(df_test)
+        transformer.transform(df_test)
 
         assert (
-            x2.categories_ == x.categories_
-        ), f"categories_ modified during transform, pre transform had {x2.categories_} but post transform has {x.categories_}"
+            transformer2.categories_ == transformer.categories_
+        ), f"categories_ modified during transform, pre transform had {transformer2.categories_} but post transform has {transformer.categories_}"
 
     @pytest.mark.parametrize(
         "library",
@@ -241,15 +241,15 @@ class TestTransform(
         df = d.create_df_7(library=library)
         df = df[["b", "c"]]
 
-        x = OneHotEncodingTransformer(
+        transformer = OneHotEncodingTransformer(
             columns=["b", "c"],
             separator="|",
             drop_original=True,
         )
 
-        x.fit(df)
+        transformer.fit(df)
 
-        df_transformed = x.transform(df)
+        df_transformed = transformer.transform(df)
 
         expected_columns = ["b|x", "b|y", "b|z", "c|a", "c|b", "c|c"]
 
@@ -269,12 +269,12 @@ class TestTransform(
         df_train = d.create_df_7(library=library)
         df_test = d.create_df_8(library=library)
 
-        x = OneHotEncodingTransformer(columns=["a", "b", "c"], verbose=True)
+        transformer = OneHotEncodingTransformer(columns=["a", "b", "c"], verbose=True)
 
-        x.fit(df_train)
+        transformer.fit(df_train)
 
         with pytest.warns(UserWarning, match="unseen categories"):
-            x.transform(df_test)
+            transformer.transform(df_test)
 
     @pytest.mark.parametrize(
         "library",
