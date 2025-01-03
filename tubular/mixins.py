@@ -174,13 +174,20 @@ class WeightColumnMixin:
             msg = f"{self.classname()}: weight column must be positive"
             raise ValueError(msg)
 
-        # check weight non-null
-        if X.select(nw.col(weights_column).is_null().sum()).item() != 0:
+        if (
+            # check weight non-None
+            (X.select(nw.col(weights_column).is_null().sum()).item() != 0)
+            or
+            # TODO - update this section with narwhals is_nan method once this becomes
+            # available
+            # check weight non-NaN - polars differentiates between None and NaN
+            (np.isnan(X.get_column(weights_column).to_numpy()).sum() != 0)
+        ):
             msg = f"{self.classname()}: weight column must be non-null"
             raise ValueError(msg)
 
-        # check weight not inf, currently no polars-y way to do this in narwhals
-        if np.isinf(X[weights_column].to_numpy()).any():
+        # check weight not inf
+        if not X.select((nw.col(weights_column).is_finite()).all()).item():
             msg = f"{self.classname()}: weight column must not contain infinite values."
             raise ValueError(msg)
 
