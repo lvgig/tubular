@@ -584,6 +584,7 @@ class ToDatetimeTransformer(BaseGenericDateTransformer):
             **self.to_datetime_kwargs,
         )
 
+        # Drop original columns if self.drop_original is True
         return DropOriginalMixin.drop_original_column(
             self,
             X,
