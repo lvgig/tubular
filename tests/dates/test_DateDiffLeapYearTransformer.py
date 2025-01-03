@@ -1,5 +1,6 @@
 import datetime
 
+import narwhals as nw
 import numpy as np
 import pandas as pd
 import pytest
@@ -17,6 +18,7 @@ from tests.base_tests import (
 from tests.dates.test_BaseGenericDateTransformer import (
     GenericDatesMixinTransformTests,
 )
+from tests.utils import assert_frame_equal_dispatch, dataframe_init_dispatch
 from tubular.dates import DateDiffLeapYearTransformer
 
 
@@ -78,6 +80,93 @@ class TestInit(
             )
 
 
+def expected_df_1(library="pandas"):
+    """Expected output for test_expected_output_drop_original_true."""
+
+    df_dict = {
+        "c": [
+            26,
+            19,
+            0,
+            0,
+            0,
+            -2,
+            -3,
+            30,
+        ],
+    }
+
+    return dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
+
+
+def expected_df_2(library="pandas"):
+    """Expected output for test_expected_output_drop_original_false."""
+
+    df_dict = {
+        "a": [
+            datetime.date(1993, 9, 27),  # day/month greater than
+            datetime.date(2000, 3, 19),  # day/month less than
+            datetime.date(2018, 11, 10),  # same day
+            datetime.date(2018, 10, 10),  # same year day/month greater than
+            datetime.date(2018, 10, 10),  # same year day/month less than
+            datetime.date(2018, 10, 10),  # negative day/month less than
+            datetime.date(2018, 12, 10),  # negative day/month greater than
+            datetime.date(
+                1985,
+                7,
+                23,
+            ),  # large gap, this is incorrect with timedelta64 solutions
+        ],
+        "b": [
+            datetime.date(2020, 5, 1),
+            datetime.date(2019, 12, 25),
+            datetime.date(2018, 11, 10),
+            datetime.date(2018, 11, 10),
+            datetime.date(2018, 9, 10),
+            datetime.date(2015, 11, 10),
+            datetime.date(2015, 11, 10),
+            datetime.date(2015, 7, 23),
+        ],
+        "c": [
+            26,
+            19,
+            0,
+            0,
+            0,
+            -2,
+            -3,
+            30,
+        ],
+    }
+
+    df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
+
+    # ensure types line up with test data
+    df = nw.from_native(df)
+    for col in [col for col in df.columns if col not in ["c"]]:
+        df = df.with_columns(
+            nw.col(col).cast(nw.Date),
+        )
+
+    return nw.to_native(df)
+
+
+def expected_df_3(library="pandas"):
+    """Expected output for test_expected_output_nulls."""
+
+    df_dict = {
+        "a": [
+            np.nan,
+        ],
+        "b": [
+            np.nan,
+        ],
+        "c": [None],
+    }
+
+    return dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
+
+
 class TestTransform(
     DropOriginalTransformMixinTests,
     GenericTransformTests,
@@ -88,78 +177,6 @@ class TestTransform(
     @classmethod
     def setup_class(cls):
         cls.transformer_name = "DateDiffLeapYearTransformer"
-
-    def expected_df_1():
-        """Expected output for test_expected_output_drop_original_true."""
-        return pd.DataFrame(
-            {
-                "c": [
-                    26,
-                    19,
-                    0,
-                    0,
-                    0,
-                    -2,
-                    -3,
-                    30,
-                ],
-            },
-        )
-
-    def expected_df_2():
-        """Expected output for test_expected_output_drop_original_false."""
-        return pd.DataFrame(
-            {
-                "a": [
-                    datetime.date(1993, 9, 27),  # day/month greater than
-                    datetime.date(2000, 3, 19),  # day/month less than
-                    datetime.date(2018, 11, 10),  # same day
-                    datetime.date(2018, 10, 10),  # same year day/month greater than
-                    datetime.date(2018, 10, 10),  # same year day/month less than
-                    datetime.date(2018, 10, 10),  # negative day/month less than
-                    datetime.date(2018, 12, 10),  # negative day/month greater than
-                    datetime.date(
-                        1985,
-                        7,
-                        23,
-                    ),  # large gap, this is incorrect with timedelta64 solutions
-                ],
-                "b": [
-                    datetime.date(2020, 5, 1),
-                    datetime.date(2019, 12, 25),
-                    datetime.date(2018, 11, 10),
-                    datetime.date(2018, 11, 10),
-                    datetime.date(2018, 9, 10),
-                    datetime.date(2015, 11, 10),
-                    datetime.date(2015, 11, 10),
-                    datetime.date(2015, 7, 23),
-                ],
-                "c": [
-                    26,
-                    19,
-                    0,
-                    0,
-                    0,
-                    -2,
-                    -3,
-                    30,
-                ],
-            },
-        )
-
-    def expected_df_3():
-        """Expected output for test_expected_output_nulls."""
-        return pd.DataFrame(
-            {
-                "a": [
-                    np.nan,
-                ],
-                "b": [
-                    np.nan,
-                ],
-                "c": [None],
-            },
-        )
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -179,11 +196,7 @@ class TestTransform(
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_frame_equal_msg(
-            actual=df_transformed,
-            expected=expected,
-            msg_tag="Unexpected values in DateDiffLeapYearTransformer.transform (with drop_original)",
-        )
+        assert_frame_equal_dispatch(df_transformed, expected)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -203,11 +216,7 @@ class TestTransform(
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_frame_equal_msg(
-            actual=df_transformed,
-            expected=expected,
-            msg_tag="Unexpected values in DateDiffLeapYearTransformer.transform (with drop_original=False)",
-        )
+        assert_frame_equal_dispatch(df_transformed, expected)
 
     @pytest.mark.parametrize(
         ("columns"),
@@ -230,11 +239,7 @@ class TestTransform(
 
         df_transformed = x.transform(df[columns])
 
-        ta.equality.assert_frame_equal_msg(
-            actual=df_transformed,
-            expected=expected,
-            msg_tag=f"Unexpected values in DateDiffLeapYearTransformer.transform between {columns[0]} and {columns[1]}",
-        )
+        assert_frame_equal_dispatch(df_transformed, expected)
 
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):

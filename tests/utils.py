@@ -15,6 +15,8 @@ PANDAS_TO_POLARS_TYPES = {
     "str": pl.String,
     "bool": pl.Boolean,
     "datetime64[ns]": pl.Datetime,
+    "datetime64[ns, UTC]": pl.Datetime(time_zone="UTC"),
+    "date32[day][pyarrow]": pl.Date,
     # this is not a pandas type, but include to help manage null column handling
     "null": pl.Null,
 }
@@ -105,6 +107,11 @@ def dataframe_init_dispatch(
     """
 
     pandas_df = pd.DataFrame(dataframe_dict)
+
+    # narwhals only supports pyarrow date type, so convert
+    for col in pandas_df:
+        if pd.api.types.infer_dtype(pandas_df[col]) == "date":
+            pandas_df[col] = pandas_df[col].astype("date32[pyarrow]")
 
     if library == "pandas":
         return pandas_df
