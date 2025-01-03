@@ -50,6 +50,11 @@ class DropOriginalMixin:
 
     """
 
+    def classname(self) -> str:
+        """Method that returns the name of the current class when called."""
+
+        return type(self).__name__
+
     def set_drop_original_column(self, drop_original: bool) -> None:
         """Helper method for validating 'drop_original' argument.
 
@@ -66,9 +71,10 @@ class DropOriginalMixin:
 
         self.drop_original = drop_original
 
+    @nw.narwhalify
     def drop_original_column(
         self,
-        X: pd.DataFrame,
+        X: FrameT,
         drop_original: bool,
         columns: list[str] | str | None,
     ) -> pd.DataFrame:
@@ -76,7 +82,7 @@ class DropOriginalMixin:
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Data with columns to drop.
 
         drop_original : bool
@@ -87,14 +93,13 @@ class DropOriginalMixin:
 
         Returns
         -------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Transformed input X with columns dropped.
 
         """
 
         if drop_original:
-            for col in columns:
-                del X[col]
+            X = X.drop(columns)
 
         return X
 
