@@ -664,9 +664,7 @@ class OutOfRangeNullTransformer(BaseCappingTransformer):
             Required for pipeline.
 
         """
-        # be careful to only run BaseCappingTransformer fit for quantiles case
-        # or we will overwrite our _replacement_values from init
-        BaseNumericTransformer.fit(self, X=X, y=y)
+        super().fit(X=X, y=y)
 
         if self.weights_column:
             WeightColumnMixin.check_weights_column(self, X, self.weights_column)
