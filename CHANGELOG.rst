@@ -22,6 +22,7 @@ Each individual change should have a link to the pull request after the descript
 Changed
 ^^^^^^^
 
+- converted OneHotEncodingTransformer to narwhals `#355 <https://github.com/lvgig/tubular/issues/355>_`
 - updated WeightsColumnMixin to use new narwhals 'is_finite' method
 - narwhalified ModeImputer `#321 <https://github.com/lvgig/tubular/issues/321>_`
 - fixed issues with all null and nullable-bool column handling in dataframe_init_dispatch

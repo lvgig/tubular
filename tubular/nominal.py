@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Literal
 import narwhals as nw
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import OneHotEncoder
 
 from tubular.base import BaseTransformer
 from tubular.mapping import BaseMappingTransformMixin
@@ -1082,8 +1081,6 @@ class OneHotEncodingTransformer(
 ):
     """Transformer to convert categorical variables into dummy columns.
 
-    Extends the sklearn OneHotEncoder class to provide easy renaming of dummy columns.
-
     Parameters
     ----------
     columns : str or list of strings or None, default = None
@@ -1119,7 +1116,7 @@ class OneHotEncodingTransformer(
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     FITS = True
 
@@ -1130,7 +1127,6 @@ class OneHotEncodingTransformer(
         drop_original: bool = False,
         copy: bool | None = None,
         verbose: bool = False,
-        dtype: np.int8 = np.int8,
         **kwargs: dict[str, bool],
     ) -> None:
         BaseTransformer.__init__(
@@ -1138,29 +1134,20 @@ class OneHotEncodingTransformer(
             columns=columns,
             verbose=verbose,
             copy=copy,
-        )
-
-        # Set the dtype attribute
-        self.dtype = dtype
-
-        # Create an instance of OneHotEncoder and assign it to _encoder
-        self._encoder = OneHotEncoder(
-            sparse_output=False,
-            handle_unknown="ignore",
-            dtype=dtype,
             **kwargs,
         )
 
         self.set_drop_original_column(drop_original)
         self.check_and_set_separator_column(separator)
 
-    def fit(self, X: pd.DataFrame, y: pd.Series | None = None) -> pd.DataFrame:
+    @nw.narwhalify
+    def fit(self, X: FrameT, y: nw.Series | None = None) -> FrameT:
         """Gets list of levels for each column to be transformed. This defines which dummy columns
         will be created in transform.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Data to identify levels from.
 
         y : None
@@ -1171,76 +1158,67 @@ class OneHotEncodingTransformer(
 
         # Check for nulls
         for c in self.columns:
-            if X[c].isna().sum() > 0:
+            if X.select(nw.col(c).is_null().sum()).item() > 0:
                 raise ValueError(
                     f"{self.classname()}: column %s has nulls - replace before proceeding"
                     % c,
                 )
 
+        self.categories_ = {}
+        self.new_feature_names_ = {}
         # Check each field has less than 100 categories/levels
         for c in self.columns:
-            levels = X[c].unique().tolist()
+            levels = X.select(nw.col(c).unique())
 
-            if len(levels) > 100:
+            level_count = levels.select(nw.col(c).count()).item()
+
+            if level_count > 100:
                 raise ValueError(
                     f"{self.classname()}: column %s has over 100 unique values - consider another type of encoding"
                     % c,
                 )
 
-        self._encoder.fit(X[self.columns], y=y)
+            # Set the categories_ attribute to ensure check_is_fitted works
+            levels_list = levels.get_column(c).to_list()
 
-        # Set the categories_ attribute to ensure check_is_fitted works
-        self.categories_ = self._encoder.categories_
+            # for consistency
+            levels_list.sort()
+
+            self.categories_[c] = levels_list
+
+            self.new_feature_names_[c] = self._get_feature_names(column=c)
 
         return self
 
     def _get_feature_names(
         self,
-        input_features: list[str],
-        **kwargs: dict[str, bool],
+        column: str,
     ) -> list[str]:
-        """Function to access the get_feature_names attribute of the scikit learn attribute. Will return the output columns of the OHE transformer.
-
-        In scikit learn 1.0 "get_feature_names" was deprecated and then replaced with "get_feature_names_out" in version 1.2. The logic in this
-        function will call the correct attribute, or raise an error if it can't be found.
+        """Function to get list of features that will be output by transformer
 
         Parameters
         ----------
-        input_features : list[str]
-            Input columns being transformed by the OHE transformer.
+        column: str
+            column to get dummy feature names for
 
-        kwargs : dict
-            Keyword arguments to be passed on to the scikit learn attribute.
         """
-        if hasattr(self._encoder, "get_feature_names"):
-            input_columns = self._encoder.get_feature_names(
-                input_features=input_features,
-                **kwargs,
-            )
 
-        elif hasattr(self._encoder, "get_feature_names_out"):
-            input_columns = self._encoder.get_feature_names_out(
-                input_features=input_features,
-                **kwargs,
-            )
+        return [
+            column + self.separator + str(level) for level in self.categories_[column]
+        ]
 
-        else:
-            msg = "Cannot access scikit learn OneHotEncoder get_feature_names method, may be a version issue"
-            raise AttributeError(msg)
-
-        return input_columns
-
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+    @nw.narwhalify
+    def transform(self, X: FrameT) -> FrameT:
         """Create new dummy columns from categorical fields.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Data to apply one hot encoding to.
 
         Returns
         -------
-        X_transformed : pd.DataFrame
+        X_transformed : pd/pl.DataFrame
             Transformed input X with dummy columns derived from categorical columns added. If drop_original
             = True then the original categorical columns that the dummies are created from will not be in
             the output X.
@@ -1250,19 +1228,23 @@ class OneHotEncodingTransformer(
         # Check that transformer has been fit before calling transform
         self.check_is_fitted(["categories_"])
 
-        X = BaseTransformer.transform(self, X)
+        X = nw.from_native(BaseTransformer.transform(self, X))
 
-        # Check for nulls
+        missing_levels = {}
         for c in self.columns:
-            if X[c].isna().sum() > 0:
+            # Check for nulls
+            if X.select(nw.col(c).is_null().sum()).item() > 0:
                 raise ValueError(
                     f"{self.classname()}: column %s has nulls - replace before proceeding"
                     % c,
                 )
 
-        # Print warning for unseen levels
-        for i, c in enumerate(self.columns):
-            unseen_levels = set(X[c].unique().tolist()) - set(self.categories_[i])
+            # print warning for unseen levels
+            present_levels = set(X.select(nw.col(c).unique()).get_column(c).to_list())
+            unseen_levels = present_levels.difference(set(self.categories_[c]))
+            missing_levels[c] = list(
+                set(self.categories_[c]).difference(present_levels),
+            )
             if len(unseen_levels) > 0:
                 warnings.warn(
                     f"{self.classname()}: column {c} has unseen categories: {unseen_levels}",
@@ -1270,41 +1252,26 @@ class OneHotEncodingTransformer(
                     stacklevel=2,
                 )
 
-        # Apply OHE transform
-        X_transformed = self._encoder.transform(X[self.columns])
+            dummies = X.get_column(c).to_dummies(separator=self.separator)
 
-        input_columns = self._get_feature_names(input_features=self.columns)
-
-        X_transformed = pd.DataFrame(
-            X_transformed,
-            columns=input_columns,
-            index=X.index,
-        )
-
-        # Rename dummy fields if separator is specified
-        if self.separator != "_":
-            old_names = [
-                c + "_" + str(lvl)
-                for i, c in enumerate(self.columns)
-                for lvl in self._encoder.categories_[i]
-            ]
-            new_names = [
-                c + self.separator + str(lvl)
-                for i, c in enumerate(self.columns)
-                for lvl in self._encoder.categories_[i]
-            ]
-
-            X_transformed = X_transformed.rename(
-                columns=dict(zip(old_names, new_names)),
+            # insert 0 cols for missing levels
+            dummies = dummies.with_columns(
+                nw.lit(0).alias(c + self.separator + str(missing_level))
+                for missing_level in missing_levels[c]
             )
 
+            wanted_dummies = self.new_feature_names_[c]
+
+            # cast dummy columns to bool
+            dummies = dummies.with_columns(
+                nw.col(new_column).cast(nw.Boolean) for new_column in wanted_dummies
+            )
+            X = nw.concat([X, dummies.select(wanted_dummies)], how="horizontal")
+
         # Drop original columns if self.drop_original is True
-        X = DropOriginalMixin.drop_original_column(
+        return DropOriginalMixin.drop_original_column(
             self,
             X,
             self.drop_original,
             self.columns,
         )
-
-        # Concatenate original and new dummy fields
-        return pd.concat((X, X_transformed), axis=1)
