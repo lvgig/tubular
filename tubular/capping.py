@@ -248,7 +248,7 @@ class BaseCappingTransformer(BaseNumericTransformer, WeightColumnMixin):
         X : FrameT
             Dataframe with relevant columns to calculate quantiles from.
 
-        quantiles : None
+        quantiles : list[float]
             Weighted quantiles to calculate. Must all be between 0 and 1.
 
         values_col: str
