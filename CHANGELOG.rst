@@ -28,6 +28,13 @@ Changed
 - added NaN error handling to WeightColumnMixin
 - narwhalified MeanImputer `#344 https://github.com/lvgig/tubular/issues/344_`
 - narwhalified BaseMappingTransformer `#367 <https://github.com/lvgig/tubular/issues/367>_`
+- narwhalified BaseMappingTransformerMixin. As part of this made mapping transformers more 
+type-conscious, they now rely on an input 'return_dtypes' dict arg.
+`#369 <https://github.com/lvgig/tubular/issues/369>_`
+- As part of #369, updated OrdinalEncoderTransformer to output Int8 type
+- As part of #369, updated NominalToIntegerTransformer to output Int8 type. Removed inverse_mapping
+functionality, as this is more complicated when transform is opinionated on types.
+- placeholder
 - placeholder
 - placeholder
 - placeholder

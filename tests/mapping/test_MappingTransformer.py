@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import pytest
 import test_aide as ta
@@ -16,6 +17,7 @@ from tests.mapping.test_BaseMappingTransformer import (
     GenericFitTests,
     OtherBaseBehaviourTests,
 )
+from tests.utils import assert_frame_equal_dispatch
 from tubular.mapping import MappingTransformer
 
 
@@ -44,15 +46,25 @@ class TestTransform(BaseMappingTransformerTransformTests):
 
     def expected_df_1():
         """Expected output for test_expected_output."""
-        return pd.DataFrame(
+
+        df = pd.DataFrame(
             {"a": ["a", "b", "c", "d", "e", "f"], "b": [1, 2, 3, 4, 5, 6]},
         )
 
+        df["b"] = df["b"].astype(np.int8)
+
+        return df
+
     def expected_df_2():
         """Expected output for test_non_specified_values_unchanged."""
-        return pd.DataFrame(
+
+        df = pd.DataFrame(
             {"a": [5, 6, 7, 4, 5, 6], "b": ["z", "y", "x", "d", "e", "f"]},
         )
+
+        df["a"] = df["a"].astype(np.int8)
+
+        return df
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -71,11 +83,7 @@ class TestTransform(BaseMappingTransformerTransformTests):
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_frame_equal_msg(
-            actual=df_transformed,
-            expected=expected,
-            msg_tag="expected output from mapping transformer",
-        )
+        assert_frame_equal_dispatch(df_transformed, expected)
 
     @pytest.mark.parametrize(
         ("df", "expected"),
@@ -91,11 +99,7 @@ class TestTransform(BaseMappingTransformerTransformTests):
 
         df_transformed = x.transform(df)
 
-        ta.equality.assert_frame_equal_msg(
-            actual=df_transformed,
-            expected=expected,
-            msg_tag="expected output from mapping transformer",
-        )
+        assert_frame_equal_dispatch(df_transformed, expected)
 
     @pytest.mark.parametrize(
         ("mapping", "return_dtypes", "output_col_type_check"),
@@ -129,7 +133,7 @@ class TestTransform(BaseMappingTransformerTransformTests):
         x = MappingTransformer(mappings=mapping, return_dtypes=return_dtypes)
         df = x.transform(df)
 
-        assert output_col_type_check(df[return_dtypes.keys()[0]])
+        assert output_col_type_check(df[list(return_dtypes.keys())[0]])
 
     def test_category_dtype_is_conserved(self):
         """This is a separate test due to the behaviour of category dtypes.
@@ -140,7 +144,7 @@ class TestTransform(BaseMappingTransformerTransformTests):
         df["b"] = df["b"].astype("category")
 
         mapping = {"b": {"a": "aaa", "b": "bbb"}}
-        return_dtypes = {"b": "Category"}
+        return_dtypes = {"b": "Categorical"}
 
         x = MappingTransformer(mappings=mapping, return_dtypes=return_dtypes)
         df = x.transform(df)
@@ -151,7 +155,8 @@ class TestTransform(BaseMappingTransformerTransformTests):
         ("mapping", "mapped_col", "return_dtypes"),
         [
             ({"a": {99: "99", 98: "98"}}, "a", {"a": "Int32"}),
-            ({"b": {"z": 99, "y": 98}}, "b", {"b": "Int64"}),
+            # below types come out as str-like as not all existing str vals converted
+            ({"b": {"z": 99, "y": 98}}, "b", {"b": "String"}),
         ],
     )
     def test_no_applicable_mapping(self, mapping, mapped_col, return_dtypes):

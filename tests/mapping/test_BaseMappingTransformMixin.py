@@ -74,6 +74,7 @@ class TestTransform(GenericTransformTests):
             return
 
         transformer.mappings = mapping
+        transformer.return_dtypes = {"a": "String", "b": "Int64"}
 
         df_transformed = transformer.transform(df)
 
@@ -91,6 +92,10 @@ class TestTransform(GenericTransformTests):
             return
 
         transformer.mappings = mapping
+        transformer.return_dtypes = {
+            "a": "String",
+            "b": "Int64",
+        }
 
         transformer.transform(df)
 
@@ -117,6 +122,9 @@ class TestTransform(GenericTransformTests):
             return
 
         transformer.mappings = mapping
+        transformer.return_dtypes = {
+            "a": "String",
+        }
 
         x_fitted = transformer.fit(df, df["c"])
 
@@ -138,6 +146,7 @@ class TestTransform(GenericTransformTests):
             return
 
         transformer.mappings = mapping
+        transformer.return_dtypes = {"a": "String"}
 
         transformer = transformer.fit(df, df["c"])
 
@@ -162,6 +171,7 @@ class TestTransform(GenericTransformTests):
             return
 
         transformer.mappings = mapping
+        transformer.return_dtypes = {"a": "String", "b": "Int64"}
 
         transformer = transformer.fit(df, df["c"])
 
@@ -190,6 +200,7 @@ class TestTransform(GenericTransformTests):
             return
 
         transformer.mappings = mapping
+        transformer.return_dtypes = {"a": "String", "b": "String"}
 
         # update to abnormal index
         df.index = [2 * i for i in df.index]

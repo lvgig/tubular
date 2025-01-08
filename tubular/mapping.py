@@ -143,22 +143,24 @@ class BaseMappingTransformMixin(BaseTransformer):
             Transformed input X with levels mapped accoriding to mappings dict.
 
         """
-        self.check_is_fitted(["mappings"])
-
-        if not self.return_dtypes:
-            msg = f"{self.classname()}.transform requires return_dtypes attr to be specified"
-            raise ValueError(
-                msg,
-            )
+        self.check_is_fitted(["mappings", "return_dtypes"])
 
         X = nw.from_native(super().transform(X))
         native_namespace = nw.get_native_namespace(X)
+
+        # will do a join further down, which does not preserve index
+        # polars does not care about this, but pandas does,
+        # so need to handle a bit carefully
+        if nw.get_native_namespace(X).__name__ == "pandas":
+            index = nw.to_native(X).index
+
+        # pull out column order to preserve
+        column_order = X.columns
 
         for col in self.mappings:
             mappings = self.mappings[col]
 
             # TODO - update this logic once narwhals implements map_dict
-
             # differentiate between unmapped cols and cols mapped to null
             # by including unmapped cols
             unique = X.get_column(col).unique()
@@ -187,7 +189,12 @@ class BaseMappingTransformMixin(BaseTransformer):
                 .rename({new_col_values: col})
             )
 
-        return X
+        # restore original index for pandas
+        if nw.get_native_namespace(X).__name__ == "pandas":
+            X = nw.to_native(X)
+            X.index = index
+
+        return X[column_order]
 
 
 class MappingTransformer(BaseMappingTransformer, BaseMappingTransformMixin):
