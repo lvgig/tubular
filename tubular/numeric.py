@@ -78,7 +78,7 @@ class BaseNumericTransformer(BaseTransformer, CheckNumericMixin):
 
         super().fit(X, y)
 
-        CheckNumericMixin.check_numeric_columns(self, X)
+        CheckNumericMixin.check_numeric_columns(self, X[self.columns])
 
         return self
 
@@ -100,7 +100,7 @@ class BaseNumericTransformer(BaseTransformer, CheckNumericMixin):
 
         X = super().transform(X)
 
-        CheckNumericMixin.check_numeric_columns(self, X)
+        CheckNumericMixin.check_numeric_columns(self, X[self.columns])
 
         return X
 
