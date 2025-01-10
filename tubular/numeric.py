@@ -71,7 +71,7 @@ class BaseNumericTransformer(BaseTransformer, CheckNumericMixin):
         X : pd/pl.DataFrame
             A dataframe containing the required columns
 
-        y : None
+        y : pd/pl.Series | None
             Required for pipeline.
 
         """
