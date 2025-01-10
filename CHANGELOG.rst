@@ -30,7 +30,8 @@ Changed
 - narwhalified MeanImputer `#344 https://github.com/lvgig/tubular/issues/344_`
 - narwhalified DropOriginalMixin `#352 <https://github.com/lvgig/tubular/issues/352>_`
 - narwhalified BaseMappingTransformer `#367 <https://github.com/lvgig/tubular/issues/367>_`
-- placeholder
+- narwhalified GroupRareLevelsTransformer. As part of this, had to make transformer more opinionated
+and refuse columns with nulls (raises an error directing to imputers.) `#372 <https://github.com/lvgig/tubular/issues/372>_`
 - placeholder
 - placeholder
 - placeholder
