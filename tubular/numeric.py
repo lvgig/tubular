@@ -233,9 +233,7 @@ class LogTransformer(BaseNumericTransformer, DropOriginalMixin):
             else:
                 X[new_column_names] = np.log(X[self.columns]) / np.log(self.base)
 
-        self.drop_original_column(X, self.drop_original, self.columns)
-
-        return X
+        return self.drop_original_column(X, self.drop_original, self.columns)
 
 
 class CutTransformer(BaseNumericTransformer):
