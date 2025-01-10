@@ -1,9 +1,11 @@
 import datetime
 
+import narwhals as nw
 import numpy as np
 import pandas as pd
+import polars as pl
 import pytest
-import test_aide as ta
+from pandas.testing import assert_frame_equal
 
 from tests.base_tests import (
     ColumnStrListInitTests,
@@ -30,7 +32,7 @@ class TestInit(
         """Test that an exception is raised if to_datetime_kwargs is not a dict."""
         with pytest.raises(
             TypeError,
-            match=r"""ToDatetimeTransformer: to_datetime_kwargs should be a dict but got type \<class 'int'\>""",
+            match=r"""ToDatetimeTransformer: to_datetime_kwargs should be a dict but got \<class 'int'\>""",
         ):
             ToDatetimeTransformer(column="b", new_column_name="a", to_datetime_kwargs=1)
 
@@ -38,7 +40,7 @@ class TestInit(
         """Test that an exception is raised if to_datetime_kwargs has keys which are not str."""
         with pytest.raises(
             TypeError,
-            match=r"""ToDatetimeTransformer: unexpected type \(\<class 'int'\>\) for to_datetime_kwargs key in position 1, must be str""",
+            match=r"""ToDatetimeTransformer: unexpected type <class 'int'> for to_datetime_kwargs key, must be str""",
         ):
             ToDatetimeTransformer(
                 new_column_name="a",
@@ -48,7 +50,7 @@ class TestInit(
 
 
 class TestTransform(GenericTransformTests):
-    """Tests for BaseDatetimeTransformer.transform."""
+    """Tests for ToDatetimeTransformer.transform."""
 
     @classmethod
     def setup_class(cls):
@@ -77,29 +79,36 @@ class TestTransform(GenericTransformTests):
                     pd.NaT,
                 ],
             },
-        )
+        ).astype({"a": "float64", "b": "float64"})
 
-    def create_to_datetime_test_df():
-        """Create DataFrame to be used in the ToDatetimeTransformer tests."""
+    def create_to_datetime_test_df_pandas():
+        """Create Pandas DataFrame to be used in the ToDatetimeTransformer tests."""
         return pd.DataFrame(
             {"a": [1950, 1960, 2000, 2001, np.nan, 2010], "b": [1, 2, 3, 4, 5, np.nan]},
         )
 
+    def create_to_datetime_test_df_polars():
+        """Create Polars DataFrame to be used in the ToDatetimeTransformer tests."""
+        return pl.DataFrame(
+            {"a": [1950, 1960, 2000, 2001, None, 2010], "b": [1, 2, 3, 4, 5, None]},
+        )
+
     @pytest.mark.parametrize(
-        ("df", "expected"),
-        ta.pandas.adjusted_dataframe_params(
-            create_to_datetime_test_df(),
-            expected_df_1(),
-        ),
+        "df",
+        [create_to_datetime_test_df_pandas(), create_to_datetime_test_df_polars()],
     )
-    def test_expected_output(self, df, expected):
-        """Test input data is transformed as expected."""
+    def test_expected_output(self, df):
+        """Test input data is transformed as expected for both Pandas and Polars."""
+
+        df = nw.from_native(df)
+
+        df = df.with_columns(df["a"].cast(nw.String).alias("a"))
+
         to_dt_1 = ToDatetimeTransformer(
             column="a",
             new_column_name="a_Y",
             to_datetime_kwargs={"format": "%Y", "utc": datetime.timezone.utc},
         )
-
         to_dt_2 = ToDatetimeTransformer(
             column="b",
             new_column_name="b_m",
@@ -109,21 +118,25 @@ class TestTransform(GenericTransformTests):
         df_transformed = to_dt_1.transform(df)
         df_transformed = to_dt_2.transform(df_transformed)
 
-        print(df_transformed)
-        print(expected)
-
-        ta.equality.assert_equal_dispatch(
-            expected=expected,
-            actual=df_transformed,
-            msg="ToDatetimeTransformer.transform output",
+        df_transformed_native = (
+            df_transformed.to_native()
+            if hasattr(df_transformed, "to_native")
+            else df_transformed
         )
+        expected_native = TestTransform.expected_df_1()
+
+        df_transformed_native = df_transformed_native.astype(
+            {"a": "float64", "b": "float64"},
+        )
+
+        assert_frame_equal(df_transformed_native, expected_native)
 
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
     """
     Class to run tests for BaseTransformerBehaviour outside the three standard methods.
 
-    May need to overwite specific tests in this class if the tested transformer modifies this behaviour.
+    May need to overwrite specific tests in this class if the tested transformer modifies this behaviour.
     """
 
     @classmethod
