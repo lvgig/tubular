@@ -518,7 +518,7 @@ class CappingTransformer(BaseCappingTransformer):
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     def __init__(
         self,
@@ -529,7 +529,8 @@ class CappingTransformer(BaseCappingTransformer):
     ) -> None:
         super().__init__(capping_values, quantiles, weights_column, **kwargs)
 
-    def fit(self, X: pd.DataFrame, y: None = None) -> CappingTransformer:
+    @nw.narwhalify
+    def fit(self, X: FrameT, y: None = None) -> CappingTransformer:
         """Learn capping values from input data X.
 
         Calculates the quantiles to cap at given the quantiles dictionary supplied
@@ -538,7 +539,7 @@ class CappingTransformer(BaseCappingTransformer):
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             A dataframe with required columns to be capped.
 
         y : None
