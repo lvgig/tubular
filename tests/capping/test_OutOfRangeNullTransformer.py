@@ -1,7 +1,5 @@
-import numpy as np
-import pandas as pd
+import narwhals as nw
 import pytest
-import test_aide as ta
 
 import tests.test_data as d
 from tests.base_tests import OtherBaseBehaviourTests
@@ -10,6 +8,7 @@ from tests.capping.test_BaseCappingTransformer import (
     GenericCappingInitTests,
     GenericCappingTransformTests,
 )
+from tests.utils import assert_frame_equal_dispatch, dataframe_init_dispatch
 from tubular.capping import OutOfRangeNullTransformer
 
 
@@ -28,6 +27,7 @@ class TestFit(GenericCappingFitTests):
     def setup_class(cls):
         cls.transformer_name = "OutOfRangeNullTransformer"
 
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     @pytest.mark.parametrize(
         ("values", "sample_weight", "quantiles"),
         [
@@ -46,6 +46,7 @@ class TestFit(GenericCappingFitTests):
         quantiles,
         minimal_attribute_dict,
         uninitialized_transformers,
+        library,
     ):
         """Test that weighted_quantile gives the expected outputs."""
 
@@ -59,17 +60,17 @@ class TestFit(GenericCappingFitTests):
         if not sample_weight:
             sample_weight = [1] * len(values)
 
-        df = pd.DataFrame(
-            {
-                "a": values,
-                "w": sample_weight,
-            },
-        )
+        df_dict = {
+            "a": values,
+            "w": sample_weight,
+        }
+
+        df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
 
         transformer.fit(df)
 
-        lower_replacement = np.nan if quantiles[0] else None
-        upper_replacement = np.nan if quantiles[1] else None
+        lower_replacement = None if quantiles[0] else False
+        upper_replacement = None if quantiles[1] else False
         expected = [lower_replacement, upper_replacement]
         assert (
             transformer._replacement_values["a"] == expected
@@ -83,28 +84,28 @@ class TestTransform(GenericCappingTransformTests):
     def setup_class(cls):
         cls.transformer_name = "OutOfRangeNullTransformer"
 
-    def expected_df_1():
+    def expected_df_1(self, library="pandas"):
         """Expected output from test_expected_output_min_and_max."""
-        return pd.DataFrame(
-            {
-                "a": [np.nan, 2, 3, 4, 5, np.nan, np.nan],
-                "b": [1, 2, 3, np.nan, 7, np.nan, np.nan],
-                "c": [np.nan, 1, 2, 3, np.nan, np.nan, np.nan],
-            },
-        )
 
-    @pytest.mark.parametrize(
-        ("df", "expected"),
-        ta.pandas.adjusted_dataframe_params(d.create_df_3(), expected_df_1()),
-    )
+        df_dict = {
+            "a": [None, 2, 3, 4, 5, None, None],
+            "b": [1, 2, 3, None, 7, None, None],
+            "c": [None, 1, 2, 3, None, None, None],
+        }
+
+        return dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
+
+    @pytest.mark.parametrize("library", ["pandas", "polars"])
     def test_expected_output_min_and_max_combinations(
         self,
-        df,
-        expected,
         minimal_attribute_dict,
         uninitialized_transformers,
+        library,
     ):
         """Test that capping is applied correctly in transform."""
+
+        df = d.create_df_3(library=library)
+        expected = self.expected_df_1(library=library)
 
         args = minimal_attribute_dict[self.transformer_name].copy()
         args["capping_values"] = {"a": [2, 5], "b": [None, 7], "c": [0, None]}
@@ -113,11 +114,19 @@ class TestTransform(GenericCappingTransformTests):
 
         df_transformed = transformer.transform(df)
 
-        ta.equality.assert_frame_equal_msg(
-            actual=df_transformed,
-            expected=expected,
-            msg_tag=f"Unexpected values in {self.transformer_name}.transform",
-        )
+        assert_frame_equal_dispatch(df_transformed, expected)
+
+        # Check outcomes for single rows
+        df = nw.from_native(df)
+        expected = nw.from_native(expected)
+        for i in range(len(df)):
+            df_transformed_row = transformer.transform(df[[i]].to_native())
+            df_expected_row = expected[[i]].to_native()
+
+            assert_frame_equal_dispatch(
+                df_transformed_row,
+                df_expected_row,
+            )
 
 
 class TestOtherBaseBehaviour(OtherBaseBehaviourTests):
@@ -140,10 +149,10 @@ class TestSetReplacementValues:
         [
             (
                 {"a": [0, 1], "b": [None, 1], "c": [3, None]},
-                {"a": [np.nan, np.nan], "b": [None, np.nan], "c": [np.nan, None]},
+                {"a": [None, None], "b": [False, None], "c": [None, False]},
             ),
             ({}, {}),
-            ({"a": [None, 0.1]}, {"a": [None, np.nan]}),
+            ({"a": [None, 0.1]}, {"a": [False, None]}),
         ],
     )
     def test_expected_replacement_values_output(
