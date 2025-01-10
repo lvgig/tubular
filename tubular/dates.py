@@ -5,8 +5,10 @@ from __future__ import annotations
 import datetime
 import warnings
 
+import narwhals as nw
 import numpy as np
 import pandas as pd
+import polars as pl
 
 from tubular.base import BaseTransformer
 from tubular.mixins import DropOriginalMixin, NewColumnNameMixin, TwoColumnMixin
@@ -478,7 +480,7 @@ class DateDifferenceTransformer(BaseDateTwoColumnTransformer):
 class ToDatetimeTransformer(BaseGenericDateTransformer):
     """Class to transform convert specified columns to datetime.
 
-    Class simply uses the pd.to_datetime method on the specified columns.
+    Uses the pd.to_datetime method for Pandas or pl.col().str.strptime for Polars.
 
     Parameters
     ----------
@@ -505,7 +507,7 @@ class ToDatetimeTransformer(BaseGenericDateTransformer):
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     def __init__(
         self,
@@ -517,15 +519,15 @@ class ToDatetimeTransformer(BaseGenericDateTransformer):
     ) -> None:
         if to_datetime_kwargs is None:
             to_datetime_kwargs = {}
-        else:
-            if type(to_datetime_kwargs) is not dict:
-                msg = f"{self.classname()}: to_datetime_kwargs should be a dict but got type {type(to_datetime_kwargs)}"
-                raise TypeError(msg)
 
-            for i, k in enumerate(to_datetime_kwargs.keys()):
-                if type(k) is not str:
-                    msg = f"{self.classname()}: unexpected type ({type(k)}) for to_datetime_kwargs key in position {i}, must be str"
-                    raise TypeError(msg)
+        if not isinstance(to_datetime_kwargs, dict):
+            msg = f"{self.classname()}: to_datetime_kwargs should be a dict but got {type(to_datetime_kwargs)}"
+            raise TypeError(msg)
+
+        for k in to_datetime_kwargs:
+            if not isinstance(k, str):
+                msg = f"{self.classname()}: unexpected type {type(k)} for to_datetime_kwargs key, must be str"
+                raise TypeError(msg)
 
         self.to_datetime_kwargs = to_datetime_kwargs
 
@@ -540,8 +542,9 @@ class ToDatetimeTransformer(BaseGenericDateTransformer):
             **kwargs,
         )
 
-    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """Convert specified column to datetime using pd.to_datetime.
+    @nw.narwhalify
+    def transform(self, X: nw.DataFrame) -> nw.DataFrame:
+        """Convert specified column to datetime using Narwhals.
 
         Parameters
         ----------
@@ -549,14 +552,46 @@ class ToDatetimeTransformer(BaseGenericDateTransformer):
             Data with column to transform.
 
         """
+
         # purposely avoid BaseDateTransformer method, as uniquely for this transformer columns
         # are not yet date/datetime
-        X = BaseTransformer.transform(self, X)
+        X = nw.from_native(BaseTransformer.transform(self, X))
 
-        X[self.new_column_name] = pd.to_datetime(
-            X[self.columns[0]],
-            **self.to_datetime_kwargs,
-        )
+        native_X = X.to_native()
+        if isinstance(native_X, pd.DataFrame):
+            native_X[self.columns[0]] = (
+                native_X[self.columns[0]].astype(str).str.split(".").str[0]
+            )
+            native_X[self.new_column_name] = pd.to_datetime(
+                native_X[self.columns[0]],
+                **{k: v for k, v in self.to_datetime_kwargs.items() if k != "utc"},
+            )
+            if self.to_datetime_kwargs.get("utc", False):
+                native_X[self.new_column_name] = native_X[
+                    self.new_column_name
+                ].dt.tz_localize("UTC")
+            X = nw.from_native(native_X)
+
+        elif isinstance(native_X, pl.DataFrame):
+            X = X.with_columns(
+                nw.col(self.columns[0]).str.replace(".0", "").alias(self.columns[0]),
+            )
+
+            X = X.with_columns(
+                nw.col(self.columns[0])
+                .str.strptime(nw.Datetime, "%Y", strict=False)
+                .alias(self.new_column_name),
+            )
+
+            if self.to_datetime_kwargs.get("utc", False):
+                X = X.with_columns(
+                    nw.col(self.new_column_name)
+                    .dt.convert_time_zone("UTC")
+                    .alias(self.new_column_name),
+                )
+        else:
+            error_message = f"Unsupported DataFrame type: {type(native_X)}"
+            raise TypeError(error_message)
 
         # Drop original columns if self.drop_original is True
         return DropOriginalMixin.drop_original_column(
