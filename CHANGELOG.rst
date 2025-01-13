@@ -29,6 +29,7 @@ Changed
 - added NaN error handling to WeightColumnMixin
 - narwhalified BaseNumericTransformer `#358 <https://github.com/lvgig/tubular/issues/358>_`
 - narwhalified BaseCappingTransformer `#357 <https://github.com/lvgig/tubular/issues/357>_`
+- narwhalified CappingTransformer `#361 <https://github.com/lvgig/tubular/issues/361>_`
 - narwhalified MeanImputer `#344 https://github.com/lvgig/tubular/issues/344_`
 - narwhalified BaseNumericTransformer `#358 https://github.com/lvgig/tubular/issues/358`
 - narwhalified DropOriginalMixin `#352 <https://github.com/lvgig/tubular/issues/352>_`
