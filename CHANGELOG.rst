@@ -22,11 +22,17 @@ Each individual change should have a link to the pull request after the descript
 Changed
 ^^^^^^^
 
+- converted OneHotEncodingTransformer to narwhals `#355 <https://github.com/lvgig/tubular/issues/355>_`
 - updated WeightsColumnMixin to use new narwhals 'is_finite' method
 - narwhalified ModeImputer `#321 <https://github.com/lvgig/tubular/issues/321>_`
 - fixed issues with all null and nullable-bool column handling in dataframe_init_dispatch
 - added NaN error handling to WeightColumnMixin
+- narwhalified BaseNumericTransformer `#358 <https://github.com/lvgig/tubular/issues/358>_`
+- narwhalified BaseCappingTransformer `#357 <https://github.com/lvgig/tubular/issues/357>_`
+- narwhalified CappingTransformer `#361 <https://github.com/lvgig/tubular/issues/361>_`
 - narwhalified MeanImputer `#344 https://github.com/lvgig/tubular/issues/344_`
+- narwhalified BaseNumericTransformer `#358 https://github.com/lvgig/tubular/issues/358`
+- narwhalified DropOriginalMixin `#352 <https://github.com/lvgig/tubular/issues/352>_`
 - narwhalified BaseMappingTransformer `#367 <https://github.com/lvgig/tubular/issues/367>_`
 - narwhalified BaseMappingTransformerMixin. As part of this made mapping transformers more 
 type-conscious, they now rely on an input 'return_dtypes' dict arg.

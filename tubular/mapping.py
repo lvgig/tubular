@@ -97,12 +97,12 @@ class BaseMappingTransformer(BaseTransformer):
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Data to apply mappings to.
 
         Returns
         -------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Input X, copied if specified by user.
 
         """
