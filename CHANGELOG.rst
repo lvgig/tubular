@@ -32,6 +32,7 @@ Changed
 - narwhalified CappingTransformer `#361 <https://github.com/lvgig/tubular/issues/361>_`
 - narwhalified OutOfRangeNullTransformer `#362 <https://github.com/lvgig/tubular/issues/362>_`
 - narwhalified MeanImputer `#344 https://github.com/lvgig/tubular/issues/344_`
+- narwhalified BaseNumericTransformer `#358 https://github.com/lvgig/tubular/issues/358`
 - narwhalified DropOriginalMixin `#352 <https://github.com/lvgig/tubular/issues/352>_`
 - narwhalified BaseMappingTransformer `#367 <https://github.com/lvgig/tubular/issues/367>_`
 - placeholder
