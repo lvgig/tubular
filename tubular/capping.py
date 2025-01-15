@@ -8,13 +8,11 @@ from typing import TYPE_CHECKING
 
 import narwhals as nw
 import numpy as np
-import pandas as pd
 
 from tubular.mixins import WeightColumnMixin
 from tubular.numeric import BaseNumericTransformer
 
 if TYPE_CHECKING:
-    import pandas as pd
     from narwhals.typing import FrameT
 
 
@@ -641,7 +639,7 @@ class OutOfRangeNullTransformer(BaseCappingTransformer):
 
         for k, cap_values_list in capping_values.items():
             null_replacements_list = [
-                np.nan if replace_value is not None else None
+                None if replace_value is not None else False
                 for replace_value in cap_values_list
             ]
 
@@ -649,7 +647,8 @@ class OutOfRangeNullTransformer(BaseCappingTransformer):
 
         return _replacement_values
 
-    def fit(self, X: pd.DataFrame, y: None = None) -> OutOfRangeNullTransformer:
+    @nw.narwhalify
+    def fit(self, X: FrameT, y: None = None) -> OutOfRangeNullTransformer:
         """Learn capping values from input data X.
 
         Calculates the quantiles to cap at given the quantiles dictionary supplied
