@@ -278,14 +278,7 @@ def create_date_test_df(library="pandas"):
         ],
     }
 
-    df = u.dataframe_init_dispatch(df_dict, library=library)
-
-    # ensure cols have date type
-    df = nw.from_native(df)
-    for col in df.columns:
-        df = df.with_columns(nw.col(col).cast(nw.Date))
-
-    return nw.to_native(df)
+    return u.dataframe_init_dispatch(df_dict, library=library)
 
 
 def create_datediff_test_df(library="pandas"):
@@ -426,16 +419,7 @@ def create_datediff_test_df(library="pandas"):
         ],
     }
 
-    df = u.dataframe_init_dispatch(df_dict, library=library)
-
-    df = nw.from_native(df)
-    # ensure cols have correct type
-    for col in df.columns:
-        df = df.with_columns(
-            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
-        )
-
-    return nw.to_native(df)
+    return u.dataframe_init_dispatch(df_dict, library=library)
 
 
 # Create between dates df staying here as used in conftest also
@@ -448,15 +432,7 @@ def create_is_between_dates_df_1(library="pandas"):
         "c": pd.date_range(start="1/3/2016", end="27/04/2017", periods=2),
     }
 
-    df = u.dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
-    # ensure cols have correct type
-    df = nw.from_native(df)
-    for col in df.columns:
-        df = df.with_columns(
-            nw.col(col).cast(nw.Datetime(time_unit="ns")),
-        )
-
-    return nw.to_native(df)
+    return u.dataframe_init_dispatch(df_dict, library=library)
 
 
 def create_is_between_dates_df_2(library="pandas"):
@@ -489,16 +465,7 @@ def create_is_between_dates_df_2(library="pandas"):
         ],
     }
 
-    df = u.dataframe_init_dispatch(df_dict, library=library)
-
-    # ensure cols have correct type
-    df = nw.from_native(df)
-    for col in df.columns:
-        df = df.with_columns(
-            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
-        )
-
-    return nw.to_native(df)
+    return u.dataframe_init_dispatch(df_dict, library=library)
 
 
 def create_is_between_dates_df_3(library="pandas"):
@@ -555,16 +522,7 @@ def create_is_between_dates_df_3(library="pandas"):
         ],
     }
 
-    df = u.dataframe_init_dispatch(df_dict, library=library)
-
-    # ensure cols have correct type
-    df = nw.from_native(df)
-    for col in df.columns:
-        df = df.with_columns(
-            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
-        )
-
-    return nw.to_native(df)
+    return u.dataframe_init_dispatch(df_dict, library=library)
 
 
 def create_date_diff_different_dtypes(library="pandas"):
@@ -622,21 +580,7 @@ def create_date_diff_different_dtypes(library="pandas"):
         ],
     }
 
-    df = u.dataframe_init_dispatch(df_dict, library=library)
-
-    # ensure cols have correct type
-    df = nw.from_native(df)
-    for col in ["datetime_col_1", "datetime_col_2"]:
-        df = df.with_columns(
-            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
-        )
-
-    for col in ["date_col_1", "date_col_2"]:
-        df = df.with_columns(
-            nw.col(col).cast(nw.Date),
-        )
-
-    return nw.to_native(df)
+    return u.dataframe_init_dispatch(df_dict, library=library)
 
 
 def create_date_diff_different_dtypes_and_nans(library="pandas"):
@@ -694,21 +638,7 @@ def create_date_diff_different_dtypes_and_nans(library="pandas"):
         ],
     }
 
-    df = u.dataframe_init_dispatch(df_dict, library=library)
-
-    # ensure cols have correct type
-    df = nw.from_native(df)
-    for col in ["datetime_col_1", "datetime_col_2"]:
-        df = df.with_columns(
-            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
-        )
-
-    for col in ["date_col_1", "date_col_2"]:
-        df = df.with_columns(
-            nw.col(col).cast(nw.Date),
-        )
-
-    return nw.to_native(df)
+    return u.dataframe_init_dispatch(df_dict, library=library)
 
 
 def expected_date_diff_df_2(library="pandas"):

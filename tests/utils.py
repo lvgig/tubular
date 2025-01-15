@@ -113,6 +113,10 @@ def dataframe_init_dispatch(
         if pd.api.types.infer_dtype(pandas_df[col]) == "date":
             pandas_df[col] = pandas_df[col].astype("date32[pyarrow]")
 
+        # ensure datetimes setup as expected
+        if pd.api.types.is_datetime64_any_dtype(pandas_df[col]):
+            pandas_df[col] = pd.to_datetime(pandas_df[col])
+
     if library == "pandas":
         return pandas_df
 

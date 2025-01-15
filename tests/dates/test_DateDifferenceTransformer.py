@@ -1,6 +1,5 @@
 import datetime
 
-import narwhals as nw
 import numpy as np
 import pytest
 import test_aide as ta
@@ -210,16 +209,7 @@ def expected_df_3(library="pandas"):
         ],
     }
 
-    df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
-
-    # ensure types line up with test data
-    df = nw.from_native(df)
-    for col in [col for col in df.columns if col not in ["D"]]:
-        df = df.with_columns(
-            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
-        )
-
-    return nw.to_native(df)
+    return dataframe_init_dispatch(df_dict, library=library)
 
 
 def expected_df_4(library="pandas"):
@@ -386,16 +376,7 @@ def expected_df_4(library="pandas"):
         ],
     }
 
-    df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
-
-    # ensure types line up with test data
-    df = nw.from_native(df)
-    for col in [col for col in df.columns if col not in ["h"]]:
-        df = df.with_columns(
-            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
-        )
-
-    return nw.to_native(df)
+    return dataframe_init_dispatch(df_dict, library=library)
 
 
 def expected_df_5(library="pandas"):
@@ -562,16 +543,7 @@ def expected_df_5(library="pandas"):
         ],
     }
 
-    df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
-
-    # ensure types line up with test data
-    df = nw.from_native(df)
-    for col in [col for col in df.columns if col not in ["m"]]:
-        df = df.with_columns(
-            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
-        )
-
-    return nw.to_native(df)
+    return dataframe_init_dispatch(df_dict, library=library)
 
 
 def expected_df_6(library="pandas"):
@@ -738,16 +710,7 @@ def expected_df_6(library="pandas"):
         ],
     }
 
-    df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
-
-    # ensure types line up with test data
-    df = nw.from_native(df)
-    for col in [col for col in df.columns if col not in ["s"]]:
-        df = df.with_columns(
-            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
-        )
-
-    return nw.to_native(df)
+    return dataframe_init_dispatch(df_dict, library=library)
 
 
 def expected_df_7(library="pandas"):
@@ -784,16 +747,7 @@ def expected_df_7(library="pandas"):
         ],
     }
 
-    df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
-
-    # ensure types line up with test data
-    df = nw.from_native(df)
-    for col in [col for col in df.columns if col not in ["D"]]:
-        df = df.with_columns(
-            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
-        )
-
-    return nw.to_native(df)
+    return dataframe_init_dispatch(df_dict, library=library)
 
 
 def create_datediff_test_nulls_df(library="pandas"):
@@ -826,16 +780,7 @@ def create_datediff_test_nulls_df(library="pandas"):
         ],
     }
 
-    df = dataframe_init_dispatch(dataframe_dict=df_dict, library=library)
-
-    # ensure types line up with test data
-    df = nw.from_native(df)
-    for col in df.columns:
-        df = df.with_columns(
-            nw.col(col).cast(nw.Datetime(time_zone="UTC")),
-        )
-
-    return nw.to_native(df)
+    return dataframe_init_dispatch(df_dict, library=library)
 
 
 class TestTransform(
