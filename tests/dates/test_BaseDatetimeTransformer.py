@@ -20,10 +20,10 @@ class DatetimeMixinTransformTests:
     @pytest.mark.parametrize(
         ("bad_value", "bad_type"),
         [
-            (1, "int64"),
-            ("a", "object"),
-            (np.nan, "float64"),
-            (pd.to_datetime("01/02/2020").date(), "date"),
+            (1, "Int64"),
+            ("a", "String"),
+            (np.nan, "Float64"),
+            (pd.to_datetime("01/02/2020").date(), "Date"),
         ],
     )
     def test_non_datetypes_error(
@@ -45,6 +45,9 @@ class DatetimeMixinTransformTests:
             df = deepcopy(minimal_dataframe_lookup[self.transformer_name])
             col = columns[i]
             df[col] = bad_value
+            # force date test to wanted type
+            if bad_type == "Date":
+                df[col] = df[col].astype("date32[pyarrow]")
 
             x = uninitialized_transformers[self.transformer_name](
                 **args,
