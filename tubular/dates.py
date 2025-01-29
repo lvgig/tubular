@@ -186,7 +186,7 @@ class BaseDatetimeTransformer(BaseGenericDateTransformer):
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     def __init__(
         self,
@@ -202,20 +202,21 @@ class BaseDatetimeTransformer(BaseGenericDateTransformer):
             **kwargs,
         )
 
+    @nw.narwhalify
     def transform(
         self,
-        X: pd.DataFrame,
-    ) -> pd.DataFrame:
+        X: FrameT,
+    ) -> FrameT:
         """base transform method for transformers that operate exclusively on datetime columns
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Data containing self.columns
 
         Returns
         -------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Validated data
 
         """
