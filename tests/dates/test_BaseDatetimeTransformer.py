@@ -1,7 +1,9 @@
 from copy import deepcopy
 
+import narwhals as nw
 import numpy as np
 import pandas as pd
+import polars as pl
 import pytest
 
 from tests.base_tests import (
@@ -17,6 +19,11 @@ from tests.base_tests import (
 class DatetimeMixinTransformTests:
     """Generic tests for Datetime Transformers"""
 
+    @pytest.mark.parametrize(
+        "minimal_dataframe_lookup",
+        ["pandas", "polars"],
+        indirect=["minimal_dataframe_lookup"],
+    )
     @pytest.mark.parametrize(
         ("bad_value", "bad_type"),
         [
@@ -34,24 +41,35 @@ class DatetimeMixinTransformTests:
         bad_value,
         bad_type,
     ):
-        "Test that transform raises an error if columns contains non date types"
+        "Test that transform raises an error if columns contains non datetime types"
 
         args = minimal_attribute_dict[self.transformer_name].copy()
-
-        # pull out columns arg to use below, and remove from dict
         columns = args["columns"]
 
-        for i in range(len(columns)):
-            df = deepcopy(minimal_dataframe_lookup[self.transformer_name])
-            col = columns[i]
-            df[col] = bad_value
-            # force date test to wanted type
-            if bad_type == "Date":
-                df[col] = df[col].astype("date32[pyarrow]")
+        transformer = uninitialized_transformers[self.transformer_name](
+            **args,
+        )
 
-            x = uninitialized_transformers[self.transformer_name](
-                **args,
-            )
+        df = deepcopy(minimal_dataframe_lookup[self.transformer_name])
+
+        # if transformer is not yet polars compatible, skip this test
+        if not transformer.polars_compatible and isinstance(df, pl.DataFrame):
+            return
+
+        for i in range(len(columns)):
+            col = columns[i]
+            # force date test to wanted type if pandas df, to avoid
+            # narwhals NotImplementedError where Date dtype is only
+            # supported for pyarrow-backed dtypes in pandas
+            if bad_type == "Date" and isinstance(df, pd.DataFrame):
+                bad_df = deepcopy(df)
+                bad_df[col] = bad_df[col].astype("date32[pyarrow]")
+                bad_df = nw.from_native(bad_df)
+            else:
+                bad_df = nw.from_native(df).clone()
+                bad_df = bad_df.with_columns(
+                    nw.lit(bad_value).cast(getattr(nw, bad_type)).alias(col),
+                )
 
             msg = rf"{col} type should be in \['datetime64'\] but got {bad_type}"
 
@@ -59,7 +77,7 @@ class DatetimeMixinTransformTests:
                 TypeError,
                 match=msg,
             ):
-                x.transform(df)
+                transformer.transform(nw.to_native(bad_df))
 
 
 class TestInit(
