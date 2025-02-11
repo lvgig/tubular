@@ -350,7 +350,7 @@ class GroupRareLevelsTransformer(BaseTransformer, WeightColumnMixin):
         self.unseen_levels_to_rare = unseen_levels_to_rare
 
     @nw.narwhalify
-    def _check_strlike_columns(self, X: FrameT) -> None:
+    def _check_str_like_columns(self, X: FrameT) -> None:
         """check that transformer being called on only str-like columns
 
         Parameters
@@ -360,7 +360,7 @@ class GroupRareLevelsTransformer(BaseTransformer, WeightColumnMixin):
 
         """
 
-        strlike_columns = list(
+        str_like_columns = list(
             set(self.columns).intersection(
                 set(
                     X.select(
@@ -372,14 +372,14 @@ class GroupRareLevelsTransformer(BaseTransformer, WeightColumnMixin):
             ),
         )
 
-        non_strlike_columns = set(self.columns).difference(
+        non_str_like_columns = set(self.columns).difference(
             set(
-                strlike_columns,
+                str_like_columns,
             ),
         )
 
-        if len(non_strlike_columns) != 0:
-            msg = f"{self.classname()}: transformer must run on str-like columns, but got non-strlike {non_strlike_columns}"
+        if len(non_str_like_columns) != 0:
+            msg = f"{self.classname()}: transformer must run on str-like columns, but got non str-like {non_str_like_columns}"
             raise TypeError(msg)
 
     @nw.narwhalify
@@ -405,7 +405,7 @@ class GroupRareLevelsTransformer(BaseTransformer, WeightColumnMixin):
         for c in self.columns:
             nulls_count = 0
 
-            # pick out strlike dtypes that allow nans
+            # pick out str_like dtypes that allow nans
             nulls_count += X.select(nw.col(c).is_null().sum()).item()
 
             if nulls_count != 0:
@@ -436,7 +436,9 @@ class GroupRareLevelsTransformer(BaseTransformer, WeightColumnMixin):
         if self.weights_column is not None:
             WeightColumnMixin.check_weights_column(self, X, self.weights_column)
 
-        self._check_strlike_columns(X.with_columns(nw.col(col) for col in self.columns))
+        self._check_str_like_columns(
+            X.with_columns(nw.col(col) for col in self.columns),
+        )
 
         self._check_for_nulls(X)
 
@@ -518,7 +520,9 @@ class GroupRareLevelsTransformer(BaseTransformer, WeightColumnMixin):
         """
         X = nw.from_native(BaseTransformer.transform(self, X))
 
-        self._check_strlike_columns(X.with_columns(nw.col(col) for col in self.columns))
+        self._check_str_like_columns(
+            X.with_columns(nw.col(col) for col in self.columns),
+        )
 
         self._check_for_nulls(X)
 

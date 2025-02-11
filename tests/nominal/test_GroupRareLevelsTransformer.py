@@ -309,7 +309,7 @@ class TestTransform(GenericNominalTransformTests):
         x.columns = ["a"]
 
         msg = re.escape(
-            "GroupRareLevelsTransformer: transformer must run on str-like columns, but got non-strlike {'a'}",
+            "GroupRareLevelsTransformer: transformer must run on str-like columns, but got non str-like {'a'}",
         )
         with pytest.raises(
             TypeError,
