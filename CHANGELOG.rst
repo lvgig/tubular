@@ -29,11 +29,17 @@ Changed
 - added NaN error handling to WeightColumnMixin
 - narwhalified BaseNumericTransformer `#358 <https://github.com/lvgig/tubular/issues/358>_`
 - narwhalified BaseCappingTransformer `#357 <https://github.com/lvgig/tubular/issues/357>_`
+- narwhalified CappingTransformer `#361 <https://github.com/lvgig/tubular/issues/361>_`
+- narwhalified OutOfRangeNullTransformer `#362 <https://github.com/lvgig/tubular/issues/362>_`
 - narwhalified MeanImputer `#344 https://github.com/lvgig/tubular/issues/344_`
+- narwhalified BaseGenericDateTransformer. As part of this updated test data handling of date columns
+  across repo `#365 <https://github.com/lvgig/tubular/issues/365>_`
+- narwhalified BaseNumericTransformer `#358 https://github.com/lvgig/tubular/issues/358`
 - narwhalified DropOriginalMixin `#352 <https://github.com/lvgig/tubular/issues/352>_`
 - narwhalified BaseMappingTransformer `#367 <https://github.com/lvgig/tubular/issues/367>_`
 - narwhalified GroupRareLevelsTransformer. As part of this, had to make transformer more opinionated
 and refuse columns with nulls (raises an error directing to imputers.) `#372 <https://github.com/lvgig/tubular/issues/372>_`
+- narwhalified BaseDatetimeTransformer `#375 <https://github.com/azukds/tubular/issues/375>`
 - placeholder
 - placeholder
 - placeholder

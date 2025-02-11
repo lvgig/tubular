@@ -4,12 +4,28 @@ from __future__ import annotations
 
 import datetime
 import warnings
+import zoneinfo
+from typing import TYPE_CHECKING
 
+import narwhals as nw
+import narwhals.selectors as ncs
 import numpy as np
 import pandas as pd
 
 from tubular.base import BaseTransformer
 from tubular.mixins import DropOriginalMixin, NewColumnNameMixin, TwoColumnMixin
+
+if TYPE_CHECKING:
+    from narhwals.typing import FrameT
+
+TIME_UNITS = ["us", "ns", "ms"]
+TIME_ZONES = zoneinfo.available_timezones().union({None})
+
+DATETIME_VARIANTS = [
+    nw.Datetime(time_unit=time_unit, time_zone=time_zone)
+    for time_unit in TIME_UNITS
+    for time_zone in TIME_ZONES
+]
 
 
 class BaseGenericDateTransformer(
@@ -42,7 +58,7 @@ class BaseGenericDateTransformer(
 
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     def __init__(
         self,
@@ -56,9 +72,10 @@ class BaseGenericDateTransformer(
         self.set_drop_original_column(drop_original)
         self.check_and_set_new_column_name(new_column_name)
 
+    @nw.narwhalify
     def check_columns_are_date_or_datetime(
         self,
-        X: pd.DataFrame,
+        X: FrameT,
         datetime_only: bool,
     ) -> None:
         """Raise a type error if a column to be operated on is not a datetime.datetime or datetime.date object
@@ -66,7 +83,7 @@ class BaseGenericDateTransformer(
         Parameters
         ----------
 
-        X: pd.DataFrame
+        X: pd/pl.DataFrame
             Data to validate
 
         datetime_only: bool
@@ -76,14 +93,22 @@ class BaseGenericDateTransformer(
 
         type_dict = {}
         datetime_type = "datetime64"
-        date_type = "date"
+        date_type = "date32[pyarrow]"
         allowed_types = [datetime_type]
         if not datetime_only:
             allowed_types = [*allowed_types, date_type]
 
+        date_columns = list(
+            X.select(ncs.by_dtype(nw.Date)).columns,
+        )
+
+        datetime_columns = list(
+            X.select(ncs.by_dtype(*DATETIME_VARIANTS)).columns,
+        )
+
         for col in self.columns:
-            is_datetime = pd.api.types.is_datetime64_any_dtype(X[col])
-            is_date = pd.api.types.infer_dtype(X[col]) == date_type
+            is_datetime = col in datetime_columns
+            is_date = col in date_columns
             if is_datetime:
                 type_dict[col] = datetime_type
 
@@ -91,7 +116,7 @@ class BaseGenericDateTransformer(
                 type_dict[col] = date_type
 
             else:
-                col_dtype = date_type if is_date else X[col].dtype
+                col_dtype = X.get_column(col).dtype
 
                 msg = f"{self.classname()}: {col} type should be in {allowed_types} but got {col_dtype}"
                 raise TypeError(msg)
@@ -101,21 +126,22 @@ class BaseGenericDateTransformer(
         valid_types = present_types.issubset(set(allowed_types))
 
         if not valid_types or len(present_types) > 1:
-            msg = f"{self.classname()}: Columns fed to datetime transformers should be {allowed_types} and have consistent types, but found {present_types}. Please use ToDatetimeTransformer to standardise."
+            msg = rf"{self.classname()}: Columns fed to datetime transformers should be {allowed_types} and have consistent types, but found {present_types}. Please use ToDatetimeTransformer to standardise."
             raise TypeError(
                 msg,
             )
 
+    @nw.narwhalify
     def transform(
         self,
-        X: pd.DataFrame,
+        X: FrameT,
         datetime_only: bool = False,
     ) -> pd.DataFrame:
         """Base transform method, calls parent transform and validates data.
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Data containing self.columns
 
         datetime_only: bool
@@ -123,12 +149,12 @@ class BaseGenericDateTransformer(
 
         Returns
         -------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Validated data
 
         """
 
-        X = super().transform(X)
+        X = nw.from_native(super().transform(X))
 
         self.check_columns_are_date_or_datetime(X, datetime_only=datetime_only)
 
@@ -160,7 +186,7 @@ class BaseDatetimeTransformer(BaseGenericDateTransformer):
         class attribute, indicates whether transformer has been converted to polars/pandas agnostic narwhals framework
     """
 
-    polars_compatible = False
+    polars_compatible = True
 
     def __init__(
         self,
@@ -176,20 +202,21 @@ class BaseDatetimeTransformer(BaseGenericDateTransformer):
             **kwargs,
         )
 
+    @nw.narwhalify
     def transform(
         self,
-        X: pd.DataFrame,
-    ) -> pd.DataFrame:
+        X: FrameT,
+    ) -> FrameT:
         """base transform method for transformers that operate exclusively on datetime columns
 
         Parameters
         ----------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Data containing self.columns
 
         Returns
         -------
-        X : pd.DataFrame
+        X : pd/pl.DataFrame
             Validated data
 
         """
