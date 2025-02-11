@@ -1,5 +1,3 @@
-import re
-
 import polars as pl
 import pytest
 import test_aide as ta
@@ -23,28 +21,6 @@ class BaseMappingTransformerInitTests(GenericInitTests):
     Note this deliberately avoids starting with "Tests" so that the tests are not run on import.
     """
 
-    @pytest.mark.parametrize("non_string", [1, True, None])
-    def test_columns_list_element_error(
-        self,
-        non_string,
-        minimal_attribute_dict,
-        uninitialized_transformers,
-    ):
-        """Test an error is raised if columns list contains non-string elements (note
-        columns is derived from mappings keys)."""
-
-        args = minimal_attribute_dict[self.transformer_name].copy()
-        # mappings keys are fed into columns param
-        args["mappings"][non_string] = {1: 2, 3: 4}
-
-        with pytest.raises(
-            TypeError,
-            match=re.escape(
-                f"{self.transformer_name}: each element of columns should be a single (string) column name",
-            ),
-        ):
-            uninitialized_transformers[self.transformer_name](**args)
-
     def test_no_keys_dict_error(
         self,
         uninitialized_transformers,
@@ -61,39 +37,39 @@ class BaseMappingTransformerInitTests(GenericInitTests):
         ):
             uninitialized_transformers[self.transformer_name](**kwargs)
 
-    def test_mappings_contains_non_dict_items_error(
+    def test_inferred_return_dtypes(
         self,
         uninitialized_transformers,
         minimal_attribute_dict,
     ):
-        """Test that an exception is raised if mappings contains non-dict items."""
+        "test that return_dtypes are inferred correctly if not provided"
 
         kwargs = minimal_attribute_dict[self.transformer_name]
-        kwargs["mappings"] = {"a": {"a": 1}, "b": 1}
+        kwargs["mappings"] = {
+            "a": {"a": 1, "b": 2},
+            "b": {"c": True, "d": False},
+            "c": {"d": 1.0, "e": 2.0},
+        }
+        kwargs["return_dtypes"] = None
 
-        with pytest.raises(
-            ValueError,
-            match=f"{self.transformer_name}: values in mappings dictionary should be dictionaries",
-        ):
-            uninitialized_transformers[self.transformer_name](
-                **kwargs,
-            )
+        transformer = uninitialized_transformers[self.transformer_name](
+            **kwargs,
+        )
 
-    def test_mappings_not_dict_error(
-        self,
-        uninitialized_transformers,
-        minimal_attribute_dict,
-    ):
-        """Test that an exception is raised if mappings is not a dict."""
+        expected = {
+            "a": "Int64",
+            "b": "Boolean",
+            "c": "Float64",
+        }
 
-        kwargs = minimal_attribute_dict[self.transformer_name]
-        kwargs["mappings"] = ()
+        actual = transformer.return_dtypes
 
-        with pytest.raises(
-            ValueError,
-            match=f"{self.transformer_name}: mappings must be a dictionary",
-        ):
-            uninitialized_transformers[self.transformer_name](**kwargs)
+        assert (
+            actual == expected
+        ), f"return_dtypes attr not inferred as expected, expected {expected} but got {actual}"
+
+    def test_verbose_non_bool_error(self):
+        "overload this test, as transformer has been converted to beartype"
 
 
 class BaseMappingTransformerTransformTests(GenericTransformTests):
@@ -115,9 +91,11 @@ class BaseMappingTransformerTransformTests(GenericTransformTests):
         mapping = {
             "b": {1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 7},
         }
+        return_dtypes = {"b": "Float32"}
 
         args = minimal_attribute_dict[self.transformer_name].copy()
         args["mappings"] = mapping
+        args["return_dtypes"] = return_dtypes
 
         transformer = uninitialized_transformers[self.transformer_name](**args)
 

@@ -453,7 +453,7 @@ class GenericFitTests:
             ),
         ):
             uninitialized_transformers[self.transformer_name](
-                unexpected_kwarg="spanish inquisition",
+                unexpected_kwarg=True,
                 **minimal_attribute_dict[self.transformer_name],
             )
 
