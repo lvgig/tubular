@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import warnings
 from collections import OrderedDict
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 import narwhals as nw
 import numpy as np
 import pandas as pd
+import polars as pl
+from beartype import beartype
 from pandas.api.types import is_categorical_dtype
 
 from tubular.base import BaseTransformer
@@ -63,32 +65,36 @@ class BaseMappingTransformer(BaseTransformer):
         "Float64",
     ]
 
+    @beartype
     def __init__(
         self,
-        mappings: dict[str, dict],
-        return_dtypes: dict[str, RETURN_DTYPES] | None = None,
-        **kwargs: dict[str, bool],
+        mappings: dict[str, dict[Union[str, float, int], Union[str, float, int]]],
+        return_dtypes: Union[dict[str, RETURN_DTYPES], None] = None,
+        **kwargs: Optional[bool],
     ) -> None:
-        if isinstance(mappings, dict):
-            if not len(mappings) > 0:
-                msg = f"{self.classname()}: mappings has no values"
-                raise ValueError(msg)
-
-            for j in mappings.values():
-                if not isinstance(j, dict):
-                    msg = f"{self.classname()}: values in mappings dictionary should be dictionaries"
-                    raise ValueError(msg)
-
-            self.mappings = mappings
-
-        else:
-            msg = f"{self.classname()}: mappings must be a dictionary"
+        if not len(mappings) > 0:
+            msg = f"{self.classname()}: mappings has no values"
             raise ValueError(msg)
 
+        self.mappings = mappings
+
         columns = list(mappings.keys())
+
+        # if return_dtypes is not provided, then infer from mappings
+        if not return_dtypes:
+            return_dtypes = self._infer_return_types(mappings)
+
         self.return_dtypes = return_dtypes
 
         super().__init__(columns=columns, **kwargs)
+
+    @staticmethod
+    def _infer_return_types(
+        mappings: dict[str, dict[str, str | float | int]],
+    ) -> dict[str, str]:
+        "infer return_dtypes from provided mappings"
+        print(mappings)
+        return {col: str(pl.Series(mappings[col].values()).dtype) for col in mappings}
 
     @nw.narwhalify
     def transform(self, X: FrameT) -> FrameT:

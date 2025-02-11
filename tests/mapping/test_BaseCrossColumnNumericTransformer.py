@@ -36,6 +36,37 @@ class BaseCrossColumnNumericTransformerInitTests(
         ):
             uninitialized_transformers[self.transformer_name](**args)
 
+    def test_inferred_return_dtypes(
+        self,
+        uninitialized_transformers,
+        minimal_attribute_dict,
+    ):
+        """test that return_dtypes are inferred correctly if not provided - test is
+        overloaded as these transformers can only handle numeric types
+        """
+
+        kwargs = minimal_attribute_dict[self.transformer_name]
+        kwargs["mappings"] = {
+            "a": {"a": 1, "b": 2},
+            "c": {"d": 1.0, "e": 2.0},
+        }
+        kwargs["return_dtypes"] = None
+
+        transformer = uninitialized_transformers[self.transformer_name](
+            **kwargs,
+        )
+
+        expected = {
+            "a": "Int64",
+            "c": "Float64",
+        }
+
+        actual = transformer.return_dtypes
+
+        assert (
+            actual == expected
+        ), f"return_dtypes attr not inferred as expected, expected {expected} but got {actual}"
+
 
 class BaseCrossColumnNumericTransformerTransformTests(
     BaseCrossColumnMappingTransformerTransformTests,
