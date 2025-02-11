@@ -86,18 +86,17 @@ class GenericNominalTransformTests(GenericTransformTests):
         assert_frame_equal_dispatch(df, d.create_df_1(library=library))
 
     @pytest.mark.parametrize(
-        "minimal_dataframe_lookup",
+        "library",
         ["pandas"],
-        indirect=True,
     )
     def test_pandas_index_not_updated(
         self,
         initialized_transformers,
-        minimal_dataframe_lookup,
+        library,
     ):
         """Test that the original (pandas) dataframe index is not transformed when transform method used."""
 
-        df = d.create_df_1()
+        df = d.create_df_1(library=library)
 
         x = initialized_transformers[self.transformer_name]
 

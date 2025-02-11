@@ -1,3 +1,5 @@
+import datetime
+
 import numpy as np
 import pandas as pd
 import polars as pl
@@ -47,6 +49,13 @@ def test_type_alignment():
         "g": [True, None],
         # None
         "h": [None, None],
+        # date
+        "i": [datetime.date(2020, 5, 1), datetime.date(2021, 5, 1)],
+        # datetime
+        "j": [
+            datetime.datetime(1993, 9, 27, tzinfo=datetime.timezone.utc),
+            datetime.datetime(1995, 9, 27, tzinfo=datetime.timezone.utc),
+        ],
     }
 
     expected_pandas_types = {
@@ -59,6 +68,8 @@ def test_type_alignment():
         "f": bool,
         "g": object,
         "h": object,
+        "i": "date32[day][pyarrow]",
+        "j": "datetime64[ns, UTC]",
     }
 
     expected_polars_types = {
@@ -71,6 +82,8 @@ def test_type_alignment():
         "f": pl.Boolean,
         "g": pl.Boolean,
         "h": pl.Null,
+        "i": pl.Date,
+        "j": pl.Datetime,
     }
 
     pandas_output = dataframe_init_dispatch(library="pandas", dataframe_dict=df_dict)
@@ -82,7 +95,6 @@ def test_type_alignment():
     ), "dataframe_init_dispatch: polars and pandas output should have same columns for same input dataframe_dict"
 
     for col in pandas_output:
-        print(col)
         assert pandas_output[col].dtype == expected_pandas_types[col]
 
         assert polars_output[col].dtype == expected_polars_types[col]
