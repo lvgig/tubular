@@ -1123,6 +1123,7 @@ class OneHotEncodingTransformer(
     def __init__(
         self,
         columns: str | list[str] | None = None,
+        values: list[str] | None = None,
         separator: str = "_",
         drop_original: bool = False,
         copy: bool | None = None,
