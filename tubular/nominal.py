@@ -1088,7 +1088,7 @@ class OneHotEncodingTransformer(
         columns in X are used.
 
     values: list of strings or None, default = None
-        Optional parameter to select specific columns to be transformed. If it is None, all categorical columns will be encoded.
+        Optional parameter to select specific column levels to be transformed. If it is None, all levels in the categorical column will be encoded.
 
     separator : str
         Used to create dummy column names, the name will take
@@ -1126,7 +1126,7 @@ class OneHotEncodingTransformer(
     def __init__(
         self,
         columns: str | list[str] | None = None,
-        values: list[str] | None = None,
+        values: dict[str, list[str]] | None = None,
         separator: str = "_",
         drop_original: bool = False,
         copy: bool | None = None,
@@ -1189,25 +1189,23 @@ class OneHotEncodingTransformer(
             # for consistency
             levels_list.sort()
 
-            self.categories_[c] = levels_list
+            # filter if 'values' is provided
+            if self.values is not None:
+                selected_values = self.values.get(c, None)
 
-            self.new_feature_names_[c] = self._get_feature_names(column=c)
+                if selected_values is not None:
+                    levels_list = [
+                        level for level in levels_list if level in selected_values
+                    ]
 
-        # filter categories if values is provided
-        if self.values is not None:
-            self.categories_ = {
-                c: self.categories_[c] for c in self.values if c in self.categories_
-            }
-            self.new_feature_names_ = {
-                c: self.new_feature_names_[c]
-                for c in self.values
-                if c in self.new_feature_names_
-            }
+            if levels_list:
+                self.categories_[c] = levels_list
 
-        # checks if column in 'values' exist in categories
-        if not self.categories_:
-            error_message = "No valid columns in 'values' for encoding"
-            raise ValueError(error_message)
+                self.new_feature_names_[c] = self._get_feature_names(column=c)
+
+            if not self.categories_:
+                error_message = "No valid categories found in 'values' for encoding"
+                raise ValueError(error_message)
 
         return self
 
