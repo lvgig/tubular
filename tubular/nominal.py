@@ -1087,6 +1087,9 @@ class OneHotEncodingTransformer(
         Names of columns to transform. If the default of None is supplied all object and category
         columns in X are used.
 
+    values: list of strings or None, default = None
+        Optional parameter to select specific columns to be transformed. If it is None, all categorical columns will be encoded.
+
     separator : str
         Used to create dummy column names, the name will take
         the format [categorical feature][separator][category level]
@@ -1138,6 +1141,7 @@ class OneHotEncodingTransformer(
             **kwargs,
         )
 
+        self.values = values
         self.set_drop_original_column(drop_original)
         self.check_and_set_separator_column(separator)
 
@@ -1188,6 +1192,22 @@ class OneHotEncodingTransformer(
             self.categories_[c] = levels_list
 
             self.new_feature_names_[c] = self._get_feature_names(column=c)
+
+        # filter categories if values is provided
+        if self.values is not None:
+            self.categories_ = {
+                c: self.categories_[c] for c in self.values if c in self.categories_
+            }
+            self.new_feature_names_ = {
+                c: self.new_feature_names_[c]
+                for c in self.values
+                if c in self.new_feature_names_
+            }
+
+        # checks if column in 'values' exist in categories
+        if not self.categories_:
+            error_message = "No valid columns in 'values' for encoding"
+            raise ValueError(error_message)
 
         return self
 
