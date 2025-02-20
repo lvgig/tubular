@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Literal
 import narwhals as nw
 import numpy as np
 import pandas as pd
+from beartype import beartype
 
 from tubular.base import BaseTransformer
 from tubular.mapping import BaseMappingTransformMixin
@@ -1087,7 +1088,7 @@ class OneHotEncodingTransformer(
         Names of columns to transform. If the default of None is supplied all object and category
         columns in X are used.
 
-    values: list of strings or None, default = None
+    values: dict[str, list[str] or None , default = None
         Optional parameter to select specific column levels to be transformed. If it is None, all levels in the categorical column will be encoded.
 
     separator : str
@@ -1123,6 +1124,7 @@ class OneHotEncodingTransformer(
 
     FITS = True
 
+    @beartype
     def __init__(
         self,
         columns: str | list[str] | None = None,
@@ -1189,23 +1191,16 @@ class OneHotEncodingTransformer(
             # for consistency
             levels_list.sort()
 
-            # filter if 'values' is provided
-            if self.values is not None:
-                selected_values = self.values.get(c, None)
+            # categories if 'values' is provided
+            selected_values = self.values.get(c, None) if self.values else None
 
-                if selected_values is not None:
-                    levels_list = [
-                        level for level in levels_list if level in selected_values
-                    ]
+            if selected_values is None:
+                final_categories = levels_list
+            else:
+                final_categories = selected_values
 
-            if levels_list:
-                self.categories_[c] = levels_list
-
-                self.new_feature_names_[c] = self._get_feature_names(column=c)
-
-            if not self.categories_:
-                error_message = "No valid categories found in 'values' for encoding"
-                raise ValueError(error_message)
+            self.categories_[c] = final_categories
+            self.new_feature_names_[c] = self._get_feature_names(column=c)
 
         return self
 
@@ -1278,6 +1273,22 @@ class OneHotEncodingTransformer(
                 nw.lit(0).alias(c + self.separator + str(missing_level))
                 for missing_level in missing_levels[c]
             )
+
+            # find user-defined values not present in dataset
+            missing_values = set(self.categories_[c]).difference(present_levels)
+
+            if missing_values:
+                warnings.warn(
+                    f"{self.classname()}: column {c} includes user-specified values not found in the dataset: {missing_values}."
+                    "These will be encoded with all zeros.",
+                    UserWarning,
+                    stacklevel=2,
+                )
+
+            # assign 0 for missing user-defined values
+            for missing_value in missing_values:
+                missing_col_name = c + self.separator + str(missing_value)
+                X = X.with_columns(nw.lit(0).alias(missing_col_name))
 
             wanted_dummies = self.new_feature_names_[c]
 
