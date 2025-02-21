@@ -1126,7 +1126,7 @@ class OneHotEncodingTransformer(
     def __init__(
         self,
         columns: str | list[str] | None = None,
-        values: dict[str, list[str]] | None = None,
+        wanted_values: dict[str, list[str]] | None = None,
         separator: str = "_",
         drop_original: bool = False,
         copy: bool | None = None,
@@ -1140,23 +1140,30 @@ class OneHotEncodingTransformer(
             copy=copy,
             **kwargs,
         )
-        if not isinstance(values, dict):
-            msg = "Values should be a dictionary"
-            raise TypeError(msg)
-        
-        for key, val_list in values.items():
-            # check key is a string
-            if not isinstance(key, str):
-                msg="Key in 'values' should be a string"
-                raise TypeError(msg)
-            
-            # check value is a list
-            if not isinstance(val_list, list):
-                msg = "Values in the 'values' disctionary should be a list"
-                raise TypeError(msg)
-            
 
-        self.values = values
+        if wanted_values is not None:
+            if not isinstance(wanted_values, dict):
+                msg = "Wanted_values should be a dictionary"
+                raise TypeError(msg)
+
+            for key, val_list in wanted_values.items():
+                # check key is a string
+                if not isinstance(key, str):
+                    msg = "Key in 'wanted_values' should be a string"
+                    raise TypeError(msg)
+
+                # check value is a list
+                if not isinstance(val_list, list):
+                    msg = "Values in the 'wanted_values' dictionary should be a list"
+                    raise TypeError(msg)
+
+                # check if each value within the list is a string
+                for val in val_list:
+                    if not isinstance(val, str):
+                        msg = "Entries in 'wanted_values' list should be a string "
+                        raise TypeError(msg)
+
+        self.wanted_values = wanted_values
         self.set_drop_original_column(drop_original)
         self.check_and_set_separator_column(separator)
 
@@ -1205,7 +1212,9 @@ class OneHotEncodingTransformer(
             levels_list.sort()
 
             # categories if 'values' is provided
-            selected_values = self.values.get(c, None) if self.values else None
+            selected_values = (
+                self.wanted_values.get(c, None) if self.wanted_values else None
+            )
 
             if selected_values is None:
                 final_categories = levels_list
@@ -1214,32 +1223,23 @@ class OneHotEncodingTransformer(
 
             self.categories_[c] = final_categories
             self.new_feature_names_[c] = self._get_feature_names(column=c)
+        missing_levels = {}
+        present_levels = set(X.select(nw.col(c).unique()).get_column(c).to_list())
+        missing_levels = self.warn_missing_levels(present_levels, c, missing_levels)
 
         return self
 
     def warn_missing_levels(
-        self,
-        X: FrameT,
-        c: str,
-        missing_levels: dict[str, list[str]]):
-        # print warning for unseen levels
-        present_levels = set(X.select(nw.col(c).unique()).get_column(c).to_list())
-        unseen_levels = present_levels.difference(set(self.categories_[c]))
+        self, present_levels, c: str, missing_levels: dict[str, list[str]]
+    ):
+        # print warning for missing levels
         missing_levels[c] = list(
             set(self.categories_[c]).difference(present_levels),
         )
-        if len(unseen_levels) > 0:
-            warning_msg = (
-                f"{self.classname()}: column {c} has unseen categories: {unseen_levels}"
-            )
-            warnings.warn(warning_msg, UserWarning, stacklevel=2)
         if missing_levels:
-            warning_msg: (
-                f"{self.classname()}: column '{c}' includes user-specified values not found in the dataset: {missing_levels}."
-                "They will be encoded with all zeros"
-            )
+            warning_msg = (f"{self.classname()}: column {c} includes user-specified values not found in the dataset")
             warnings.warn(warning_msg, UserWarning, stacklevel=2)
-        
+
         return missing_levels
 
     def _get_feature_names(
@@ -1260,7 +1260,7 @@ class OneHotEncodingTransformer(
         ]
 
     @nw.narwhalify
-    def transform(self, X: FrameT) -> FrameT:
+    def transform(self, X: FrameT, present_levels) -> FrameT:
         """Create new dummy columns from categorical fields.
 
         Parameters
@@ -1290,8 +1290,11 @@ class OneHotEncodingTransformer(
                     f"{self.classname()}: column %s has nulls - replace before proceeding"
                     % c,
                 )
-
-            missing_levels = self.warn_missing_levels(X, c, missing_levels)
+            # print warning for unseen levels
+            unseen_levels = present_levels.difference(set(self.categories_[c]))
+            if len(unseen_levels) > 0:
+                warning_msg = f"{self.classname()}: column {c} has unseen categories: {unseen_levels}"
+                warnings.warn(warning_msg, UserWarning, stacklevel=2)
 
             dummies = X.get_column(c).to_dummies(separator=self.separator)
 
