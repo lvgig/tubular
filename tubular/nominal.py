@@ -1141,7 +1141,20 @@ class OneHotEncodingTransformer(
             **kwargs,
         )
         if not isinstance(values, dict):
-            raise TypeError("Values should be a dictionary")
+            msg = "Values should be a dictionary"
+            raise TypeError(msg)
+        
+        for key, val_list in values.items():
+            # check key is a string
+            if not isinstance(key, str):
+                msg="Key in 'values' should be a string"
+                raise TypeError(msg)
+            
+            # check value is a list
+            if not isinstance(val_list, list):
+                msg = "Values in the 'values' disctionary should be a list"
+                raise TypeError(msg)
+            
 
         self.values = values
         self.set_drop_original_column(drop_original)
@@ -1204,7 +1217,11 @@ class OneHotEncodingTransformer(
 
         return self
 
-    def warn_missing_levels(self, X: FrameT, c: str, missing_levels: dict[str, list[str]])-> None:
+    def warn_missing_levels(
+        self,
+        X: FrameT,
+        c: str,
+        missing_levels: dict[str, list[str]]):
         # print warning for unseen levels
         present_levels = set(X.select(nw.col(c).unique()).get_column(c).to_list())
         unseen_levels = present_levels.difference(set(self.categories_[c]))
@@ -1212,11 +1229,18 @@ class OneHotEncodingTransformer(
             set(self.categories_[c]).difference(present_levels),
         )
         if len(unseen_levels) > 0:
-            warning_msg= (f"{self.classname()}: column {c} has unseen categories: {unseen_levels}")
-            warnings.warn(warning_msg,
-                UserWarning,
-                stacklevel=2,
+            warning_msg = (
+                f"{self.classname()}: column {c} has unseen categories: {unseen_levels}"
             )
+            warnings.warn(warning_msg, UserWarning, stacklevel=2)
+        if missing_levels:
+            warning_msg: (
+                f"{self.classname()}: column '{c}' includes user-specified values not found in the dataset: {missing_levels}."
+                "They will be encoded with all zeros"
+            )
+            warnings.warn(warning_msg, UserWarning, stacklevel=2)
+        
+        return missing_levels
 
     def _get_feature_names(
         self,
@@ -1267,18 +1291,7 @@ class OneHotEncodingTransformer(
                     % c,
                 )
 
-            # print warning for unseen levels
-            present_levels = set(X.select(nw.col(c).unique()).get_column(c).to_list())
-            unseen_levels = present_levels.difference(set(self.categories_[c]))
-            missing_levels[c] = list(
-                set(self.categories_[c]).difference(present_levels),
-            )
-            if len(unseen_levels) > 0:
-                warnings.warn(
-                    f"{self.classname()}: column {c} has unseen categories: {unseen_levels}",
-                    UserWarning,
-                    stacklevel=2,
-                )
+            missing_levels = self.warn_missing_levels(X, c, missing_levels)
 
             dummies = X.get_column(c).to_dummies(separator=self.separator)
 
@@ -1287,22 +1300,6 @@ class OneHotEncodingTransformer(
                 nw.lit(0).alias(c + self.separator + str(missing_level))
                 for missing_level in missing_levels[c]
             )
-
-            # find user-defined values not present in dataset
-            missing_values = set(self.categories_[c]).difference(present_levels)
-
-            if missing_values:
-                warnings.warn(
-                    f"{self.classname()}: column {c} includes user-specified values not found in the dataset: {missing_values}."
-                    "These will be encoded with all zeros.",
-                    UserWarning,
-                    stacklevel=2,
-                )
-
-            # assign 0 for missing user-defined values
-            for missing_value in missing_values:
-                missing_col_name = c + self.separator + str(missing_value)
-                X = X.with_columns(nw.lit(0).alias(missing_col_name))
 
             wanted_dummies = self.new_feature_names_[c]
 
