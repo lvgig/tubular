@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Literal
 import narwhals as nw
 import numpy as np
 import pandas as pd
-from beartype import beartype
 
 from tubular.base import BaseTransformer
 from tubular.mapping import BaseMappingTransformMixin
@@ -1124,7 +1123,6 @@ class OneHotEncodingTransformer(
 
     FITS = True
 
-    @beartype
     def __init__(
         self,
         columns: str | list[str] | None = None,
@@ -1142,6 +1140,8 @@ class OneHotEncodingTransformer(
             copy=copy,
             **kwargs,
         )
+        if not isinstance(values, dict):
+            raise TypeError("Values should be a dictionary")
 
         self.values = values
         self.set_drop_original_column(drop_original)
@@ -1203,6 +1203,20 @@ class OneHotEncodingTransformer(
             self.new_feature_names_[c] = self._get_feature_names(column=c)
 
         return self
+
+    def warn_missing_levels(self, X: FrameT, c: str, missing_levels: dict[str, list[str]])-> None:
+        # print warning for unseen levels
+        present_levels = set(X.select(nw.col(c).unique()).get_column(c).to_list())
+        unseen_levels = present_levels.difference(set(self.categories_[c]))
+        missing_levels[c] = list(
+            set(self.categories_[c]).difference(present_levels),
+        )
+        if len(unseen_levels) > 0:
+            warning_msg= (f"{self.classname()}: column {c} has unseen categories: {unseen_levels}")
+            warnings.warn(warning_msg,
+                UserWarning,
+                stacklevel=2,
+            )
 
     def _get_feature_names(
         self,
